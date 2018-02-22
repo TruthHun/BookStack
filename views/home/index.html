@@ -8,17 +8,7 @@
     {{template "widgets/header.html" .}}
     <div class="container manual-body" style="overflow-x: hidden !important;;">
         <div class="row">
-            {{if gt (.Labels|len) 1000000}}
-            <div class="hide tag-container-outer">
-                <span class="title">热门标签：</span>
-                <span class="tags">
-                    {{range  $index,$item := .Labels}}
-                    <a href="{{urlfor "LabelController.Index" ":key" $item.LabelName}}">{{$item.LabelName}}<span class="detail">{{$item.BookNumber}}</span></a>
-                    {{end}}
-                </span>
-            </div>
 
-            {{end}}
 
             <div class="manual-list">
                 {{range $index,$item := .Lists}}
@@ -27,7 +17,7 @@
                     <dl class="manual-item-standard">
                         <dt>
                             <a class="clearfix tooltips" href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" target="_blank" >
-                                <img class="img-responsive border-cover-img" src="{{$.OssDomain}}{{$item.Cover}}/cover" class="cover" alt="{{$item.BookName}}">
+                                <img class="img-responsive border-cover-img" onerror="this.src='/static/images/book.png'" src="{{$.OssDomain}}{{$item.Cover}}/cover" class="cover" alt="{{$item.BookName}}">
                             </a>
                         </dt>
                         <dd>
