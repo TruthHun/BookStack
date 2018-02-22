@@ -1,0 +1,21 @@
+<div class="modal fade" id="ModalDownload" tabindex="-1" role="dialog" aria-labelledby="ModalDownloadLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="ModalDownloadLabel">文档下载</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
+                <div class="help-block">
+                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> PDF文档</a>
+                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> EPUB文档</a>
+                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> MOBI文档</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">关闭窗口</button>
+            </div>
+        </div>
+    </div>
+</div>

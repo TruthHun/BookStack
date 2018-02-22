@@ -1,0 +1,57 @@
+# 第三方登录配置
+[oauth]
+
+##### Gitee(码云) ####
+# 申请地址（需要先登录）：https://gitee.com/oauth/applications
+
+# 您的ClientId
+giteeClientId=
+
+# 您的ClientSecret
+giteeClientSecret=
+
+# 回调地址，把下面的bookstack.cn的域名换成你的即可
+giteeCallback=http://www.bookstack.cn/login/gitee
+
+# 下面这两项不要动
+giteeAccesstoken=https://gitee.com/oauth/token
+giteeUserInfo=https://gitee.com/api/v5/user
+
+
+
+######## GitHub ########
+# 申请地址(需要先登录你的GitHub)：https://github.com/settings/developers
+
+# 您的ClientId
+githubClientId=
+
+# 您的ClientSecret
+githubClientSecret=
+
+# 回调地址，把下面的bookstack.cn的域名换成你的即可
+githubCallback=http://www.bookstack.cn/login/github
+
+# 下面这两项不要动
+githubAccesstoken=https://github.com/login/oauth/access_token
+githubUserInfo=https://api.github.com/user
+
+
+
+#### QQ ####
+# 申请地址（需要先登录你的QQ）:https://connect.qq.com/manage.html
+
+#ClientId，即 APP ID
+qqClientId=
+
+#ClientSecret，即 APP Key
+qqClientSecret=
+
+# 回调地址，把下面的bookstack.cn的域名换成你的即可
+qqCallback=http://www.bookstack.cn/login/qq
+
+# 下面这三项不要动
+qqAccesstoken=https://graph.qq.com/oauth2.0/token
+qqOpenId=https://graph.qq.com/oauth2.0/me
+qqUserInfo=https://graph.qq.com/user/get_user_info
+
+### TODO 微信和微博登录，主要是我这边忘记了以前注册的个人开发者信息，当前没开发，后续会开发出来 ####

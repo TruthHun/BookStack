@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+{{template "widgets/head.html" .}}
+</head>
+<body>
+<div class="manual-reader manual-container manual-search-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="search-head">
+            <strong class="search-title">显示标签为"{{.LabelName}}"的项目</strong>
+        </div>
+        <div class="row">
+            <div class="manual-list">
+                {{range $index,$item := .Lists}}
+                <div class="col-xs-6 col-sm-3 col-md-2">
+                    <dl class="manual-item-standard">
+                        <dt>
+                            <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" class="tooltips" target="_blank">
+                                <img src="{{$.OssDomain}}{{$item.Cover}}/cover" class="cover img-responsive border-cover-img" alt="{{$item.BookName}}">
+                            </a>
+                        </dt>
+                        <dd>
+                            <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" class="name tooltips" title="{{$item.BookName}}" target="_blank">{{$item.BookName}}</a>
+                        </dd>
+                        {{/*<dd>*/}}
+                            {{/*<span class="author">*/}}
+                                {{/*<b class="text">作者</b>*/}}
+                                {{/*<b class="text">-</b>*/}}
+                                {{/*<b class="text">{{$item.CreateName}}</b>*/}}
+                            {{/*</span>*/}}
+                        {{/*</dd>*/}}
+                    </dl>
+                </div>
+                {{end}}
+                <div class="clearfix"></div>
+            </div>
+            <div class="pagination-container">
+                {{.PageHtml}}
+            </div>
+        </div>
+    </div>
+</div>
+{{template "widgets/footer.html" .}}
+</body>
+</html>

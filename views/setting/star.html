@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {{template "widgets/head.html" .}}
+    <link href="{{$.StaticDomain}}/static/webuploader/webuploader.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="manual-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="row">
+
+            {{template "setting/menu.html" .}}
+
+            <div class="page-right">
+                <div class="m-box">
+                    <div class="box-head">
+                        <strong class="box-title">我的收藏</strong>
+                    </div>
+                </div>
+
+                <div id="bookList" class="box-body">
+                    <div class="book-list">
+                        {{range .Books}}
+                        <div class="list-item clearfix">
+                            <div class="col-sm-2 col-xs-12" style="padding-left: 0px;">
+                                <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" title="阅读文档">
+                                    <img src="{{$.StaticDomain}}{{.Cover}}/cover" alt="" class="img-responsive border-cover-img">
+                                </a>
+                            </div>
+                            <div class="col-sm-10 col-xs-12" style="padding-right: 0px; padding-left: 0px;">
+                                <div class="book-title">
+                                    <div class="pull-left">
+                                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="阅读文档" data-toggle="tooltip">
+                                            {{.BookName}}
+                                        </a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="info">
+                                    <span title="" data-toggle="tooltip" data-original-title="创建者"><i class="fa fa-user"></i> {{.Nickname}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="收藏人次"><i class="fa fa-heart"></i> {{.Star}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                    <span title="" data-toggle="tooltip" data-original-title="文档评分"><i class="fa fa-line-chart"></i> {{scoreFloat .Score}}</span>
+                                </div>
+                                <div class="desc-text">{{.Description}}</div>
+                                <div class="btns">
+                                    <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" target="_blank" class="btn btn-default btn-sm" title="阅读文档"><i class="fa fa-eye"></i> 阅读文档</a>
+                                    <a href="{{urlfor "BookController.Star" ":id" .BookId}}" data-toggle="tooltip" class="btn btn-default btn-sm ajax-get confirm" class="ajax-get" title="取消收藏"><i aria-hidden="true" class="fa fa-remove"></i> 取消收藏</a>
+                                </div>
+                            </div>
+                        </div>
+                        {{end}}
+                        <nav class="pagination-container">
+                            {{.PageHtml}}
+                        </nav>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Start Modal -->
+<div class="modal fade" id="upload-logo-panel" tabindex="-1" role="dialog" aria-labelledby="修改头像" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">修改头像</h4>
+            </div>
+            <div class="modal-body">
+                <div class="wraper">
+                    <div id="image-wraper">
+
+                    </div>
+                </div>
+                <div class="watch-crop-list">
+                    <div class="preview-title">预览</div>
+                    <ul>
+                        <li>
+                            <div class="img-preview preview-lg"></div>
+                        </li>
+                        <li>
+                            <div class="img-preview preview-sm"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <div class="modal-footer">
+                <span id="error-message"></span>
+                <div id="filePicker" class="btn">选择</div>
+                <button type="button" id="saveImage" class="btn btn-success" style="height: 40px;width: 77px;" data-loading-text="上传中...">上传</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+
+<script src="{{$.StaticDomain}}/static/webuploader/webuploader.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
+        <script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+        <script src="/static/js/main.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#upload-logo-panel").on("hidden.bs.modal",function () {
+            $("#upload-logo-panel").find(".modal-body").html(window.modalHtml);
+        }).on("show.bs.modal",function () {
+            window.modalHtml = $("#upload-logo-panel").find(".modal-body").html();
+        });
+
+
+        $("#memberInfoForm").ajaxForm({
+            beforeSubmit : function () {
+
+                var email = $.trim($("#userEmail").val());
+                if(!email){
+                    return showError('邮箱不能为空');
+                }
+                $("button[type='submit']").button('loading');
+            },
+            success : function (res) {
+                $("button[type='submit']").button('reset');
+                if(res.errcode === 0){
+                    showSuccess("保存成功");
+                }else{
+                    showError(res.message);
+                }
+            }
+        });
+
+        try {
+            var uploader = WebUploader.create({
+                auto: false,
+                swf: '/static/webuploader/Uploader.swf',
+                server: '{{urlfor "SettingController.Upload"}}',
+                pick: "#filePicker",
+                fileVal : "image-file",
+                fileNumLimit : 1,
+                compress : false,
+                accept: {
+                    title: 'Images',
+                    extensions: 'jpg,jpeg,png',
+                    mimeTypes: 'image/jpg,image/jpeg,image/png'
+                }
+            }).on("beforeFileQueued",function (file) {
+                uploader.reset();
+            }).on( 'fileQueued', function( file ) {
+                uploader.makeThumb( file, function( error, src ) {
+                    $img = '<img src="' + src +'" style="max-width: 360px;max-height: 360px;">';
+                    if ( error ) {
+                        $img.replaceWith('<span>不能预览</span>');
+                        return;
+                    }
+
+                    $("#image-wraper").html($img);
+                    window.ImageCropper = $('#image-wraper>img').cropper({
+                        aspectRatio: 1 / 1,
+                        dragMode : 'move',
+                        viewMode : 1,
+                        preview : ".img-preview"
+                    });
+                }, 1, 1 );
+            }).on("uploadError",function (file,reason) {
+                console.log(reason);
+                $("#error-message").text("上传失败:" + reason);
+
+            }).on("uploadSuccess",function (file, res) {
+
+                if(res.errcode === 0){
+                    console.log(res);
+                    $("#upload-logo-panel").modal('hide');
+                    $("#headimgurl").attr('src',res.data);
+                }else{
+                    $("#error-message").text(res.message);
+                }
+            }).on("beforeFileQueued",function (file) {
+                if(file.size > 1024*1024*2){
+                    uploader.removeFile(file);
+                    uploader.reset();
+                    alert("文件必须小于2MB");
+                    return false;
+                }
+            }).on("uploadComplete",function () {
+                $("#saveImage").button('reset');
+            });
+            $("#saveImage").on("click",function () {
+                var files = uploader.getFiles();
+                if(files.length > 0) {
+                    $("#saveImage").button('loading');
+                    var cropper = window.ImageCropper.cropper("getData");
+
+                    uploader.option("formData", cropper);
+
+                    uploader.upload();
+                }else{
+                    alert("请选择头像");
+                }
+            });
+        }catch(e){
+            console.log(e);
+        }
+    });
+</script>
+</body>
+</html>

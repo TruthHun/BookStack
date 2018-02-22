@@ -1,0 +1,153 @@
+# 程序名称
+appname = BookStack
+
+# 程序版本
+version = v1.0.0
+
+# 监听端口
+httpport = 8181
+
+# 运行模式。开发时，请设置为开发模式"dev"，即development；部署时，请设置为产品模式"prod"，即product。dev模式下，会打印各种调试信息
+runmode = dev
+
+# 是否开启session，这个必须开启，否则没法玩了。
+sessionon = true
+
+# session名称，这个你自己定。
+sessionname = bookstack
+copyrequestbody = true
+
+# 启动gzip压缩，则设置为true，否则设置为false。建议启动
+EnableGzip=true
+
+# 要压缩的静态文件扩展名，其中.xml是sitemap站点地图压缩。建议按照这个来就行了
+StaticExtensionsToGzip = .css, .js, .xml
+
+
+# 默认Session生成Key的秘钥
+beegoserversessionkey=bookstack
+
+########Session储存方式##############
+#以文件方式储存
+sessionprovider=file
+sessionproviderconfig=store/session
+
+# 静态目录。这个是站点地图的静态目录
+StaticDir = sitemap:sitemap
+
+#生成下载文档的时间间隔。也就是距离用户第一次点击生成下载文档到第二次点击生成下载文档的时间间隔，避免用户频繁点击生成下载文档而导致大量耗费服务器资源导致服务器宕机
+GenerateInterval=300
+
+# 站点可直接访问的静态文件【注意，这里千万不能配置.conf文件扩展名，否则会把.conf文件当做静态文件而被外部访问，导致数据库账号密码等泄露。按照默认的来即可】
+StaticExt=.txt,.xml,.ico,.png,.jpg,.jpeg,.gif,.html
+
+#评论时间间隔，每次发表评论，限定间隔秒数，避免被恶意刷评论
+CommentInterval=10
+
+# 生成下载文档时导出pdf文档的配置，这里建议把关于bookstack.cn的信息替换成你自己的就行，其他的建议不要动
+exportHeader=<p style='color:#8E8E8E;font-size:12px;'>_SECTION_</p>
+exportFooter=<p style='color:#8E8E8E;font-size:12px;'>本文档使用 <a href='http://www.bookstack.cn' style='text-decoration:none;color:#1abc9c;font-weight:bold;'>书栈(BookStack.CN)</a> 构建 <span style='float:right'>- _PAGENUM_ -</span></p>
+exportFontSize=14
+exportPaperSize=a4
+exportCreator=书栈(BookStack.CN)
+exportMarginLeft=72
+exportMarginRight=72
+exportMarginTop=72
+exportMarginBottom=72
+
+#时区设置
+timezone = Asia/Shanghai
+
+####################MySQL 数据库配置###########################
+db_adapter=mysql
+
+# 您的数据库host
+db_host=
+
+#您的数据库端口
+db_port=3306
+
+#您的数据库用户名
+db_username=
+
+# 您的数据库密码
+db_password=
+
+#您使用的数据库
+db_database=bookstack
+
+
+
+# 静态资源域名，没有则留空。比如你将static目录下的所有静态资源都放到了专门的服务器上，那么这个域名就行用来访问你的静态资源的域名。
+static_domain=http://static.bookstack.cn
+
+# 谷歌浏览器，用于发布内容的时候渲染未被渲染的markdown。建议安装最新版的Chrome浏览器，并把Chrome浏览器加入系统环境变量。
+# 使用Chrome的headless去处理。之前考虑使用phantomjs的，但是phantomjs有些小问题，不如Chrome强大。
+chrome=chromium-browser
+
+#项目默认封面
+cover=/static/images/book.png
+
+#默认头像
+avatar=/static/images/avatar.png
+
+#默认阅读令牌长度
+token_size=12
+
+#上传文件的后缀
+upload_file_ext=txt|doc|docx|xls|xlsx|ppt|pptx|pdf|7z|rar|jpg|jpeg|png|gif
+
+####################邮件配置######################
+#是否启用邮件
+enable_mail=true
+#每小时限制指定邮箱邮件发送次数
+mail_number=5
+#smtp服务用户名
+smtp_user_name=admin@bookstack.cn
+#smtp服务器地址
+smtp_host=smtpdm.aliyun.com
+#smtp密码
+smtp_password=BOOKSTACKi23456789c
+#端口号
+smtp_port=25
+#发送邮件的显示名称
+form_user_name=admin@bookstack.cn
+
+#接收回件的邮箱。留空则表示使用发送邮件的邮箱作为接收回件邮箱
+reply_user_name=bookstack@qq.com
+
+#邮件有效期30分钟
+mail_expired=30
+
+
+################Active Directory/LDAP################
+#是否启用ldap
+ldap_enable=false
+#ldap主机名
+ldap_host=ad.example.com
+#ldap端口
+ldap_port=3268
+#ldap内哪个属性作为用户名
+ldap_attribute=sAMAccountName
+#搜索范围
+ldap_base=DC=example,DC=com
+#第一次绑定ldap用户dn
+ldap_user=CN=ldap helper,OU=example.com,DC=example,DC=com
+#第一次绑定ldap用户密码
+ldap_password=superSecret
+#自动注册用户角色：0 超级管理员 /1 管理员/ 2 普通用户 
+ldap_user_role=2
+#ldap搜索filter规则,AD服务器: objectClass=User, openldap服务器: objectClass=posixAccount ,也可以定义为其他属性,如: title=mindoc
+ldap_filter=objectClass=posixAccount
+
+
+include "oss.conf"
+include "oauth.conf"
+
+
+
+
+
+
+
+

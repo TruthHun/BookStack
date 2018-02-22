@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>{{.Model.BookName}} - 书栈(BookStack.CN)</title>
+    <link href="editormd.css" rel="stylesheet">
+</head>
+<body>
+    <h1 id="article-title">{{.Doc.DocumentName}}</h1>
+    <div class="article-body markdown-body editormd-preview-container"  id="page-content">
+        {{str2html .Doc.Release}}
+    </div>
+</body>
+</html>

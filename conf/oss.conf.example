@@ -1,0 +1,25 @@
+# 阿里云OSS配置
+[oss]
+
+# 是否是内网，如果您的阿里云服务器和OSS是同一内网，请设置为true，这样能更快地将文件移到oss上，否则设置为false。
+# 一般情况下，在开发阶段，设置为false
+IsInternal=false
+
+# 内网Endpoint,如：oss-cn-hongkong-internal.aliyuncs.com
+EndpointInternal=
+
+# 外网Endpoint，如：oss-cn-hongkong.aliyuncs.com
+EndpointOuter=
+
+
+# 您的阿里云AccessKeyId
+AccessKeyId=
+
+# 您的阿里云AccessKeySecret
+AccessKeySecret=
+
+# 只读状态的Bucket，不要私有的，也不要公共读写的
+Bucket=
+
+# oss中绑定的域名，如果您没有绑定域名，则使用阿里云oss的自带域名也行
+Domain=

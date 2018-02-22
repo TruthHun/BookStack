@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{.SeoTitle}}</title>
+    <meta name="keywords" content="{{.SeoKeywords}}"/>
+    <meta name="description" content="{{.SeoDescription}}"/>
+
+{{/*<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">*/}}
+{{/*<link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">*/}}
+    <link href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="{{$.StaticDomain}}/static/jstree/3.3.4/themes/default/style.min.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/nprogress/nprogress.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/css/jstree.css" rel="stylesheet">
+    {{if eq .Model.Editor "markdown"}}
+    <link href="{{$.StaticDomain}}/static/editor.md/css/editormd.preview.css" rel="stylesheet">
+    <!--<link href="/static/prettify/themes/atelier-estuary-dark.min.css" rel="stylesheet">-->
+    {{/*<link href="/static/css/markdown.preview.css" rel="stylesheet">*/}}
+    {{else}}
+    <link href="{{$.StaticDomain}}/static/highlight/styles/zenburn.css" rel="stylesheet">
+    {{end}}
+    <link href="{{$.StaticDomain}}/static/css/toast.css" rel="stylesheet">
+    <link href="/static/css/bookstack.css" rel="stylesheet">
+
+{{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+{{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+
+    <style>
+        .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
+            display: block;
+            white-space: pre;
+        }
+        li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
+        .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint{border-color: #efefef;}
+        body{-webkit-overflow-scrolling:touch;}
+    </style>
+</head>
+<body>
+<div class="m-manual manual-mode-view manual-reader">
+
+    <header class="navbar navbar-static-top manual-head" role="banner">
+        <div class="container-fluid">
+            <div class="navbar-header pull-left manual-title">
+                <span class="slidebar" id="slidebar"><i class="fa fa-align-justify"></i></span>
+                <a href="{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" title="{{.Model.BookName}}" class="book-title">{{.Model.BookName}}</a>
+                <span style="font-size: 12px;font-weight: 100;"></span>
+            </div>
+            <div class="navbar-header pull-right manual-menu">
+                <div class="bookstack-item">
+                    {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
+                    <a title="首页" href="/" class="btn btn-default"><i class="fa fa-home"></i> 首页</a>
+                    <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-default"><i class="fa fa-cloud-download"></i> 下载</a>
+                    <a href="{{urlfor "BookController.Star" ":id" .Model.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
+                    {{if eq (doesStar $.Member.MemberId $.Model.BookId) true}}
+                        <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
+                    {{else}}
+                        <i class="fa fa-heart-o"></i> <span style="color: #333;">收藏</span>
+                    {{end}}
+                    </a>
+                    {{if eq $.Member.MemberId $.Model.MemberId}}
+                        <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </header>
+    <article class="container-fluid manual-body">
+
+        <div class="manual-right">
+            <div class="manual-article">
+                <div class="article-head">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-2">
+
+                            </div>
+                            <div class="col-md-8 text-center">
+                                <h1 id="article-title">{{.Title}}</h1>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <div class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
+                    {{.Content}}
+                    </div>
+                    <div class="row hung-read-link">
+                        <div class="col-xs-12 hung-pre">
+                            <span class="text-muted">上一篇:</span><a href="#"></a>
+                        </div>
+                        <div class="col-xs-12 hung-next">
+                            <span class="text-muted">下一篇:</span><a href="#"></a>
+                        </div>
+                    </div>
+                    {{/*<div class="jump-top">*/}}
+                        {{/*<a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>*/}}
+                    {{/*</div>*/}}
+                    <div class="bookstack-bars">
+                        <ul>
+                            <li class="visible-xs"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
+                            <li class="visible-xs">
+                                <a href="{{urlfor "BookController.Star" ":id" .Model.BookId}}" rel="nofollow" class="ajax-star">
+                                {{if eq (doesStar $.Member.MemberId $.Model.BookId) true}}
+                                    <i class="fa fa-heart"></i>
+                                {{else}}
+                                    <i class="fa fa-heart-o"></i>
+                                {{end}}
+                                </a>
+                            </li>
+                            <li class="visible-xs">
+                                <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload"><i class="fa fa-cloud-download"></i></a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="manual-left">
+            <div class="manual-tab">
+                <div class="tab-navg">
+                    <span data-mode="view" class="navg-item active"><i class="fa fa-align-justify"></i><b class="text">目录</b></span>
+                    <span data-mode="search" class="navg-item"><i class="fa fa-search"></i><b class="text">搜索</b></span>
+                </div>
+                <div class="tab-util">
+                    <span class="manual-fullscreen-switch">
+                        <b class="open fa fa-angle-right" title="展开"></b>
+                        <b class="close fa fa-angle-left" title="关闭"></b>
+                    </span>
+                </div>
+                <div class="tab-wrap">
+                    <div class="tab-item manual-catalog">
+                        <div class="catalog-list read-book-preview" id="sidebar">
+                        {{.Result}}
+                        </div>
+
+                    </div>
+                    <div class="tab-item manual-search">
+                        <div class="search-container">
+                            <div class="search-form">
+                                <form id="searchForm" action="{{urlfor "DocumentController.Search" ":key" .Model.Identify}}" method="post">
+                                    <div class="form-group">
+                                        <input type="search" placeholder="请输入搜索关键字" class="form-control" name="keyword">
+                                        <button type="submit" class="btn btn-default btn-search" id="btnSearch">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="search-result">
+                                <div class="search-empty">
+                                    <i class="fa fa-search-plus" aria-hidden="true"></i>
+                                    <b class="text">暂无相关搜索结果！</b>
+                                </div>
+                                <ul class="search-list" id="searchList">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="m-copyright">
+                <p>
+                    本文档使用 <a href="//www.bookstack.cn" style="color: #0e8c8c;font-weight: bold" target="_blank">书栈(BookStack.CN)</a> 构建
+                </p>
+            </div>
+        </div>
+
+        <div class="manual-progress"><b class="progress-bar"></b></div>
+    </article>
+    <div class="manual-mask"></div>
+</div>
+<div id="menu-hidden" style="display: none;">
+{{.Result}}
+</div>
+
+{{template "widgets/download.html" .}}
+
+{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+<script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/jstree/3.3.4/jstree.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{$.StaticDomain}}/static/nprogress/nprogress.js"></script>
+<script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlight.js"></script>
+<script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlightjs-line-numbers.min.js"></script>
+<script type="text/javascript" src="{{$.StaticDomain}}/static/js/jquery.highlight.js"></script>
+<!-- <script type="text/javascript" src="/static/layer/layer.js"></script> -->
+{{/*<script src="{{cdnjs "/static/editor.md/editormd.min.js"}}" type="text/javascript"></script>*/}}
+<script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script type="text/javascript" src="/static/js/bookstack.js"></script>
+<script type="text/javascript" src="/static/js/main.js"></script>
+<script type="text/javascript">
+$(function () {
+    $("#searchList").on("click","a",function () {
+        var id = $(this).attr("data-id");
+        var url = "{{urlfor "DocumentController.Read" ":key" .Model.Identify ":id" ""}}/" + id;
+        $(this).parent("li").siblings().find("a").removeClass("active");
+        $(this).addClass("active");
+        loadDocument(url,id,function (body) {
+            return $(body).highlight(window.keyword);
+        });
+    });
+    //以https或者http开头的url链接，加上target='_blank'
+    $(".markdown-body").on("click","a",function (e) {
+        e.preventDefault();
+        var href=$(this).attr("href").toLowerCase();
+        if($(this).attr("target")=="_blank" ||href.indexOf("http://")==0 || href.indexOf("https://")==0 ){
+            window.open(href);
+        }else{
+            location.href=href;
+        }
+    });
+});
+</script>
+</body>
+</html>

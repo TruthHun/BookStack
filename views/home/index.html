@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {{template "widgets/head.html" .}}
+</head>
+<body>
+<div class="manual-reader manual-container">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body" style="overflow-x: hidden !important;;">
+        <div class="row">
+            {{if gt (.Labels|len) 1000000}}
+            <div class="hide tag-container-outer">
+                <span class="title">热门标签：</span>
+                <span class="tags">
+                    {{range  $index,$item := .Labels}}
+                    <a href="{{urlfor "LabelController.Index" ":key" $item.LabelName}}">{{$item.LabelName}}<span class="detail">{{$item.BookNumber}}</span></a>
+                    {{end}}
+                </span>
+            </div>
+
+            {{end}}
+
+            <div class="manual-list">
+                {{range $index,$item := .Lists}}
+                {{/*<div class="list-item">*/}}
+                <div class="col-xs-6 col-sm-3 col-md-2">
+                    <dl class="manual-item-standard">
+                        <dt>
+                            <a class="clearfix tooltips" href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" target="_blank" >
+                                <img class="img-responsive border-cover-img" src="{{$.OssDomain}}{{$item.Cover}}/cover" class="cover" alt="{{$item.BookName}}">
+                            </a>
+                        </dt>
+                        <dd>
+                            <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" class="name tooltips" title="{{$item.BookName}}" target="_blank">{{$item.BookName}}</a>
+                        </dd>
+                        {{/*<dd>*/}}
+                            {{/*<span class="author">*/}}
+                                {{/*<b class="text">作者</b>*/}}
+                                {{/*<b class="text">-</b>*/}}
+                                {{/*<b class="text">{{$item.CreateName}}</b>*/}}
+                            {{/*</span>*/}}
+                        {{/*</dd>*/}}
+                    </dl>
+                </div>
+                {{end}}
+                <div class="clearfix"></div>
+            </div>
+            <nav class="pagination-container">
+                {{if gt .TotalPages 1}}
+                {{.PageHtml}}
+                {{end}}
+                <div class="clearfix"></div>
+            </nav>
+        </div>
+    </div>
+</div>
+{{template "widgets/footer.html" .}}
+</body>
+</html>

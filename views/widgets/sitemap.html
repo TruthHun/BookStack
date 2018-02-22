@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+{{template "widgets/head.html" .}}
+    <style>
+        li.col-xs-12{display: block;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;
+            padding-left: 0px;line-height: 200%;}
+    </style>
+</head>
+<body>
+<div class="manual-reader manual-container">
+{{template "widgets/header.html" .}}
+    <div class="container" style="margin-top: 75px;">
+        <div class="row">
+            <ul>
+                {{range .Docs}}
+                <li class="col-sm-6 col-xs-12"><a href="{{urlfor "DocumentController.Read" ":key" .Identify ":id" .DocumentId}}" target="_blank" title="{{.DocumentName}}">{{.DocumentName}}</a></li>
+                {{end}}
+            </ul>
+        </div>
+        <div class="row">
+            <div class="pagination">
+                {{.PageHtml}}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

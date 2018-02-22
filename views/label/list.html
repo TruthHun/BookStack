@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+{{template "widgets/head.html" .}}
+</head>
+<body>
+<div class="manual-reader manual-container manual-search-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="search-head">
+            <strong class="search-title">显示标签列表</strong>
+        </div>
+        <div class="row">
+            {{if gt (.Labels|len) 0}}
+            <div class="hide tag-container-outer" style="border: 0;margin-top: 0;padding: 5px 15px;min-height: 200px;">
+                <span class="tags">
+                    {{range  $index,$item := .Labels}}
+                    <a href="{{urlfor "LabelController.Index" ":key" $item.LabelName}}">{{$item.LabelName}}<span class="detail">{{$item.BookNumber}}</span></a>
+                    {{end}}
+                </span>
+            </div>
+
+            {{end}}
+            <div class="pagination-container">
+                {{if gt .TotalPages 1}}
+                {{.PageHtml}}
+                {{end}}
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{{template "widgets/footer.html" .}}
+</body>
+</html>

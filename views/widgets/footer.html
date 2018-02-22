@@ -1,0 +1,54 @@
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 friend-links">
+                <span class="text-muted">友情链接</span>
+                <a href="http://www.myquant.cn" title="掘金量化" target="_blank">掘金量化</a>
+                <a href="http://wenku.it" title="IT文库" target="_blank">IT文库</a>
+                <a href="http://www.weiyoou.com" title="微友搜索网" target="_blank">微友搜索网</a>
+                <a href="http://www.wangpanzhijia.net" title="网盘之家" target="_blank">网盘之家</a>
+                <a href="http://www.hc-cms.com" title="HC-CMS" target="_blank">HC-CMS</a>
+            </div>
+            <div class="clearfix mgt-15px text-center">
+                <div class="col-xs-12 mgt-15px">
+
+                    <span><a target="_blank" title="赞助书栈" href="/read/help/support">赞助书栈</a> </span>
+                    <span>&nbsp;·&nbsp;</span>
+                    <span><a target="_blank" title="使用帮助" href="/books/help">使用帮助</a> </span>
+                    <span>&nbsp;·&nbsp;</span>
+                    <span><a target="_blank" title="关于我们" href="/read/help/about">关于我们</a> </span>
+                    <span>&nbsp;·&nbsp;</span>
+                    <span><a target="_blank" title="联系我们" href="/read/help/contact">联系我们</a> </span>
+                </div>
+                <div class="col-xs-12 hidden-xs mgt-15px">
+                    <small class="text-muted">
+                        <span>Modified By <a target="_blank" title="BookStack" href="http://www.bookstack.cn">BookStack</a> </span>
+                        <span>&nbsp;·&nbsp;</span>
+                        <span>Powered By <a href="https://www.iminho.me" TARGET="_blank" title="MinDoc">MinDoc</a></span>
+                    </small>
+                </div>
+                <div class="col-xs-12 mgt-15px  text-center">
+                    <div class="help-block">{{$.ICP}}</div>
+                    <div class="help-block">
+                        <small><a target="_blank" class="text-muted" title="站点地图" href="/sitemap.xml">站点地图</a></small>
+                        {{/*<small><a target="_blank" class="text-muted" title="站点地图" href="{{urlfor "BaseController.Sitemap"}}">站点地图</a></small>*/}}
+                    </div>
+                    <div class="help-block">{{str2html $.TONGJI}}</div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        $(".tooltips").tooltip();
+    })
+</script>
