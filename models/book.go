@@ -35,13 +35,13 @@ type Book struct {
 	Theme             string    `orm:"column(theme);size(255);default(default)" json:"theme"`              //主题风格
 	CreateTime        time.Time `orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` // CreateTime 创建时间 .
 	MemberId          int       `orm:"column(member_id);size(100)" json:"member_id"`
-	ModifyTime        time.Time `orm:"type(datetime);column(modify_time)" json:"modify_time"`
-	ReleaseTime       time.Time `orm:"type(datetime);column(release_time)" json:"release_time"`   //项目发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
-	GenerateTime      time.Time `orm:"type(datetime);column(generate_time)" json:"generate_time"` //下载文档生成时间
-	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`       //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
-	Version           int64     `orm:"type(bigint);column(version)" json:"version"`
-	Vcnt              int       `orm:"column(vcnt)" json:"vcnt"`               //文档项目被阅读次数
-	Star              int       `orm:"column(star)" json:"star"`               //文档项目被收藏次数
+	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now_add" json:"modify_time"`
+	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);null" json:"release_time"`   //项目发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
+	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);null" json:"generate_time"` //下载文档生成时间
+	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate);null" json:"-"`       //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
+	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
+	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`               //文档项目被阅读次数
+	Star              int       `orm:"column(star);default(0)" json:"star"`               //文档项目被收藏次数
 	Score             int       `orm:"column(score);default(40)" json:"score"` //文档项目评分，默认40，即4.0星
 	CntScore          int       //评分人数
 	CntComment        int       //评论人数
