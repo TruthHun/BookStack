@@ -13,6 +13,7 @@ import (
 	"github.com/TruthHun/gotil/sitemap"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"net/url"
 )
 
 var ModelOss = new(Oss)
@@ -130,7 +131,7 @@ func SitemapUpdate(domain string) {
 					bookIdentify = idtf
 				}
 				su = append(su, sitemap.SitemapUrl{
-					Loc:        domain + beego.URLFor("DocumentController.Read", ":key", bookIdentify, ":id", doc.Identify),
+					Loc:        domain + beego.URLFor("DocumentController.Read", ":key", bookIdentify, ":id", url.QueryEscape(doc.Identify)),
 					Lastmod:    doc.ModifyTime.Format("2006-01-02 15:04:05"),
 					ChangeFreq: sitemap.DAILY,
 					Priority:   0.9,
