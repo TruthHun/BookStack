@@ -101,7 +101,7 @@ func (m *Option) Init() error {
 
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLED_REGISTER").Exist() {
 		option := NewOption()
-		option.OptionValue = "false"
+		option.OptionValue = "true"
 		option.OptionName = "ENABLED_REGISTER"
 		option.OptionTitle = "是否启用注册"
 		if _, err := o.Insert(option); err != nil {
@@ -128,7 +128,7 @@ func (m *Option) Init() error {
 	}
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLE_ANONYMOUS").Exist() {
 		option := NewOption()
-		option.OptionValue = "false"
+		option.OptionValue = "true"
 		option.OptionName = "ENABLE_ANONYMOUS"
 		option.OptionTitle = "启用匿名访问"
 		if _, err := o.Insert(option); err != nil {
