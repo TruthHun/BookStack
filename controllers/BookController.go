@@ -455,9 +455,12 @@ func (this *BookController) Create() {
 		book.Cover = conf.GetDefaultCover()
 		book.Editor = "markdown"
 		book.Theme = "default"
-		book.GenerateTime=time.Now()
-		book.LastClickGenerate=time.Now()
 		book.Score = 40 //默认评分，40即表示4星
+		//设置默认时间，因为beego的orm好像无法设置datetime的默认值
+		defaultTime,_:=time.Parse("2006-01-02 15:04:05","2006-01-02 15:04:05")
+		book.LastClickGenerate=defaultTime
+		book.GenerateTime=defaultTime
+		book.ReleaseTime=defaultTime
 
 		err := book.Insert()
 
@@ -597,7 +600,7 @@ func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 	book, err := models.NewBook().FindByIdentify(identify)
 
-	//3分钟内不允许再次点击生成下载文档
+	//x分钟内不允许再次点击生成下载文档
 	if time.Now().Unix()-book.LastClickGenerate.Unix() < beego.AppConfig.DefaultInt64("GenerateInterval", 300) {
 		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
 	}

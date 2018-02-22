@@ -63,7 +63,6 @@ func initialization() {
 		}
 
 		book := models.NewBook()
-
 		book.MemberId = member.MemberId
 		book.BookName = "BookStack"
 		book.Status = 0
@@ -78,6 +77,11 @@ func initialization() {
 		book.Cover = conf.GetDefaultCover()
 		book.Editor = "markdown"
 		book.Theme = "default"
+		//设置默认时间，因为beego的orm好像无法设置datetime的默认值
+		defaultTime,_:=time.Parse("2006-01-02 15:04:05","2006-01-02 15:04:05")
+		book.LastClickGenerate=defaultTime
+		book.GenerateTime=defaultTime
+		book.ReleaseTime=defaultTime
 		book.Score = 40
 
 		if err := book.Insert(); err != nil {
