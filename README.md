@@ -2,9 +2,9 @@
 
 BookStack，分享知识，共享智慧！知识，因分享，传承久远！
 
-BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，但为了运营而生的。
+BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，为运营而生。
 
-在开发的过程中，我增加和移除了一些东西，目前已经不兼容MinDoc了（毕竟数据表结构、字段、索引都有了一些不同），同时只支持markdown编辑器器。
+在开发的过程中，我增加和移除了一些东西，目前已经不兼容MinDoc了（毕竟数据表结构、字段、索引都有了一些不同），同时只支持markdown编辑器。
 
 如果您要部署使用BookStack，需要有阿里云的ECS服务器和OSS（因为文件存储，我只开发了OSS的，毕竟我自己用的是阿里云的ECS，通过内网，能将文件快速同步到OSS）。
 
@@ -28,7 +28,7 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，但�
 [http://demo.bookstack.cn](http://demo.bookstack.cn)
 
 有些功能，只有拥有管理员权限的用户才能使用，所提放出演示站点，欢迎大家随便玩。
-管理员账号和密码如下（请大家不要随意更改，谢谢）：
+管理员账号和密码如下（请大家不要更改密码，以方便大家体验，谢谢）：
 ```
 账号：bookstack
 密码：bookstack.cn
@@ -41,7 +41,7 @@ Tips:
 [http://www.bookstack.cn](http://www.bookstack.cn)
 
 因为演示站点上的内容，大家在测试的时候，肯定是各种乱七八糟的什么内容都有，所以放出正式站点，给大家看下真正的效果。
-还望大家不要在这个站点发一些乱七八糟的内容，毕竟这是我自己的正式站点，谢谢。
+还望大家不要在这个站点发一些乱七八糟的内容，毕竟这是正式站点，谢谢。
 
 
 ## 功能与亮点
@@ -70,6 +70,7 @@ Tips:
 但是，文档项目中的文档少的时候，一个个去创建倒没什么，但是文档数量多了之后，简直就是虐待自己，排序的时候还要一个一个去拖拽进行排序，很麻烦。现在，这个问题已经解决了。如下：
 - 在文档项目中，创建一个文档标识为`summary.md`的文档(大小写不敏感)
 - 在文档总，填充无序列表的markdown内容，如：
+
 ```markdown
 <bookstack-summary></bookstack-summary>
 * [第0章. 前言]($ch0.md)
@@ -86,7 +87,7 @@ Tips:
 - 然后保存。保存成功之后，程序会帮你创建如"第0章. 前言"，并把文档标识设置为"ch0.md"，同时目录结构还按照你的这个来调整和排序。
 
 注意：
-> 必须要有`<bookstack-summary></bookstack-summary>`，这样是为了告诉程序，我这个`summary.md`的文档，是用来创建文档和对文档进行排序的。当然，排序完成之后，当前页面会刷新一遍，并且把`<bookstack-summary></bookstack-summary>`移除了。有时候，你的排序一次没有排序成功，再添加一次这个标签，程序会自动帮你再排序一次。
+> 必须要有`<bookstack-summary></bookstack-summary>`，这样是为了告诉程序，我这个`summary.md`的文档，是用来创建文档和对文档进行排序的。当然，排序完成之后，当前页面会刷新一遍，并且把`<bookstack-summary></bookstack-summary>`移除了。有时候，第一次排序并没有排序成功，再添加一次这个标签，程序会自动帮你再排序一次。
 > 我自己也常用这种方式批量创建文档以及批量修改文档的标题
 
 
@@ -158,20 +159,20 @@ Tips:
 
 
 # 安装与使用
-为了方便，安装和使用教程，请移步到这里：
+为了方便，安装和使用教程，请移步到这里：http://www.bookstack.cn/read/help/Ubuntu.md
 > 目前只写了Ubuntu下的安装教程，Windows下的安装和使用教程，暂时没时间
 
 # 在开发的开源项目
-- wenku.it IT文库，地址：http://wenku.it
-- ApiServ.me API服务，地址：http://apiserv.me
-- BookStack 无库版(不需要数据库)，地址：https://github.com/BookStackCN/BookStack
+- wenku.it IT文库，地址：http://wenku.it （半成品）
+- ApiServ.me API服务，地址：http://apiserv.me (半成品)
+- BookStack 无库版(不需要数据库)，地址：https://github.com/BookStackCN/BookStack （半成品）
 
 # 待开发的开源项目
 - NetDisk.ME 网盘项目，"抄袭"百度网盘和腾讯微云
 - OneHourADay.CN 每天一小时（微信小程序）
 
 # 关于本人
-2014年7月本科"毕业"踏入挨踢行业；Web全栈工程师；什么都懂一点，什么都不精通。
+2014年7月本科"毕业"踏入IT行业；Web全栈工程师；什么都懂一点，什么都不精通。
 
 
 # 赞助我
