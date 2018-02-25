@@ -37,12 +37,13 @@ var (
 	Segmenter sego.Segmenter
 	ReleaseMaps =make(map[int]bool)//是否正在发布内容，map[book_id]bool
 	ReleaseMapsLock sync.RWMutex
+	BasePath,_=filepath.Abs(filepath.Dir(os.Args[0]))
 )
 
 func init() {
 	//加载分词字典
 	go func() {
-		Segmenter.LoadDictionary("./dictionary/dictionary.txt")
+		Segmenter.LoadDictionary(BasePath+"/dictionary/dictionary.txt")
 	}()
 }
 
