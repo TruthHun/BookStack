@@ -80,7 +80,7 @@ func (this *Star) List(uid, p, listRows int) (cnt int64, books []StarResult, err
 	filter := o.QueryTable("md_star").Filter("uid", uid)
 	//这里先暂时每次都统计一次用户的收藏数量。合理的做法是在用户表字段中增加一个收藏计数
 	if cnt, _ = filter.Count(); cnt > 0 {
-		sql := `select b.*,m.nickname from md_star s left join md_books b on s.bid=b.book_id left join md_members m on m.member_id=b.member_id where s.uid=? order by id desc limit %v offset %v`
+		sql := `select b.*,m.nickname from md_books b left join md_star s on s.bid=b.book_id left join md_members m on m.member_id=b.member_id where s.uid=? order by id desc limit %v offset %v`
 		sql = fmt.Sprintf(sql, listRows, (p-1)*listRows)
 		_, err = o.Raw(sql, uid).QueryRows(&books)
 	}
