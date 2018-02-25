@@ -16,11 +16,9 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，但�
 
 当时想着自己也开发一套，但是后来没时间，当时也没那个技术积累。
 
-后来学了Go语言，又在无意间遇到了[Mindoc](https://github.com/lifei6671/mindoc)，然后对[Mindoc](https://github.com/lifei6671/mindoc)做了二次开发。
+后来学了Go语言，又在无意间遇到了[Mindoc](https://github.com/lifei6671/mindoc)，然后我们公司([掘金量化](https://www.myquant.cn))也恰巧让我开发公司官网和文档系统，然后我就对[Mindoc](https://github.com/lifei6671/mindoc)做了二次开发。
 
-本来是不想开源的，因为自己写代码的时候，写着写着，代码改来改去，然后代码就乱七八糟了，怕开源出来丢人现眼。
-
-踏入IT行业三年多时间以来，自身也受益于各种开源项目和开源组件，所以最终还是决定将BookStack开源出来。
+本来是不想开源的，因为自己写代码的时候，写着写着，代码改来改去，然后代码就乱七八糟了，怕开源出来丢人现眼。但是踏入IT行业三年多时间以来，自身也受益于各种开源项目和开源组件，所以最终还是决定将BookStack开源出来。
 
 其中肯定还是有不足的地方，大家在使用的过程中，遇到问题，欢迎反馈。
 
