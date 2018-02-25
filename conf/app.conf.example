@@ -140,7 +140,7 @@ ldap_user_role=2
 #ldap搜索filter规则,AD服务器: objectClass=User, openldap服务器: objectClass=posixAccount ,也可以定义为其他属性,如: title=mindoc
 ldap_filter=objectClass=posixAccount
 
-
+# 不要修改
 include "oss.conf"
 include "oauth.conf"
 
