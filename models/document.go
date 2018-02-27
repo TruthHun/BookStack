@@ -105,6 +105,9 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64,err error) {
 		if mm.DocumentId == 0 {
 			id, err = o.Insert(m)
 			NewBook().ResetDocumentNumber(m.BookId)
+		}else{//identify存在，则执行更新
+			_,err=o.Update(m)
+			id=int64(mm.DocumentId)
 		}
 	}
 	return

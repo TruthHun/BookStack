@@ -1,16 +1,17 @@
 <div class="modal fade" id="ModalPull" tabindex="-1" role="dialog" aria-labelledby="ModalPullLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form class="ajax-form" action="{{urlfor "BookController.DownloadProjectFromGithub"}}" method="post">
+        <form class="ajax-form" action="{{urlfor "BookController.DownloadProject"}}" method="post">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="ModalPullLabel">从GitHub拉取项目</h4>
+                    <h4 class="modal-title" id="ModalPullLabel">拉取项目</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <input type="text" name="link" required class="form-control" placeholder="请输入项目的下载连接">
                         <input type="hidden" value="" name="identify">
                     </div>
+                    <div class="help-block">支持任意zip压缩的markdown项目拉取</div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>

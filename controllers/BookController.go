@@ -689,8 +689,8 @@ func (this *BookController) IsPermission() (*models.BookResult, error) {
 	return book, nil
 }
 
-//从github下载项目
-func (this *BookController) DownloadProjectFromGithub() {
+//从github等拉取下载markdown项目
+func (this *BookController) DownloadProject() {
 	//处理步骤
 	//1、接受上传上来的zip文件，并存放到store/temp目录下
 	//2、解压zip到当前目录，然后移除非图片文件
@@ -711,6 +711,9 @@ func (this *BookController) DownloadProjectFromGithub() {
 	}
 	//GitHub项目链接
 	link := this.GetString("link")
+	if strings.ToLower(filepath.Ext(link))!=".zip"{
+		this.JsonResult(1, "只支持拉取zip压缩的markdown项目")
+	}
 	go func() {
 		if file, err := util.CrawlFile(link, "store", 60); err != nil {
 			beego.Error(err)
@@ -816,7 +819,7 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 								if err:=ModelStore.InsertOrUpdate(models.DocumentStore{
 									DocumentId:int(doc_id),
 									Markdown:mdcont,
-								});err!=nil{
+								},"markdown");err!=nil{
 									beego.Error(err)
 								}
 							}else{

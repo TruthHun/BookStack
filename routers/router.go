@@ -49,7 +49,7 @@ func init() {
 	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")        //收藏
 	beego.Router("/book/comment/:id", &controllers.BookController{}, "post:Comment") //收藏
 	beego.Router("/book/uploadProject", &controllers.BookController{}, "post:UploadProject")
-	beego.Router("/book/downloadProject", &controllers.BookController{}, "post:DownloadProjectFromGithub")
+	beego.Router("/book/downloadProject", &controllers.BookController{}, "post:DownloadProject")
 	beego.Router("/book/:key/dashboard", &controllers.BookController{}, "*:Dashboard")
 	beego.Router("/book/:key/setting", &controllers.BookController{}, "*:Setting")
 	beego.Router("/book/:key/users", &controllers.BookController{}, "*:Users")
