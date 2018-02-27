@@ -184,7 +184,9 @@
     <div class="manual-mask"></div>
 </div>
 <div id="menu-hidden" style="display: none;">
-{{.Result}}
+    {{.Result}}
+    <!--站点统计代码-->
+    {{str2html $.TONGJI}}
 </div>
 
 {{template "widgets/download.html" .}}
