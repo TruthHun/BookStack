@@ -102,7 +102,7 @@ func (this *Score) AddScore(uid, book_id, score int) (err error) {
 			} else {
 				book.CntScore = book.CntScore + 1
 			}
-			book.Score = (book.Score*book.CntScore + score) / book.CntScore
+			book.Score = (book.Score*(book.CntScore-1) + score) / book.CntScore
 			_, err = o.Update(&book, "cnt_score", "score")
 			if err != nil {
 				beego.Error(err.Error())
