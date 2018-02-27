@@ -86,7 +86,7 @@ function RenderByMarkdown($content) {
  */
 function loadDocument($url,$id,$callback) {
     $.ajax({
-        url : $url+"?fr=bookstack.cn",
+        url : $url+"?fr=BookStack",
         type : "GET",
         beforeSend :function (xhr) {
             var body = events.data('body_' + $id);
@@ -111,7 +111,7 @@ function loadDocument($url,$id,$callback) {
         },
         success : function (res) {
             if(res.errcode === 0){
-                console.log("bookstack.cn");
+                console.log("BookStack");
                 var body = res.data.body;
                 var doc_title = res.data.doc_title;
                 var title = res.data.title;
@@ -247,6 +247,10 @@ $(function () {
         $selector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
         if($selector.length>0){
             e.preventDefault();
+            var CurSelector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
+            if (CurSelector.parent().hasClass("jstree-closed")){
+                CurSelector.parent().find(".jstree-icon").trigger("click");
+            }
             $('a.jstree-anchor[href="'+$(this).attr("href")+'"]').trigger("click");
         }
     });
