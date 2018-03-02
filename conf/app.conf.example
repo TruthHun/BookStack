@@ -140,6 +140,12 @@ ldap_user_role=2
 #ldap搜索filter规则,AD服务器: objectClass=User, openldap服务器: objectClass=posixAccount ,也可以定义为其他属性,如: title=mindoc
 ldap_filter=objectClass=posixAccount
 
+
+# 存储类型，后续扩展成本地存储(local)、阿里云OSS存储(oss)、七牛云存储(qiniu)、腾讯云存储(cos)、百度云存储(bos)和又拍云存储(upyun)
+# 目前可选项：local、oss
+store_type=local
+
+
 # 不要修改
 include "oss.conf"
 include "oauth.conf"
