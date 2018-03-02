@@ -49,7 +49,7 @@
                         </template>
                         <template v-else>
                             <div class="list-item" v-for="item in lists">
-                                <img :src="item.avatar" onerror="this.src='/static/images/middle.gif'" class="img-circle" width="34" height="34">
+                                <img :src="item.avatar" onerror="this.src='/static/images/avatar.png'" class="img-circle" width="34" height="34">
                                 <span>${item.account}</span>
                                 <div class="operate">
                                     <template v-if="item.role_id == 0">
