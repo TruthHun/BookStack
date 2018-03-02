@@ -130,28 +130,47 @@ func (this *SettingController) Qrcode() {
 			this.JsonResult(500, "不支持的图片格式")
 		}
 
-		savepath := fmt.Sprintf("uploads/qrcode-%v-%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+		savepath := fmt.Sprintf("uploads/qrcode/%v-%v%v", this.Member.MemberId, time.Now().Unix(), ext)
 		if err = this.SaveToFile("qrcode", savepath); err != nil {
 			this.JsonResult(1, "二维码保存失败", savepath)
 		}
 		url := ""
-		if err := models.ModelOss.MoveToOss(savepath, savepath, true, false); err != nil {
-			beego.Error(err.Error())
-		} else {
-			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savepath
+		switch utils.StoreType {
+		case utils.StoreOss:
+			if err := models.ModelStoreOss.MoveToOss(savepath, savepath, true, false); err != nil {
+				beego.Error(err.Error())
+			} else {
+				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savepath
+			}
+		case utils.StoreLocal:
+			if err := models.ModelStoreLocal.MoveToStore(savepath, savepath, false); err != nil {
+				beego.Error(err.Error())
+			} else {
+				url = "/" + savepath
+			}
 		}
+
 		var member models.Member
 		o := orm.NewOrm()
 		o.QueryTable("md_members").Filter("member_id", this.Member.MemberId).Filter("member_id", this.Member.MemberId).One(&member, "member_id", "wxpay", "alipay")
 		if member.MemberId > 0 {
+			dels := []string{}
+
 			if alipay {
-				models.ModelOss.DelFromOss(member.Alipay)
+				dels = append(dels, member.Alipay)
 				member.Alipay = savepath
 			} else {
-				models.ModelOss.DelFromOss(member.Wxpay)
+				dels = append(dels, member.Wxpay)
 				member.Wxpay = savepath
 			}
-			o.Update(&member, "wxpay", "alipay")
+			if _, err := o.Update(&member, "wxpay", "alipay"); err == nil {
+				switch utils.StoreType {
+				case utils.StoreOss:
+					go models.ModelStoreOss.DelFromOss(dels...)
+				case utils.StoreLocal:
+					go models.ModelStoreLocal.DelFiles(dels...)
+				}
+			}
 		}
 		//删除旧的二维码，并更新新的二维码
 		data := map[string]interface{}{
@@ -248,11 +267,19 @@ func (this *SettingController) Upload() {
 			this.JsonResult(60001, "保存头像失败")
 		}
 	}
-
-	if err := models.ModelOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
-		beego.Error(err.Error())
-	} else {
-		url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
+	switch utils.StoreType {
+	case utils.StoreOss: //oss存储
+		if err := models.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
+		}
+	case utils.StoreLocal: //本地存储
+		if err := models.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./"), false); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = "/" + strings.TrimLeft(url, "./")
+		}
 	}
 
 	this.JsonResult(0, "ok", url)

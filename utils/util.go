@@ -14,7 +14,6 @@ import (
 
 	"net/mail"
 
-	"io/ioutil"
 	"path/filepath"
 
 	"os/exec"
@@ -22,28 +21,36 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TruthHun/gotil/filetil"
 	"github.com/TruthHun/gotil/util"
 	"github.com/astaxie/beego"
 	"github.com/huichen/sego"
 
-	"github.com/TruthHun/html2md"
-	"github.com/russross/blackfriday"
 	"sync"
+
+	"github.com/TruthHun/html2md"
+)
+
+//存储类型
+
+//更多存储类型有待扩展
+const (
+	StoreLocal string = "local"
+	StoreOss   string = "oss"
 )
 
 //分词器
 var (
-	Segmenter sego.Segmenter
-	ReleaseMaps =make(map[int]bool)//是否正在发布内容，map[book_id]bool
+	Segmenter       sego.Segmenter
+	ReleaseMaps     = make(map[int]bool) //是否正在发布内容，map[book_id]bool
 	ReleaseMapsLock sync.RWMutex
-	BasePath,_=filepath.Abs(filepath.Dir(os.Args[0]))
+	BasePath, _            = filepath.Abs(filepath.Dir(os.Args[0]))
+	StoreType       string = beego.AppConfig.String("store_type") //存储类型
 )
 
 func init() {
 	//加载分词字典
 	go func() {
-		Segmenter.LoadDictionary(BasePath+"/dictionary/dictionary.txt")
+		Segmenter.LoadDictionary(BasePath + "/dictionary/dictionary.txt")
 	}()
 }
 
@@ -96,64 +103,6 @@ func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
 	return m.Send(msg)
 }
 
-func SortBySummary(htmlstr string, pid int) {
-	//在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
-	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(htmlstr))
-	doc.Find("body>ul>li>a").Each(func(i int, selection *goquery.Selection) {
-		nid, _ := selection.Attr("id")
-		fmt.Println("====", pid, selection.Text(), nid)
-		if str, err := selection.Siblings().Html(); err == nil {
-			id, _ := selection.Attr("id")
-			idNum, _ := strconv.Atoi(id)
-			SortBySummary("<ul>"+str+"</ul>", idNum)
-		}
-	})
-}
-
-//查找替换md(这个重要)
-func ReplaceToAbs(folder string) {
-	files, _ := filetil.ScanFiles(folder)
-	for _, file := range files {
-		if strings.HasSuffix(file.Path, ".md") {
-			mdb, _ := ioutil.ReadFile(file.Path)
-			mdCont := string(mdb)
-			basePath := filepath.Dir(file.Path)
-			basePath = strings.Trim(strings.Replace(basePath, "\\", "/", -1), "/")
-			basePathSlice := strings.Split(basePath, "/")
-			l := len(basePathSlice)
-			b, _ := ioutil.ReadFile(file.Path)
-			output := blackfriday.MarkdownCommon(b)
-			doc, _ := goquery.NewDocumentFromReader(strings.NewReader(string(output)))
-			doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-				if src, ok := selection.Attr("src"); ok && !strings.HasPrefix(strings.ToLower(src), "http") && strings.HasPrefix(src, "./") {
-					if cnt := strings.Count(src, "../"); cnt < l {
-						newSrc := strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
-						mdCont = strings.Replace(mdCont, src, newSrc, -1)
-						fmt.Println(file.Path, src, newSrc)
-					}
-				}
-			})
-			//要注意判断有锚点的情况
-			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-				if href, ok := selection.Attr("href"); ok && !strings.HasPrefix(strings.ToLower(href), "http") && strings.HasPrefix(href, "./") {
-					if cnt := strings.Count(href, "../"); cnt < l {
-						newHref := ""
-						if cnt == 0 && strings.HasPrefix(href, "#") { //以#开头，链接则是锚点链接，
-							newHref = file.Path + href
-						} else {
-							newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
-						}
-						fmt.Println(file.Path, href, newHref)
-						mdCont = strings.Replace(mdCont, href, newHref, -1)
-					}
-				}
-			})
-			ioutil.WriteFile(file.Path, []byte(mdCont), os.ModePerm)
-		}
-	}
-
-}
-
 //渲染markdown为html并录入数据库
 func RenderDocumentById(id int) {
 	//使用chromium-browser
@@ -199,10 +148,10 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 				//遍历a标签替换相对链接
 				doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 					//存在href，且不以http://和https://开头
-					if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://")&& !strings.HasPrefix(strings.ToLower(href), "#")) {
-						if strings.HasPrefix(href,"/"){
+					if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://") && !strings.HasPrefix(strings.ToLower(href), "#")) {
+						if strings.HasPrefix(href, "/") {
 							selection.SetAttr("href", strings.Join(slice[0:3], "/")+href)
-						}else{
+						} else {
 							l := strings.Count(href, "../")
 							//需要多减1，因为"http://"或"https://"后面多带一个斜杠
 							selection.SetAttr("href", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(href, "./"))
@@ -214,10 +163,10 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 				doc.Find("img").Each(func(i int, selection *goquery.Selection) {
 					//存在href，且不以http://和https://开头
 					if src, ok := selection.Attr("src"); ok && (!strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://")) {
-						if strings.HasPrefix(src,"/"){//以斜杠开头
-						//TODO: 域名+src
+						if strings.HasPrefix(src, "/") { //以斜杠开头
+							//TODO: 域名+src
 							selection.SetAttr("src", strings.Join(slice[0:3], "/")+src)
-						}else{
+						} else {
 							l := strings.Count(src, "../")
 							//需要多减1，因为"http://"或"https://"后面多带一个斜杠
 							selection.SetAttr("src", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(src, "./"))
@@ -226,8 +175,8 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 				})
 
 				//h1-h6标题中不要存在链接或者图片，所以提取文本
-				Hs:=[]string{"h1","h2","h3","h4","h5","h6"}
-				for _,tag:=range Hs{
+				Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
+				for _, tag := range Hs {
 					doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
 						//存在href，且不以http://和https://开头
 						selection.SetText(selection.Text())

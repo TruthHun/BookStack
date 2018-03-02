@@ -27,28 +27,24 @@ import (
 
 // Document struct.
 type Document struct {
-	DocumentId   int           `orm:"pk;auto;column(document_id)" json:"doc_id"`
-	DocumentName string        `orm:"column(document_name);size(500)" json:"doc_name"`
-	Identify     string        `orm:"column(identify);size(100);index;null;default(null)" json:"identify"` // Identify 文档唯一标识
-	BookId       int           `orm:"column(book_id);type(int);index" json:"book_id"`
-	ParentId     int           `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
-	OrderSort    int           `orm:"column(order_sort);default(0);type(int);index" json:"order_sort"`
+	DocumentId   int    `orm:"pk;auto;column(document_id)" json:"doc_id"`
+	DocumentName string `orm:"column(document_name);size(500)" json:"doc_name"`
+	Identify     string `orm:"column(identify);size(100);index;null;default(null)" json:"identify"` // Identify 文档唯一标识
+	BookId       int    `orm:"column(book_id);type(int);index" json:"book_id"`
+	ParentId     int    `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
+	OrderSort    int    `orm:"column(order_sort);default(0);type(int);index" json:"order_sort"`
 	//Markdown     string        `orm:"column(markdown);type(text);null" json:"markdown"` // Markdown markdown格式文档.
-	Release      string        `orm:"column(release);type(text);null" json:"release"`   // Release 发布后的Html格式内容.
+	Release string `orm:"column(release);type(text);null" json:"release"` // Release 发布后的Html格式内容.
 	//Content      string        `orm:"column(content);type(text);null" json:"content"`   // Content 未发布的 Html 格式内容.
-	CreateTime   time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
-	MemberId     int           `orm:"column(member_id);type(int)" json:"member_id"`
-	ModifyTime   time.Time     `orm:"column(modify_time);type(datetime);default(null);auto_now" json:"modify_time"`
-	ModifyAt     int           `orm:"column(modify_at);type(int)" json:"-"`
-	Version      int64         `orm:"type(bigint);column(version)" json:"version"`
-	AttachList   []*Attachment `orm:"-" json:"attach"`
-	Vcnt         int           `orm:"column(vcnt);default(0)" json:"vcnt"` //文档项目被浏览次数
-	Markdown string `orm:"-" json:"markdown"`
+	CreateTime time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
+	MemberId   int           `orm:"column(member_id);type(int)" json:"member_id"`
+	ModifyTime time.Time     `orm:"column(modify_time);type(datetime);default(null);auto_now" json:"modify_time"`
+	ModifyAt   int           `orm:"column(modify_at);type(int)" json:"-"`
+	Version    int64         `orm:"type(bigint);column(version)" json:"version"`
+	AttachList []*Attachment `orm:"-" json:"attach"`
+	Vcnt       int           `orm:"column(vcnt);default(0)" json:"vcnt"` //文档项目被浏览次数
+	Markdown   string        `orm:"-" json:"markdown"`
 }
-
-
-
-
 
 // 多字段唯一键
 func (m *Document) TableUnique() [][]string {
@@ -93,9 +89,9 @@ func (m *Document) Find(id int) (*Document, error) {
 }
 
 //插入和更新文档.
-func (m *Document) InsertOrUpdate(cols ...string) (id int64,err error) {
+func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
-	id=int64(m.DocumentId)
+	id = int64(m.DocumentId)
 	if m.DocumentId > 0 {
 		_, err = o.Update(m, cols...)
 	} else {
@@ -105,9 +101,9 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64,err error) {
 		if mm.DocumentId == 0 {
 			id, err = o.Insert(m)
 			NewBook().ResetDocumentNumber(m.BookId)
-		}else{//identify存在，则执行更新
-			_,err=o.Update(m)
-			id=int64(mm.DocumentId)
+		} else { //identify存在，则执行更新
+			_, err = o.Update(m)
+			id = int64(mm.DocumentId)
 		}
 	}
 	return
@@ -132,7 +128,7 @@ func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Do
 func (m *Document) RecursiveDocument(doc_id int) error {
 
 	o := orm.NewOrm()
-	modelStore:=new(DocumentStore)
+	modelStore := new(DocumentStore)
 
 	if doc, err := m.Find(doc_id); err == nil {
 		o.Delete(doc)
@@ -179,9 +175,9 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 		return
 	}
 	idx := 1
-	ModelStore:=new(DocumentStore)
+	ModelStore := new(DocumentStore)
 	for _, item := range docs {
-		content:=strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId,"content"))
+		content := strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
 		if len(content) == 0 {
 			//达到5个协程，休息3秒
 			//if idx%5 == 0 {
@@ -222,7 +218,7 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 		beego.Error(err.Error())
 	}
 	utils.ReleaseMapsLock.Lock()
-	delete(utils.ReleaseMaps,book_id)
+	delete(utils.ReleaseMaps, book_id)
 	utils.ReleaseMapsLock.Unlock()
 }
 
@@ -289,9 +285,9 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		ioutil.WriteFile(htmlname, []byte(htmlstr), os.ModePerm)
 		ExpCfg.Toc = append(ExpCfg.Toc, toc)
 	}
-ModelStore:=new(DocumentStore)
+	ModelStore := new(DocumentStore)
 	for _, doc := range docs {
-		content:=strings.TrimSpace(ModelStore.GetFiledById(doc.DocumentId,"content"))
+		content := strings.TrimSpace(ModelStore.GetFiledById(doc.DocumentId, "content"))
 		if content == "" { //内容为空，渲染文档内容，并再重新获取文档内容
 			utils.RenderDocumentById(doc.DocumentId)
 			orm.NewOrm().Read(doc, "document_id")
@@ -371,15 +367,29 @@ ModelStore:=new(DocumentStore)
 	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
 	exts := []string{".pdf", ".epub", ".mobi"}
 	for _, ext := range exts {
-		//不要开启gzip压缩，否则会出现文件损坏的情况
-		if err := ModelOss.MoveToOss(folder+"output/book"+ext, newBook+ext, true, false); err != nil {
-			beego.Error(err)
-		} else { //设置下载头
-			ModelOss.SetObjectMeta(newBook+ext, book.BookName+"-BookStack.CN"+ext)
+		switch utils.StoreType {
+		case utils.StoreOss:
+			//不要开启gzip压缩，否则会出现文件损坏的情况
+			if err := ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBook+ext, true, false); err != nil {
+				beego.Error(err)
+			} else { //设置下载头
+				ModelStoreOss.SetObjectMeta(newBook+ext, book.BookName+ext)
+			}
+		case utils.StoreLocal: //本地存储
+			ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext, true)
 		}
+
 	}
-	if err := ModelOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
-		beego.Error(err)
+	//删除旧文件
+	switch utils.StoreType {
+	case utils.StoreOss:
+		if err := ModelStoreOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
+			beego.Error(err)
+		}
+	case utils.StoreLocal: //本地存储
+		if err := ModelStoreLocal.DelFiles(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
+			beego.Error(err)
+		}
 	}
 
 	//最后再更新文档生成时间

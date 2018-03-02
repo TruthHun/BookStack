@@ -395,15 +395,14 @@ func (this *DocumentController) Create() {
 	document.DocumentName = doc_name
 	document.ParentId = parent_id
 
-
-	if doc_id,err := document.InsertOrUpdate(); err != nil {
+	if doc_id, err := document.InsertOrUpdate(); err != nil {
 		beego.Error("InsertOrUpdate => ", err)
 		this.JsonResult(6005, "保存失败")
 	} else {
-		ModelStore:=new(models.DocumentStore)
-		if ModelStore.GetFiledById(doc_id,"markdown")==""{
+		ModelStore := new(models.DocumentStore)
+		if ModelStore.GetFiledById(doc_id, "markdown") == "" {
 			//因为创建和更新文档基本信息都调用的这个接口，先判断markdown是否有内容，没有内容则添加默认内容
-			if err:=ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId:int(doc_id),Markdown:"[TOC]\n\r\n\r"});err!=nil{
+			if err := ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(doc_id), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 				beego.Error(err)
 			}
 		}
@@ -421,7 +420,7 @@ func (this *DocumentController) CreateMulti() {
 		if book.BookId > 0 {
 			content := this.GetString("content")
 			if slice := strings.Split(content, "\n"); len(slice) > 0 {
-				ModelStore:=new(models.DocumentStore)
+				ModelStore := new(models.DocumentStore)
 				for _, row := range slice {
 					if chapter := strings.Split(strings.TrimSpace(row), " "); len(chapter) > 1 {
 						if ok, err := regexp.MatchString(`^[a-zA-Z0-9_\-\.]*$`, chapter[0]); ok && err == nil {
@@ -432,13 +431,13 @@ func (this *DocumentController) CreateMulti() {
 									Identify:     chapter[0],
 									BookId:       book_id,
 									//Markdown:     "[TOC]\n\r",
-									MemberId:     this.Member.MemberId,
+									MemberId: this.Member.MemberId,
 								}
-								if doc_id,err:=doc.InsertOrUpdate();err==nil{
-									if err:=ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId:int(doc_id),Markdown: "[TOC]\n\r\n\r"});err!=nil{
+								if doc_id, err := doc.InsertOrUpdate(); err == nil {
+									if err := ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(doc_id), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 										beego.Error(err.Error())
 									}
-								}else{
+								} else {
 									beego.Error(err)
 								}
 							}
@@ -579,11 +578,19 @@ func (this *DocumentController) Upload() {
 		}
 	}
 	osspath := fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
-	if err := models.ModelOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
-		beego.Error(err.Error())
+	switch utils.StoreType {
+	case utils.StoreOss:
+		if err := models.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
+			beego.Error(err.Error())
+		}
+		attachment.HttpPath = this.OssDomain + "/" + osspath
+	case utils.StoreLocal:
+		osspath = "uploads/" + osspath
+		if err := models.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath, true); err != nil {
+			beego.Error(err.Error())
+		}
+		attachment.HttpPath = "/" + osspath
 	}
-	//注意：这里不要转成OSS所绑定的域名的地址，在前端来进行绑定
-	attachment.HttpPath = this.OssDomain + "/" + osspath
 
 	result := map[string]interface{}{
 		"errcode":   0,
@@ -773,7 +780,7 @@ func (this *DocumentController) Content() {
 	if doc_id <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
-	ModelStore:=new(models.DocumentStore)
+	ModelStore := new(models.DocumentStore)
 	if this.Ctx.Input.IsPost() { //更新文档内容
 		markdown := strings.TrimSpace(this.GetString("markdown", ""))
 		content := this.GetString("html")
@@ -822,7 +829,7 @@ func (this *DocumentController) Content() {
 		}
 		content = this.replaceLinks(identify, content, is_summary)
 
-		var ds=models.DocumentStore{}
+		var ds = models.DocumentStore{}
 
 		if markdown == "" && content != "" {
 			ds.Markdown = content
@@ -831,12 +838,12 @@ func (this *DocumentController) Content() {
 		}
 		doc.Version = time.Now().Unix()
 		ds.Content = content
-		if doc_id,err := doc.InsertOrUpdate(); err != nil {
+		if doc_id, err := doc.InsertOrUpdate(); err != nil {
 			beego.Error("InsertOrUpdate => ", err)
 			this.JsonResult(6006, "保存失败")
-		}else{
-			ds.DocumentId=int(doc_id)
-			if err:=ModelStore.InsertOrUpdate(ds,"markdown","content");err!=nil{
+		} else {
+			ds.DocumentId = int(doc_id)
+			if err := ModelStore.InsertOrUpdate(ds, "markdown", "content"); err != nil {
 				beego.Error(err)
 			}
 		}
@@ -879,7 +886,7 @@ func (this *DocumentController) Content() {
 	//为了减少数据的传输量，这里Release和Content的内容置空，前端会根据markdown文本自动渲染
 	//doc.Release = ""
 	//doc.Content = ""
-	doc.Markdown=ModelStore.GetFiledById(doc.DocumentId,"markdown")
+	doc.Markdown = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 	this.JsonResult(0, "ok", doc)
 }
 
@@ -904,12 +911,24 @@ func (this *DocumentController) Export() {
 		} else {
 			//查询文档是否存在
 			obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
-			if err := models.ModelOss.IsObjectExist(obj); err != nil {
-				beego.Error(err, obj)
-				this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
-			} else {
-				this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": this.OssDomain + "/" + obj})
+			switch utils.StoreType {
+			case utils.StoreOss:
+				if err := models.ModelStoreOss.IsObjectExist(obj); err != nil {
+					beego.Error(err, obj)
+					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+				} else {
+					this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": this.OssDomain + "/" + obj})
+				}
+			case utils.StoreLocal:
+				obj = "uploads/" + obj
+				if err := models.ModelStoreLocal.IsObjectExist(obj); err != nil {
+					beego.Error(err, obj)
+					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+				} else {
+					this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": "/" + obj})
+				}
 			}
+
 		}
 	} else {
 		beego.Error(err.Error())
@@ -1321,13 +1340,13 @@ func (this *DocumentController) Compare() {
 	}
 	this.Data["HistoryId"] = history_id
 	this.Data["DocumentId"] = doc.DocumentId
-	ModelStore:=new(models.DocumentStore)
+	ModelStore := new(models.DocumentStore)
 	if editor == "markdown" {
 		this.Data["HistoryContent"] = history.Markdown
-		this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId,"markdown")
+		this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 	} else {
 		this.Data["HistoryContent"] = template.HTML(history.Content)
-		this.Data["Content"] = template.HTML(ModelStore.GetFiledById(doc.DocumentId,"content"))
+		this.Data["Content"] = template.HTML(ModelStore.GetFiledById(doc.DocumentId, "content"))
 	}
 }
 

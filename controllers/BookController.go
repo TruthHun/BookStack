@@ -351,13 +351,30 @@ func (this *BookController) UploadCover() {
 	//如果原封面不是默认封面则删除
 	if old_cover != conf.GetDefaultCover() {
 		os.Remove("." + old_cover)
-		models.ModelOss.DelFromOss(old_cover) //从OSS和本地都各执行一次删除
+		switch utils.StoreType {
+		case utils.StoreOss:
+			models.ModelStoreOss.DelFromOss(old_cover) //从OSS执行一次删除
+		case utils.StoreLocal:
+			models.ModelStoreLocal.DelFiles(old_cover) //从本地执行一次删除
+		}
+
 	}
-	if err := models.ModelOss.MoveToOss("."+url, osspath, true, false); err != nil {
-		beego.Error(err.Error())
-	} else {
-		url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + osspath + "/cover"
+	switch utils.StoreType {
+	case utils.StoreOss: //oss
+		if err := models.ModelStoreOss.MoveToOss("."+url, osspath, true, false); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + osspath + "/cover"
+		}
+	case utils.StoreLocal:
+		save := "uploads/" + osspath
+		if err := models.ModelStoreLocal.MoveToStore("."+url, save, true); err != nil {
+			beego.Error(err.Error())
+		} else {
+			url = "/" + save
+		}
 	}
+
 	this.JsonResult(0, "ok", url)
 }
 
@@ -457,10 +474,10 @@ func (this *BookController) Create() {
 		book.Theme = "default"
 		book.Score = 40 //默认评分，40即表示4星
 		//设置默认时间，因为beego的orm好像无法设置datetime的默认值
-		defaultTime,_:=time.Parse("2006-01-02 15:04:05","2006-01-02 15:04:05")
-		book.LastClickGenerate=defaultTime
-		book.GenerateTime=defaultTime
-		book.ReleaseTime=defaultTime
+		defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+		book.LastClickGenerate = defaultTime
+		book.GenerateTime = defaultTime
+		book.ReleaseTime = defaultTime
 
 		err := book.Insert()
 
@@ -581,11 +598,10 @@ func (this *BookController) Release() {
 	utils.ReleaseMapsLock.Lock()
 	defer utils.ReleaseMapsLock.Unlock()
 
-
-	if _,ok:=utils.ReleaseMaps[book_id];ok{
+	if _, ok := utils.ReleaseMaps[book_id]; ok {
 		this.JsonResult(1, "上次内容发布正在执行中，请稍后再操作")
 	}
-	utils.ReleaseMaps[book_id]=true
+	utils.ReleaseMaps[book_id] = true
 
 	go func(identify string) {
 		models.NewDocument().ReleaseContent(book_id, this.BaseUrl())
@@ -711,7 +727,7 @@ func (this *BookController) DownloadProject() {
 	}
 	//GitHub项目链接
 	link := this.GetString("link")
-	if strings.ToLower(filepath.Ext(link))!=".zip"{
+	if strings.ToLower(filepath.Ext(link)) != ".zip" {
 		this.JsonResult(1, "只支持拉取zip压缩的markdown项目")
 	}
 	go func() {
@@ -789,15 +805,23 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 
 		//读取文件，把图片文档录入oss
 		if files, err := filetil.ScanFiles(prefix); err == nil {
-			ModelStore:=new(models.DocumentStore)
+			ModelStore := new(models.DocumentStore)
 			//文档对应的标识
 			for _, file := range files {
 				if !file.IsDir {
 					ext := strings.ToLower(filepath.Ext(file.Path))
 					if strings.Contains(".jpg.jpeg.png.gif.bmp.svg.webp", ext) { //图片，录入oss
-						if err := models.ModelOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, prefix), false, false); err != nil {
-							beego.Error(err)
+						switch utils.StoreType {
+						case utils.StoreOss:
+							if err := models.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, prefix), false, false); err != nil {
+								beego.Error(err)
+							}
+						case utils.StoreLocal:
+							if err := models.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, prefix), false); err != nil {
+								beego.Error(err)
+							}
 						}
+
 					} else if ext == ".md" || ext == ".markdown" { //markdown文档，提取文档内容，录入数据库
 						doc := new(models.Document)
 						if b, err := ioutil.ReadFile(file.Path); err == nil {
@@ -815,14 +839,14 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
 								doc.OrderSort = 0
 							}
-							if doc_id,err := doc.InsertOrUpdate(); err == nil {
-								if err:=ModelStore.InsertOrUpdate(models.DocumentStore{
-									DocumentId:int(doc_id),
-									Markdown:mdcont,
-								},"markdown");err!=nil{
+							if doc_id, err := doc.InsertOrUpdate(); err == nil {
+								if err := ModelStore.InsertOrUpdate(models.DocumentStore{
+									DocumentId: int(doc_id),
+									Markdown:   mdcont,
+								}, "markdown"); err != nil {
 									beego.Error(err)
 								}
-							}else{
+							} else {
 								beego.Error(err.Error())
 							}
 						} else {

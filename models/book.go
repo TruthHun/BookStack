@@ -38,10 +38,10 @@ type Book struct {
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now_add" json:"modify_time"`
 	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //项目发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
 	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //下载文档生成时间
-	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`       //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
+	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
-	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`               //文档项目被阅读次数
-	Star              int       `orm:"column(star);default(0)" json:"star"`               //文档项目被收藏次数
+	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    //文档项目被阅读次数
+	Star              int       `orm:"column(star);default(0)" json:"star"`    //文档项目被收藏次数
 	Score             int       `orm:"column(score);default(40)" json:"score"` //文档项目评分，默认40，即4.0星
 	CntScore          int       //评分人数
 	CntComment        int       //评论人数
@@ -75,7 +75,7 @@ func (m *Book) Insert() error {
 		relationship.BookId = m.BookId
 		relationship.RoleId = 0
 		relationship.MemberId = m.MemberId
-		if err = relationship.Insert();err != nil {
+		if err = relationship.Insert(); err != nil {
 			logs.Error("插入项目与用户关联 => ", err)
 			return err
 		}
@@ -84,12 +84,12 @@ func (m *Book) Insert() error {
 		document.DocumentName = "空白文档"
 		document.Identify = "blank"
 		document.MemberId = m.MemberId
-		if id,err := document.InsertOrUpdate();err == nil {
-			var ds=DocumentStore{
-				DocumentId:int(id),
-				Markdown:"[TOC]\n\r\n\r",//默认内容
+		if id, err := document.InsertOrUpdate(); err == nil {
+			var ds = DocumentStore{
+				DocumentId: int(id),
+				Markdown:   "[TOC]\n\r\n\r", //默认内容
 			}
-			err=new(DocumentStore).InsertOrUpdate(ds)
+			err = new(DocumentStore).InsertOrUpdate(ds)
 			return err
 		}
 	}
@@ -230,8 +230,8 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 	o.Begin()
 
 	//删除md_document_store中的文档
-	sql:="delete from md_document_store where document_id in(select document_id from md_documents where book_id=?)"
-	if _, err := o.Raw(sql, m.BookId).Exec();err!=nil{
+	sql := "delete from md_document_store where document_id in(select document_id from md_documents where book_id=?)"
+	if _, err := o.Raw(sql, m.BookId).Exec(); err != nil {
 		beego.Error(err)
 	}
 
@@ -266,7 +266,12 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 
 	if err = o.Commit(); err == nil {
 		//删除oss中项目对应的文件夹
-		go ModelOss.DelOssFolder("projects/" + m.Identify)
+		switch utils.StoreType {
+		case utils.StoreLocal: //删除本地存储，记得加上uploads
+			go ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
+		case utils.StoreOss:
+			go ModelStoreOss.DelOssFolder("projects/" + m.Identify)
+		}
 	}
 	return err
 }
