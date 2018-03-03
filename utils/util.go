@@ -227,3 +227,19 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 
 	return
 }
+
+//操作图片显示
+//如果用的是oss存储，这style是avatar、cover可选项
+func HandlePicShow(img string, style string) (url string) {
+	if strings.HasPrefix(img, "https://") || strings.HasPrefix(img, "http://") {
+		return img
+	}
+	img = "/" + strings.TrimLeft(img, "./")
+	switch StoreType {
+	case StoreOss:
+		url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + img + "/" + style
+	case StoreLocal:
+		url = "/" + strings.TrimLeft(img, "./")
+	}
+	return
+}
