@@ -230,7 +230,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 
 //操作图片显示
 //如果用的是oss存储，这style是avatar、cover可选项
-func HandlePicShow(img string, style ...string) (url string) {
+func ShowImg(img string, style ...string) (url string) {
 	if strings.HasPrefix(img, "https://") || strings.HasPrefix(img, "http://") {
 		return img
 	}
