@@ -195,7 +195,7 @@ func RegisterFunction() {
 	//用户是否收藏了文档
 	beego.AddFuncMap("doesStar", new(models.Star).DoesStar)
 	beego.AddFuncMap("scoreFloat", utils.ScoreFloat)
-	beego.AddFuncMap("showImg", utils.HandlePicShow)
+	beego.AddFuncMap("showImg", utils.ShowImg)
 }
 
 func ResolveCommand(args []string) {
