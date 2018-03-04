@@ -58,7 +58,7 @@
                     <div class="dashboard">
                         <div class="pull-left" style="width: 200px;margin-bottom: 15px;">
                             <div class="book-image">
-                                <img src="{{$.OssDomain}}{{.Model.Cover}}/cover" class="border-cover-img" onerror="this.src='/static/images/book.png'" width="174" height="229" style="border: 1px solid #666">
+                                <img src="{{showImg .Model.Cover "cover"}}" class="border-cover-img" onerror="this.src='/static/images/book.png'" width="174" height="229" style="border: 1px solid #666">
                             </div>
                         </div>
 

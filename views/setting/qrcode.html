@@ -25,20 +25,20 @@
                     <div class="help-block">每一个热心分享知识的人，都值得被打赏！</div>
                     <div class="help-block">在这里，您可以上传您的 <strong>支付宝收款二维码</strong> 和 <strong>微信收款二维码</strong> 来接收读者们的赞助，书栈不会从中拿您一分钱。</div>
                     <div class="help-block">您的二维码将会在您分享文档的介绍页面中的打赏按钮功能里面展示。</div>
-                    <div class="help-block">分享，让知识传承更久远！书栈(BookStack.CN)，与您同在！</div>
+                    <div class="help-block">分享，让知识传承更久远！{{.SITE_NAME}}，与您同在！</div>
                 </div>
                 <div class="col-xs-6 col-sm-4">
                     <h3>支付宝收款二维码</h3>
                     <div class="help-block">点击图片上传或更新您的二维码</div>
                     <div>
-                        <img class="border qrcode-pay qrcode-alipay img-responsive" data-paytype="alipay" src="{{if .Qrcode.Alipay}}{{$.OssDomain}}/{{.Qrcode.Alipay}}{{else}}/static/images/plus-o.png{{end}}" alt="支付宝二维码">
+                        <img class="border qrcode-pay qrcode-alipay img-responsive" data-paytype="alipay" src="{{if .Qrcode.Alipay}}{{showImg .Qrcode.Alipay}}{{else}}/static/images/plus-o.png{{end}}" alt="支付宝二维码">
                     </div>
                 </div>
                 <div class="col-xs-6 col-sm-4">
                     <h3>微信收款二维码</h3>
                     <div class="help-block">点击图片上传或更新您的二维码</div>
                     <div>
-                        <img class="border qrcode-pay qrcode-wxpay img-responsive"  data-paytype="wxpay" src="{{if .Qrcode.Wxpay}}{{$.OssDomain}}/{{.Qrcode.Wxpay}}{{else}}/static/images/plus-o.png{{end}}" alt="微信支付二维码">
+                        <img class="border qrcode-pay qrcode-wxpay img-responsive"  data-paytype="wxpay" src="{{if .Qrcode.Wxpay}}{{showImg .Qrcode.Wxpay}}{{else}}/static/images/plus-o.png{{end}}" alt="微信支付二维码">
                     </div>
                 </div>
 

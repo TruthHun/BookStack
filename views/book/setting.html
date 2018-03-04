@@ -61,7 +61,7 @@
                         <label>项目封面 &nbsp; &nbsp; &nbsp;</label>
                         <label>
                             <a href="javascript:;" data-toggle="modal" data-target="#upload-logo-panel">
-                                <img src="{{$.OssDomain}}{{.Model.Cover}}/cover" onerror="this.src='/static/images/book.png'" alt="封面" style="max-width: 120px;" class="border-cover-img" id="headimgurl">
+                                <img src="{{showImg .Model.Cover "cover"}}" onerror="this.src='/static/images/book.png'" alt="封面" style="max-width: 120px;" class="border-cover-img" id="headimgurl">
                             </a>
                         </label>
                     </div>

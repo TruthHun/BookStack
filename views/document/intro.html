@@ -16,7 +16,7 @@
             </h1>
         </div>
         <div class="col-sm-3 col-xs-6">
-            <img src="{{$.OssDomain}}{{.Book.Cover}}/cover"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
+            <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
         </div>
         <div class="col-sm-9 col-xs-6">
             <ul class="none-listyle">

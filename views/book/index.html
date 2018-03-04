@@ -52,7 +52,7 @@
                             <div class="list-item clearfix" v-for="item in lists">
                                 <div class="col-sm-2 col-xs-12" style="padding-left: 0px">
                                     <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
-                                        <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="'{{$.OssDomain}}'+item.cover+'/cover'" alt="">
+                                        <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="item.cover" alt="">
                                     </a>
                                 </div>
                                 <div class="col-sm-10 col-xs-12" style="padding-right: 0px;padding-left: 0px;">

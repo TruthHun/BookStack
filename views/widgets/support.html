@@ -14,13 +14,13 @@
                 <div class="col-xs-6 text-center" style="padding-left: 0px">
                     <div class="help-block">支付宝打赏</div>
                     {{if .Qrcode.Alipay}}
-                        <img src="{{$.OssDomain}}/{{.Qrcode.Alipay}}" class="img-responsive img-thumbnail" alt="支付宝二维码">
+                        <img src="{{showImg .Qrcode.Alipay}}" class="img-responsive img-thumbnail" alt="支付宝二维码">
                     {{end}}
                 </div>
                 <div class="col-xs-6 text-center" style="padding: 0px">
                     <div class="help-block">微信打赏</div>
                     {{if .Qrcode.Wxpay}}
-                        <img src="{{$.OssDomain}}/{{.Qrcode.Wxpay}}" class="img-responsive img-thumbnail" alt="微信支付二维码">
+                        <img src="{{showImg .Qrcode.Wxpay}}" class="img-responsive img-thumbnail" alt="微信支付二维码">
                     {{end}}
                 </div>
             </div>

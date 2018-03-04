@@ -25,7 +25,7 @@
                         <label>用户头像</label>
                         <label>
                             <a href="javascript:;" data-toggle="modal" data-target="#upload-logo-panel">
-                                <img src="{{$.OssDomain}}{{.Member.Avatar}}/avatar" onerror="this.src='/static/images/middle.gif'" class="img-circle border" alt="头像" style="max-width: 120px;max-height: 120px;" id="headimgurl">
+                                <img src="{{showImg .Member.Avatar "avatar"}}" onerror="this.src='/static/images/avatar.png'" class="img-circle border" alt="头像" style="max-width: 120px;max-height: 120px;" id="headimgurl">
                             </a>
                         </label>
                     </div>

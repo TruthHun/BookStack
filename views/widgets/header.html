@@ -70,7 +70,7 @@
                 {{if gt .Member.MemberId 0}}
                 <li>
                     <div class="img user-info" data-toggle="dropdown">
-                        <img  onerror="this.src='/static/images/avatar.png'"  src="{{$.OssDomain}}{{.Member.Avatar}}/avatar" class="img-circle userbar-avatar border" alt="{{.Member.Nickname}}">
+                        <img  onerror="this.src='/static/images/avatar.png'"  src="{{showImg .Member.Avatar "avatar"}}" class="img-circle userbar-avatar border" alt="{{.Member.Nickname}}">
                         <div class="userbar-content">
                             <span>{{.Member.Nickname}}</span>
                             <div>{{.Member.RoleName}}</div>
