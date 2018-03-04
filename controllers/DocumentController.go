@@ -588,7 +588,7 @@ func (this *DocumentController) Upload() {
 		attachment.HttpPath = this.OssDomain + "/" + osspath
 	case utils.StoreLocal:
 		osspath = "uploads/" + osspath
-		if err := models.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath, true); err != nil {
+		if err := models.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
 			beego.Error(err.Error())
 		}
 		attachment.HttpPath = "/" + osspath

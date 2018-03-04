@@ -380,7 +380,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 				ModelStoreOss.SetObjectMeta(newBook+ext, book.BookName+ext)
 			}
 		case utils.StoreLocal: //本地存储
-			ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext, true)
+			ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext)
 		}
 
 	}

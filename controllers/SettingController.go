@@ -144,7 +144,7 @@ func (this *SettingController) Qrcode() {
 				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savepath
 			}
 		case utils.StoreLocal:
-			if err := models.ModelStoreLocal.MoveToStore(savepath, savepath, false); err != nil {
+			if err := models.ModelStoreLocal.MoveToStore(savepath, savepath); err != nil {
 				beego.Error(err.Error())
 			} else {
 				url = "/" + savepath
@@ -276,7 +276,7 @@ func (this *SettingController) Upload() {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
 		}
 	case utils.StoreLocal: //本地存储
-		if err := models.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./"), false); err != nil {
+		if err := models.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./")); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = "/" + strings.TrimLeft(url, "./")

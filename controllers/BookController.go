@@ -380,7 +380,7 @@ func (this *BookController) UploadCover() {
 		}
 	case utils.StoreLocal:
 		save := book.Cover
-		if err := models.ModelStoreLocal.MoveToStore("."+url, save, true); err != nil {
+		if err := models.ModelStoreLocal.MoveToStore("."+url, save); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = book.Cover
@@ -799,37 +799,51 @@ func (this *BookController) UploadProject() {
 //@param            originFilename      上传文件的原始文件名
 //@param            github              是否是来自GitHub，如果是来自GitHub的压缩包，需要再进入一层目录
 func (this *BookController) unzipToData(book_id int, identify, zipfile, originFilename string, github bool) {
-	prefix := "store/" + identify
-	os.RemoveAll(prefix)
-	os.MkdirAll(prefix, os.ModePerm)
-	defer func() {
-		os.Remove(zipfile)   //最后删除上传的临时文件
-		os.RemoveAll(prefix) //删除解压后的文件夹
-	}()
+
+	//说明：
+	//OSS中的图片存储规则为projects/$identify/项目中图片原路径
+	//本地存储规则为uploads/projects/$identify/项目中图片原路径
+
+	projectRoot := "" //项目根目录
+
+	//解压目录
+	unzipPath := "cache/store/" + identify
+
+	imgMap := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".bmp": true, ".svg": true, ".webp": true}
+
+	//如果存在相同目录，则率先移除
+	os.RemoveAll(unzipPath)
+	os.MkdirAll(unzipPath, os.ModePerm)
+
+	//TODO:打开下面注释的代码
+	//defer func() {
+	//	os.Remove(zipfile)   //最后删除上传的临时文件
+	//	os.RemoveAll(unzipPath) //删除解压后的文件夹
+	//}()
+
 	//注意：这里的prefix必须是判断是否是GitHub之前的prefix
-	if err := ziptil.Unzip(zipfile, prefix); err != nil {
+	if err := ziptil.Unzip(zipfile, unzipPath); err != nil {
 		beego.Error("解压失败", zipfile, err.Error())
 	} else {
-		if github {
-			prefix = prefix + "/" + strings.TrimSuffix(originFilename, ".zip")
-		}
-		this.replaceToAbs(prefix, identify)
 
 		//读取文件，把图片文档录入oss
-		if files, err := filetil.ScanFiles(prefix); err == nil {
+		if files, err := filetil.ScanFiles(unzipPath); err == nil {
+			projectRoot = this.getProjectRoot(files)
+			this.replaceToAbs(projectRoot, identify)
+
 			ModelStore := new(models.DocumentStore)
 			//文档对应的标识
 			for _, file := range files {
 				if !file.IsDir {
 					ext := strings.ToLower(filepath.Ext(file.Path))
-					if strings.Contains(".jpg.jpeg.png.gif.bmp.svg.webp", ext) { //图片，录入oss
+					if ok, _ := imgMap[ext]; ok { //图片，录入oss
 						switch utils.StoreType {
 						case utils.StoreOss:
-							if err := models.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, prefix), false, false); err != nil {
+							if err := models.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
 								beego.Error(err)
 							}
 						case utils.StoreLocal:
-							if err := models.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, prefix), false); err != nil {
+							if err := models.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
 								beego.Error(err)
 							}
 						}
@@ -841,11 +855,11 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 							if !strings.HasPrefix(mdcont, "[TOC]") {
 								mdcont = "[TOC]\r\n\r\n" + mdcont
 							}
-							doc.DocumentName = utils.ParseTitleFromMdHtml(mdtil.Md2html(mdcont))
+							htmlstr := mdtil.Md2html(mdcont)
+							doc.DocumentName = utils.ParseTitleFromMdHtml(htmlstr)
 							doc.BookId = book_id
-							//doc.Markdown = mdcont
 							//文档标识
-							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, prefix), "/"), "/", "-", -1)
+							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, projectRoot), "/"), "/", "-", -1)
 							doc.MemberId = this.Member.MemberId
 							doc.OrderSort = 1
 							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
@@ -873,12 +887,114 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 	}
 }
 
-//查找并替换markdown文件中的路径，把图片链接替换成oss链接，把文档间的链接替换成【$+文档标识链接】
-func (this *BookController) replaceToAbs(prefix string, identify string) {
-	var imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
-	files, _ := filetil.ScanFiles(prefix)
+//func (this *BookController) unzipToData(book_id int, identify, zipfile, originFilename string, github bool) {
+//
+//	//说明：
+//	//OSS中的图片存储规则为projects/$identify/项目中图片原路径
+//	//本地存储规则为uploads/projects/$identify/项目中图片原路径
+//
+//	prefix := "cache/store/" + identify
+//	os.RemoveAll(prefix)
+//	os.MkdirAll(prefix, os.ModePerm)
+//	defer func() {
+//		os.Remove(zipfile)   //最后删除上传的临时文件
+//		os.RemoveAll(prefix) //删除解压后的文件夹
+//	}()
+//
+//	//注意：这里的prefix必须是判断是否是GitHub之前的prefix
+//	if err := ziptil.Unzip(zipfile, prefix); err != nil {
+//		beego.Error("解压失败", zipfile, err.Error())
+//	} else {
+//		if github {
+//			prefix = prefix + "/" + strings.TrimSuffix(originFilename, ".zip")
+//		}
+//		this.replaceToAbs(prefix, identify)
+//
+//		//读取文件，把图片文档录入oss
+//		if files, err := filetil.ScanFiles(prefix); err == nil {
+//			ModelStore := new(models.DocumentStore)
+//			//文档对应的标识
+//			for _, file := range files {
+//				if !file.IsDir {
+//					ext := strings.ToLower(filepath.Ext(file.Path))
+//					if strings.Contains(".jpg.jpeg.png.gif.bmp.svg.webp", ext) { //图片，录入oss
+//						switch utils.StoreType {
+//						case utils.StoreOss:
+//							if err := models.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, prefix), false, false); err != nil {
+//								beego.Error(err)
+//							}
+//						case utils.StoreLocal:
+//							if err := models.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, prefix), false); err != nil {
+//								beego.Error(err)
+//							}
+//						}
+//
+//					} else if ext == ".md" || ext == ".markdown" { //markdown文档，提取文档内容，录入数据库
+//						doc := new(models.Document)
+//						if b, err := ioutil.ReadFile(file.Path); err == nil {
+//							mdcont := strings.TrimSpace(string(b))
+//							if !strings.HasPrefix(mdcont, "[TOC]") {
+//								mdcont = "[TOC]\r\n\r\n" + mdcont
+//							}
+//							htmlstr := mdtil.Md2html(mdcont)
+//							doc.DocumentName = utils.ParseTitleFromMdHtml(htmlstr)
+//							doc.BookId = book_id
+//							//文档标识
+//							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, prefix), "/"), "/", "-", -1)
+//							doc.MemberId = this.Member.MemberId
+//							doc.OrderSort = 1
+//							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
+//								doc.OrderSort = 0
+//							}
+//							if doc_id, err := doc.InsertOrUpdate(); err == nil {
+//								if err := ModelStore.InsertOrUpdate(models.DocumentStore{
+//									DocumentId: int(doc_id),
+//									Markdown:   mdcont,
+//								}, "markdown"); err != nil {
+//									beego.Error(err)
+//								}
+//							} else {
+//								beego.Error(err.Error())
+//							}
+//						} else {
+//							beego.Error("读取文档失败：", file.Path, "错误信息：", err)
+//						}
+//
+//					}
+//				}
+//			}
+//		}
+//
+//	}
+//}
+
+//获取文档项目的根目录
+func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) {
+	//获取项目的根目录(感觉这个函数封装的不是很好，有更好的方法，请通过issue告知我，谢谢。)
+	i := 1000
+	for _, f := range fl {
+		if !f.IsDir {
+			if cnt := strings.Count(f.Path, "/"); cnt < i {
+				root = filepath.Dir(f.Path)
+			}
+		}
+	}
+	return
+}
+
+//查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
+func (this *BookController) replaceToAbs(projectRoot string, identify string) {
+	imgBaseUrl := "/uploads/projects/" + identify
+	switch utils.StoreType {
+	case utils.StoreLocal:
+		imgBaseUrl = "/uploads/projects/" + identify
+	case utils.StoreOss:
+		imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
+	}
+	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
 		if strings.HasSuffix(file.Path, ".md") {
+			//mdb ==> markdown byte
 			mdb, _ := ioutil.ReadFile(file.Path)
 			mdCont := string(mdb)
 			basePath := filepath.Dir(file.Path)
@@ -893,11 +1009,11 @@ func (this *BookController) replaceToAbs(prefix string, identify string) {
 			doc.Find("img").Each(func(i int, selection *goquery.Selection) {
 				//非http开头的图片地址，即是相对地址
 				if src, ok := selection.Attr("src"); ok && !strings.HasPrefix(strings.ToLower(src), "http") {
-					newSrc := src                                 //默认为旧地址
-					if cnt := strings.Count(src, "./"); cnt < l { //已"./"或者"../"开头的路径
+					newSrc := src                                  //默认为旧地址
+					if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
 						newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
 					}
-					newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), prefix), "/")
+					newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
 					mdCont = strings.Replace(mdCont, src, newSrc, -1)
 				}
 			})
@@ -906,10 +1022,10 @@ func (this *BookController) replaceToAbs(prefix string, identify string) {
 			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 				if href, ok := selection.Attr("href"); ok && !strings.HasPrefix(strings.ToLower(href), "http") && !strings.HasPrefix(href, "#") {
 					newHref := href //默认
-					if cnt := strings.Count(href, "./"); cnt < l && cnt > 0 {
+					if cnt := strings.Count(href, "../"); cnt < l && cnt > 0 {
 						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
 					}
-					newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), prefix)
+					newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
 					if !strings.HasPrefix(href, "$") { //原链接不包含$符开头，否则表示已经替换过了。
 						newHref = "$" + strings.Replace(strings.Trim(newHref, "/"), "/", "-", -1)
 						slice := strings.Split(newHref, "$")
