@@ -487,7 +487,7 @@ func (this *BookController) Create() {
 		//设置默认时间，因为beego的orm好像无法设置datetime的默认值
 		defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
 		book.LastClickGenerate = defaultTime
-		book.GenerateTime = defaultTime
+		book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") //默认生成文档的时间
 		book.ReleaseTime = defaultTime
 
 		err := book.Insert()
@@ -637,7 +637,8 @@ func (this *BookController) Generate() {
 		this.JsonResult(1, "项目不存在；或您不是文档创始人，没有文档生成权限")
 	}
 
-	go new(models.Document).GenerateBook(book, this.BaseUrl())
+	baseUrl := "http://localhost:" + beego.AppConfig.String("httpport")
+	go new(models.Document).GenerateBook(book, baseUrl)
 
 	this.JsonResult(0, "下载文档生成任务已交由后台执行，请您耐心等待。")
 }

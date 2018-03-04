@@ -893,7 +893,6 @@ func (this *DocumentController) Content() {
 }
 
 //导出文件
-//TODO:从oss判断文件状态
 func (this *DocumentController) Export() {
 	this.TplName = "document/export.html"
 	identify := this.Ctx.Input.Param(":key")
