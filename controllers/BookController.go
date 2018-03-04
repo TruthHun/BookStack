@@ -314,7 +314,6 @@ func (this *BookController) UploadCover() {
 	os.MkdirAll(path, os.ModePerm)
 
 	err = this.SaveToFile("image-file", filePath)
-	beego.Debug("save", filePath)
 
 	if err != nil {
 		logs.Error("", err)
@@ -807,17 +806,19 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 	projectRoot := "" //项目根目录
 
 	//解压目录
-	unzipPath := "cache/store/" + identify
+	unzipPath := "store/" + identify
+
+	//如果存在相同目录，则率先移除
+	if err := os.RemoveAll(unzipPath); err != nil {
+		beego.Error(err.Error())
+	}
+	os.MkdirAll(unzipPath, os.ModePerm)
 
 	imgMap := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".bmp": true, ".svg": true, ".webp": true}
 
-	//如果存在相同目录，则率先移除
-	os.RemoveAll(unzipPath)
-	os.MkdirAll(unzipPath, os.ModePerm)
-
 	//TODO:打开下面注释的代码
 	//defer func() {
-	//	os.Remove(zipfile)   //最后删除上传的临时文件
+	//	os.Remove(zipfile)      //最后删除上传的临时文件
 	//	os.RemoveAll(unzipPath) //删除解压后的文件夹
 	//}()
 
@@ -976,6 +977,7 @@ func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) 
 		if !f.IsDir {
 			if cnt := strings.Count(f.Path, "/"); cnt < i {
 				root = filepath.Dir(f.Path)
+				i = cnt
 			}
 		}
 	}
@@ -993,7 +995,7 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	}
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
-		if strings.HasSuffix(file.Path, ".md") {
+		if ext := strings.ToLower(filepath.Ext(file.Path)); ext == ".md" || ext == ".markdown" {
 			//mdb ==> markdown byte
 			mdb, _ := ioutil.ReadFile(file.Path)
 			mdCont := string(mdb)
@@ -1022,7 +1024,7 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 				if href, ok := selection.Attr("href"); ok && !strings.HasPrefix(strings.ToLower(href), "http") && !strings.HasPrefix(href, "#") {
 					newHref := href //默认
-					if cnt := strings.Count(href, "../"); cnt < l && cnt > 0 {
+					if cnt := strings.Count(href, "../"); cnt < l {
 						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
 					}
 					newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
@@ -1032,7 +1034,6 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 						if ll := len(slice); ll > 0 {
 							newHref = "$" + slice[ll-1]
 						}
-						//mdCont = strings.Replace(mdCont, "-$", "-", -1) //先这样替换一遍。比如a.md和b-a.md，如果先替换a.md，会出现b-$a.md。这是错误的
 						mdCont = strings.Replace(mdCont, "]("+href, "]("+newHref, -1)
 					}
 				}
