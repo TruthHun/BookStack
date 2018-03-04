@@ -2,7 +2,7 @@
 appname = BookStack
 
 # 程序版本
-version = v1.0.0
+version = v1.1
 
 # 监听端口
 httpport = 8181
@@ -103,15 +103,15 @@ enable_mail=true
 #每小时限制指定邮箱邮件发送次数
 mail_number=5
 #smtp服务用户名
-smtp_user_name=admin@bookstack.cn
+smtp_user_name=
 #smtp服务器地址
-smtp_host=smtpdm.aliyun.com
+smtp_host=
 #smtp密码
-smtp_password=BOOKSTACKi23456789c
+smtp_password=
 #端口号
 smtp_port=25
 #发送邮件的显示名称
-form_user_name=admin@bookstack.cn
+form_user_name=
 
 #接收回件的邮箱。留空则表示使用发送邮件的邮箱作为接收回件邮箱
 reply_user_name=bookstack@qq.com
