@@ -745,7 +745,7 @@ func (this *BookController) DownloadProject() {
 		if file, err := util.CrawlFile(link, "store", 60); err != nil {
 			beego.Error(err)
 		} else {
-			this.unzipToData(book.BookId, identify, file, filepath.Base(file), true)
+			this.unzipToData(book.BookId, identify, file, filepath.Base(file))
 		}
 	}()
 	this.JsonResult(0, "提交成功。下载任务已交由后台执行")
@@ -760,8 +760,6 @@ func (this *BookController) UploadProject() {
 	if _, err := this.IsPermission(); err != nil {
 		this.JsonResult(1, err.Error())
 	}
-
-	github, _ := this.GetBool("github", false)
 
 	//普通用户没法上传项目
 	if this.Member.Role > 1 {
@@ -784,7 +782,7 @@ func (this *BookController) UploadProject() {
 	}
 	tmpfile := "store/" + identify + ".zip" //保存的文件名
 	if err := this.SaveToFile("zipfile", tmpfile); err == nil {
-		go this.unzipToData(book.BookId, identify, tmpfile, h.Filename, github)
+		go this.unzipToData(book.BookId, identify, tmpfile, h.Filename)
 	} else {
 		beego.Error(err.Error())
 	}
@@ -796,8 +794,7 @@ func (this *BookController) UploadProject() {
 //@param            identify            项目标识
 //@param            zipfile             压缩文件
 //@param            originFilename      上传文件的原始文件名
-//@param            github              是否是来自GitHub，如果是来自GitHub的压缩包，需要再进入一层目录
-func (this *BookController) unzipToData(book_id int, identify, zipfile, originFilename string, github bool) {
+func (this *BookController) unzipToData(book_id int, identify, zipfile, originFilename string) {
 
 	//说明：
 	//OSS中的图片存储规则为projects/$identify/项目中图片原路径
