@@ -411,10 +411,12 @@ func (this *BookController) Users() {
 	this.Data["Model"] = *book
 
 	members, totalCount, err := models.NewMemberRelationshipResult().FindForUsersByBookId(book.BookId, pageIndex, 15)
-
+	for idx, member := range members {
+		member.Avatar = utils.ShowImg(member.Avatar, "avatar")
+		members[idx] = member
+	}
 	if totalCount > 0 {
 		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, 10, totalCount)
-
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
