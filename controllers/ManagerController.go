@@ -36,8 +36,8 @@ func (this *ManagerController) Index() {
 	this.Data["Model"] = models.NewDashboard().Query()
 	this.GetSeoByPage("manage_dashboard", map[string]string{
 		"title":       "仪表盘 - " + this.Sitename,
-		"keywords":    "书栈,BookStack,BookStack.CN,书栈网,文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"keywords":    "仪表盘",
+		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	this.Data["IsDashboard"] = true
 }
@@ -49,8 +49,8 @@ func (this *ManagerController) Users() {
 	pageIndex, _ := this.GetInt("page", 0)
 	this.GetSeoByPage("manage_users", map[string]string{
 		"title":       "用户管理 - " + this.Sitename,
-		"keywords":    "书栈,BookStack,BookStack.CN,书栈网,文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"keywords":    "用户管理",
+		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 
 	members, totalCount, err := models.NewMember().FindToPager(pageIndex, conf.PageSize)
@@ -204,8 +204,8 @@ func (this *ManagerController) EditMember() {
 	this.TplName = "manager/edit_users.html"
 	this.GetSeoByPage("manage_users_edit", map[string]string{
 		"title":       "用户编辑 - " + this.Sitename,
-		"keywords":    "书栈,BookStack,BookStack.CN,书栈网,文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"keywords":    "用户标记",
+		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	this.Data["IsUsers"] = true
 	member_id, _ := this.GetInt(":id", 0)
@@ -295,8 +295,8 @@ func (this *ManagerController) Books() {
 	this.Data["IsBooks"] = true
 	this.GetSeoByPage("manage_project_list", map[string]string{
 		"title":       "项目管理 - " + this.Sitename,
-		"keywords":    "书栈,BookStack,BookStack.CN,书栈网,文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"keywords":    "项目管理",
+		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	pageIndex, _ := this.GetInt("page", 1)
 	private, _ := this.GetInt("private")
@@ -322,8 +322,8 @@ func (this *ManagerController) EditBook() {
 
 	this.GetSeoByPage("manage_project_edit", map[string]string{
 		"title":       "项目设置 - " + this.Sitename,
-		"keywords":    "书栈,BookStack,BookStack.CN,书栈网,文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
-		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
+		"keywords":    "项目设置",
+		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 
 	this.TplName = "manager/edit_book.html"
