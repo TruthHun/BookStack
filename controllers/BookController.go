@@ -816,11 +816,10 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 
 	imgMap := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".bmp": true, ".svg": true, ".webp": true}
 
-	//TODO:打开下面注释的代码
-	//defer func() {
-	//	os.Remove(zipfile)      //最后删除上传的临时文件
-	//	os.RemoveAll(unzipPath) //删除解压后的文件夹
-	//}()
+	defer func() {
+		os.Remove(zipfile)      //最后删除上传的临时文件
+		os.RemoveAll(unzipPath) //删除解压后的文件夹
+	}()
 
 	//注意：这里的prefix必须是判断是否是GitHub之前的prefix
 	if err := ziptil.Unzip(zipfile, unzipPath); err != nil {
