@@ -267,7 +267,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 			"--pdf-page-margin-top", beego.AppConfig.DefaultString("exportMarginTop", "72"),
 		},
 	}
-	folder := fmt.Sprintf("cache/%v/", book.Identify)
+	folder := fmt.Sprintf("cache/books/%v/", book.Identify)
 	os.MkdirAll(folder, os.ModePerm)
 	if !debug {
 		defer os.RemoveAll(folder)
