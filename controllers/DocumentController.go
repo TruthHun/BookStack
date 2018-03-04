@@ -569,6 +569,8 @@ func (this *DocumentController) Upload() {
 		beego.Error("Attachment Insert => ", err)
 		this.JsonResult(6006, "文件保存失败")
 	}
+	//TODO:移除debug
+	beego.Debug(attachment)
 	if attachment.HttpPath == "" {
 		attachment.HttpPath = beego.URLFor("DocumentController.DownloadAttachment", ":key", identify, ":attach_id", attachment.AttachmentId)
 

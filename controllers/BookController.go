@@ -50,6 +50,11 @@ func (this *BookController) Index() {
 	} else {
 		this.Data["PageHtml"] = ""
 	}
+	//处理封面图片
+	for idx, book := range books {
+		book.Cover = utils.ShowImg(book.Cover, "cover")
+		books[idx] = book
+	}
 	b, err := json.Marshal(books)
 	if err != nil || len(books) <= 0 {
 		this.Data["Result"] = template.JS("[]")
@@ -308,14 +313,17 @@ func (this *BookController) UploadCover() {
 	os.MkdirAll(path, os.ModePerm)
 
 	err = this.SaveToFile("image-file", filePath)
+	beego.Debug("save", filePath)
 
 	if err != nil {
 		logs.Error("", err)
 		this.JsonResult(500, "图片保存失败")
 	}
-	defer func(filePath string) {
-		os.Remove(filePath)
-	}(filePath)
+	if utils.StoreType != utils.StoreLocal {
+		defer func(filePath string) {
+			os.Remove(filePath)
+		}(filePath)
+	}
 
 	//剪切图片
 	subImg, err := graphics.ImageCopyFromFile(filePath, x, y, width, height)
@@ -344,6 +352,9 @@ func (this *BookController) UploadCover() {
 	old_cover := book.Cover
 	osspath := fmt.Sprintf("projects/%v/%v", book.Identify, strings.TrimLeft(url, "./"))
 	book.Cover = "/" + osspath
+	if utils.StoreType == utils.StoreLocal {
+		book.Cover = url
+	}
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6001, "保存图片失败")
@@ -367,11 +378,11 @@ func (this *BookController) UploadCover() {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + osspath + "/cover"
 		}
 	case utils.StoreLocal:
-		save := "uploads/" + osspath
+		save := book.Cover
 		if err := models.ModelStoreLocal.MoveToStore("."+url, save, true); err != nil {
 			beego.Error(err.Error())
 		} else {
-			url = "/" + save
+			url = book.Cover
 		}
 	}
 

@@ -130,7 +130,8 @@ func (this *SettingController) Qrcode() {
 			this.JsonResult(500, "不支持的图片格式")
 		}
 
-		savepath := fmt.Sprintf("uploads/qrcode/%v-%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+		savepath := fmt.Sprintf("uploads/qrcode/%v/%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+		os.MkdirAll(filepath.Dir(savepath), 0777)
 		if err = this.SaveToFile("qrcode", savepath); err != nil {
 			this.JsonResult(1, "二维码保存失败", savepath)
 		}
