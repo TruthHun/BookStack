@@ -50,6 +50,9 @@
                         {{else}}
                         <button type="button"  class="btn btn-danger btn-sm pull-right" data-toggle="modal" data-target="#changePrivatelyOwnedModal" style="margin-right: 5px;">转为私有</button>
                         {{end}}
+                        <a href="{{urlfor "BookController.Generate" ":key" .Model.Identify}}" style="margin-right: 5px;"  class="btn btn-success btn-sm ajax-get  pull-right">
+                            生成下载文档
+                        </a>
                         <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除项目</button>
 
                         {{end}}
@@ -283,6 +286,7 @@
 <script src="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/bootstrap/plugins/tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
 <script src="/static/js/main.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
