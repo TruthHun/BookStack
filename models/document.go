@@ -275,10 +275,14 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 
 	//生成致谢信内容
 	if htmlstr, err := utils.ExecuteViewPathTemplate("document/tpl_statement.html", map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+		h1Title := "说明"
+		if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr)); err == nil {
+			h1Title = doc.Find("h1").Text()
+		}
 		toc := converter.Toc{
 			Id:    time.Now().Nanosecond(),
 			Pid:   0,
-			Title: "致谢",
+			Title: h1Title,
 			Link:  "statement.html",
 		}
 		htmlname := folder + toc.Link
