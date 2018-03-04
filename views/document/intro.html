@@ -129,7 +129,7 @@
                                     {{range .Comments}}
                                     <li class="clearfix">
                                         <div class="col-xs-12">
-                                            <img src="{{$.StaticDomain}}{{.Avatar}}/avatar" class="img-thumbnail img-circle img-responsive" alt="进击的皇虫">
+                                            <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="进击的皇虫">
                                             <span class="username">{{.Nickname}}</span>
                                             <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
                                             <span class="text-muted hidden-xs pull-right">{{date .TimeCreate "Y-m-d H:i:s"}}</span>
