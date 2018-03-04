@@ -36,6 +36,9 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，为�
 
 目前v1.1版本已开发完成，实现了本地化存储的支持([升级日志](change.md))。本地化存储的支持，通过`app.conf`文件的`store_type`项来配置。
 
+v1.0版本有很多地方不适于用于运营，使用v1.0版本的用户，建议升级到v1.1版本。
+
+> 关于BookStack使用文档难产：程序从v1.0开发升级到v1.1，满打满算用了一天的时间；而光写`readme.md`这个文档，当初就花了足足两天时间...会抽时间在开发v1.2版本前，把使用文档撰写出来，届时使用文档将发布在书栈网的[书栈(BookStack)使用手册](http://www.bookstack.cn/books/help)。
 
 <a name="open"></a>
 ## 开源
