@@ -96,7 +96,7 @@
                                         </template>
                                         <a :href="'/book/' + item.identify + '/setting'" title="项目设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">项目</span>设置</a>
                                         {{if lt $.Member.Role 2}}
-                                        <a href="javascript:void(0);" class="btn btn-default btn-upload-zip  btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="使用zip打包并批量上传当前项目，程序自动添加。在打包的时候，需要注意，必须在项目的根文件夹压缩。">
+                                        <a href="javascript:void(0);" class="btn btn-default btn-upload-zip  btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">
                                             <i class="fa fa-cloud-upload"></i> 导入<span class="hidden-xs">项目</span>
                                         </a>
                                         <a href="javascript:void(0);" class="btn btn-default btn-pull-project-from-github btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
