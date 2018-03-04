@@ -31,25 +31,29 @@
                                 <label>站点统计</label>
                                 <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="3">{{.TONGJI.OptionValue}}</textarea>
                             </div>
-                            <div class="form-group">
+
+                            {{/*肯定要允许游客进行访问*/}}
+                            <div class="form-group hide">
                                 <label>启用匿名访问</label>
                                 <div class="radio">
                                     <label class="radio-inline">
-                                        <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "true"}}checked{{end}} name="ENABLE_ANONYMOUS" value="true">开启<span class="text"></span>
+                                        <input type="radio" checked name="ENABLE_ANONYMOUS" value="true">开启<span class="text"></span>
                                     </label>
                                     <label class="radio-inline">
-                                        <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "false"}}checked{{end}} name="ENABLE_ANONYMOUS" value="false">关闭<span class="text"></span>
+                                        <input type="radio" name="ENABLE_ANONYMOUS" value="false">关闭<span class="text"></span>
                                     </label>
                                 </div>
                             </div>
-                        <div class="form-group">
+
+                        {{/*肯定要允许用户注册行为*/}}
+                        <div class="form-group hide">
                             <label>启用注册</label>
                             <div class="radio">
                                 <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "true"}}checked{{end}} name="ENABLED_REGISTER" value="true">开启<span class="text"></span>
+                                    <input type="radio" checked name="ENABLED_REGISTER" value="true">开启<span class="text"></span>
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "false"}}checked{{end}} name="ENABLED_REGISTER" value="false">关闭<span class="text"></span>
+                                    <input type="radio" name="ENABLED_REGISTER" value="false">关闭<span class="text"></span>
                                 </label>
                             </div>
                         </div>

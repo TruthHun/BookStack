@@ -44,19 +44,20 @@ func (this *LabelController) Index() {
 	//		this.Abort("500")
 	//	}
 	//}
+
+	pageSize := 24
 	member_id := 0
 	if this.Member != nil {
 		member_id = this.Member.MemberId
 	}
-	search_result, totalCount, err := models.NewBook().FindForLabelToPager(labelName, pageIndex, conf.PageSize, member_id)
+	search_result, totalCount, err := models.NewBook().FindForLabelToPager(labelName, pageIndex, pageSize, member_id)
 
 	if err != nil {
 		beego.Error(err)
 		return
 	}
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
-
+		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.Index", ":key", labelName), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -86,8 +87,7 @@ func (this *LabelController) List() {
 		this.ShowErrorPage(50001, err.Error())
 	}
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, pageSize, totalCount)
-
+		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.List"), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""

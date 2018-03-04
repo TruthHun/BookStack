@@ -46,7 +46,8 @@ func (this *BookController) Index() {
 		this.Abort("500")
 	}
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
+		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
 	} else {
 		this.Data["PageHtml"] = ""
 	}

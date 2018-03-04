@@ -587,7 +587,7 @@ textarea{
     padding-left: 15px;
 }
 .pagination-container .pagination{
-    box-shadow: 0 1px 2px 0 #e3e3e0;
+    box-shadow: unset;
 }
 .pagination-container .pagination>li>a,.pagination-container .pagination>li>span{
     padding: 8px 16px !important;

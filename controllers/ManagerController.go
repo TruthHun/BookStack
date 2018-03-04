@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"fmt"
+
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
@@ -51,7 +53,7 @@ func (this *ManagerController) Users() {
 		"description": "书栈(BookStack.CN)专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 
-	members, totalCount, err := models.NewMember().FindToPager(pageIndex, 15)
+	members, totalCount, err := models.NewMember().FindToPager(pageIndex, conf.PageSize)
 
 	if err != nil {
 		this.Data["ErrorMessage"] = err.Error()
@@ -59,9 +61,7 @@ func (this *ManagerController) Users() {
 	}
 
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, 10, int(totalCount))
-
-		this.Data["PageHtml"] = html
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(totalCount), conf.PageSize, pageIndex, beego.URLFor("ManagerController.Users"), "")
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -309,9 +309,7 @@ func (this *ManagerController) Books() {
 	}
 
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
-
-		this.Data["PageHtml"] = html
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("ManagerController.Books"), fmt.Sprintf("&private=%v", private))
 	} else {
 		this.Data["PageHtml"] = ""
 	}

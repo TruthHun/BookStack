@@ -14,7 +14,7 @@ func init() {
 	beego.Router("/bind", &controllers.AccountController{}, "post:Bind")
 	//beego.Router("/find_password", &controllers.AccountController{}, "*:FindPassword")
 	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")
-	beego.Router("/captcha", &controllers.AccountController{}, "*:Captcha")
+	//beego.Router("/captcha", &controllers.AccountController{}, "*:Captcha")
 
 	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")
 	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")

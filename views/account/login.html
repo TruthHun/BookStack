@@ -39,26 +39,18 @@
                                     <input type="password" class="form-control" placeholder="密码" name="password" id="password" autocomplete="off">
                                 </div>
                             </div>
-                            {{if .ENABLED_CAPTCHA }}
-                            {{if ne .ENABLED_CAPTCHA "false"}}
-                            <div class="form-group">
-                                <div class="input-group" style="float: left;width: 180px;">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-check-square"></i>
+                            {{if .CaptchaOn}}
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-check-square"></i>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="验证码" name="captcha" autocomplete="off">
                                     </div>
-                                    <input type="text" name="code" id="code" class="form-control" style="width: 120px" maxlength="5" placeholder="验证码" autocomplete="off">&nbsp;
                                 </div>
-                                <img id="captcha-img" style="width: 120px;height:33px;display: inline-block;float: right" src="{{urlfor "AccountController.Captcha"}}" onclick="this.src='{{urlfor "AccountController.Captcha"}}?key=login&t='+(new Date()).getTime();" title="点击换一张">
-                                <div class="clearfix"></div>
-                            </div>
+                            {{create_captcha}}
                             {{end}}
-                            {{end}}
-                            {{/*<div class="checkbox">*/}}
-                                {{/*<label>*/}}
-                                    {{/*<input type="checkbox" name="is_remember" value="yes"> 保持登录*/}}
-                                {{/*</label>*/}}
-                            {{/*</div>*/}}
-                            <div class="form-group">
+                            <div class="form-group mgt-15px">
                                 <button type="button" id="btn-login" class="btn btn-success" style="width: 100%"  data-loading-text="正在登录..." autocomplete="off">立即登录</button>
                             </div>
                             <div class="form-group">
@@ -104,24 +96,18 @@
 
             var account = $.trim($("#account").val());
             var password = $.trim($("#password").val());
-            var code = $("#code").val();
+            var code = $("[name=captcha]").val();
             if(account === ""){
-                $("#account").tooltip({placement:"auto",title : "账号不能为空",trigger : 'manual'})
-                    .tooltip('show')
-                    .parents('.form-group').addClass('has-error');
+                layer.msg("账号不能为空");
                 $btn.button('reset');
                 return false;
 
             }else if(password === ""){
-                $("#password").tooltip({title : '密码不能为空',trigger : 'manual'})
-                    .tooltip('show')
-                    .parents('.form-group').addClass('has-error');
+                layer.msg("密码不能为空");
                 $btn.button('reset');
                 return false;
             }else if(code !== undefined && code === ""){
-                $("#code").tooltip({title : '验证码不能为空',trigger : 'manual'})
-                    .tooltip('show')
-                    .parents('.form-group').addClass('has-error');
+                layer.msg("验证码不能为空");
                 $btn.button('reset');
                 return false;
             }else{
@@ -131,12 +117,11 @@
                     dataType : "json",
                     type : "POST",
                     success : function (res) {
-
                         if(res.errcode !== 0){
-                            $("#captcha-img").click();
-                            $("#code").val('');
+                            $("[name=captcha]").val('');
                             layer.msg(res.message);
                             $btn.button('reset');
+                            $(".captcha img").trigger("click");
                         }else{
                             window.location = "/";
                         }

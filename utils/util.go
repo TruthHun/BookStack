@@ -7,10 +7,11 @@ import (
 	"strconv"
 	"strings"
 
+	html1 "html/template"
+
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/html2article"
 	"github.com/alexcesaro/mail/mailer"
-	//"github.com/lunny/html2md"
 
 	"net/mail"
 
@@ -246,4 +247,114 @@ func ShowImg(img string, style ...string) (url string) {
 		url = img
 	}
 	return
+}
+
+//分页函数（这个分页函数不具有通用性）
+//rollPage:展示分页的个数
+//totalRows：总记录
+//currentPage:每页显示记录数
+//urlPrefix:url链接前缀
+//urlParams:url键值对参数
+func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix string, urlSuffix string, urlParams ...interface{}) html1.HTML {
+	var (
+		htmlPage, path string
+		pages          []int
+		params         []string
+	)
+	//总页数
+	totalPage := totalRows / listRows
+	if totalRows%listRows > 0 {
+		totalPage += 1
+	}
+	//只有1页的时候，不分页
+	if totalPage < 2 {
+		return ""
+	}
+	params_len := len(urlParams)
+	if params_len > 0 {
+		if params_len%2 > 0 {
+			params_len = params_len - 1
+		}
+		for i := 0; i < params_len; {
+			key := strings.TrimSpace(fmt.Sprintf("%v", urlParams[i]))
+			val := strings.TrimSpace(fmt.Sprintf("%v", urlParams[i+1]))
+			//键存在，同时值不为0也不为空
+			if len(key) > 0 && len(val) > 0 && val != "0" {
+				params = append(params, key, val)
+			}
+			i = i + 2
+		}
+	}
+
+	path = strings.Trim(urlPrefix, "/")
+	if len(params) > 0 {
+		path = path + "/" + strings.Trim(strings.Join(params, "/"), "/")
+	}
+	//最后再处理一次“/”，是为了防止urlPrifix参数为空时，出现多余的“/”
+	path = "/" + strings.Trim(path, "/")
+
+	if currentPage > totalPage {
+		currentPage = totalPage
+	}
+	if currentPage < 1 {
+		currentPage = 1
+	}
+	index := 0
+	rp := rollPage * 2
+	for i := rp; i > 0; i-- {
+		p := currentPage + rollPage - i
+		if p > 0 && p <= totalPage {
+
+			pages = append(pages, p)
+		}
+	}
+	for k, v := range pages {
+		if v == currentPage {
+			index = k
+		}
+	}
+	pages_len := len(pages)
+	if currentPage > 1 {
+		htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=1">1..</a></li><li><a class="num" href="`+path+`?page=%d%v">«</a></li>`, currentPage-1, urlSuffix)
+	}
+	if pages_len <= rollPage {
+		for _, v := range pages {
+			if v == currentPage {
+				htmlPage += fmt.Sprintf(`<li class="active"><a href="javascript:void(0);">%d</a></li>`, v)
+			} else {
+				htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=%d%v">%d</a></li>`, v, urlSuffix, v)
+			}
+		}
+
+	} else {
+		index_min := index - rollPage/2
+		index_max := index + rollPage/2
+		page_slice := make([]int, 0)
+		if index_min > 0 && index_max < pages_len { //切片索引未越界
+			page_slice = pages[index_min:index_max]
+		} else {
+			if index_min < 0 {
+				page_slice = pages[0:rollPage]
+			} else if index_max > pages_len {
+				page_slice = pages[(pages_len - rollPage):pages_len]
+			} else {
+				page_slice = pages[index_min:index_max]
+			}
+
+		}
+
+		for _, v := range page_slice {
+			if v == currentPage {
+				htmlPage += fmt.Sprintf(`<li class="active"><a href="javascript:void(0);">%d</a></li>`, v)
+			} else {
+				htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=%d%v">%d</a></li>`, v, urlSuffix, v)
+			}
+		}
+
+	}
+	if currentPage < totalPage {
+		htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=%v%v">»</a></li><li><a class="num" href="`+path+`?page=%v%v">..%d</a></li>`, currentPage+1, urlSuffix, totalPage, urlSuffix, totalPage)
+	}
+
+	return html1.HTML(`<ul class="pagination">` + htmlPage + `</ul>`)
 }

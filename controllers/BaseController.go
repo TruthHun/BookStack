@@ -64,6 +64,9 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
+	if this.Member.RoleName == "" {
+		this.Member.ResolveRoleName()
+	}
 	this.Data["Member"] = this.Member
 	this.Data["BaseUrl"] = this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
 
@@ -208,7 +211,6 @@ func (this *BaseController) StaticFile() {
 	this.Abort("404")
 }
 
-//TODO	直接通过用户id进行登录，供第三方登录调用
 func (this *BaseController) loginByMemberId(memberId int) (err error) {
 	member, err := models.NewMember().Find(memberId)
 	if member.MemberId == 0 {
@@ -272,19 +274,19 @@ func (this *BaseController) sortBySummary(htmlstr string, book_id int) {
 		}
 	}
 	if len(hrefs) > 0 { //存在未创建的文档，先创建
-		ModelStore:=new(models.DocumentStore)
+		ModelStore := new(models.DocumentStore)
 		for identify, doc_name := range hrefs {
-			doc:=models.Document{
+			doc := models.Document{
 				BookId:       book_id,
 				Identify:     identify,
 				DocumentName: doc_name,
 				CreateTime:   time.Now(),
 				ModifyTime:   time.Now(),
 			}
-			if doc_id,err:=doc.InsertOrUpdate();err==nil{
+			if doc_id, err := doc.InsertOrUpdate(); err == nil {
 				ModelStore.InsertOrUpdate(models.DocumentStore{
-					DocumentId:int(doc_id),
-					Markdown:"[TOC]\n\r\n\r",
+					DocumentId: int(doc_id),
+					Markdown:   "[TOC]\n\r\n\r",
 				})
 			}
 		}

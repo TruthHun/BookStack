@@ -119,8 +119,11 @@ func (m *BookResult) FindByIdentify(identify string, member_id int) (*BookResult
 
 func (m *BookResult) FindToPager(pageIndex, pageSize int, private ...int) (books []*BookResult, totalCount int, err error) {
 	o := orm.NewOrm()
-
-	count, err := o.QueryTable(NewBook().TableNameWithPrefix()).Count()
+	pri := 0
+	if len(private) > 0 {
+		pri = private[0]
+	}
+	count, err := o.QueryTable(NewBook().TableNameWithPrefix()).Filter("privately_owned", pri).Count()
 
 	if err != nil {
 		return
@@ -135,7 +138,7 @@ func (m *BookResult) FindToPager(pageIndex, pageSize int, private ...int) (books
 		ORDER BY book.order_index DESC ,book.book_id DESC  LIMIT ?,?`
 	condition := ""
 	if len(private) > 0 {
-		condition = "where book.privately_owned=" + strconv.Itoa(private[0])
+		condition = "where book.privately_owned=" + strconv.Itoa(pri)
 	}
 	sql = fmt.Sprintf(sql, condition)
 	offset := (pageIndex - 1) * pageSize

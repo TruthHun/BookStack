@@ -29,12 +29,6 @@
                                     <input type="text" class="form-control" name="account" placeholder="由英文字母数字组成，限3-50个字符" id="account" value="{{.Username}}" autocomplete="off">
                                 </div>
                             </div>
-                            <div class="form-group has-hidden">
-                                <div class="input-group">
-                                    <div class="input-group-addon">用户昵称</div>
-                                    <input type="text" class="form-control" name="nickname" id="nickname" value="{{.Nickname}}" autocomplete="off">
-                                </div>
-                            </div>
                             <div class="form-group">
                                 <div class="input-group">
                                     <div class="input-group-addon">登录密码</div>
@@ -45,6 +39,12 @@
                                 <div class="input-group">
                                     <div class="input-group-addon">确认密码</div>
                                     <input type="password" class="form-control" placeholder="密码必须在6-50个字符之间" name="password2" id="password2" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group has-hidden">
+                                <div class="input-group">
+                                    <div class="input-group-addon">用户昵称</div>
+                                    <input type="text" class="form-control" name="nickname" id="nickname" value="{{.Nickname}}" autocomplete="off">
                                 </div>
                             </div>
                             <div class="form-group has-hidden">
@@ -61,9 +61,21 @@
                                     <label><input type="radio" name="isbind" checked value="0"> 注册新账号</label>
                                     <label><input type="radio" name="isbind" value="1"> 绑定已有账号</label>
                                 </div>
+                            {{else}}
+                                {{if .CaptchaOn}}
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                &nbsp;验 证 码&nbsp;
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="验证码" name="captcha" autocomplete="off">
+                                        </div>
+                                    </div>
+                                {{create_captcha}}
+                                {{end}}
                             {{end}}
 
-                            <div class="form-group">
+                            <div class="form-group mgt-15px">
                                 <button type="submit" class="btn btn-success btn-block" data-has="绑定已有账号" data-not="注册新账号">注册新账号</button>
                             </div>
 

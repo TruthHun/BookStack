@@ -14,13 +14,23 @@ import (
 	"github.com/TruthHun/BookStack/oauth"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/utils/captcha"
 	"github.com/lifei6671/gocaptcha"
 )
 
 // AccountController 用户登录与注册.
 type AccountController struct {
 	BaseController
+}
+
+var cpt *captcha.Captcha
+
+func init() {
+	// use beego cache system store the captcha data
+	fc := &cache.FileCache{CachePath: "./cache/captcha"}
+	cpt = captcha.NewWithFilter("/captcha/", fc)
 }
 
 //第三方登录回调
@@ -32,15 +42,23 @@ func (this *AccountController) Oauth() {
 	//return
 
 	var (
-		ierr     error  //错误
-		nickname string //昵称
-		avatar   string //头像的http链接地址
-		email    string //邮箱地址
-		username string //用户名
-		tips     string
-		id       interface{} //第三方的用户id，唯一识别码
-		IsEmail  bool        //是否是使用邮箱注册
+		ierr      error  //错误
+		nickname  string //昵称
+		avatar    string //头像的http链接地址
+		email     string //邮箱地址
+		username  string //用户名
+		tips      string
+		id        interface{} //第三方的用户id，唯一识别码
+		IsEmail   bool        //是否是使用邮箱注册
+		captchaOn bool        //是否开启了验证码
 	)
+
+	//如果开启了验证码
+	if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
+		captchaOn = true
+		this.Data["CaptchaOn"] = captchaOn
+	}
+
 	oa := this.GetString(":oauth")
 	code := this.GetString("code")
 	switch oa {
@@ -178,31 +196,40 @@ func (this *AccountController) Oauth() {
 // Login 用户登录.
 func (this *AccountController) Login() {
 	this.TplName = "account/login.html"
-	var remember CookieRemember
+	var (
+		remember  CookieRemember
+		captchaOn bool //是否开启了验证码
+	)
+
+	//如果开启了验证码
+	if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
+		captchaOn = true
+		this.Data["CaptchaOn"] = captchaOn
+	}
 
 	//如果Cookie中存在登录信息
 	if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
 		if err := utils.Decode(cookie, &remember); err == nil {
-			if member, err := models.NewMember().Find(remember.MemberId); err == nil {
-				this.SetMember(*member)
+			if err := this.loginByMemberId(remember.MemberId); err == nil {
 				this.Redirect(beego.URLFor("HomeController.Index"), 302)
 				this.StopRun()
 			}
+			//if member, err := models.NewMember().Find(remember.MemberId); err == nil {
+			//	this.SetMember(*member)
+			//	this.Redirect(beego.URLFor("HomeController.Index"), 302)
+			//	this.StopRun()
+			//}
 		}
 	}
 
 	if this.Ctx.Input.IsPost() {
 		account := this.GetString("account")
 		password := this.GetString("password")
-		captcha := this.GetString("code")
 
-		//如果开启了验证码
-		if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
-			v, ok := this.GetSession(conf.CaptchaSessionName).(string)
-			if !ok || !strings.EqualFold(v, captcha) {
-				this.JsonResult(6001, "验证码不正确")
-			}
+		if captchaOn && !cpt.VerifyReq(this.Ctx.Request) {
+			this.JsonResult(1, "验证码不正确")
 		}
+
 		member, err := models.NewMember().Login(account, password)
 
 		//如果没有数据
@@ -226,6 +253,7 @@ func (this *AccountController) Login() {
 
 		return
 	}
+
 	this.Data["GiteeClientId"] = beego.AppConfig.String("oauth::giteeClientId")
 	this.Data["GiteeCallback"] = beego.AppConfig.String("oauth::giteeCallback")
 	this.Data["GithubClientId"] = beego.AppConfig.String("oauth::githubClientId")
@@ -270,6 +298,12 @@ func (this *AccountController) Bind() {
 	if oauthType != "email" {
 		if auth, ok := this.GetSession("auth").(string); !ok || fmt.Sprintf("%v-%v", oauthType, oauthId) != auth {
 			this.JsonResult(6005, "绑定信息有误，授权类型不符")
+		}
+	} else { //邮箱登录，如果开启了验证码，则对验证码进行校验
+		if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
+			if !cpt.VerifyReq(this.Ctx.Request) {
+				this.JsonResult(1, "验证码不正确")
+			}
 		}
 	}
 

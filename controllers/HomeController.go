@@ -3,6 +3,7 @@ package controllers
 import (
 	"math"
 
+	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
@@ -19,8 +20,10 @@ func (this *HomeController) Index() {
 	if !this.EnableAnonymous && this.Member == nil {
 		this.Redirect(beego.URLFor("AccountController.Login"), 302)
 	}
+
 	pageIndex, _ := this.GetInt("page", 1)
-	pageSize := 18
+	//每页显示24个，为了兼容Pad、mobile、PC
+	pageSize := 24
 
 	member_id := 0
 
@@ -35,7 +38,8 @@ func (this *HomeController) Index() {
 		this.Abort("500")
 	}
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, pageSize, totalCount)
+		//html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, pageSize, totalCount)
+		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, "/", "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
