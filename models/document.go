@@ -310,7 +310,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 			gq.Find("img").Each(func(i int, s *goquery.Selection) {
 				pic := ""
 				if src, ok := s.Attr("src"); ok {
-					if strings.HasPrefix(src, "http") {
+					if srcLower := strings.ToLower(src); strings.HasPrefix(srcLower, "http://") || strings.HasPrefix(srcLower, "https://") {
 						pic = src
 					} else {
 						pic = base_url + src
