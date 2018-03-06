@@ -33,7 +33,7 @@ BookStack.exe
 BookStack.exe~
 cache/
 uploads
-store
+/store
 bs.zip
 *.xml
 render.jpg
