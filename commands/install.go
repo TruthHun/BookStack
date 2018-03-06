@@ -5,11 +5,12 @@ import (
 	"os"
 	"time"
 
+	"strings"
+
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"strings"
 )
 
 //系统安装.
@@ -78,10 +79,11 @@ func initialization() {
 		book.Editor = "markdown"
 		book.Theme = "default"
 		//设置默认时间，因为beego的orm好像无法设置datetime的默认值
-		defaultTime,_:=time.Parse("2006-01-02 15:04:05","2006-01-02 15:04:05")
-		book.LastClickGenerate=defaultTime
-		book.GenerateTime=defaultTime
-		book.ReleaseTime=defaultTime
+		defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+		book.LastClickGenerate = defaultTime
+		book.GenerateTime = defaultTime
+		//book.ReleaseTime = defaultTime
+		book.ReleaseTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05")
 		book.Score = 40
 
 		if err := book.Insert(); err != nil {
@@ -91,9 +93,10 @@ func initialization() {
 		initSeo()
 	}
 }
+
 //初始化SEO
-func initSeo()  {
-	sqlslice:=[]string{"insert ignore into `md_seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','首页','书栈网(BookStack.CN)_分享，让知识传承更久远','{keywords}','{description}'),",
+func initSeo() {
+	sqlslice := []string{"insert ignore into `md_seo`(`id`,`page`,`statement`,`title`,`keywords`,`description`) values ('1','index','首页','书栈网(BookStack.CN)_分享，让知识传承更久远','{keywords}','{description}'),",
 		"('2','label_list','标签列表页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('3','label_content','标签内容页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('4','book_info','文档信息页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
@@ -111,7 +114,7 @@ func initSeo()  {
 		"('17','manage_project_list','项目列表','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('18','manage_project_edit','项目编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
 	}
-	if _,err:=orm.NewOrm().Raw(strings.Join(sqlslice,"")).Exec();err!=nil{
+	if _, err := orm.NewOrm().Raw(strings.Join(sqlslice, "")).Exec(); err != nil {
 		beego.Error(err.Error())
 	}
 }
