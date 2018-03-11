@@ -28,6 +28,7 @@ func (this *Local) MoveToStore(tmpfile, save string) (err error) {
 		save = strings.TrimPrefix(save, "./")
 	}
 	if strings.ToLower(tmpfile) != strings.ToLower(save) { //不是相同文件路径
+		save = strings.TrimLeft(save, "./")
 		os.MkdirAll(filepath.Dir(save), os.ModePerm)
 		err = os.Rename(tmpfile, save)
 	}
