@@ -228,21 +228,28 @@
 <div class="modal fade" id="deleteBookModal" tabindex="-1" role="dialog" aria-labelledby="deleteBookModalLabel">
     <div class="modal-dialog" role="document">
         <form method="post" id="deleteBookForm" action="{{urlfor "BookController.Delete"}}">
-            <input type="hidden" name="identify" value="{{.Model.Identify}}">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">删除项目</h4>
                 </div>
                 <div class="modal-body">
-                    <span style="font-size: 14px;font-weight: 400;">确定删除项目吗？</span>
-                    <p></p>
-                    <p class="text error-message">删除项目后将无法找回。</p>
+                    <div class="help-block">当前文档项目标识为 <span class="text-danger">{{.Model.Identify}}</span> ；删除项目后将无法找回。</div>
+                    <div class="help-block">如确定删除，请输入当前文档标识和您的登录密码。</div>
+                    <div class="input-group">
+                        <span class="input-group-addon">文档标识</span>
+                        <input type="text" name="identify" autocomplete="off" class="form-control">
+                    </div>
+                    <br>
+                    <div class="input-group form-group">
+                        <span class="input-group-addon">登录密码</span>
+                        <input type="password" name="password" autocomplete="off" class="form-control">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <span id="form-error-message2" class="error-message"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="submit" id="btnDeleteBook" class="btn btn-primary" data-loading-text="删除中...">确定删除</button>
+                    <button type="submit" id="btnDeleteBook" class="btn btn-danger" data-loading-text="删除中...">确定删除</button>
                 </div>
             </div>
         </form>

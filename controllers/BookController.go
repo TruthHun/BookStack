@@ -564,6 +564,14 @@ func (this *BookController) Delete() {
 	if bookResult.RoleId != conf.BookFounder {
 		this.JsonResult(6002, "只有创始人才能删除项目")
 	}
+
+	//用户密码
+	pwd := this.GetString("password")
+
+	if m, err := models.NewMember().Login(this.Member.Account, pwd); err != nil || m.MemberId == 0 {
+		this.JsonResult(1, "项目删除失败，您的登录密码不正确")
+	}
+
 	err = models.NewBook().ThoroughDeleteBook(bookResult.BookId)
 
 	if err == orm.ErrNoRows {
