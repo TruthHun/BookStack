@@ -10,6 +10,9 @@
                     <li>
                         <a href="{{urlfor "LabelController.List"}}" class="visible-xs" title="标签"><i class="fa fa-tags"></i> 标签</a>
                     </li>
+                    <li>
+                        <a href="{{urlfor "BaseController.Search"}}" class="visible-xs visible-sm" title="搜索"><i class="fa fa-search"></i> 搜索</a>
+                    </li>
                     <li><a href="https://github.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-github"></i> 开源</a></li>
                 {{if gt .Member.MemberId 0}}
                     <li>

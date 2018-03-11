@@ -700,3 +700,6 @@ a{color: #333}
 }
 .login-by-third  a{border:1px solid #ddd;padding: 3px;border-radius: 50%;overflow:hidden;margin-right: 8px;display: inline-block}
 .login-by-third img{width: 35px;height: 35px;border-radius: 50%;}
+
+.single-search .search-form{margin: 150px auto;}
+.single-search .search-form .input-group-addon{cursor: pointer;}
