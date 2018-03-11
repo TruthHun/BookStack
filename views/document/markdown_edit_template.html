@@ -331,11 +331,20 @@
                         <label class="col-sm-2 control-label">内容提取</label>
                         <div class="col-sm-10">
                             <label class="radio-inline">
-                                <input type="radio" name="intelligence" value="true" checked> 智能提取
+                                <input type="radio" name="intelligence" value="1" checked> 智能提取
                             </label>
                             <label class="radio-inline">
-                                <input type="radio" name="intelligence" value="false"> 全文提取
+                                <input type="radio" name="intelligence" value="0"> 全文提取
                             </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="intelligence" value="2"> DIY模式
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-diy" style="display: none;">
+                        <label class="col-sm-2 control-label">选择器</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="diy" placeholder="请输入选择器" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
@@ -441,6 +450,15 @@
 <script src="/static/js/markdown.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
+
+        $("[name=intelligence]").click(function () {
+            if($(this).val()=="2"){
+                $(".form-group-diy").fadeIn();
+            }else{
+                $(".form-group-diy").hide();
+            }
+        })
+
         $("#attachInfo").on("click",function () {
             $("#uploadAttachModal").modal("show");
         });

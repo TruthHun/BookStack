@@ -408,10 +408,11 @@ func (this *BaseController) Crawl() {
 		this.SetSession("crawl", "1")
 		defer this.DelSession("crawl")
 		urlstr := this.GetString("url")
-		force, _ := this.GetBool("force")                     //是否是强力采集，强力采集，使用Chrome
-		intelligence, _ := this.GetBool("intelligence", true) //是否是强力采集，强力采集，使用Chrome
+		force, _ := this.GetBool("force")              //是否是强力采集，强力采集，使用Chrome
+		intelligence, _ := this.GetInt("intelligence") //是否是强力采集，强力采集，使用Chrome
 		contType, _ := this.GetInt("type")
-		if content, err := utils.CrawlHtml2Markdown(urlstr, contType, force, intelligence); err != nil {
+		diySel := this.GetString("diy")
+		if content, err := utils.CrawlHtml2Markdown(urlstr, contType, force, intelligence, diySel); err != nil {
 			this.JsonResult(1, "采集失败："+err.Error())
 		} else {
 			this.JsonResult(0, "采集成功", content)

@@ -129,8 +129,9 @@ func CrawlByChrome(urlstr string) (b []byte, err error) {
 //内容类型，contType:0表示markdown，1表示html，2表示文本
 //force:是否是强力采集
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
-func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, headers ...map[string]string) (cont string, err error) {
-	if force {
+//diySelecter:自定义选择器
+func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelecter string, headers ...map[string]string) (cont string, err error) {
+	if force { //强力模式
 		var b []byte
 		b, err = CrawlByChrome(urlstr)
 		cont = string(b)
@@ -184,8 +185,11 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 					})
 				}
 
+				diySelecter = strings.TrimSpace(diySelecter)
+
 				cont, err = doc.Html()
-				if intelligence {
+
+				if intelligence == 1 { //智能提取
 					ext, err := html2article.NewFromHtml(cont)
 					if err != nil {
 						return cont, err
@@ -196,11 +200,24 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 					}
 					switch contType {
 					case 1: //=>html
-						cont = article.Html + "<br/><br/><br/>原文：" + urlstr
+						cont = article.Html + "\n原文：\n> " + urlstr
 					case 2: //=>text
-						cont = article.Content + fmt.Sprintf("\n\r\n\r原文:%v", urlstr)
+						cont = article.Content + fmt.Sprintf("\n原文：\n> %v", urlstr)
 					default: //0 && other=>markdown
-						cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:[%v](%v)", urlstr, urlstr)
+						cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
+					}
+				} else if intelligence == 2 && diySelecter != "" { //自定义提取
+					if htmlstr, err := doc.Find(diySelecter).Html(); err != nil {
+						return "", err
+					} else {
+						switch contType {
+						case 1: //=>html
+							cont = htmlstr + "\n\n\n原文：\n> " + urlstr
+						case 2: //=>text
+							cont = doc.Find(diySelecter).Text() + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
+						default: //0 && other=>markdown
+							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
+						}
 					}
 				} else {
 					//移除body中的所有js标签
@@ -211,12 +228,12 @@ func CrawlHtml2Markdown(urlstr string, contType int, force, intelligence bool, h
 					switch contType {
 					case 1: //=>html
 						htmlstr, _ := doc.Find("body").Html()
-						cont = htmlstr + "<br/><br/><br/>原文：" + urlstr
+						cont = htmlstr + "\n\n\n原文：\n> " + urlstr
 					case 2: //=>text
-						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r原文:%v", urlstr)
+						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
 					default: //0 && other=>markdown
 						htmlstr, _ := doc.Find("body").Html()
-						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r原文:[%v](%v)", urlstr, urlstr)
+						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
 					}
 				}
 
