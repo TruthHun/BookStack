@@ -22,13 +22,14 @@ func (this *Local) IsObjectExist(object string) (err error) {
 //@param            save             存储文件，不建议与临时文件相同，特别是IsDel参数值为true的时候
 //@param            IsDel            文件上传后，是否删除临时文件
 func (this *Local) MoveToStore(tmpfile, save string) (err error) {
+	save = strings.TrimLeft(save, "/")
 	//"./a.png"与"a.png"是相同路径
 	if strings.HasPrefix(tmpfile, "./") || strings.HasPrefix(save, "./") {
 		tmpfile = strings.TrimPrefix(tmpfile, "./")
 		save = strings.TrimPrefix(save, "./")
 	}
 	if strings.ToLower(tmpfile) != strings.ToLower(save) { //不是相同文件路径
-		save = strings.TrimLeft(save, "./")
+
 		os.MkdirAll(filepath.Dir(save), os.ModePerm)
 		err = os.Rename(tmpfile, save)
 	}
