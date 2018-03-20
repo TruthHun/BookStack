@@ -263,18 +263,7 @@
             }
         });
 
-        $("#notarget").load(function () {
-            var obj=JSON.parse($(this).contents().find('body').text());
-            if(obj.errcode==0){
-                alertTips("success","上传成功",2000,"");
-                setTimeout(function () {
-                    location.reload();
-                },1500);
-            }else{
-                alertTips("danger",obj.message,3000,"");
-            }
-            $(".btn-upload-zip").removeClass("disabled");
-        });
+
 
     });
 </script>

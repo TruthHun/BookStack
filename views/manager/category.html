@@ -61,7 +61,7 @@
                             {{if eq $item.Pid 0}}
                             <tr>
                                 <td>
-                                    <img class="icon-category-small" src="{{$item.Icon}}" alt="">
+                                    <img class="icon-category-small" data-id="{{$item.Id}}" src="{{$item.Icon}}" alt="">
                                 </td>
                                 <td>
                                     <div class="input-group">
@@ -100,7 +100,7 @@
                                         {{if eq $item.Id $child.Pid}}
                                         <tr class="cates-group-{{$item.Id}}">
                                             <td>
-                                                <img class="icon-category-small" src="{{$child.Icon}}" alt="">
+                                                <img class="icon-category-small" data-id="{{$child.Id}}" src="{{$child.Icon}}" alt="">
                                             </td>
                                             <td>
                                                 <div class="input-group">
@@ -145,6 +145,12 @@
     </div>
     <!-- {{template "widgets/footer.html" .}} -->
 </div>
+
+{{/*更新图标*/}}
+<form action="{{urlfor "ManagerController.UpdateCateIcon"}}" target="notarget" method="post" class="cate-icon-form" enctype="multipart/form-data">
+    <input type="text" name="id" value="">
+    <input type="file" accept="image/jpeg,image/jpg,image/png,image/gif" id="cate-icon" name="icon">
+</form>
 
 <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel">
     <div class="modal-dialog" role="document">
@@ -191,6 +197,8 @@
     </div>
 </div><!--END Modal-->
 
+
+<iframe src="" style="display: none;" name="notarget" id="notarget" frameborder="0"></iframe>
 
 
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}

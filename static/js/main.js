@@ -260,5 +260,31 @@ $(function () {
         _this.addClass("hide").siblings().removeClass("hide");
     })
 
+    //更换分类的图标
+    $(".category-manager .icon-category-small").click(function () {
+        var form=$("form.cate-icon-form");
+        form.find("[name=id]").val($(this).attr("data-id"));
+        form.find("[name=icon]").trigger("click");
+    })
+    $("#cate-icon").change(function () {
+       if($(this).val()!=""){
+           $("form.cate-icon-form").submit();
+       }
+    });
+
+
+    $("#notarget").load(function () {
+        var obj=JSON.parse($(this).contents().find('body').text());
+        if(obj.errcode==0){
+            alertTips("success","上传成功",2000,"");
+            setTimeout(function () {
+                location.reload();
+            },1500);
+        }else{
+            alertTips("danger",obj.message,3000,"");
+        }
+        $(".btn-upload-zip").removeClass("disabled");
+    });
+
 
 });

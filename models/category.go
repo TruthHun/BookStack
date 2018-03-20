@@ -74,3 +74,10 @@ func (this *Category) UpdateByField(id int, field, val string) (err error) {
 	_, err = orm.NewOrm().QueryTable(tableCategory).Filter("id", id).Update(orm.Params{field: val})
 	return
 }
+
+//查询单个分类
+func (this *Category) Find(id int) (cate Category) {
+	cate.Id = id
+	orm.NewOrm().Read(&cate)
+	return cate
+}

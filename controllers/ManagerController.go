@@ -11,6 +11,10 @@ import (
 
 	"fmt"
 
+	"time"
+
+	"os"
+
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
@@ -757,5 +761,41 @@ func (this *ManagerController) DelCate() {
 		this.JsonResult(1, err.Error())
 	} else {
 		this.JsonResult(0, "删除成功")
+	}
+}
+
+//更新分类的图标
+func (this *ManagerController) UpdateCateIcon() {
+	var err error
+	id, _ := this.GetInt("id")
+	if id == 0 {
+		this.JsonResult(1, "参数不正确")
+	}
+	Model := new(models.Category)
+	if cate := Model.Find(id); cate.Id > 0 {
+		cate.Icon = strings.TrimLeft(cate.Icon, "/")
+		if f, h, err1 := this.GetFile("icon"); err1 == nil {
+			defer f.Close()
+			tmpfile := fmt.Sprintf("uploads/icons/%v%v"+filepath.Ext(h.Filename), id, time.Now().Unix())
+			os.MkdirAll(filepath.Dir(tmpfile), os.ModePerm)
+			if err = this.SaveToFile("icon", tmpfile); err == nil {
+				switch utils.StoreType {
+				case utils.StoreOss:
+					models.ModelStoreOss.MoveToOss(tmpfile, tmpfile, true, false)
+					models.ModelStoreOss.DelFromOss(cate.Icon)
+				case utils.StoreLocal:
+					models.ModelStoreLocal.DelFiles(cate.Icon)
+				}
+				err = Model.UpdateByField(cate.Id, "icon", "/"+tmpfile)
+			}
+		} else {
+			err = err1
+		}
+
+	}
+	if err == nil {
+		this.JsonResult(0, "更新成功")
+	} else {
+		this.JsonResult(1, err.Error())
 	}
 }
