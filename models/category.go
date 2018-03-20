@@ -40,6 +40,7 @@ func (this *Category) AddCates(pid int, cates string) (err error) {
 	return
 }
 
+//TODO:删除分类的图标
 //删除分类（如果分类下的文档项目不为0，则不允许删除）
 func (this *Category) Del(id int) (err error) {
 	o := orm.NewOrm()
@@ -47,7 +48,9 @@ func (this *Category) Del(id int) (err error) {
 	if err = o.Read(&cate); cate.Cnt > 0 { //当前分类下文档项目数量不为0，不允许删除
 		return errors.New("删除失败，当前分类下的问下项目不为0，不允许删除")
 	}
-	_, err = o.Delete(&cate, "id")
+	if _, err = o.Delete(&cate, "id"); err == nil {
+		_, err = o.QueryTable(tableCategory).Filter("pid", id).Delete()
+	}
 	return
 }
 
@@ -63,5 +66,11 @@ func (this *Category) GetCates(pid int, status int) (cates []Category, err error
 		qs.Filter("status", status)
 	}
 	_, err = qs.OrderBy("-status", "sort", "title").All(&cates)
+	return
+}
+
+//根据字段更新内容
+func (this *Category) UpdateByField(id int, field, val string) (err error) {
+	_, err = orm.NewOrm().QueryTable(tableCategory).Filter("id", id).Update(orm.Params{field: val})
 	return
 }

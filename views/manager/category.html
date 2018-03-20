@@ -69,12 +69,12 @@
                                             <i class="fa fa-minus-circle" data-id="{{$item.Id}}" title="收起"></i>
                                             <i class="fa fa-plus-circle hide" data-id="{{$item.Id}}" title="展开"></i>
                                         </span>
-                                        <input type="text" class="form-control" value="{{$item.Title}}">
+                                        <input type="text" class="form-control change-update" name="title" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}" value="{{$item.Title}}">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="sort" class="form-control" value="{{$item.Sort}}">
+                                        <input type="number" name="sort"  data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}" class="form-control change-update" value="{{$item.Sort}}">
                                     </div>
                                 </td>
                                 <td>{{$item.Cnt}}</td>
@@ -87,12 +87,12 @@
                                 </td>
                                 <td>
                                     {{if eq $item.Status true}}
-                                        <span>关闭</span>
+                                        <a href="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}&field=status&value=0" class="ajax-get">关闭</a>
                                     {{else}}
-                                        <span>启用</span>
+                                        <a href="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}&field=status&value=1" class="ajax-get">启用</a>
                                     {{end}}
                                     |
-                                    <a href="#">删除</a>
+                                    <a  href="{{urlfor "ManagerController.DelCate"}}?id={{$item.Id}}" class="ajax-get confirm">删除</a>
                                 </td>
                             </tr>
 
@@ -105,12 +105,12 @@
                                             <td>
                                                 <div class="input-group">
                                                     <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| --</span>
-                                                    <input type="text" class="form-control" value="{{$child.Title}}">
+                                                    <input type="text" name="title"  data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}" class="form-control change-update" value="{{$child.Title}}">
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="input-group">
-                                                    <input type="number" name="sort" class="form-control" value="{{$child.Sort}}">
+                                                    <input type="number" name="sort" class="form-control change-update" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}" value="{{$child.Sort}}">
                                                 </div>
                                             </td>
                                             <td>{{$item.Cnt}}</td>
@@ -122,13 +122,14 @@
                                             {{end}}
                                             </td>
                                             <td>
+
                                             {{if eq $child.Status true}}
-                                                <span>关闭</span>
+                                                <a href="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}&field=status&value=0" class="ajax-get">关闭</a>
                                             {{else}}
-                                                <span>启用</span>
+                                                <a href="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}&field=status&value=1" class="ajax-get">启用</a>
                                             {{end}}
                                                 |
-                                                <a href="#">删除</a>
+                                                <a href="{{urlfor "ManagerController.DelCate"}}?id={{$child.Id}}" class="ajax-get confirm">删除</a>
                                             </td>
                                         </tr>
                                         {{end}}

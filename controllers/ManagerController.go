@@ -733,5 +733,29 @@ func (this *ManagerController) Category() {
 		this.Data["IsCategory"] = true
 		this.TplName = "manager/category.html"
 	}
+}
 
+//更新分类字段内容
+func (this *ManagerController) UpdateCate() {
+	field := this.GetString("field")
+	val := this.GetString("value")
+	id, _ := this.GetInt("id")
+	if err := new(models.Category).UpdateByField(id, field, val); err != nil {
+		this.JsonResult(1, "更新失败："+err.Error())
+	} else {
+		this.JsonResult(0, "更新成功")
+	}
+}
+
+//删除分类
+func (this *ManagerController) DelCate() {
+	var err error
+	if id, _ := this.GetInt("id"); id > 0 {
+		err = new(models.Category).Del(id)
+	}
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	} else {
+		this.JsonResult(0, "删除成功")
+	}
 }
