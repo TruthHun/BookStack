@@ -147,7 +147,7 @@
 </div>
 
 {{/*更新图标*/}}
-<form action="{{urlfor "ManagerController.UpdateCateIcon"}}" target="notarget" method="post" class="cate-icon-form" enctype="multipart/form-data">
+<form style="display: none;" action="{{urlfor "ManagerController.UpdateCateIcon"}}" target="notarget" method="post" class="cate-icon-form" enctype="multipart/form-data">
     <input type="text" name="id" value="">
     <input type="file" accept="image/jpeg,image/jpg,image/png,image/gif" id="cate-icon" name="icon">
 </form>
