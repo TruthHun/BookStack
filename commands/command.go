@@ -80,6 +80,8 @@ func RegisterModel() {
 		new(models.Github),
 		new(models.QQ),
 		new(models.DocumentStore),
+		new(models.Category),
+		new(models.BookCategory),
 	)
 	migrate.RegisterMigration()
 }

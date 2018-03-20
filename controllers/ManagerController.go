@@ -698,3 +698,40 @@ func (this *ManagerController) Sitemap() {
 	go models.SitemapUpdate(this.BaseUrl())
 	this.JsonResult(0, "站点地图更新提交成功，已交由后台执行更新，请耐心等待。")
 }
+
+//分类管理
+func (this *ManagerController) Category() {
+	Model := new(models.Category)
+	if strings.ToLower(this.Ctx.Request.Method) == "post" {
+		//新增分类
+		pid, _ := this.GetInt("pid")
+		if err := Model.AddCates(pid, this.GetString("cates")); err != nil {
+			this.JsonResult(1, "新增失败："+err.Error())
+		} else {
+			this.JsonResult(0, "新增成功")
+		}
+	} else {
+		//查询所有分类
+		if cates, err := Model.GetCates(-1, -1); err == nil {
+			var parents []models.Category
+			for idx, item := range cates {
+				if strings.TrimSpace(item.Icon) == "" { //赋值为默认图片
+					item.Icon = "/static/images/icon.png"
+				} else {
+					item.Icon = utils.ShowImg(item.Icon)
+				}
+				if item.Pid == 0 {
+					parents = append(parents, item)
+				}
+				cates[idx] = item
+			}
+			this.Data["Parents"] = parents
+			this.Data["Cates"] = cates
+		} else {
+			beego.Error(err)
+		}
+		this.Data["IsCategory"] = true
+		this.TplName = "manager/category.html"
+	}
+
+}

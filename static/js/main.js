@@ -247,4 +247,18 @@ $(function () {
         });
     });
 
+    //后台分类管理，分类展开和收起
+    $(".category-manager .fa-minus-circle").click(function () {
+        var _this=$(this),id=_this.attr("data-id");
+        $(".cates-group-"+id).hide();
+        _this.addClass("hide").siblings().removeClass("hide");
+    })
+    //后台分类管理，分类展开和收起
+    $(".category-manager .fa-plus-circle").click(function () {
+        var _this=$(this),id=_this.attr("data-id");
+        $(".cates-group-"+id).fadeIn();
+        _this.addClass("hide").siblings().removeClass("hide");
+    })
+
+
 });

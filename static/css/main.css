@@ -703,3 +703,10 @@ a{color: #333}
 
 .single-search .search-form{margin: 150px auto;}
 .single-search .search-form .input-group-addon{cursor: pointer;}
+.icon-category{border-radius: 50%;width: 50px;height: 50px;border: 1px solid #EFEFEF;}
+.icon-category-small{border-radius: 50%;width: 34px;height: 34px;border: 1px solid #EFEFEF;}
+.category-manager .input-group-addon{background-color: transparent;border-color: transparent;}
+.category-manager .form-control{border-radius: 4px !important;}
+.category-manager .icon-category-small{cursor: pointer;}
+.category-manager .fa-minus-circle{cursor: pointer;font-size: 20px;}
+.category-manager .fa-plus-circle{cursor: pointer;font-size: 20px;color: #5cb85c;}

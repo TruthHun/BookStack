@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <title>分类管理 - {{.SITE_NAME}}</title>
+
+    <<link href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/static/css/main.css" rel="stylesheet">
+{{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+{{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+
+    <link rel="stylesheet" href="/static/css/toast.css">
+</head>
+<body>
+<div class="manual-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body category-manager">
+        <div class="row">
+            <div class="page-left">
+                {{template "manager/menu.html" .}}
+            </div>
+            <div class="page-right">
+                <div class="m-box">
+                    <div class="box-head">
+                        <strong class="box-title">分类管理</strong>
+                        <a href="javascript:void(0);" class="pull-right btn btn-success" data-toggle="modal" data-target="#addCategoryModal"><i class="fa fa-plus"></i> 新增分类</a>
+                    </div>
+                </div>
+                <div class="box-body" id="bookList">
+                    <table class="table table-hover table-striped">
+                        <caption>说明
+                            <ul>
+                                <li>只支持二级分类</li>
+                                <li>分类排序，值越小越靠前</li>
+                                <li>分类的icon图标，宽高比为1:1，最小图片尺寸为50x50像素</li>
+                                <li>点击分类图标可更换新图标</li>
+                                <li>分类关闭之后，只是在前台起到隐藏作用</li>
+                                <li>如果分类下的文档项目不为0，则该分类不能删除</li>
+                                <li>点击 <i class="fa fa-minus-circle"></i> 可以收起分类；点击 <i class="fa fa-plus-circle"></i> 可以展开分类</li>
+                            </ul>
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>图标</th>
+                            <th>名称</th>
+                            <th>排序</th>
+                            <th>统计</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $idx,$item:=.Cates}}
+                            {{if eq $item.Pid 0}}
+                            <tr>
+                                <td>
+                                    <img class="icon-category-small" src="{{$item.Icon}}" alt="">
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-minus-circle" data-id="{{$item.Id}}" title="收起"></i>
+                                            <i class="fa fa-plus-circle hide" data-id="{{$item.Id}}" title="展开"></i>
+                                        </span>
+                                        <input type="text" class="form-control" value="{{$item.Title}}">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input type="number" name="sort" class="form-control" value="{{$item.Sort}}">
+                                    </div>
+                                </td>
+                                <td>{{$item.Cnt}}</td>
+                                <td>
+                                    {{if eq $item.Status true}}
+                                        <span class="text-success">启用</span>
+                                    {{else}}
+                                        <span class="text-danger">关闭</span>
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{if eq $item.Status true}}
+                                        <span>关闭</span>
+                                    {{else}}
+                                        <span>启用</span>
+                                    {{end}}
+                                    |
+                                    <a href="#">删除</a>
+                                </td>
+                            </tr>
+
+                                {{range $idx2,$child:=$.Cates}}
+                                        {{if eq $item.Id $child.Pid}}
+                                        <tr class="cates-group-{{$item.Id}}">
+                                            <td>
+                                                <img class="icon-category-small" src="{{$child.Icon}}" alt="">
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| --</span>
+                                                    <input type="text" class="form-control" value="{{$child.Title}}">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="number" name="sort" class="form-control" value="{{$child.Sort}}">
+                                                </div>
+                                            </td>
+                                            <td>{{$item.Cnt}}</td>
+                                            <td>
+                                            {{if eq $child.Status true}}
+                                                <span class="text-success">启用</span>
+                                            {{else}}
+                                                <span class="text-danger">关闭</span>
+                                            {{end}}
+                                            </td>
+                                            <td>
+                                            {{if eq $child.Status true}}
+                                                <span>关闭</span>
+                                            {{else}}
+                                                <span>启用</span>
+                                            {{end}}
+                                                |
+                                                <a href="#">删除</a>
+                                            </td>
+                                        </tr>
+                                        {{end}}
+                                {{end}}
+                            {{end}}
+
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- {{template "widgets/footer.html" .}} -->
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel">
+    <div class="modal-dialog" role="document">
+        <form method="post" autocomplete="off" class="form-horizontal ajax-form" action="{{urlfor "ManagerController.Category"}}" id="addCategoryModalForm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增分类</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-sm-12">父级分类</label>
+                    <div class="col-sm-12">
+                        <select name="pid" class="form-control">
+                            <option value="0"> 请选择父级分类 </option>
+                            {{range .Parents}}
+                            <option value="{{.Id}}">{{.Title}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-12">分类名称</label>
+                    <div class="col-sm-12">
+                        <textarea name="cates" id="cates" rows="5" class="form-control" placeholder="多个分类名称，请用换行分隔"></textarea>
+                    </div>
+                </div>
+                <div class="help-block">
+                    <ul>
+                        <li>如果不选择父级分类，则表示当前添加的为父级分类</li>
+                        <li>支持批量添加分类，多个分类，请换行</li>
+                        <li>图标的上传和排序的管理，在分类添加成功后，在管理页面进行操作</li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="modal-footer">
+                <span id="form-error-message"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-success" data-loading-text="保存中..." id="btnCreateCategory">保存</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div><!--END Modal-->
+
+
+
+{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
+<script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script src="/static/js/main.js" type="text/javascript"></script>
+</body>
+</html>
