@@ -718,3 +718,16 @@ a{color: #333}
 
 .row-cate-sub a{display: inline-block;text-align: center;}
 .row-cate-sub a img{width: 60px;height: 60px;border-radius: 4px;}
+
+.cate-list{margin-top: 80px;}
+.cate-list .panel-default>.panel-heading{border-color: transparent;}
+.cate-list .panel{box-shadow: none;}
+.cate-list .panel-default{border:0px;margin-bottom: 0px;}
+.cate-list .panel-body{padding-left: 7px;padding-right: 7px;padding-top: 0px;}
+.cate-list .panel-body img{width: 50px;height: 50px;border-right:1px solid #EFEFEF;}
+.cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 3px;}
+.cate-list .panel-body .col-xs-12{padding-left: 8px;padding-right: 8px;}
+.cate-list .cate-item>a{display: inline-block;float: left;}
+.cate-list .cate-item>div{display: inline-block;margin-left: 10px;float: left;}
+.cate-list .cate-item>div a{font-weight: bold;font-size: 16px;margin-top: 5px;}
+.cate-list .cate-item .help-block{margin-bottom: 0px;font-size: 13px;}
