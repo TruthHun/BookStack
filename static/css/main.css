@@ -710,3 +710,11 @@ a{color: #333}
 .category-manager .icon-category-small{cursor: pointer;}
 .category-manager .fa-minus-circle{cursor: pointer;font-size: 20px;}
 .category-manager .fa-plus-circle{cursor: pointer;font-size: 20px;color: #5cb85c;}
+
+.row-cate{margin-top: 35px;margin-bottom: 15px;border: 1px solid red;height: 40px;overflow:hidden;}
+.row-cate .text-muted{margin-right: 15px;}
+.row-cate a{display: inline-block;padding: 7px 18px;border-radius: 4px;border:1px solid transparent;margin-bottom: 10px;text-decoration: none;}
+.row-cate a:hover,.row-cate a.active{color: #009a61;border:1px solid #efefef;font-weight: 400;}
+
+.row-cate-sub a{display: inline-block;text-align: center;}
+.row-cate-sub a img{width: 60px;height: 60px;border-radius: 4px;}

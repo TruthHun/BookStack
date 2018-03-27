@@ -63,6 +63,7 @@ func (this *BaseController) Prepare() {
 				}
 			}
 		}
+
 	}
 	if this.Member.RoleName == "" {
 		this.Member.ResolveRoleName()

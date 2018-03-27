@@ -6,10 +6,17 @@
 <body>
 <div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body" style="overflow-x: hidden !important;;">
+    <div class="container manual-body">
+        <div class="row mgt-15px">
+            <div class="col-xs-12 mgt-15px">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="{{urlfor "HomeController.Index"}}" title="站长推荐">站长推荐</a></li>
+                    <li><a href="{{urlfor "HomeController.Index"}}?tab=popular">热门书籍</a></li>
+                    <li><a href="{{urlfor "HomeController.Index"}}?tab=latest">最新发布</a></li>
+                </ul>
+            </div>
+        </div>
         <div class="row">
-
-
             <div class="manual-list">
                 {{range $index,$item := .Lists}}
                 {{/*<div class="list-item">*/}}

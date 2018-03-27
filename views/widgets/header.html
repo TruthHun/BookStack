@@ -1,11 +1,14 @@
 <header class="navbar navbar-static-top navbar-fixed-top manual-header" role="banner">
     <div class="container">
-        <div class="navbar-header col-sm-12 col-md-7 col-lg-6">
+        <div class="navbar-header col-sm-12 col-md-8 col-lg-7">
             <div class="btn-group dropdown-menu-right pull-right slidebar visible-xs-inline-block visible-sm-inline-block">
                 <button class="btn btn-default dropdown-toggle hidden-lg" type="button" data-toggle="dropdown"><i class="fa fa-align-justify"></i></button>
                 <ul class="dropdown-menu" role="menu">
                     <li>
                         <a href="{{urlfor "HomeController.Index"}}" class="visible-xs" title="首页"><i class="fa fa-home"></i> 首页</a>
+                    </li>
+                    <li>
+                        <a href="{{urlfor "CateController.List"}}" class="visible-xs" title="分类"><i class="fa fa-tags"></i> 分类</a>
                     </li>
                     <li>
                         <a href="{{urlfor "LabelController.List"}}" class="visible-xs" title="标签"><i class="fa fa-tags"></i> 标签</a>
@@ -50,6 +53,9 @@
                 <ul class="nav navbar-nav">
                     <li {{if .IsHome}}class="active"{{end}}>
                         <a href="{{urlfor "HomeController.Index" }}" title="首页">首页</a>
+                    </li>
+                    <li class="{{if .IsCate}}active{{end}}">
+                        <a href="{{urlfor "CateController.List" }}" title="标签">分类</a>
                     </li>
                     <li class="{{if .IsLabel}}active{{end}}">
                         <a href="{{urlfor "LabelController.List" }}" title="标签">标签</a>
