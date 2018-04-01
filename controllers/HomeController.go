@@ -22,7 +22,6 @@ func (this *HomeController) Index() {
 	var (
 		tab       string
 		cid       int //分类，如果只是一级分类，则忽略，二级分类，则根据二级分类查找内容
-		total     int //记录数
 		urlPrefix = "/"
 	)
 	tab = strings.ToLower(this.GetString("tab"))
@@ -34,7 +33,6 @@ func (this *HomeController) Index() {
 	if cid, _ = this.GetInt("cid"); cid > 0 {
 		ModelCate := new(models.Category)
 		cate := ModelCate.Find(cid)
-		total = cate.Cnt
 		this.Data["Cate"] = cate
 	}
 	this.Data["Cid"] = cid
@@ -50,9 +48,7 @@ func (this *HomeController) Index() {
 	pageSize := 24
 
 	books, totalCount, err := models.NewBook().HomeData(pageIndex, pageSize, models.BookOrder(tab), cid)
-	if cid > 0 { //以分类的统计为准
-		totalCount = total
-	}
+
 	if err != nil {
 		beego.Error(err)
 		this.Abort("404")

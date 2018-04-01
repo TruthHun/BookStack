@@ -293,39 +293,47 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 //TODO:完善根据分类查询数据
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
-
-	//先查询分类id是否大于0，大于0，则按照分类id查询数据
-
 	o := orm.NewOrm()
-	//.Limit(pageSize).Offset((pageIndex - 1) * pageSize)
-	qs := o.QueryTable("md_books").Filter("privately_owned", 0)
-	switch orderType {
-	case OrderRecommend: //推荐
-		qs = qs.Filter("order_index__gt", 0).OrderBy("-order_index")
-	case OrderPopular: //受欢迎
-		qs = qs.OrderBy("-star", "-vcnt")
-	case OrderLatest: //最新发布
-		qs = qs.OrderBy("-release_time")
-	case OrderScore: //评分
-		qs = qs.OrderBy("-score")
-	case OrderComment: //评论
-		qs = qs.OrderBy("-cnt_comment")
-	case OrderStar: //收藏
-		qs = qs.OrderBy("-star")
-	case OrderView: //收藏
-		qs = qs.OrderBy("-vcnt")
-	}
-
-	if cid == 0 {
-		if total, _ := qs.Count(); total > 0 {
-			totalCount = int(total)
-		}
-	}
-
+	order := ""   //排序
+	condStr := "" //查询条件
+	cond := []string{"b.privately_owned=0"}
 	if len(fields) == 0 {
 		fields = append(fields, "book_id", "book_name", "identify", "cover")
 	}
-	qs.Limit(pageSize).Offset((pageIndex-1)*pageSize).All(&books, fields...)
+	switch orderType {
+	case OrderRecommend: //推荐
+		cond = append(cond, "b.order_index>0")
+		order = "b.order_index desc"
+	case OrderPopular: //受欢迎
+		order = "b.star desc,b.vcnt desc"
+	case OrderLatest: //最新发布
+		order = "b.release_time desc"
+	case OrderScore: //评分
+		order = "b.score desc"
+	case OrderComment: //评论
+		order = "b.cnt_comment desc"
+	case OrderStar: //收藏
+		order = "b.star desc"
+	case OrderView: //收藏
+		order = "b.vcnt desc"
+	}
+	if cid > 0 {
+		cond = append(cond, "c.category_id="+strconv.Itoa(cid))
+	}
+	if len(cond) > 0 {
+		condStr = " where " + strings.Join(cond, " and ")
+	}
+	sqlFmt := "select %v from md_books b left join md_book_category c on b.book_id=c.book_id" + condStr + " group by b.book_id "
+	fieldStr := "b." + strings.Join(fields, ",b.")
+	sql := fmt.Sprintf(sqlFmt, fieldStr) + " order by " + order + fmt.Sprintf(" limit %v offset %v", pageSize, (pageIndex-1)*pageSize)
+	sqlCount := fmt.Sprintf(sqlFmt, "count(*) cnt") + " limit 1"
+	var params []orm.Params
+	if _, err := o.Raw(sqlCount).Values(&params); err == nil {
+		if len(params) > 0 {
+			totalCount, _ = strconv.Atoi(params[0]["cnt"].(string))
+		}
+	}
+	o.Raw(sql).QueryRows(&books)
 	return
 }
 
