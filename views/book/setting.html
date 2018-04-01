@@ -80,6 +80,23 @@
                                 <input type="text" class="form-control" value="{{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" placeholder="项目唯一标识" disabled>
                             </div>
                             <div class="form-group">
+                                <label>分类</label>
+                                {{range $idx,$cate:=$.Cates}}
+                                    {{if eq $cate.Pid 0}}
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading"><h3 class="panel-title">{{$cate.Title}}</h3></div>
+                                        <div class="panel-body">
+                                            {{range $idx1,$item:=$.Cates}}
+                                                {{if eq $item.Pid $cate.Id}}
+                                                    <label><input type="checkbox" name="cid" value="{{$item.Id}}">{{$item.Title}}</label>
+                                                {{end}}
+                                            {{end}}
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                {{end}}
+                            </div>
+                            <div class="form-group">
                                 <label>描述</label>
                                 <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="项目描述">{{.Model.Description}}</textarea>
                                 <p class="text">描述信息不超过500个字符,支持Markdown语法</p>
@@ -89,17 +106,17 @@
                                 <input type="text" class="form-control" name="label" placeholder="项目标签" value="{{.Model.Label}}">
                                 <p class="text">最多允许添加10个标签，多个标签请用“,”分割</p>
                             </div>
-                            <div class="form-group">
-                                <label>编辑器</label>
-                                <div class="radio">
-                                    <label class="radio-inline">
-                                        <input type="radio"{{if eq .Model.Editor "markdown"}} checked{{end}} name="editor" value="markdown"> Markdown编辑器
-                                    </label>
-                                    <!-- <label class="radio-inline">
-                                        <input type="radio"{{if eq .Model.Editor "html"}} checked{{end}} name="editor" value="html"> Html编辑器
-                                    </label> -->
-                                </div>
-                            </div>
+                            <!--<div class="form-group">-->
+                                <!--<label>编辑器</label>-->
+                                <!--<div class="radio">-->
+                                    <!--<label class="radio-inline">-->
+                                        <!--<input type="radio"{{if eq .Model.Editor "markdown"}} checked{{end}} name="editor" value="markdown"> Markdown编辑器-->
+                                    <!--</label>-->
+                                    <!--&lt;!&ndash; <label class="radio-inline">-->
+                                        <!--<input type="radio"{{if eq .Model.Editor "html"}} checked{{end}} name="editor" value="html"> Html编辑器-->
+                                    <!--</label> &ndash;&gt;-->
+                                <!--</div>-->
+                            <!--</div>-->
                             <!--
                             {{/*
                             <div class="form-group">

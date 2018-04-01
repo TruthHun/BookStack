@@ -143,6 +143,7 @@ func (this *BookController) Setting() {
 	if book.PrivateToken != "" {
 		book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
 	}
+	this.Data["Cates"], _ = new(models.Category).GetCates(-1, 1)
 	this.Data["Model"] = book
 
 }

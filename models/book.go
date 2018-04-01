@@ -290,8 +290,12 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 }
 
 //首页数据
+//TODO:完善根据分类查询数据
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
-func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, fields ...string) (books []Book, totalCount int, err error) {
+func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
+
+	//先查询分类id是否大于0，大于0，则按照分类id查询数据
+
 	o := orm.NewOrm()
 	//.Limit(pageSize).Offset((pageIndex - 1) * pageSize)
 	qs := o.QueryTable("md_books").Filter("privately_owned", 0)
@@ -311,9 +315,13 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, fields ...
 	case OrderView: //收藏
 		qs = qs.OrderBy("-vcnt")
 	}
-	if total, _ := qs.Count(); total > 0 {
-		totalCount = int(total)
+
+	if cid == 0 {
+		if total, _ := qs.Count(); total > 0 {
+			totalCount = int(total)
+		}
 	}
+
 	if len(fields) == 0 {
 		fields = append(fields, "book_id", "book_name", "identify", "cover")
 	}

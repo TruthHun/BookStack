@@ -25,6 +25,7 @@ func Install() {
 		panic(err.Error())
 		os.Exit(1)
 	}
+	initSeo()
 	fmt.Println("Install Successfully!")
 	os.Exit(0)
 
@@ -90,7 +91,7 @@ func initialization() {
 			panic("Book.Insert => " + err.Error())
 			os.Exit(0)
 		}
-		initSeo()
+
 	}
 }
 
@@ -112,7 +113,8 @@ func initSeo() {
 		"('15','manage_users','用户管理','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('16','manage_users_edit','用户编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('17','manage_project_list','项目列表','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
-		"('18','manage_project_edit','项目编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
+		"('18','manage_project_edit','项目编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
+		"('19','cate','书籍分类','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
 	}
 	if _, err := orm.NewOrm().Raw(strings.Join(sqlslice, "")).Exec(); err != nil {
 		beego.Error(err.Error())

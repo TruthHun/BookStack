@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/TruthHun/BookStack/commands"
-	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/controllers"
 	"github.com/astaxie/beego"
 	"github.com/kardianos/service"
@@ -19,8 +18,8 @@ type Daemon struct {
 func NewDaemon() *Daemon {
 
 	config := &service.Config{
-		Name:             "mindocd",                               //服务显示名称
-		DisplayName:      "MinDoc service",                        //服务名称
+		Name:             "BookStackd",                            //服务显示名称
+		DisplayName:      "BookStack Service",                     //服务名称
 		Description:      "A document online management program.", //服务描述
 		WorkingDirectory: commands.WorkingDirectory,
 		Arguments:        os.Args[1:],
@@ -49,8 +48,6 @@ func (d *Daemon) Run() {
 
 	beego.ErrorController(&controllers.ErrorController{})
 
-	fmt.Printf("MinDoc version => %s\nbuild time => %s\nstart directory => %s\n%s\n", conf.VERSION, conf.BUILD_TIME, os.Args[0], conf.GO_VERSION)
-
 	beego.Run()
 }
 
@@ -62,6 +59,7 @@ func (d *Daemon) Stop(s service.Service) error {
 }
 
 func Install() {
+	fmt.Println(os.Args, "---", os.Args[3:])
 	d := NewDaemon()
 	d.config.Arguments = os.Args[3:]
 
@@ -81,6 +79,27 @@ func Install() {
 
 	os.Exit(0)
 }
+
+//func Install() {
+//	d := NewDaemon()
+//	d.config.Arguments = os.Args[3:]
+//
+//	s, err := service.New(d, d.config)
+//
+//	if err != nil {
+//		beego.Error("Create service error => ", err)
+//		os.Exit(1)
+//	}
+//	err = s.Install()
+//	if err != nil {
+//		beego.Error("Install service error:", err)
+//		os.Exit(1)
+//	} else {
+//		beego.Info("Service installed!")
+//	}
+//
+//	os.Exit(0)
+//}
 
 func Uninstall() {
 	d := NewDaemon()
