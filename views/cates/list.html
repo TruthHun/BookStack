@@ -12,7 +12,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    <a href="#"><i class="fa fa-chevron-circle-right"></i> {{$cate.Title}} （{{$cate.Cnt}}）</a>
+                    <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} （{{$cate.Cnt}}）</a>
                 </h3>
             </div>
             <div class="panel-body">
@@ -20,10 +20,10 @@
                     {{if eq $cate.Id $children.Pid}}
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="cate-item clearfix">
-                            <a href="#"><img src="{{$children.Icon}}" alt=""></a>
                             <div>
-                                <a href="#">{{$children.Title}} （{{$children.Cnt}}）</a>
-                                <div class="help-block">PHP是世界上最好的语言...</div>
+                                <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}" title="{{$children.Title}}" class="pull-left"><img src="{{$children.Icon}}" alt="{{$children.Title}}"></a>
+                                <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
+                                <div class="help-block">{{$children.Intro}}</div>
                             </div>
                         </div>
                     </div>

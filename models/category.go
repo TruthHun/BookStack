@@ -14,6 +14,7 @@ type Category struct {
 	Id     int    //自增主键
 	Pid    int    //分类id
 	Title  string `orm:"size(30);unique"` //分类名称
+	Intro  string //介绍
 	Icon   string //分类icon
 	Cnt    int    //分类下的文档项目统计
 	Sort   int    //排序
@@ -60,10 +61,10 @@ func (this *Category) Del(id int) (err error) {
 func (this *Category) GetCates(pid int, status int) (cates []Category, err error) {
 	qs := orm.NewOrm().QueryTable(tableCategory)
 	if pid > -1 {
-		qs.Filter("pid", pid)
+		qs = qs.Filter("pid", pid)
 	}
 	if status == 0 || status == 1 {
-		qs.Filter("status", status)
+		qs = qs.Filter("status", status)
 	}
 	_, err = qs.OrderBy("-status", "sort", "title").All(&cates)
 	return

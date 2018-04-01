@@ -3,6 +3,10 @@ package controllers
 import (
 	"math"
 
+	"strings"
+
+	"strconv"
+
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
@@ -14,6 +18,23 @@ type HomeController struct {
 }
 
 func (this *HomeController) Index() {
+	//tab
+	var (
+		tab       string
+		cid       int //分类，如果只是一级分类，则忽略，二级分类，则根据二级分类查找内容
+		urlPrefix = "/"
+	)
+	tab = strings.ToLower(this.GetString("tab"))
+	switch tab {
+	case "recommend", "popular", "latest":
+	default:
+		tab = "recommend"
+	}
+	if cid, _ = this.GetInt("cid"); cid > 0 {
+		ModelCate := new(models.Category)
+		this.Data["Cate"] = ModelCate.Find(cid)
+	}
+	this.Data["Cid"] = cid
 	this.TplName = "home/index.html"
 	this.Data["IsHome"] = true
 	//如果没有开启匿名访问，则跳转到登录页面
@@ -25,21 +46,18 @@ func (this *HomeController) Index() {
 	//每页显示24个，为了兼容Pad、mobile、PC
 	pageSize := 24
 
-	member_id := 0
-
-	//首页，无论是否已登录，都只显示公开的文档。用户个人的私有文档，在项目管理里面查看
-	//if this.Member != nil {
-	//	member_id = this.Member.MemberId
-	//}
-	books, totalCount, err := models.NewBook().FindForHomeToPager(pageIndex, pageSize, member_id)
+	books, totalCount, err := models.NewBook().HomeData(pageIndex, pageSize, models.BookOrder(tab))
 
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 	if totalCount > 0 {
-		//html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, pageSize, totalCount)
-		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, "/", "")
+		urlSuffix := "&tab=" + tab
+		if cid > 0 {
+			urlPrefix = urlPrefix + "&cid=" + strconv.Itoa(cid)
+		}
+		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, urlPrefix, urlSuffix)
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
@@ -48,14 +66,7 @@ func (this *HomeController) Index() {
 
 	this.Data["Lists"] = books
 
-	labels, totalCount, err := models.NewLabel().FindToPager(1, 10)
-
-	if err != nil {
-		this.Data["Labels"] = make([]*models.Label, 0)
-	} else {
-		this.Data["Labels"] = labels
-	}
-
+	this.Data["Tab"] = tab
 	this.GetSeoByPage("index", map[string]string{
 		"title":       this.Sitename,
 		"keywords":    "文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",

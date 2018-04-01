@@ -50,6 +50,7 @@
                         <tr>
                             <th>图标</th>
                             <th>名称</th>
+                            <th>简介</th>
                             <th>排序</th>
                             <th>统计</th>
                             <th>状态</th>
@@ -70,6 +71,11 @@
                                             <i class="fa fa-plus-circle hide" data-id="{{$item.Id}}" title="展开"></i>
                                         </span>
                                         <input type="text" class="form-control change-update" name="title" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}" value="{{$item.Title}}">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control change-update" name="intro" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$item.Id}}" value="{{$item.Intro}}">
                                     </div>
                                 </td>
                                 <td>
@@ -106,6 +112,11 @@
                                                 <div class="input-group">
                                                     <span class="input-group-addon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| --</span>
                                                     <input type="text" name="title"  data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}" class="form-control change-update" value="{{$child.Title}}">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control change-update" name="intro" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}" value="{{$child.Intro}}">
                                                 </div>
                                             </td>
                                             <td>

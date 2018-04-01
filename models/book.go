@@ -16,6 +16,19 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+//定义书籍排序类型
+type BookOrder string
+
+const (
+	OrderRecommend BookOrder = "recommend"
+	OrderPopular   BookOrder = "popular"
+	OrderLatest    BookOrder = "latest"
+	OrderScore     BookOrder = "score"   //评分排序
+	OrderComment   BookOrder = "comment" //评论排序
+	OrderStar      BookOrder = "star"    //收藏排序
+	OrderView      BookOrder = "vcnt"    //浏览排序
+)
+
 // Book struct .
 type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`
@@ -276,8 +289,40 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 	return err
 }
 
+//首页数据
+//orderType:排序条件，可选值：recommend(推荐)、latest（）
+func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, fields ...string) (books []Book, totalCount int, err error) {
+	o := orm.NewOrm()
+	//.Limit(pageSize).Offset((pageIndex - 1) * pageSize)
+	qs := o.QueryTable("md_books").Filter("privately_owned", 0)
+	switch orderType {
+	case OrderRecommend: //推荐
+		qs = qs.Filter("order_index__gt", 0).OrderBy("-order_index")
+	case OrderPopular: //受欢迎
+		qs = qs.OrderBy("-star", "-vcnt")
+	case OrderLatest: //最新发布
+		qs = qs.OrderBy("-release_time")
+	case OrderScore: //评分
+		qs = qs.OrderBy("-score")
+	case OrderComment: //评论
+		qs = qs.OrderBy("-cnt_comment")
+	case OrderStar: //收藏
+		qs = qs.OrderBy("-star")
+	case OrderView: //收藏
+		qs = qs.OrderBy("-vcnt")
+	}
+	if total, _ := qs.Count(); total > 0 {
+		totalCount = int(total)
+	}
+	if len(fields) == 0 {
+		fields = append(fields, "book_id", "book_name", "identify", "cover")
+	}
+	qs.Limit(pageSize).Offset((pageIndex-1)*pageSize).All(&books, fields...)
+	return
+}
+
 //分页查找系统首页数据.
-func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int) (books []*BookResult, totalCount int, err error) {
+func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType string) (books []*BookResult, totalCount int, err error) {
 	o := orm.NewOrm()
 
 	offset := (pageIndex - 1) * pageSize

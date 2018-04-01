@@ -710,6 +710,7 @@ a{color: #333}
 .category-manager .icon-category-small{cursor: pointer;}
 .category-manager .fa-minus-circle{cursor: pointer;font-size: 20px;}
 .category-manager .fa-plus-circle{cursor: pointer;font-size: 20px;color: #5cb85c;}
+.category-manager  [name=sort]{width: 80px !important;}
 
 .row-cate{margin-top: 35px;margin-bottom: 15px;border: 1px solid red;height: 40px;overflow:hidden;}
 .row-cate .text-muted{margin-right: 15px;}
@@ -728,6 +729,7 @@ a{color: #333}
 .cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 3px;}
 .cate-list .panel-body .col-xs-12{padding-left: 8px;padding-right: 8px;}
 .cate-list .cate-item>a{display: inline-block;float: left;}
-.cate-list .cate-item>div{display: inline-block;margin-left: 10px;float: left;}
+.cate-list .cate-item>div{display: inline-block;padding-right: 10px;width: 100%;}
+.cate-list .cate-item>div a.pull-left{margin-right: 10px;margin-top: 0px}
 .cate-list .cate-item>div a{font-weight: bold;font-size: 16px;margin-top: 5px;}
-.cate-list .cate-item .help-block{margin-bottom: 0px;font-size: 13px;}
+.cate-list .cate-item .help-block{margin-bottom: 0px;font-size: 13px;height: 20px;line-height: 20px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}

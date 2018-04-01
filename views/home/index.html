@@ -9,10 +9,17 @@
     <div class="container manual-body">
         <div class="row mgt-15px">
             <div class="col-xs-12 mgt-15px">
+                {{if gt $.Cid 0}}
+                    <ol class="breadcrumb">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="{{urlfor "CateController.List"}}">分类</a></li>
+                        <li class="active">{{$.Cate.Title}}</li>
+                    </ol>
+                {{end}}
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="{{urlfor "HomeController.Index"}}" title="站长推荐">站长推荐</a></li>
-                    <li><a href="{{urlfor "HomeController.Index"}}?tab=popular">热门书籍</a></li>
-                    <li><a href="{{urlfor "HomeController.Index"}}?tab=latest">最新发布</a></li>
+                    <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}" title="站长推荐">站长推荐</a></li>
+                    <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}">热门书籍</a></li>
+                    <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}">最新发布</a></li>
                 </ul>
             </div>
         </div>
