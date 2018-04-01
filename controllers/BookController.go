@@ -134,7 +134,8 @@ func (this *BookController) Setting() {
 		if err == models.ErrPermissionDenied {
 			this.Abort("403")
 		}
-		this.Abort("500")
+		beego.Error(err.Error())
+		this.Abort("404")
 	}
 	//如果不是创始人也不是管理员则不能操作
 	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
@@ -143,6 +144,16 @@ func (this *BookController) Setting() {
 	if book.PrivateToken != "" {
 		book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
 	}
+
+	//查询当前书籍的分类id
+	if selectedCates, rows, _ := new(models.BookCategory).GetByBookId(book.BookId); rows > 0 {
+		var maps = make(map[int]bool)
+		for _, cate := range selectedCates {
+			maps[cate.Id] = true
+		}
+		this.Data["Maps"] = maps
+	}
+
 	this.Data["Cates"], _ = new(models.Category).GetCates(-1, 1)
 	this.Data["Model"] = book
 
@@ -197,6 +208,10 @@ func (this *BookController) SaveBook() {
 	bookResult.Description = description
 	bookResult.CommentStatus = comment_status
 	bookResult.Label = tag
+	//更新书籍分类
+	if cids, ok := this.Ctx.Request.Form["cid"]; ok {
+		new(models.BookCategory).SetBookCates(book.BookId, cids)
+	}
 	this.JsonResult(0, "ok", bookResult)
 }
 

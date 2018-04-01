@@ -375,3 +375,11 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 
 	return html1.HTML(`<ul class="pagination">` + htmlPage + `</ul>`)
 }
+
+//判断数据是否在map中
+func InMap(maps map[int]bool, key int) (ret bool) {
+	if _, ok := maps[key]; ok {
+		return true
+	}
+	return
+}

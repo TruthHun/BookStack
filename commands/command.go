@@ -181,6 +181,7 @@ func RegisterFunction() {
 	beego.AddFuncMap("getNicknameByUid", func(id interface{}) string {
 		return new(models.Member).GetNicknameByUid(id)
 	})
+	beego.AddFuncMap("inMap", utils.InMap)
 	//将标签转成a链接
 	beego.AddFuncMap("tagsToLink", func(tags string) (links string) {
 		var linkArr []string

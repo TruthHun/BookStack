@@ -3,6 +3,7 @@ package models
 import (
 	"strings"
 
+	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego/orm"
 	"github.com/kataras/iris/core/errors"
 )
@@ -41,7 +42,6 @@ func (this *Category) AddCates(pid int, cates string) (err error) {
 	return
 }
 
-//TODO:删除分类的图标
 //删除分类（如果分类下的文档项目不为0，则不允许删除）
 func (this *Category) Del(id int) (err error) {
 	o := orm.NewOrm()
@@ -51,6 +51,14 @@ func (this *Category) Del(id int) (err error) {
 	}
 	if _, err = o.Delete(&cate, "id"); err == nil {
 		_, err = o.QueryTable(tableCategory).Filter("pid", id).Delete()
+	}
+	if err == nil { //删除分类图标
+		switch utils.StoreType {
+		case utils.StoreOss:
+			ModelStoreOss.DelFromOss(cate.Icon)
+		case utils.StoreLocal:
+			ModelStoreLocal.DelFiles(cate.Icon)
+		}
 	}
 	return
 }
