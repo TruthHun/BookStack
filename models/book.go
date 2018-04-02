@@ -293,6 +293,52 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 //TODO:完善根据分类查询数据
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
+	if cid > 0 { //针对cid>0
+		return m.homeData(pageIndex, pageSize, orderType, cid, fields...)
+	}
+	o := orm.NewOrm()
+	order := ""   //排序
+	condStr := "" //查询条件
+	cond := []string{"privately_owned=0"}
+	if len(fields) == 0 {
+		fields = append(fields, "book_id", "book_name", "identify", "cover")
+	}
+	switch orderType {
+	case OrderRecommend: //推荐
+		cond = append(cond, "order_index>0")
+		order = "order_index desc"
+	case OrderPopular: //受欢迎
+		order = "star desc,vcnt desc"
+	case OrderLatest: //最新发布
+		order = "release_time desc"
+	case OrderScore: //评分
+		order = "score desc"
+	case OrderComment: //评论
+		order = "cnt_comment desc"
+	case OrderStar: //收藏
+		order = "star desc"
+	case OrderView: //收藏
+		order = "vcnt desc"
+	}
+	if len(cond) > 0 {
+		condStr = " where " + strings.Join(cond, " and ")
+	}
+	sqlFmt := "select %v from md_books " + condStr
+	fieldStr := strings.Join(fields, ",")
+	sql := fmt.Sprintf(sqlFmt, fieldStr) + " order by " + order + fmt.Sprintf(" limit %v offset %v", pageSize, (pageIndex-1)*pageSize)
+	sqlCount := fmt.Sprintf(sqlFmt, "count(*) cnt")
+	var params []orm.Params
+	if _, err := o.Raw(sqlCount).Values(&params); err == nil {
+		if len(params) > 0 {
+			totalCount, _ = strconv.Atoi(params[0]["cnt"].(string))
+		}
+	}
+	_, err = o.Raw(sql).QueryRows(&books)
+	return
+}
+
+//针对cid大于0
+func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	o := orm.NewOrm()
 	order := ""   //排序
 	condStr := "" //查询条件
@@ -323,17 +369,17 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, f
 	if len(cond) > 0 {
 		condStr = " where " + strings.Join(cond, " and ")
 	}
-	sqlFmt := "select %v from md_books b left join md_book_category c on b.book_id=c.book_id" + condStr + " group by b.book_id "
+	sqlFmt := "select %v from md_books b left join md_book_category c on b.book_id=c.book_id" + condStr
 	fieldStr := "b." + strings.Join(fields, ",b.")
 	sql := fmt.Sprintf(sqlFmt, fieldStr) + " order by " + order + fmt.Sprintf(" limit %v offset %v", pageSize, (pageIndex-1)*pageSize)
-	sqlCount := fmt.Sprintf(sqlFmt, "count(*) cnt") + " limit 1"
+	sqlCount := fmt.Sprintf(sqlFmt, "count(*) cnt")
 	var params []orm.Params
 	if _, err := o.Raw(sqlCount).Values(&params); err == nil {
 		if len(params) > 0 {
 			totalCount, _ = strconv.Atoi(params[0]["cnt"].(string))
 		}
 	}
-	o.Raw(sql).QueryRows(&books)
+	_, err = o.Raw(sql).QueryRows(&books)
 	return
 }
 
