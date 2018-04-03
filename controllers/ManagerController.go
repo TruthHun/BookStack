@@ -699,7 +699,11 @@ func (this *ManagerController) UpdateBookSort() {
 }
 
 func (this *ManagerController) Sitemap() {
-	go models.SitemapUpdate(this.BaseUrl())
+	baseUrl := this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
+	if host := beego.AppConfig.String("sitemap_host"); len(host) > 0 {
+		baseUrl = this.Ctx.Input.Scheme() + "://" + host
+	}
+	go models.SitemapUpdate(baseUrl)
 	this.JsonResult(0, "站点地图更新提交成功，已交由后台执行更新，请耐心等待。")
 }
 

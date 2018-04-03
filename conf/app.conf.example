@@ -23,6 +23,8 @@ EnableGzip=true
 # 要压缩的静态文件扩展名，其中.xml是sitemap站点地图压缩。建议按照这个来就行了
 StaticExtensionsToGzip = .css, .js, .xml
 
+#站点地图host（主要用于使用CDN的时候，host与实际host不一样，导致生成的sitemap不一样）
+sitemap_host=www.bookstack.cn
 
 # 默认Session生成Key的秘钥
 beegoserversessionkey=bookstack
