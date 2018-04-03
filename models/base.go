@@ -100,7 +100,7 @@ func SitemapUpdate(domain string) {
 	limit := 10000
 	for i := 0; i < 10; i++ {
 		var books []Book
-		qsBooks.Limit(limit).Offset(i*limit).All(&books, "book_id", "identify", "modify_time", "book_name")
+		qsBooks.Limit(limit).Offset(i*limit).All(&books, "book_id", "identify", "release_time", "book_name")
 		if len(books) > 0 {
 			file := "sitemap/books-" + strconv.Itoa(i) + ".xml"
 			files = append(files, file)
