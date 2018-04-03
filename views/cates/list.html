@@ -22,7 +22,7 @@
                     <div class="col-xs-12 col-sm-6 col-md-4">
                         <div class="cate-item clearfix">
                             <div>
-                                <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=latest" title="{{$children.Title}}" class="pull-left"><img src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
+                                <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=latest" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
                                 <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=latest" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
                                 <div class="help-block">{{$children.Intro}}</div>
                             </div>
