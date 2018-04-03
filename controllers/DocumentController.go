@@ -128,7 +128,7 @@ func (this *DocumentController) Index() {
 	this.Data["Comments"], _ = new(models.Comments).BookComments(1, 30, bookResult.BookId)
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
 	this.GetSeoByPage("book_info", map[string]string{
-		"title":       bookResult.BookName,
+		"title":       "《" + bookResult.BookName + "》",
 		"keywords":    bookResult.Label,
 		"description": bookResult.Description,
 	})
@@ -217,7 +217,7 @@ func (this *DocumentController) Read() {
 
 	//SEO
 	this.GetSeoByPage("book_read", map[string]string{
-		"title":       doc.DocumentName + " - " + bookResult.BookName,
+		"title":       doc.DocumentName + " - 《" + bookResult.BookName + "》",
 		"keywords":    bookResult.Label,
 		"description": bookResult.Description,
 	})
