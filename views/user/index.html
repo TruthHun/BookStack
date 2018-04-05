@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {{template "widgets/head.html" .}}
+</head>
+<body>
+<div class="manual-reader manual-container">
+    {{template "widgets/header.html" .}}
+    <div class="ucenter">
+        {{template "user/base.html" .}}
+
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#">分享<span class="text-muted hidden-xs">(21)</span></a></li>
+                        <li><a href="#">收藏<span class="text-muted hidden-xs">(21)</span></a></li>
+                        <li><a href="#">关注<span class="text-muted hidden-xs">(21)</span></a></li>
+                        <li><a href="#">粉丝<span class="text-muted hidden-xs">(21)</span></a></li>
+                    </ul>
+                </div>
+                <div class="col-xs-12">
+                    <div class="ucenter-content">
+
+                        <div class="help-block mgt-15px"><span class="text-muted mgt-15px">当前用户暂时还没有分享知识...</span></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+{{template "widgets/footer.html" .}}
+</body>
+</html>

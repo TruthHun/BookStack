@@ -740,3 +740,12 @@ a{color: #333}
 #bookEditForm .panel-body label{margin-right: 8px;}
 #bookEditForm .panel-body{padding-bottom: 8px;}
 #bookEditForm .panel{margin-bottom: 8px;}
+
+.nopadding{padding: 0px !important;}
+
+/*用户主页*/
+.ucenter{margin-top: 55px;}
+.ucenter .well{border-radius: 0px;border: 0px;box-shadow: none;}
+.ucenter h3{margin:0px;font-size: 20px;font-weight: 400;text-align: center;}
+.ucenter .ucenter-avatar .thumbnail{margin:15px auto;border-radius: 50%;}
+.ucenter .ucenter-content{min-height: 250px;}

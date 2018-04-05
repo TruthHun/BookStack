@@ -102,6 +102,14 @@ func init() {
 	beego.Router("/search", &controllers.BaseController{}, "get:Search")
 	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")
 
+	//用户中心 【start】
+	beego.Router("/user/:username", &controllers.UserController{}, "get:Index")
+	beego.Router("/user/:username/collection", &controllers.UserController{}, "get:Collection")
+	beego.Router("/user/:username/follow", &controllers.UserController{}, "get:Follow")
+	beego.Router("/user/:username/fans", &controllers.UserController{}, "get:Fans")
+
+	//用户中心 【end】
+
 	beego.Router("/tag/:key", &controllers.LabelController{}, "get:Index")
 	beego.Router("/tag", &controllers.LabelController{}, "get:List")
 	beego.Router("/tags", &controllers.LabelController{}, "get:List")
