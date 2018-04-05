@@ -84,7 +84,8 @@ func (this *AccountController) Oauth() {
 						}
 						nickname = info.Name
 						username = info.Login
-						avatar = "/static/images/gitee.png"
+						avatar = info.AvatarURL
+						//avatar = "/static/images/gitee.png"
 						email = info.Email
 						id = info.Id
 					}
@@ -115,7 +116,8 @@ func (this *AccountController) Oauth() {
 						}
 						nickname = info.Name
 						username = info.Login
-						avatar = "/static/images/github.png"
+						//avatar = "/static/images/github.png"
+						avatar = info.AvatarURL
 						email = info.Email
 						id = info.Id
 					}
@@ -152,7 +154,8 @@ func (this *AccountController) Oauth() {
 							}
 							nickname = info.Name
 							username = ""
-							avatar = "/static/images/qq.png"
+							//avatar = "/static/images/qq.png"
+							avatar = info.AvatarURL
 							email = ""
 							id = openid
 						}
