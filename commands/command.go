@@ -82,6 +82,7 @@ func RegisterModel() {
 		new(models.DocumentStore),
 		new(models.Category),
 		new(models.BookCategory),
+		new(models.Fans),
 	)
 	migrate.RegisterMigration()
 }
@@ -199,6 +200,7 @@ func RegisterFunction() {
 	beego.AddFuncMap("doesStar", new(models.Star).DoesStar)
 	beego.AddFuncMap("scoreFloat", utils.ScoreFloat)
 	beego.AddFuncMap("showImg", utils.ShowImg)
+	beego.AddFuncMap("IsFollow", new(models.Fans).Relation)
 }
 
 func ResolveCommand(args []string) {

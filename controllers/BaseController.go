@@ -432,3 +432,21 @@ func (this *BaseController) Search() {
 	this.Data["SeoTitle"] = "搜索 - " + this.Sitename
 	this.TplName = "widgets/search.html"
 }
+
+//关注或取消关注
+func (this *BaseController) SetFollow() {
+	var cancel bool
+	if this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+	uid, _ := this.GetInt(":uid")
+	if uid == this.Member.MemberId {
+		this.JsonResult(1, "自己不能关注自己")
+	}
+	cancel, _ = new(models.Fans).FollowOrCancle(uid, this.Member.MemberId)
+	if cancel {
+		this.JsonResult(0, "您已经成功取消了关注")
+	} else {
+		this.JsonResult(0, "您已经成功关注了Ta")
+	}
+}

@@ -286,5 +286,36 @@ $(function () {
         $(".btn-upload-zip").removeClass("disabled");
     });
 
+    //添加关注
+    // $(".btn-follow").click(function (e) {
+    $(".ucenter").on("click",".btn-follow",function (e) {
+        e.preventDefault();
+        var _this=$(this),href=_this.attr("href");
+        $.get(href,function (ret) {
+            var obj=parseJson(ret);
+           if(obj.errcode==0){
+               var html='<a href="'+href+'" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a>';
+               _this.hide();
+              _this.before(html);
+               _this.remove();
+           }
+        })
+    })
+
+    //取消关注
+    $(".ucenter").on("click",".btn-cancel",function (e) {
+        e.preventDefault();
+        var _this=$(this),href=_this.attr("href");
+        $.get(href,function (ret) {
+            var obj=parseJson(ret);
+            if(obj.errcode==0){
+                var html='<a href="'+href+'" class="btn btn-success btn-sm btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a>';
+                _this.hide();
+                _this.before(html);
+                _this.remove();
+            }
+        })
+    })
+
 
 });

@@ -6,9 +6,15 @@
                     <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
                     <h3>{{.User.Nickname}}</h3>
                     <div class="help-block"><span class="text-muted">(@{{.User.Account}})</span></div>
-                    <!--<div><a href="#" class="btn btn-success btn-sm"><i class="fa fa-heart-o"></i> 关注Ta</a></div>-->
-                    <div><a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a></div>
-                    <!--<div><a href="#" class="btn btn-default btn-sm"><i class="fa fa-heart text-danger"></i> 取消关注</a></div>-->
+                    {{if .IsSelf}}
+                        <div><a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a></div>
+                    {{else}}
+                        {{if (IsFollow .User.MemberId  .Member.MemberId)}}
+                            <div><a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a></div>
+                        {{else}}
+                            <div><a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-success btn-sm btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a></div>
+                        {{end}}
+                    {{end}}
                     <div class="help-block mgt-15px">{{.User.Description}}</div>
                 </div>
             </div>

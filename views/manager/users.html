@@ -41,8 +41,12 @@
                                 <tbody>
                                 <tr v-for="item in lists">
                                     <td>${item.member_id}</td>
-                                    <td><img :src="item.avatar" onerror="this.src='/static/images/middle.gif'" class="img-circle" width="34" height="34"></td>
-                                    <td>${item.nickname}(${item.account})</td>
+                                    <td>
+                                        <a :href="'/user/'+item.account" target="_blank">
+                                            <img :src="item.avatar" onerror="this.src='/static/images/middle.gif'" class="img-circle" width="34" height="34">
+                                        </a>
+                                    </td>
+                                    <td><a :href="'/user/'+item.account" target="_blank">${item.nickname}(${item.account})</a></td>
                                     <td>
                                         <template v-if="item.role == 0">
                                             超级管理员

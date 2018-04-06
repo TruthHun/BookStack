@@ -757,3 +757,9 @@ a{color: #333}
 .ucenter-content .book-info{font-size: 12px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
 .ucenter-content .book-info span{margin-right: 10px;}
 .ucenter-content .book-description{max-height: 75px;overflow: hidden;}
+.ucenter .fans-item{margin-top:15px;}
+.ucenter .fans-item a{display: inline-block;}
+.ucenter .fans-item a.fans-username{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.ucenter .fans-item .btn{margin-top: 5px;}
+.ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;}
+.ucenter .fans-item .thumbnail img{border-radius: 50%;}
