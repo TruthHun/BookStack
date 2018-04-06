@@ -31,7 +31,7 @@
                             </div>
                             <div>
                                 {{if eq $.Member.MemberId .Uid}}
-                                    <a href="javascipt:;" class="btn btn-default disabled"><i class="fa fa-heart-o"></i> 关注Ta</a>
+                                    <a href="javascipt:;" class="btn btn-default disabled btn-sm"><i class="fa fa-heart-o"></i> 关注Ta</a>
                                 {{else}}
                                     {{if eq $.Tab "fans"}}
                                         {{if (IsFollow .Uid $.Member.MemberId)}}

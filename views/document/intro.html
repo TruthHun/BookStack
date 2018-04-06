@@ -25,7 +25,7 @@
                     {{.Book.ScoreFloat}}
                     （<span class="text-muted">{{.Book.CntScore}} 个有效评分</span>）
                 </li>
-                <li><span>分享达人：</span><a target="_blank" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
+                <li><span>分享达人：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
                 <li><span>文档数量：</span>{{.Book.DocCount}}</li>
                 <li><span>阅读人次：</span>{{.Book.Vcnt}}</li>
                 <li><span>收藏数量：</span>{{.Book.Star}}</li>
