@@ -630,7 +630,6 @@ a{color: #333}
 }
 
 
-
 .border{border: 1px solid #efefef;}
 .border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;}
 .navbar-brand>img.logo{height: 50px;margin-top: -15px;}
@@ -748,4 +747,13 @@ a{color: #333}
 .ucenter .well{border-radius: 0px;border: 0px;box-shadow: none;}
 .ucenter h3{margin:0px;font-size: 20px;font-weight: 400;text-align: center;}
 .ucenter .ucenter-avatar .thumbnail{margin:15px auto;border-radius: 50%;}
-.ucenter .ucenter-content{min-height: 250px;}
+.ucenter .ucenter-content{min-height: 150px;}
+.ucenter-content ul,.ucenter-content li{list-style: none;padding: 0px;}
+.ucenter-content li.clearfix{border-bottom: 1px dashed #EFEFEF;padding:20px;padding-left: 5px;}
+.ucenter-content li.clearfix:hover{background-color: #EFEFEF;}
+.ucenter-content li.clearfix>a{display: block;}
+.ucenter-content li.clearfix h4{font-weight: 400;margin-top: 0px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;font-size: 16px;}
+.ucenter-content li.clearfix .help-block{line-height: 180%;}
+.ucenter-content .book-info{font-size: 12px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+.ucenter-content .book-info span{margin-right: 10px;}
+.ucenter-content .book-description{max-height: 75px;overflow: hidden;}

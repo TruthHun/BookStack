@@ -28,7 +28,7 @@ func (this *HomeController) Index() {
 	switch tab {
 	case "recommend", "popular", "latest":
 	default:
-		tab = "recommend"
+		tab = "popular"
 	}
 	if cid, _ = this.GetInt("cid"); cid > 0 {
 		ModelCate := new(models.Category)

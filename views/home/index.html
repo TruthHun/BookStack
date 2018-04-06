@@ -17,9 +17,9 @@
                     </ol>
                 {{end}}
                 <ul class="nav nav-tabs">
-                    <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}" title="站长推荐">站长推荐</a></li>
                     <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}">热门书籍</a></li>
                     <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}">最新发布</a></li>
+                    <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}" title="站长推荐">站长推荐</a></li>
                 </ul>
             </div>
         </div>

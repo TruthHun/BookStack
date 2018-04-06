@@ -460,3 +460,9 @@ func (m *Member) GetQrcodeByUid(uid interface{}) (qrcode map[string]string) {
 	qrcode["Wxpay"] = member.Wxpay
 	return qrcode
 }
+
+//根据用户名获取用户信息
+func (this *Member) GetByUsername(username string) (member Member, err error) {
+	err = orm.NewOrm().QueryTable("md_members").Filter("account", username).One(&member)
+	return
+}
