@@ -114,7 +114,11 @@ func initSeo() {
 		"('16','manage_users_edit','用户编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('17','manage_project_list','项目列表','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
 		"('18','manage_project_edit','项目编辑','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
-		"('19','cate','书籍分类','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
+		"('19','cate','书籍分类','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
+		"('20','ucenter-share','用户主页','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
+		"('21','ucenter-collection','用户收藏','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
+		"('22','ucenter-fans','用户粉丝','{title} - 书栈网(BookStack.CN)','{keywords}','{description}'),",
+		"('23','ucenter-follow','用户关注','{title} - 书栈网(BookStack.CN)','{keywords}','{description}');",
 	}
 	if _, err := orm.NewOrm().Raw(strings.Join(sqlslice, "")).Exec(); err != nil {
 		beego.Error(err.Error())
