@@ -746,7 +746,7 @@ a{color: #333}
 .ucenter{margin-top: 55px;}
 .ucenter .well{border-radius: 0px;border: 0px;box-shadow: none;}
 .ucenter h3{margin:0px;font-size: 20px;font-weight: 400;text-align: center;}
-.ucenter .ucenter-avatar .thumbnail{margin:15px auto;border-radius: 50%;}
+.ucenter .ucenter-avatar .thumbnail{margin:15px auto;border-radius: 50%;max-width: 120px;}
 .ucenter .ucenter-content{min-height: 150px;}
 .ucenter-content ul,.ucenter-content li{list-style: none;padding: 0px;}
 .ucenter-content li.clearfix{border-bottom: 1px dashed #EFEFEF;padding:20px;padding-left: 5px;}
@@ -761,5 +761,5 @@ a{color: #333}
 .ucenter .fans-item a{display: inline-block;}
 .ucenter .fans-item a.fans-username{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
 .ucenter .fans-item .btn{margin-top: 5px;}
-.ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;}
-.ucenter .fans-item .thumbnail img{border-radius: 50%;}
+.ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;max-width: 100px;}
+.ucenter .fans-item .thumbnail img{border-radius: 50%;max-width: 100px;}
