@@ -40,7 +40,11 @@ func init() {
 	beego.Router("/manager/update-cate", &controllers.ManagerController{}, "get:UpdateCate")
 	beego.Router("/manager/del-cate", &controllers.ManagerController{}, "get:DelCate")
 	beego.Router("/manager/icon-cate", &controllers.ManagerController{}, "post:UpdateCateIcon")
-	beego.Router("/manager/sitemap", &controllers.ManagerController{}, "get:Sitemap") //更新站点地图
+	beego.Router("/manager/sitemap", &controllers.ManagerController{}, "get:Sitemap")       //更新站点地图
+	beego.Router("/manager/friendlink", &controllers.ManagerController{}, "get:FriendLink") //友链管理
+	beego.Router("/manager/add_friendlink", &controllers.ManagerController{}, "post:AddFriendlink")
+	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendlink")
+	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendlink")
 
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
 	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")

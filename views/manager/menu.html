@@ -5,6 +5,7 @@
     <li {{if .IsSetting}}class="active"{{end}}><a href="{{urlfor "ManagerController.Setting" }}" class="item"><i class="fa fa-cogs" aria-hidden="true"></i> 配置管理</a> </li>
     <li {{if .IsManagerSeo}}class="active"{{end}}><a href="{{urlfor "ManagerController.Seo" }}" class="item"><i class="fa fa-globe" aria-hidden="true"></i> SEO管理</a> </li>
     <li {{if .IsCategory}}class="active"{{end}}><a href="{{urlfor "ManagerController.Category" }}" class="item"><i class="fa fa-th" aria-hidden="true"></i> 分类管理</a> </li>
+    <li {{if .IsFriendlink}}class="active"{{end}}><a href="{{urlfor "ManagerController.FriendLink" }}" class="item"><i class="fa fa-link" aria-hidden="true"></i> 友链管理</a> </li>
     <!--<li {{if .IsAttach}}class="active"{{end}}><a href="{{urlfor "ManagerController.AttachList" }}" class="item"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 附件管理</a> </li>-->
 {{/*<li><a href="{{urlfor "ManagerController.Comments" }}" class="item"><i class="fa fa-comments-o" aria-hidden="true"></i> 评论管理</a> </li>*/}}
 </ul>

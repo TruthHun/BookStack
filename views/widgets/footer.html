@@ -3,11 +3,9 @@
         <div class="row">
             <div class="col-xs-12 friend-links">
                 <span class="text-muted">友情链接</span>
-                <a href="http://www.myquant.cn" title="掘金量化" target="_blank">掘金量化</a>
-                <a href="http://wenku.it" title="IT文库" target="_blank">IT文库</a>
-                <a href="http://www.weiyoou.com" title="微友搜索网" target="_blank">微友搜索网</a>
-                <a href="http://www.wangpanzhijia.net" title="网盘之家" target="_blank">网盘之家</a>
-                <a href="http://www.hc-cms.com" title="HC-CMS" target="_blank">HC-CMS</a>
+                {{range $.Friendlinks}}
+                    <a href="{{.Link}}" title="{{.Title}}" target="_blank">{{.Title}}</a>
+                {{end}}
             </div>
             <div class="clearfix mgt-15px text-center">
                 <div class="col-xs-12 mgt-15px">

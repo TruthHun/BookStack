@@ -803,3 +803,40 @@ func (this *ManagerController) UpdateCateIcon() {
 		this.JsonResult(1, err.Error())
 	}
 }
+
+//友情链接
+func (this *ManagerController) FriendLink() {
+	this.Data["SeoTitle"] = "友链管理"
+	this.Data["Links"] = new(models.FriendLink).GetList(true)
+	this.Data["IsFriendlink"] = true
+	this.TplName = "manager/friendlink.html"
+}
+
+//添加友链
+func (this *ManagerController) AddFriendlink() {
+	if err := new(models.FriendLink).Add(this.GetString("title"), this.GetString("link")); err == nil {
+		this.JsonResult(0, "新增友链成功")
+	} else {
+		this.JsonResult(1, "新增友链失败:"+err.Error())
+	}
+}
+
+//更新友链
+func (this *ManagerController) UpdateFriendlink() {
+	id, _ := this.GetInt("id")
+	if err := new(models.FriendLink).Update(id, this.GetString("field"), this.GetString("value")); err == nil {
+		this.JsonResult(0, "操作成功")
+	} else {
+		this.JsonResult(1, "操作失败："+err.Error())
+	}
+}
+
+//删除友链
+func (this *ManagerController) DelFriendlink() {
+	id, _ := this.GetInt("id")
+	if err := new(models.FriendLink).Del(id); err == nil {
+		this.JsonResult(0, "删除成功")
+	} else {
+		this.JsonResult(1, "删除失败："+err.Error())
+	}
+}

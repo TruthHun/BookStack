@@ -88,6 +88,7 @@ func (this *BaseController) Prepare() {
 		}
 	}
 	this.Data["SiteName"] = this.Sitename
+	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 }
 
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session

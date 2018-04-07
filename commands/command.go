@@ -83,6 +83,7 @@ func RegisterModel() {
 		new(models.Category),
 		new(models.BookCategory),
 		new(models.Fans),
+		new(models.FriendLink),
 	)
 	migrate.RegisterMigration()
 }
