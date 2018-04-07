@@ -54,7 +54,7 @@ func (this *HomeController) Index() {
 	if totalCount > 0 {
 		urlSuffix := "&tab=" + tab
 		if cid > 0 {
-			urlPrefix = urlPrefix + "&cid=" + strconv.Itoa(cid)
+			urlSuffix = urlSuffix + "&cid=" + strconv.Itoa(cid)
 		}
 		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, urlPrefix, urlSuffix)
 		this.Data["PageHtml"] = html
