@@ -13,7 +13,7 @@
             <div class="panel-heading">
                 <h3 class="panel-title">
                     <!--这里不显示一级分类的计数，主要是为了避免误导用户，因为一本书籍，可能属于多个子分类，但是一级分类下的计数并不是所有子分类计数的和-->
-                    <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}&tab=latest" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} <!-- （{{$cate.Cnt}}） --></a>
+                    <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}&tab=popular" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} <!-- （{{$cate.Cnt}}） --></a>
                 </h3>
             </div>
             <div class="panel-body">
