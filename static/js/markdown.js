@@ -4,6 +4,7 @@ $(function () {
         width : "100%",
         height : "100%",
         path : "/static/editor.md/lib/",
+        tex  : true,
         toolbar : true,
         placeholder: "本编辑器支持Markdown编辑，左边编写，右边预览",
         imageUpload: true,
@@ -60,8 +61,13 @@ $(function () {
         },
         onchange : function () {
             resetEditorChanged(true);
-        }
+        },
     });
+
+    window.editor.katexURL={
+        js  : "https://cdn.staticfile.org/KaTeX/0.7.1/katex.min.js",
+        css :"https://cdn.staticfile.org/KaTeX/0.7.1/katex.min.css",
+    };
 
     /**
      * 实现标题栏操作
