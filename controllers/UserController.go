@@ -127,3 +127,8 @@ func (this *UserController) Fans() {
 	this.Data["Tab"] = "fans"
 	this.TplName = "user/fans.html"
 }
+
+//笔记列表
+func (this *UserController) NoteList() {
+
+}

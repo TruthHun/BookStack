@@ -581,3 +581,15 @@ func (this *AccountController) Captcha() {
 	captchaImage.SaveImage(this.Ctx.ResponseWriter, gocaptcha.ImageFormatJpeg)
 	this.StopRun()
 }
+
+//记录笔记
+func (this *AccountController) Note() {
+	docid, _ := this.GetInt("doc_id")
+	fmt.Println(docid)
+	if strings.ToLower(this.Ctx.Request.Method) == "post" {
+
+	} else {
+		this.Data["SeoTitle"] = "笔记"
+		this.TplName = "account/note.html"
+	}
+}

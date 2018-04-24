@@ -10,7 +10,7 @@ import (
 type FriendLink struct {
 	Id     int    //自增主键
 	Sort   int    //排序
-	Link   string `orm:"unique"` //链接地址
+	Link   string `orm:"unique;size(128)"` //链接地址
 	Title  string //链接名称
 	Status bool   `orm:"default(1)"` //状态
 }

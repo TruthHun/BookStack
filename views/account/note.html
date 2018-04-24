@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <title>{{.SeoTitle}}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/jstree/3.3.4/themes/default/style.min.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/editor.md/css/editormd.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/highlight/styles/zenburn.css" rel="stylesheet">
+    <link href="{{$.StaticDomain}}/static/webuploader/webuploader.css" rel="stylesheet">
+    <link href="/static/css/markdown.css" rel="stylesheet">
+    <link href="/static/css/markdown.preview.css" rel="stylesheet">
+</head>
+<body>
+    <div id="NoteEditor"></div>
+    <script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
+    <script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="{{$.StaticDomain}}/static/webuploader/webuploader.min.js" type="text/javascript"></script>
+    <script src="{{$.StaticDomain}}/static/editor.md/editormd.js" type="text/javascript"></script>
+    <script src="{{$.StaticDomain}}/static/layer/layer.js" type="text/javascript" ></script>
+
+<script type="text/javascript">
+    var NoteEditor;
+    $(function() {
+        NoteEditor = editormd("NoteEditor", {
+            width: "100%",
+            height: 350,
+            path : "/static/editor.md/lib/",
+            markdown : "[TOC]\n\n",
+            toolbarIcons : function() {
+                return [
+                    "undo", "redo", "|",
+                    "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|",
+                    "h1", "h2", "h3", "h4", "h5", "h6", "|",
+                    "list-ul", "list-ol", "hr", "|",
+                    "link", "reference-link", "image", "code",  "table", "datetime",
+                    "|"
+                ]
+            },
+//            codeFold : true,
+            saveHTMLToTextarea : true,    // 保存 HTML 到 Textarea
+            searchReplace : true,
+            htmlDecode : "style,script,iframe|on*",            // 开启 HTML 标签解析，为了安全性，默认不开启
+            emoji : true,
+            taskList : true,
+            tocm            : true,         // Using [TOCM]
+            tex : true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart : true,             // 开启流程图支持，默认关闭
+            sequenceDiagram : true,       // 开启时序/序列图支持，默认关闭,
+            imageUpload : true,
+            imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+            imageUploadURL : "./php/upload.php",
+            onload : function() {
+//                console.log('onload', this);
+            }
+        });
+
+//        $("#goto-line-btn").bind("click", function(){
+//            testEditor.gotoLine(90);
+//        });
+//
+//        $("#show-btn").bind('click', function(){
+//            testEditor.show();
+//        });
+//
+//        $("#hide-btn").bind('click', function(){
+//            testEditor.hide();
+//        });
+//
+//        $("#get-md-btn").bind('click', function(){
+//            alert(testEditor.getMarkdown());
+//        });
+//
+//        $("#get-html-btn").bind('click', function() {
+//            alert(testEditor.getHTML());
+//        });
+//
+//        $("#watch-btn").bind('click', function() {
+//            testEditor.watch();
+//        });
+//
+//        $("#unwatch-btn").bind('click', function() {
+//            testEditor.unwatch();
+//        });
+//
+//        $("#preview-btn").bind('click', function() {
+//            testEditor.previewing();
+//        });
+//
+//        $("#fullscreen-btn").bind('click', function() {
+//            testEditor.fullscreen();
+//        });
+//
+//        $("#show-toolbar-btn").bind('click', function() {
+//            testEditor.showToolbar();
+//        });
+//
+//        $("#close-toolbar-btn").bind('click', function() {
+//            testEditor.hideToolbar();
+//        });
+//
+//        $("#toc-menu-btn").click(function(){
+//            testEditor.config({
+//                tocDropdown   : true,
+//                tocTitle      : "目录 Table of Contents",
+//            });
+//        });
+//
+//        $("#toc-default-btn").click(function() {
+//            testEditor.config("tocDropdown", false);
+//        });
+    });
+</script>
+</body>
+</html>
