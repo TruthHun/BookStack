@@ -215,6 +215,12 @@ func (this *DocumentController) Read() {
 		beego.Error(err.Error())
 	}
 
+	if this.Member.MemberId > 0 { //增加用户阅读记录
+		if err := new(models.ReadRecord).Add(doc.DocumentId, this.Member.MemberId); err != nil {
+			beego.Error(err.Error())
+		}
+	}
+
 	//SEO
 	this.GetSeoByPage("book_read", map[string]string{
 		"title":       doc.DocumentName + " - 《" + bookResult.BookName + "》",
