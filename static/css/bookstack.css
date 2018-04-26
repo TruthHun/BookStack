@@ -1156,9 +1156,9 @@ table>tbody>tr:hover{
     line-height: 1.7;
 }
 .markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{
-    font-weight: normal !important;
+    font-weight: 300 !important;
 }
-.markdown-body{font-size: 1.2em !important;line-height: 1.7;}
+.markdown-body{font-size: 1.14em !important;line-height: 1.7;}
 .editormd-preview-container ol.linenums li, .editormd-html-preview ol.linenums li{
     min-height: 20px;
 }
@@ -1183,6 +1183,6 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .bookstack-bars li:last-child{border-bottom:0px;}
 .bookstack-bars li:hover{background-color: #EFEFEF}
 .bookstack-bars li:hover a{color: #10af88}
-.editormd-preview-container code, .editormd-html-preview code{padding-top: 4px;}
+.editormd-preview-container code, .editormd-html-preview code{padding-top: 6px;}
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{font-style: normal;color: #777;}
 
