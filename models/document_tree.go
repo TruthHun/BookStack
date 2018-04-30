@@ -86,11 +86,13 @@ func (m *Document) CreateDocumentTreeForHtml(book_id, selected_id int) (string, 
 
 //使用递归的方式获取指定ID的顶级ID
 func getSelectedNode(array []*DocumentTree, parent_id int) int {
-
 	for _, item := range array {
 		if _, ok := item.ParentId.(string); ok && item.DocumentId == parent_id {
 			return item.DocumentId
 		} else if pid, ok := item.ParentId.(int); ok && item.DocumentId == parent_id {
+			if pid == parent_id {
+				return 0
+			}
 			return getSelectedNode(array, pid)
 		}
 	}
