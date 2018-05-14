@@ -229,8 +229,8 @@ $(function () {
     //以https或者http开头的url链接，加上target='_blank'
     $(".markdown-body").on("click","a",function (e) {
         e.preventDefault();
-        var href=$(this).attr("href").toLowerCase();
-        if($(this).attr("target")=="_blank" ||href.indexOf("http://")==0 || href.indexOf("https://")==0 ){
+        var href=$(this).attr("href"),hrefLower=href.toLowerCase();
+        if($(this).attr("target")=="_blank" ||hrefLower.indexOf("http://")==0 || hrefLower.indexOf("https://")==0 ){
             window.open(href);
         }else{
             location.href=href;
