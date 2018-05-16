@@ -2,6 +2,7 @@
 目录：
 - [BookStack简介](#intro)
     - [开源](#open)
+    - [QQ交流群](#qqgroup)
     - [站点](#site)
 		- [演示站点](#demo)
 		- [正式站点](#normal)
@@ -60,6 +61,13 @@ v1.0版本有很多地方不适于用于运营，使用v1.0版本的用户，建
 - Github: https://github.com/TruthHun/BookStack
 - Gitee: https://gitee.com/truthhun/BookStack
 
+<a name="qqgroup"></a>
+## QQ交流群
+为方便相互学习和交流，建了个QQ群，加群请备注`来自BookStack`
+
+> QQ交流群：457803862(猿军团)
+
+同时要说明的是，这个是学习交流群，如果是程序相关问题，请提交issue，再把issue链接发群里。
 
 <a name="site"></a>
 ## 站点
