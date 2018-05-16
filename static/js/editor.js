@@ -88,7 +88,7 @@ function openDeleteDocumentDialog($node) {
             layer.close(index);
             if(res.errcode === 0){
                 window.treeCatalog.delete_node($node);
-                resetEditor($node);
+                // resetEditor($node);
             }else{
                 layer.msg("删除失败",{icon : 2})
             }
