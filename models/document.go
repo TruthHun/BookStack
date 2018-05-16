@@ -89,16 +89,19 @@ func (m *Document) Find(id int) (*Document, error) {
 }
 
 //插入和更新文档.
+//存在文档id或者文档标识，则表示更新文档内容
 func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
 	id = int64(m.DocumentId)
-	if m.DocumentId > 0 {
+	m.ModifyTime = time.Now()
+	if m.DocumentId > 0 { //文档id存在，则更新
 		_, err = o.Update(m, cols...)
 	} else {
 		var mm Document
 		//直接查询一个字段，优化MySQL IO
 		o.QueryTable("md_documents").Filter("identify", m.Identify).Filter("book_id", m.BookId).One(&mm, "document_id")
 		if mm.DocumentId == 0 {
+			m.CreateTime = time.Now()
 			id, err = o.Insert(m)
 			NewBook().ResetDocumentNumber(m.BookId)
 		} else { //identify存在，则执行更新
@@ -158,6 +161,9 @@ func (m *Document) RecursiveDocument(doc_id int) error {
 
 //发布文档
 func (m *Document) ReleaseContent(book_id int, base_url string) {
+	//发布的时间戳
+	releaseTime := time.Now()
+
 	o := orm.NewOrm()
 	var (
 		docs       []*Document
@@ -193,7 +199,6 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 				content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
 				for _, attach := range attach_list {
 					li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
-
 					content.WriteString(li)
 				}
 				content.WriteString("</ul></div>")
@@ -208,8 +213,6 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 		}
 
 	}
-	//发布的时间戳
-	releaseTime := time.Now()
 
 	//最后再更新时间戳
 	if _, err = qs.Update(orm.Params{
