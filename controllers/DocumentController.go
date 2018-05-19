@@ -228,16 +228,21 @@ func (this *DocumentController) Read() {
 		"description": bookResult.Description,
 	})
 
+	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)
 	if this.IsAjax() {
 		var data struct {
+			Id       int    `json:"doc_id"`
 			DocTitle string `json:"doc_title"`
 			Body     string `json:"body"`
 			Title    string `json:"title"`
+			Bookmark bool   `json:"bookmark"` //是否已经添加了书签
 		}
 		data.DocTitle = doc.DocumentName
 		data.Body = doc.Release
-		//data.Body = doc.Markdown
+		data.Id = doc.DocumentId
 		data.Title = this.Data["SeoTitle"].(string)
+		data.Bookmark = existBookmark
+		//data.Body = doc.Markdown
 
 		this.JsonResult(0, "ok", data)
 	}
@@ -248,11 +253,12 @@ func (this *DocumentController) Read() {
 		beego.Error(err)
 		this.Abort("500")
 	}
-
+	this.Data["Bookmark"] = existBookmark
 	this.Data["Model"] = bookResult
 	this.Data["Book"] = bookResult //文档下载需要用到Book变量
 	this.Data["Result"] = template.HTML(tree)
 	this.Data["Title"] = doc.DocumentName
+	this.Data["DocId"] = doc.DocumentId
 	this.Data["Content"] = template.HTML(doc.Release)
 
 }

@@ -103,6 +103,7 @@ function loadDocument($url,$id,$callback) {
                 $("title").text(title);
                 $("#article-title").text(doc_title);
 
+
                 events.trigger('article.open',{ $url : $url, $init : false , $id : $id });
 
                 return false;
@@ -123,6 +124,16 @@ function loadDocument($url,$id,$callback) {
                 // RenderByMarkdown($body);
                 $("title").text(title);
                 $("#article-title").text(doc_title);
+
+                $(".bookmark-action").attr("data-docid",res.data.doc_id);
+                if (res.data.bookmark){//已添加书签
+                    $(".bookmark-action .bookmark-add").addClass("hide");
+                    $(".bookmark-action .bookmark-remove").removeClass("hide");
+                }else{//未添加书签
+
+                    $(".bookmark-action .bookmark-add").removeClass("hide");
+                    $(".bookmark-action .bookmark-remove").addClass("hide");
+                }
 
                 events.data('body_' + $id,body);
                 events.data('title_' + $id,title);
@@ -241,6 +252,41 @@ $(function () {
             }
         }
     });
+
+    //展开右下角菜单
+    $(".bars-menu-toggle").click(function () {
+        if($(".bars-menu-toggle .fa-minus-circle").hasClass("hide")){
+            $(".bars-menu").removeClass("bars-menu-hide");
+            $(".bars-menu-toggle .fa-minus-circle").removeClass("hide");
+            $(".bars-menu-toggle .fa-plus-circle").addClass("hide");
+        }else{
+            $(".bars-menu").addClass("bars-menu-hide");
+            $(".bars-menu-toggle .fa-minus-circle").addClass("hide");
+            $(".bars-menu-toggle .fa-plus-circle").removeClass("hide");
+        }
+    });
+
+    //添加或者移除书签
+    $(".bookmark-action").click(function (e) {
+        e.preventDefault();
+        var _this=$(this),doc_id=_this.attr("data-docid"),href=_this.attr("href")+doc_id;
+        $.get(href,function (res) {
+            if(res.errcode==0){
+                alertTips("success",res.message,3000,"");
+            }else{
+                alertTips("danger",res.message,3000,"");
+            }
+            if(res.data){//新增书签成功
+                $(".bookmark-action").find(".bookmark-add").addClass("hide");
+                $(".bookmark-action").find(".bookmark-remove").removeClass("hide");
+            }else{
+                $(".bookmark-action").find(".bookmark-add").removeClass("hide");
+                $(".bookmark-action").find(".bookmark-remove").addClass("hide");
+            }
+           console.log(res);
+        });
+    });
+
 
     $(".hung-read-link a").click(function (e) {
         //使用笨方法解决无刷新的问题。

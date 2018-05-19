@@ -57,15 +57,16 @@
                     {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
                     <a title="首页" href="/" class="btn btn-default"><i class="fa fa-home"></i> 首页</a>
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-default"><i class="fa fa-cloud-download"></i> 下载</a>
-                    <a href="{{urlfor "BookController.Star" ":id" .Model.BookId}}" rel="nofollow" class="btn btn-default ajax-star hidden-xs hidden-sm">
-                    {{if eq (doesStar $.Member.MemberId $.Model.BookId) true}}
-                        <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
-                    {{else}}
-                        <i class="fa fa-heart-o"></i> <span style="color: #333;">收藏</span>
-                    {{end}}
-                    </a>
-                    <a href="#" rel="nofollow" class="btn btn-default"> <i class="fa fa-bookmark-o"></i> 书签</a>
                     <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>
+                    <div class="btn-group">
+                        <a href="#" data-toggle="modal" data-target="#ModalBookmark" title="查看书签" rel="nofollow" class="btn btn-default">
+                            <img src="/static/images/icon-bookmark-list.png" alt="书签"> 书签
+                        </a>
+                        <a href="{{urlfor "BookmarkController.Bookmark" ":id" ""}}" data-docid="{{.DocId}}" rel="nofollow" class="btn btn-default bookmark-action">
+                            <span class="bookmark-add {{if $.Bookmark}}hide{{end}}"> <img src="/static/images/icon-bookmark-add.png" alt="添加书签"> 添加</span>
+                            <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"> 移除</span>
+                        </a>
+                    </div>
                     {{if eq $.Member.MemberId $.Model.MemberId}}
                         <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
                     {{end}}
@@ -108,25 +109,33 @@
                     {{/*</div>*/}}
                     <div class="bookstack-bars">
                         <ul>
-                            <li class="visible-xs visible-sm"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
-                            <li class="visible-xs visible-sm">
-                                <a href="{{urlfor "BookController.Star" ":id" .Model.BookId}}" rel="nofollow" class="ajax-star">
-                                {{if eq (doesStar $.Member.MemberId $.Model.BookId) true}}
-                                    <i class="fa fa-heart"></i>
-                                {{else}}
-                                    <i class="fa fa-heart-o"></i>
-                                {{end}}
-                                </a>
-                            </li>
-                            <li class="visible-xs visible-sm">
+
+                            <li class="visible-xs visible-sm bars-menu bars-menu-hide"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
+                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload"><i class="fa fa-cloud-download"></i></a>
                             </li>
-                            <li class="visible-xs visible-sm">
-                                <a href="#"><i class="fa fa-bookmark-o"></i></a>
+                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
+                                <a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare"><i class="fa fa-share-alt"></i></a>
+                            </li>
+                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
+                                <a href="#" data-toggle="modal" data-target="#ModalBookmark" title="书签">
+                                    <img src="/static/images/icon-bookmark-list.png" alt="书签">
+                                </a>
+                            </li>
+                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
+                                <a href="{{urlfor "BookmarkController.Bookmark" ":id" ""}}" data-docid="{{.DocId}}" rel="nofollow" class="bookmark-action">
+                                <span class="bookmark-add {{if $.Bookmark}}hide{{end}}"> <img src="/static/images/icon-bookmark-add.png" alt="添加书签"></span>
+                                <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"></span>
+                                </a>
+                            </li>
+
+                            <li class="visible-xs visible-sm bars-menu-toggle">
+                                <a href="#" title="更多功能"><i class="fa fa-plus-circle"></i><i class="fa fa-minus-circle hide"></i></a>
                             </li>
                             <li>
                                 <a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
                             </li>
+
                         </ul>
                     </div>
                 </div>

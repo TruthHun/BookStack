@@ -1150,7 +1150,7 @@ table>tbody>tr:hover{
 }
 
 
-.bookstack-item a{color: #333;margin-left: 8px;}
+.bookstack-item a{color: #333;}
 
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
     line-height: 1.7;
@@ -1171,7 +1171,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     display: block;
     white-space: pre;
 }
-.hung-read-link{margin: 30px 0px 200px;line-height: 200%;}
+.hung-read-link{margin: 30px 0px 180px;line-height: 200%;}
 .hung-read-link .col-xs-12{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 0px;}
 .hung-read-link .col-xs-12 a{margin-left: 5px;}
 .bookstack-bars{position: fixed;right: 15px;bottom: 30px;border:1px solid rgba(0,0,0,.1);
@@ -1186,3 +1186,4 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .editormd-preview-container code, .editormd-html-preview code{padding-top: 6px;}
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{font-style: normal;color: #777;}
 
+.bookstack-bars .bars-menu-hide{display: none !important;}
