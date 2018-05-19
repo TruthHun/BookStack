@@ -65,6 +65,7 @@
                     {{end}}
                     </a>
                     <a href="#" rel="nofollow" class="btn btn-default"> <i class="fa fa-bookmark-o"></i> 书签</a>
+                    <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>
                     {{if eq $.Member.MemberId $.Model.MemberId}}
                         <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
                     {{end}}
@@ -194,6 +195,7 @@
 </div>
 
 
+{{template "widgets/share.html" .}}
 
 
 {{template "widgets/download.html" .}}

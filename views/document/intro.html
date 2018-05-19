@@ -45,6 +45,8 @@
                             {{end}}
                         </a>
                         <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载</a>
+                        <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-info"><i class="fa fa-share-alt"></i> &nbsp;分享</a>
+
                     </div>
                 </li>
             </ul>
@@ -53,10 +55,10 @@
             <div class="btn btn-group">
             {{range $index,$val:=.Menu}}
             {{if eq $index 0}}
-                <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 阅读</a>
+                <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i>阅读</a>
             {{end}}
             {{end}}
-                <a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i> 打赏</a>
+                <a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i>打赏</a>
                 <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
                 {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
                     <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
@@ -64,7 +66,8 @@
                     <i class="fa fa-heart-o"></i> <span style="color: #333;">收藏</span>
                 {{end}}
                 </a>
-                <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载</a>
+                <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i>下载</a>
+                <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-info"><i class="fa fa-share-alt"></i>分享</a>
             </div>
         </div>
 
@@ -154,6 +157,7 @@
 
 </div>
 {{template "widgets/support.html" .}}
+{{template "widgets/share.html" .}}
 {{template "widgets/download.html" .}}
 {{template "widgets/footer.html" .}}
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
