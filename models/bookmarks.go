@@ -20,12 +20,13 @@ type Bookmark struct {
 
 //书签列表
 type bookmarkList struct {
-	Id       int
-	Title    string //标题
-	BookId   int    `orm:"index"` //书籍id，主要是为了方便根据书籍id查询书签
-	Uid      int    //用户id
-	DocId    int    //文档id
-	CreateAt int    //创建时间
+	Id       int    `json:"id"`
+	Title    string `json:"title"`
+	Identify string `json:"identify"`
+	BookId   int    `json:"book_id"`
+	Uid      int    `json:"uid"`
+	DocId    int    `json:"doc_id"`
+	CreateAt int    `json:"create_at"`
 }
 
 var tableBookmark = "md_bookmark"
@@ -94,8 +95,8 @@ func (m *Bookmark) Delete(uid, bookId, docId int) (err error) {
 //查询书签列表
 func (m *Bookmark) List(uid, bookId int) (bl []bookmarkList, rows int64, err error) {
 	o := orm.NewOrm()
-	fields := "b.id,d.doc_name title,b.book_id,b.uid,b.doc_id,b.create_at"
-	sql := "select %v from md_bookmark b left join md_documents d on b.doc_id=d.document_id where b.uid=? and b.book_id=? limit 1000"
+	fields := "b.id,d.document_name title,d.identify,b.book_id,b.uid,b.doc_id,b.create_at"
+	sql := "select %v from md_bookmark b left join md_documents d on b.doc_id=d.document_id where b.uid=? and b.book_id=? order by b.id desc limit 1000"
 	sql = fmt.Sprintf(sql, fields)
 	rows, err = o.Raw(sql, uid, bookId).QueryRows(&bl)
 	return

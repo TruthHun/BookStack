@@ -1187,3 +1187,27 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{font-style: normal;color: #777;}
 
 .bookstack-bars .bars-menu-hide{display: none !important;}
+
+#ModalBookmark li{
+    list-style: none;border-bottom: 1px dashed #EFEFEF;
+    padding-right: 50px;position: relative;
+    padding-left: 5px;
+}
+#ModalBookmark li:last-of-type{
+    border-bottom: 0px;
+}
+#ModalBookmark li .text-muted{
+    margin-right: 5px;
+}
+#ModalBookmark li:hover{
+    background-color: #EFEFEF;
+}
+#ModalBookmark li .fa{
+    position: absolute;right: 0px;line-height: 250%;
+    padding:0px 10px;cursor: pointer;color: #888;font-weight: 100;
+}
+#ModalBookmark li a{
+    display: inline-block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+    line-height: 250%;text-decoration: none;
+}
+

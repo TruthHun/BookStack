@@ -1,3 +1,4 @@
+"use strict"
 /***
  * 加载文档到阅读区
  * @param $url
@@ -60,7 +61,7 @@
 
 //渲染markdown为html
 function RenderByMarkdown($content) {
-    testEditormdView = editormd.markdownToHTML("page-content", {
+    var testEditormdView = editormd.markdownToHTML("page-content", {
         markdown        : $content ,//+ "\r\n" + $("#append-test").text(),
         //htmlDecode      : true,       // 开启 HTML 标签解析，为了安全性，默认不开启
         htmlDecode      : "style,script,iframe",  // you can filter tags decode
@@ -116,7 +117,7 @@ function loadDocument($url,$id,$callback) {
                 var body = res.data.body;
                 var doc_title = res.data.doc_title;
                 var title = res.data.title;
-                $body = body;
+                var $body = body;
                 if (typeof $callback === "function" ){
                     $body = $callback(body);
                 }
@@ -211,7 +212,7 @@ $(function () {
      * 关闭侧边栏
      */
     $(".manual-fullscreen-switch").on("click",function () {
-        isFullScreen = !isFullScreen;
+        var isFullScreen = !isFullScreen;
         if (isFullScreen) {
             $(".m-manual").addClass('manual-fullscreen-active');
         } else {
@@ -290,7 +291,7 @@ $(function () {
 
     $(".hung-read-link a").click(function (e) {
         //使用笨方法解决无刷新的问题。
-        $selector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
+        var $selector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
         if($selector.length>0){
             e.preventDefault();
             var CurSelector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
@@ -305,6 +306,43 @@ $(function () {
         var mode = $(this).data('mode');
         $(this).siblings().removeClass('active').end().addClass('active');
         $(".m-manual").removeClass("manual-mode-view manual-mode-collect manual-mode-search").addClass("manual-mode-" + mode);
+    });
+
+    //显示书签列表
+    $(".showModalBookmark").click(function (e) {
+        e.preventDefault();
+        $.get($(this).attr("href"),function (res) {
+            if(res.errcode==0){
+                if(res.data.count>0){
+                    var arr =new Array();
+                    for (var i=0;i<res.data.count;i++){
+                        var item=res.data.list[i];
+                        arr.push('<li><a href="'+item.url+'"><span class="text-muted">[ '+item.time+' ]</span> '+item.title+'</a> <i data-url="'+item.del+'" data-docid="'+item.doc_id+'" class="fa fa-remove"></i> </li>')
+                    }
+                    $("#ModalBookmark .modal-body ul").html(arr.join(""));
+                }else{
+                    $("#ModalBookmark .modal-body ul").html('<li><div class="help-block">您当前还没有添加书签...</div></li>');
+                }
+
+                $("#ModalBookmark").modal("show");
+            }else{
+                alertTips("danger",res.message,3000,"");
+            }
+
+        });
+    });
+
+    //删除书签
+    $("#ModalBookmark").on("click",".modal-body .fa-remove",function () {
+       var _this=$(this),docid=_this.attr("data-docid"),_url=_this.attr("data-url");
+       $.get(_url,function () {//不管删除成功与否，移除记录
+           _this.parent().remove();
+           var markdocid=$(".bookmark-action").attr("data-docid");
+           if(markdocid==docid){
+               $(".bookmark-action .bookmark-add").removeClass("hide");
+               $(".bookmark-action .bookmark-remove").addClass("hide");
+           }
+       });
     });
 
     /**

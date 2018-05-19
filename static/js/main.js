@@ -73,7 +73,7 @@ function alertTips(cls,msg,timeout,url) {
         sticky:false,
         has_progress:true,
         rtl:false,
-        // position_class:'toast-top-right',
+        // position_class:'toast-top-center',
     });
     setTimeout(function () {
         if(url){

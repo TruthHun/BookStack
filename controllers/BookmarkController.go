@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/TruthHun/BookStack/models"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 type BookmarkController struct {
@@ -24,7 +27,7 @@ func (this *BookmarkController) Bookmark() {
 			if insert {
 				this.JsonResult(0, "添加书签成功", insert)
 			} else {
-				this.JsonResult(0, "删除书签成功", insert)
+				this.JsonResult(0, "移除书签成功", insert)
 			}
 		} else {
 			beego.Error(err.Error())
@@ -47,9 +50,24 @@ func (this *BookmarkController) List() {
 			beego.Error(err.Error())
 			this.JsonResult(1, "获取书签列表失败")
 		} else {
+			var (
+				book  = new(models.Book)
+				lists []map[string]interface{}
+			)
+			orm.NewOrm().QueryTable(book).Filter("book_id", bookId).One(book, "identify")
+			for _, item := range bl {
+				var list = make(map[string]interface{})
+				list["url"] = beego.URLFor("DocumentController.Read", ":key", book.Identify, ":id", item.Identify)
+				list["title"] = item.Title
+				list["doc_id"] = item.DocId
+				list["del"] = beego.URLFor("BookmarkController.Bookmark", ":id", item.DocId)
+				list["time"] = time.Unix(int64(item.CreateAt), 0).Format("01-02 15:04")
+				lists = append(lists, list)
+			}
 			this.JsonResult(0, "获取书签列表成功", map[string]interface{}{
-				"count": rows,
-				"list":  bl,
+				"count":   rows,
+				"book_id": bookId,
+				"list":    lists,
 			})
 		}
 	} else {
