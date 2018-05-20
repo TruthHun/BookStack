@@ -83,6 +83,7 @@ func init() {
 	//阅读记录
 	beego.Router("/record/:book_id", &controllers.RecordController{}, "get:List")
 	beego.Router("/record/:book_id/clear", &controllers.RecordController{}, "get:Clear")
+	beego.Router("/record/delete/:doc_id", &controllers.RecordController{}, "get:Delete")
 
 	beego.Router("/api/attach/remove/", &controllers.DocumentController{}, "post:RemoveAttachment")
 	beego.Router("/api/:key/edit/?:id", &controllers.DocumentController{}, "*:Edit")

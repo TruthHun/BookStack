@@ -12,7 +12,6 @@ import (
 )
 
 //增加一个重新阅读的功能，即重置阅读，清空所有阅读记录
-//阅读记录，不允许单个删除，因为这样没意义
 
 //阅读记录.用于记录阅读的文档，以及阅读进度统计
 type ReadRecord struct {
@@ -33,6 +32,7 @@ type ReadCount struct {
 
 //阅读记录列表（非表）
 type RecordList struct {
+	DocId    int
 	Title    string
 	Identify string
 	CreateAt int
@@ -132,7 +132,7 @@ func (this *ReadRecord) List(uid, bookId int) (lists []RecordList, cnt int64, er
 		err = errors.New("用户id和项目id不能为空")
 		return
 	}
-	fields := "r.create_at,d.document_name title,d.identify"
+	fields := "r.doc_id,r.create_at,d.document_name title,d.identify"
 	sql := "select %v from %v r left join md_documents d on r.doc_id=d.document_id where r.book_id=? and r.uid=? order by r.id desc limit 5000"
 	sql = fmt.Sprintf(sql, fields, tableReadRecord)
 	cnt, err = orm.NewOrm().Raw(sql, bookId, uid).QueryRows(&lists)
@@ -165,6 +165,25 @@ func (this *ReadRecord) Progress(uid, bookId int) (rp ReadProgress, err error) {
 		}
 		f := float32(rp.Cnt) / float32(rp.Total)
 		rp.Percent = fmt.Sprintf("%.2f", f*100) + "%"
+	}
+	return
+}
+
+//删除单条阅读记录
+func (this *ReadRecord) Delete(uid, docId int) (err error) {
+	if uid*docId == 0 {
+		err = errors.New("用户id和文档id不能为空")
+		return
+	}
+	o := orm.NewOrm()
+	var (
+		record ReadRecord
+	)
+	o.QueryTable(tableReadRecord).Filter("uid", uid).Filter("doc_id", docId).One(&record, "book_id", "id")
+	if record.BookId > 0 { //存在，则删除该阅读记录
+		if cnt, err := o.QueryTable(tableReadRecord).Filter("id", record.Id).Delete(); err == nil && cnt > 0 {
+			err = SetIncreAndDecre(tableReadCount, "cnt", "book_id="+strconv.Itoa(record.BookId)+" and uid="+strconv.Itoa(uid), false, 1)
+		}
 	}
 	return
 }

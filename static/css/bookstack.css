@@ -1193,9 +1193,6 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     padding-right: 50px;position: relative;
     padding-left: 5px;
 }
-#ModalHistory li{
-    padding-right: 5px;
-}
 #ModalBookmark li:last-of-type,#ModalHistory li:last-of-type{
     border-bottom: 0px;
 }
@@ -1205,7 +1202,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 #ModalBookmark li:hover,#ModalHistory li:hover{
     background-color: #EFEFEF;
 }
-#ModalBookmark li .fa{
+#ModalBookmark li .fa,#ModalHistory li .fa{
     position: absolute;right: 0px;line-height: 250%;
     padding:0px 10px;cursor: pointer;color: #888;font-weight: 100;
 }

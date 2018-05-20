@@ -317,7 +317,7 @@ $(function () {
                     var arr =new Array();
                     for (var i=0;i<res.data.count;i++){
                         var item=res.data.list[i];
-                        arr.push('<li><a href="'+item.url+'"><span class="text-muted">[ '+item.time+' ]</span> '+item.title+'</a> <i data-url="'+item.del+'" data-docid="'+item.doc_id+'" class="fa fa-remove"></i> </li>')
+                        arr.push('<li><a href="'+item.url+'"><span class="text-muted">[ '+item.time+' ]</span> '+item.title+'</a> <i title="移除" data-url="'+item.del+'" data-docid="'+item.doc_id+'" class="fa fa-remove tooltips"></i> </li>')
                     }
                     $("#ModalBookmark .modal-body ul").html(arr.join(""));
                 }else{
@@ -345,7 +345,7 @@ $(function () {
                 var items=res.data.lists;
                 var lists=new Array();
                 for (var i=0;i<res.data.count;i++){
-                    lists.push('<li><a href="'+items[i].url+'"><span class="text-muted">[ '+items[i].time+' ]</span> '+items[i].title+'</a></li>');
+                    lists.push('<li><a href="'+items[i].url+'"><span class="text-muted">[ '+items[i].time+' ]</span> '+items[i].title+'</a><i title="移除" data-url="'+items[i].del+'" class="fa fa-remove tooltips"></i></li>');
                 }
                 $("#ModalHistory .modal-body ul").html(lists.join(""));
                 $("#ModalHistory").modal("show");
@@ -377,6 +377,14 @@ $(function () {
                $(".bookmark-action .bookmark-remove").addClass("hide");
            }
        });
+    });
+
+    //删除阅读记录
+    $("#ModalHistory").on("click",".modal-body .fa-remove",function () {
+        var _this=$(this),_url=_this.attr("data-url");
+        $.get(_url,function () {//不管删除成功与否，移除记录
+            _this.parent().remove();
+        });
     });
 
     /**

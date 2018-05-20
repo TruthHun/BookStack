@@ -39,6 +39,7 @@ func (this *RecordController) List() {
 				list["title"] = item.Title
 				list["url"] = beego.URLFor("DocumentController.Read", ":key", rp.BookIdentify, ":id", item.Identify)
 				list["time"] = time.Unix(int64(item.CreateAt), 0).Format("01-02 15:04")
+				list["del"] = beego.URLFor("RecordController.Delete", ":doc_id", item.DocId)
 				lists = append(lists, list)
 			}
 		}
@@ -60,7 +61,21 @@ func (this *RecordController) Clear() {
 	bookId, _ := this.GetInt(":book_id")
 	if bookId > 0 {
 		m := new(models.ReadRecord)
-		m.Clear(this.Member.MemberId, bookId)
+		if err := m.Clear(this.Member.MemberId, bookId); err != nil {
+			beego.Error(err)
+		}
 	}
-	this.JsonResult(0, "阅读进度重置成功")
+	//不管删除是否成功，均返回成功
+	this.JsonResult(0, "重置阅读进度成功")
+}
+
+//删除单条阅读历史
+func (this *RecordController) Delete() {
+	docId, _ := this.GetInt(":doc_id")
+	if docId > 0 {
+		if err := new(models.ReadRecord).Delete(this.Member.MemberId, docId); err != nil {
+			beego.Error(err)
+		}
+	}
+	this.JsonResult(0, "删除成功")
 }
