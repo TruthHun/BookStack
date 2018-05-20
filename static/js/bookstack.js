@@ -362,6 +362,7 @@ $(function () {
        if(confirm("重置阅读进度，会清空所有阅读记录，您确定要执行该操作吗？")){
            $.get(href,function (res) {
                $("#ModalHistory").modal("hide");
+               alertTips("success","重置阅读进度成功",3000,"");
            });
        }
     });
