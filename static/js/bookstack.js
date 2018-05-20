@@ -332,6 +332,40 @@ $(function () {
         });
     });
 
+    //显示阅读记录
+    $(".showModalHistory").click(function(e){
+        e.preventDefault();
+        var _this=$(this),href=_this.attr("href");
+        $.get(href,function (res) {
+            if(res.errcode==0){
+                $("#ModalHistory .modal-body .help-block .text-success").text(res.data.progress.percent);
+                $("#ModalHistory .modal-body .help-block .text-muted").text(res.data.progress.cnt+" / "+res.data.progress.total);
+                $("#ModalHistory .progress-bar-success").css({"width":res.data.progress.percent});
+                $("#ModalHistory .reset-history").attr("href",res.data.clear);
+                var items=res.data.lists;
+                var lists=new Array();
+                for (var i=0;i<res.data.count;i++){
+                    lists.push('<li><a href="'+items[i].url+'"><span class="text-muted">[ '+items[i].time+' ]</span> '+items[i].title+'</a></li>');
+                }
+                $("#ModalHistory .modal-body ul").html(lists.join(""));
+                $("#ModalHistory").modal("show");
+            }else{
+                alertTips("danger",res.message,3000,"");
+            }
+        })
+    });
+
+    //重置阅读记录
+    $(".reset-history").click(function (e) {
+        e.preventDefault();
+        var _this=$(this),href=_this.attr("href");
+       if(confirm("重置阅读进度，会清空所有阅读记录，您确定要执行该操作吗？")){
+           $.get(href,function (res) {
+               $("#ModalHistory").modal("hide");
+           });
+       }
+    });
+
     //删除书签
     $("#ModalBookmark").on("click",".modal-body .fa-remove",function () {
        var _this=$(this),docid=_this.attr("data-docid"),_url=_this.attr("data-url");

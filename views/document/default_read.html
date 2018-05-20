@@ -67,7 +67,7 @@
                             <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"> 移除</span>
                         </a>
                     </div>
-                    <a href="#" class="btn btn-default showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
+                    <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
 
                     {{if eq $.Member.MemberId $.Model.MemberId}}
                         <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
@@ -120,7 +120,7 @@
                                 <a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare"><i class="fa fa-share-alt"></i></a>
                             </li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
-                                <a title="阅读记录" href="javascript:" data-toggle="modal" data-target="#ModalShare"><i class="fa fa-clock-o"></i></a>
+                                <a title="阅读记录" class="showModalHistory" href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow"><i class="fa fa-clock-o"></i></a>
                             </li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a rel="nofollow" href="{{urlfor "BookmarkController.List" ":book_id" .Model.BookId}}" data-bookid="{{.Model.BookId}}" class="showModalBookmark" title="书签">
@@ -214,6 +214,8 @@
 {{template "widgets/download.html" .}}
 
 {{template "widgets/bookmark.html" .}}
+
+{{template "widgets/history.html" .}}
 
 
 

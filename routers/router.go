@@ -80,6 +80,9 @@ func init() {
 
 	beego.Router("/bookmark/:id", &controllers.BookmarkController{}, "get:Bookmark")
 	beego.Router("/bookmark/list/:book_id", &controllers.BookmarkController{}, "get:List")
+	//阅读记录
+	beego.Router("/record/:book_id", &controllers.RecordController{}, "get:List")
+	beego.Router("/record/:book_id/clear", &controllers.RecordController{}, "get:Clear")
 
 	beego.Router("/api/attach/remove/", &controllers.DocumentController{}, "post:RemoveAttachment")
 	beego.Router("/api/:key/edit/?:id", &controllers.DocumentController{}, "*:Edit")
