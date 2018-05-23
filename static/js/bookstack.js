@@ -174,7 +174,7 @@ $(function () {
             $(".view-backtop").removeClass("active");
         }
     });
-    window.isFullScreen = false;
+    // window.isFullScreen = false;
 
     initHighlighting();
 
@@ -212,8 +212,7 @@ $(function () {
      * 关闭侧边栏
      */
     $(".manual-fullscreen-switch").on("click",function () {
-        var isFullScreen = !isFullScreen;
-        if (isFullScreen) {
+        if (!$(".m-manual").hasClass("manual-fullscreen-active")) {
             $(".m-manual").addClass('manual-fullscreen-active');
         } else {
             $(".m-manual").removeClass('manual-fullscreen-active');
