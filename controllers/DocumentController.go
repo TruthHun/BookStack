@@ -829,9 +829,9 @@ func (this *DocumentController) Content() {
 		}
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
 			//自动生成文档内容
-			markdown, content = new(models.Document).BookStackAuto(book_id, doc_id)
-			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", markdown, -1)
-			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", content, -1)
+			imd, icont := new(models.Document).BookStackAuto(book_id, doc_id)
+			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
+			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
 			is_auto = true
 		}
 		content = this.replaceLinks(identify, content, is_summary)
