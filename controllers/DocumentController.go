@@ -331,8 +331,8 @@ func (this *DocumentController) Edit() {
 
 //创建一个文档.
 func (this *DocumentController) Create() {
-	identify := this.GetString("identify")
-	doc_identify := this.GetString("doc_identify")
+	identify := this.GetString("identify")         //书籍项目标识
+	doc_identify := this.GetString("doc_identify") //新建的文档标识
 	doc_name := this.GetString("doc_name")
 	parent_id, _ := this.GetInt("parent_id", 0)
 	doc_id, _ := this.GetInt("doc_id", 0)
@@ -769,7 +769,7 @@ func (this *DocumentController) Delete() {
 func (this *DocumentController) Content() {
 	identify := this.Ctx.Input.Param(":key")
 	doc_id, err := this.GetInt("doc_id")
-
+	errMsg := "ok"
 	if err != nil {
 		doc_id, _ = strconv.Atoi(this.Ctx.Input.Param(":id"))
 	}
@@ -829,16 +829,9 @@ func (this *DocumentController) Content() {
 		}
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
 			//自动生成文档内容
-			var docs []models.Document
-			orm.NewOrm().QueryTable("md_documents").Filter("book_id", book_id).Filter("parent_id", doc_id).OrderBy("order_sort").All(&docs, "document_id", "document_name", "identify")
-			var newCont []string //新HTML内容
-			var newMd []string   //新markdown内容
-			for _, idoc := range docs {
-				newMd = append(newMd, fmt.Sprintf(`- [%v]($%v)`, idoc.DocumentName, idoc.Identify))
-				newCont = append(newCont, fmt.Sprintf(`<li><a href="$%v">%v</a></li>`, idoc.Identify, idoc.DocumentName))
-			}
-			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", strings.Join(newMd, "\n"), -1)
-			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", "<ul>"+strings.Join(newCont, "")+"</ul>", -1)
+			markdown, content = new(models.Document).BookStackAuto(book_id, doc_id)
+			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", markdown, -1)
+			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", content, -1)
 			is_auto = true
 		}
 		content = this.replaceLinks(identify, content, is_summary)
@@ -880,12 +873,17 @@ func (this *DocumentController) Content() {
 				beego.Error("DocumentHistory InsertOrUpdate => ", err)
 			}
 		}
+		if is_auto {
+			errMsg = "auto"
+		} else if is_summary {
+			errMsg = "true"
+		}
 
-		//doc.Markdown = ""
+		//
 		//doc.Content = ""
 		doc.Release = ""
 		//注意：如果errMsg的值是true，则表示更新了目录排序，需要刷新，否则不刷新
-		this.JsonResult(0, fmt.Sprintf("%v", is_summary || is_auto), doc)
+		this.JsonResult(0, errMsg, doc)
 	}
 	doc, err := models.NewDocument().Find(doc_id)
 

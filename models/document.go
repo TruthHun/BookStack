@@ -427,3 +427,19 @@ func (m *Document) GetMenuTop(book_id int) (docs []*Document, err error) {
 	}
 	return
 }
+
+//自动生成下一级的内容
+func (m *Document) BookStackAuto(bookId, docId int) (md, cont string) {
+	//自动生成文档内容
+	var docs []Document
+	orm.NewOrm().QueryTable("md_documents").Filter("book_id", bookId).Filter("parent_id", docId).OrderBy("order_sort").All(&docs, "document_id", "document_name", "identify")
+	var newCont []string //新HTML内容
+	var newMd []string   //新markdown内容
+	for _, idoc := range docs {
+		newMd = append(newMd, fmt.Sprintf(`- [%v]($%v)`, idoc.DocumentName, idoc.Identify))
+		newCont = append(newCont, fmt.Sprintf(`<li><a href="$%v">%v</a></li>`, idoc.Identify, idoc.DocumentName))
+	}
+	md = strings.Join(newMd, "\n")
+	cont = "<ul>" + strings.Join(newCont, "") + "</ul>"
+	return
+}

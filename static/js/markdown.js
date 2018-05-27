@@ -225,6 +225,7 @@ $(function () {
         var content = window.editor.getMarkdown();
         var html = window.editor.getPreviewedHTML();
         var version = "";
+        var cm = window.editor.cm;
 
         if(!node){
             layer.msg("获取当前文档信息失败");
@@ -265,6 +266,8 @@ $(function () {
                     }
                     if(res.message=="true"){//刷新页面显示最新的排序
                         location.href=location.origin+location.pathname+"?"+new Date();//刷新当前页面以获取新的排序
+                    }else if(res.message=="auto"){
+                        $(".jstree-wholerow-clicked").trigger("click");
                     }
                 }else if(res.errcode === 6005){
                     var confirmIndex = layer.confirm('文档已被其他人修改确定覆盖已存在的文档吗？', {
