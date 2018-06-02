@@ -3858,10 +3858,12 @@
 }
 .editormd-preview-container code, .editormd-html-preview code {
   border: 1px solid #ddd;
-  background: #f6f6f6;
+  background-color: #f6f6f6;
   padding: 3px;
+  padding-top:6px;
   border-radius: 3px;
   font-size: 14px;
+  color: #c7254e;
 }
 .editormd-preview-container pre, .editormd-html-preview pre {
   border: 1px solid #ddd;
