@@ -226,11 +226,14 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	}
 }
 
+//离线文档生成
 func (m *Document) GenerateBook(book *Book, base_url string) {
-	if book.ReleaseTime == book.GenerateTime && book.GenerateTime.Unix() > 0 { //如果文档没有更新，则直接返回，不再生成文档
-		beego.Error("下载文档生成时间跟文档发布时间一致，无需再重新生成下载文档", book)
-		return
-	}
+	//哪怕文档没有更新，也可以重新生成离线文档，因为也有可能是离线文档的生成规则发生了变化而需要重新生成离线文档
+	//if book.ReleaseTime == book.GenerateTime && book.GenerateTime.Unix() > 0 { //如果文档没有更新，则直接返回，不再生成文档
+	//	beego.Error("下载文档生成时间跟文档发布时间一致，无需再重新生成下载文档", book)
+	//	return
+	//}
+
 	//将书籍id加入进去，表示正在生成离线文档
 	utils.BooksGenerate.Set(book.BookId)
 	defer utils.BooksGenerate.Delete(book.BookId) //最后移除
@@ -374,8 +377,10 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 
 	//将文档移动到oss
 	//将PDF文档移动到oss
-	newBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.ReleaseTime.Unix())
-	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
+	NewGenerateTime := time.Now()
+	newBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, NewGenerateTime.Unix())
+	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix()) //旧书籍的生成时间
+
 	exts := []string{".pdf", ".epub", ".mobi"}
 	for _, ext := range exts {
 		switch utils.StoreType {
@@ -391,6 +396,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		}
 
 	}
+
 	//删除旧文件
 	switch utils.StoreType {
 	case utils.StoreOss:
@@ -404,7 +410,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 	}
 
 	//最后再更新文档生成时间
-	if _, err = qs.Update(orm.Params{"generate_time": book.ReleaseTime}); err != nil {
+	if _, err = qs.Update(orm.Params{"generate_time": NewGenerateTime}); err != nil {
 		beego.Error(err.Error())
 	}
 }
