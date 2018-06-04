@@ -174,8 +174,9 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	qs := o.QueryTable(tableBooks).Filter("book_id", book_id)
 	qs.One(&book)
 	//查询更新时间大于项目发布时间的文档
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("modify_time__gt", book.ReleaseTime).All(&docs, "document_id")
-	//_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).All(&docs, "document_id", "content")
+	//_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("modify_time__gt", book.ReleaseTime).All(&docs, "document_id")
+	//全部重新发布
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).All(&docs, "document_id", "content")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
