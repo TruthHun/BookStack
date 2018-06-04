@@ -631,14 +631,9 @@ func (this *BookController) Release() {
 		book_id = book.BookId
 	}
 
-	//加锁
-	utils.ReleaseMapsLock.Lock()
-	defer utils.ReleaseMapsLock.Unlock()
-
-	if _, ok := utils.ReleaseMaps[book_id]; ok {
+	if exist := utils.BooksRelease.Exist(book_id); exist {
 		this.JsonResult(1, "上次内容发布正在执行中，请稍后再操作")
 	}
-	utils.ReleaseMaps[book_id] = true
 
 	go func(identify string) {
 		models.NewDocument().ReleaseContent(book_id, this.BaseUrl())
@@ -653,8 +648,8 @@ func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 	book, err := models.NewBook().FindByIdentify(identify)
 
-	//x分钟内不允许再次点击生成下载文档
-	if time.Now().Unix()-book.LastClickGenerate.Unix() < beego.AppConfig.DefaultInt64("GenerateInterval", 300) {
+	//书籍正在生成离线文档
+	if isGenerating := utils.BooksGenerate.Exist(book.BookId); isGenerating {
 		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
 	}
 

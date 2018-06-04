@@ -161,6 +161,9 @@ func (m *Document) RecursiveDocument(doc_id int) error {
 
 //发布文档
 func (m *Document) ReleaseContent(book_id int, base_url string) {
+	utils.BooksRelease.Set(book_id)
+	defer utils.BooksRelease.Delete(book_id)
+
 	//发布的时间戳
 	releaseTime := time.Now()
 
@@ -176,7 +179,7 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	//查询更新时间大于项目发布时间的文档
 	//_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("modify_time__gt", book.ReleaseTime).All(&docs, "document_id")
 	//全部重新发布
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).All(&docs, "document_id", "content")
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).All(&docs, "document_id")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
@@ -221,9 +224,6 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	}); err != nil {
 		beego.Error(err.Error())
 	}
-	utils.ReleaseMapsLock.Lock()
-	delete(utils.ReleaseMaps, book_id)
-	utils.ReleaseMapsLock.Unlock()
 }
 
 func (m *Document) GenerateBook(book *Book, base_url string) {
@@ -231,6 +231,9 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		beego.Error("下载文档生成时间跟文档发布时间一致，无需再重新生成下载文档", book)
 		return
 	}
+	//将书籍id加入进去，表示正在生成离线文档
+	utils.BooksGenerate.Set(book.BookId)
+	defer utils.BooksGenerate.Delete(book.BookId) //最后移除
 	qs := orm.NewOrm().QueryTable("md_books").Filter("book_id", book.BookId)
 	//更新上一次下载文档生成时间，以起到加锁的作用
 	qs.Update(orm.Params{
@@ -404,7 +407,6 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 	if _, err = qs.Update(orm.Params{"generate_time": book.ReleaseTime}); err != nil {
 		beego.Error(err.Error())
 	}
-
 }
 
 //根据项目ID查询文档列表.

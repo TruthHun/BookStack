@@ -26,8 +26,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/huichen/sego"
 
-	"sync"
-
 	"github.com/TruthHun/html2md"
 )
 
@@ -41,11 +39,9 @@ const (
 
 //分词器
 var (
-	Segmenter       sego.Segmenter
-	ReleaseMaps     = make(map[int]bool) //是否正在发布内容，map[book_id]bool
-	ReleaseMapsLock sync.RWMutex
-	BasePath, _            = filepath.Abs(filepath.Dir(os.Args[0]))
-	StoreType       string = beego.AppConfig.String("store_type") //存储类型
+	Segmenter   sego.Segmenter
+	BasePath, _        = filepath.Abs(filepath.Dir(os.Args[0]))
+	StoreType   string = beego.AppConfig.String("store_type") //存储类型
 )
 
 func init() {

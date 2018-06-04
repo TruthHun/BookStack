@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/TruthHun/ApiServ/models"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -12,7 +11,7 @@ type Queue struct {
 	Status int8 `orm:"default(0)"` //导出状态，0待导出，1导出中，2导出完成
 }
 
-var tableQueue = models.TablePrefix + "queue"
+var tableQueue = "md_queue"
 
 //从队列中获取一项
 func (*Queue) One(status int8) (q Queue, err error) {
