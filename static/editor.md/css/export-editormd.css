@@ -3858,10 +3858,12 @@
 }
 .editormd-preview-container code, .editormd-html-preview code {
   border: 1px solid #ddd;
-  background: #f6f6f6;
+  background-color: #f6f6f6;
   padding: 3px;
+  padding-top:6px;
   border-radius: 3px;
   font-size: 14px;
+  color: #c7254e;
 }
 .editormd-preview-container pre, .editormd-html-preview pre {
   border: 1px solid #ddd;
@@ -4449,7 +4451,7 @@ hr.editormd-page-break {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 .editormd-preview-container, .editormd-html-preview{padding: 0px;}
-body{background-color: transparent !important;}
+body{background-color: transparent !important;font-size: 15px;line-height: 170%;color: #333333;}
 .editormd-preview-container ol.linenums li, .editormd-html-preview ol.linenums li{ min-height: 20px;}
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{line-height: 1.7;}
 .markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{font-weight: normal !important;}
