@@ -49,13 +49,13 @@ CommentInterval=10
 # 生成下载文档时导出pdf文档的配置，这里建议把关于bookstack.cn的信息替换成你自己的就行，其他的建议不要动
 exportHeader=<p style='color:#8E8E8E;font-size:12px;'>_SECTION_</p>
 exportFooter=<p style='color:#8E8E8E;font-size:12px;'>本文档使用 <a href='http://www.bookstack.cn' style='text-decoration:none;color:#1abc9c;font-weight:bold;'>书栈(BookStack.CN)</a> 构建 <span style='float:right'>- _PAGENUM_ -</span></p>
-exportFontSize=14
+exportFontSize=13
 exportPaperSize=a4
 exportCreator=书栈(BookStack.CN)
-exportMarginLeft=72
-exportMarginRight=72
-exportMarginTop=72
-exportMarginBottom=72
+exportMarginLeft=36
+exportMarginRight=36
+exportMarginTop=36
+exportMarginBottom=36
 
 #时区设置
 timezone = Asia/Shanghai
