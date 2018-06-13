@@ -367,9 +367,14 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 
 	//将文档移动到oss
 	//将PDF文档移动到oss
-	NewGenerateTime := time.Now()
-	newBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, NewGenerateTime.Unix())
 	oldBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix()) //旧书籍的生成时间
+	//最后再更新文档生成时间
+	book.GenerateTime = time.Now()
+	if _, err = orm.NewOrm().Update(book, "generate_time"); err != nil {
+		beego.Error(err.Error())
+	}
+	orm.NewOrm().Read(book)
+	newBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
 
 	exts := []string{".pdf", ".epub", ".mobi"}
 	for _, ext := range exts {
@@ -399,11 +404,6 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		}
 	}
 
-	//最后再更新文档生成时间
-	book.GenerateTime = NewGenerateTime
-	if _, err = orm.NewOrm().Update(book, "generate_time"); err != nil {
-		beego.Error(err.Error())
-	}
 	//if _, err = orm.NewOrm().QueryTable("md_books").Filter("book_id", book.BookId).Update(orm.Params{"generate_time": NewGenerateTime}); err != nil {
 	//	beego.Error(err.Error())
 	//}
