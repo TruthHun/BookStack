@@ -228,20 +228,10 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 
 //离线文档生成
 func (m *Document) GenerateBook(book *Book, base_url string) {
-	//哪怕文档没有更新，也可以重新生成离线文档，因为也有可能是离线文档的生成规则发生了变化而需要重新生成离线文档
-	//if book.ReleaseTime == book.GenerateTime && book.GenerateTime.Unix() > 0 { //如果文档没有更新，则直接返回，不再生成文档
-	//	beego.Error("下载文档生成时间跟文档发布时间一致，无需再重新生成下载文档", book)
-	//	return
-	//}
-
 	//将书籍id加入进去，表示正在生成离线文档
 	utils.BooksGenerate.Set(book.BookId)
 	defer utils.BooksGenerate.Delete(book.BookId) //最后移除
-	qs := orm.NewOrm().QueryTable("md_books").Filter("book_id", book.BookId)
-	//更新上一次下载文档生成时间，以起到加锁的作用
-	qs.Update(orm.Params{
-		"last_click_generate": time.Now(),
-	})
+
 	//公开文档，才生成文档文件
 	debug := true
 	if beego.AppConfig.String("runmode") == "prod" {
@@ -410,9 +400,13 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 	}
 
 	//最后再更新文档生成时间
-	if _, err = qs.Update(orm.Params{"generate_time": NewGenerateTime}); err != nil {
+	book.GenerateTime = NewGenerateTime
+	if _, err = orm.NewOrm().Update(book, "generate_time"); err != nil {
 		beego.Error(err.Error())
 	}
+	//if _, err = orm.NewOrm().QueryTable("md_books").Filter("book_id", book.BookId).Update(orm.Params{"generate_time": NewGenerateTime}); err != nil {
+	//	beego.Error(err.Error())
+	//}
 }
 
 //根据项目ID查询文档列表.
