@@ -292,7 +292,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 	ModelStore := new(DocumentStore)
 	for _, doc := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(doc.DocumentId, "content"))
-		if content == "" { //内容为空，渲染文档内容，并再重新获取文档内容
+		if utils.GetTextFromHtml(content) == "" { //内容为空，渲染文档内容，并再重新获取文档内容
 			utils.RenderDocumentById(doc.DocumentId)
 			orm.NewOrm().Read(doc, "document_id")
 		}

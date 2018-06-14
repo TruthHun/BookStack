@@ -163,5 +163,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "SPIDER").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "SPIDER"
+		option.OptionTitle = "采集器，是否只对管理员开放"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

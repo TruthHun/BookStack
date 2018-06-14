@@ -68,6 +68,19 @@
                                 </label>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>一键采集器，是否仅对管理员开放</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .SPIDER.OptionValue "true"}}checked{{end}} name="SPIDER" value="true">开启<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .SPIDER.OptionValue "false"}}checked{{end}} name="ENABLED_CAPTCHA" value="false">关闭<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
                         <!--<div class="form-group">-->
                             <!--<label>启用文档历史</label>-->
                             <!--<div class="radio">-->
