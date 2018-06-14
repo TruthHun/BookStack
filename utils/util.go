@@ -379,3 +379,10 @@ func InMap(maps map[int]bool, key int) (ret bool) {
 	}
 	return
 }
+
+func GetTextFromHtml(htmlstr string) (txt string) {
+	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr)); err == nil {
+		txt = strings.TrimSpace(doc.Find("body").Text())
+	}
+	return
+}

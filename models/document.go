@@ -188,7 +188,7 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	ModelStore := new(DocumentStore)
 	for _, item := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
-		if len(content) == 0 {
+		if len(utils.GetTextFromHtml(content)) == 0 {
 			//达到5个协程，休息3秒
 			//if idx%5 == 0 {
 			//	time.Sleep(3 * time.Second)
