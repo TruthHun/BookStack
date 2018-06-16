@@ -827,6 +827,19 @@ func (this *DocumentController) Content() {
 				markdown = strings.Replace(markdown, r, "", -1)
 			}
 		}
+
+		//替换文档中的url链接
+		if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
+			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
+			is_summary = true
+			//要清除，避免每次保存的时候都要重新排序
+			replaces := []string{"<spider></spider>", "<spider/>"}
+			for _, r := range replaces {
+				markdown = strings.Replace(markdown, r, "", -1)
+			}
+			content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, book_id, this.Member.MemberId)
+		}
+
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
 			//自动生成文档内容
 			imd, icont := new(models.Document).BookStackAuto(book_id, doc_id)

@@ -14,6 +14,8 @@ import (
 
 	"crypto/tls"
 
+	"strconv"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/utils"
@@ -23,27 +25,26 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
+	"github.com/kataras/iris/core/errors"
 )
 
 // Document struct.
 type Document struct {
-	DocumentId   int    `orm:"pk;auto;column(document_id)" json:"doc_id"`
-	DocumentName string `orm:"column(document_name);size(500)" json:"doc_name"`
-	Identify     string `orm:"column(identify);size(100);index;null;default(null)" json:"identify"` // Identify 文档唯一标识
-	BookId       int    `orm:"column(book_id);type(int);index" json:"book_id"`
-	ParentId     int    `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
-	OrderSort    int    `orm:"column(order_sort);default(0);type(int);index" json:"order_sort"`
-	//Markdown     string        `orm:"column(markdown);type(text);null" json:"markdown"` // Markdown markdown格式文档.
-	Release string `orm:"column(release);type(text);null" json:"release"` // Release 发布后的Html格式内容.
-	//Content      string        `orm:"column(content);type(text);null" json:"content"`   // Content 未发布的 Html 格式内容.
-	CreateTime time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
-	MemberId   int           `orm:"column(member_id);type(int)" json:"member_id"`
-	ModifyTime time.Time     `orm:"column(modify_time);type(datetime);default(null);auto_now" json:"modify_time"`
-	ModifyAt   int           `orm:"column(modify_at);type(int)" json:"-"`
-	Version    int64         `orm:"type(bigint);column(version)" json:"version"`
-	AttachList []*Attachment `orm:"-" json:"attach"`
-	Vcnt       int           `orm:"column(vcnt);default(0)" json:"vcnt"` //文档项目被浏览次数
-	Markdown   string        `orm:"-" json:"markdown"`
+	DocumentId   int           `orm:"pk;auto;column(document_id)" json:"doc_id"`
+	DocumentName string        `orm:"column(document_name);size(500)" json:"doc_name"`
+	Identify     string        `orm:"column(identify);size(100);index;null;default(null)" json:"identify"` // Identify 文档唯一标识
+	BookId       int           `orm:"column(book_id);type(int);index" json:"book_id"`
+	ParentId     int           `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
+	OrderSort    int           `orm:"column(order_sort);default(0);type(int);index" json:"order_sort"`
+	Release      string        `orm:"column(release);type(text);null" json:"release"` // Release 发布后的Html格式内容.
+	CreateTime   time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
+	MemberId     int           `orm:"column(member_id);type(int)" json:"member_id"`
+	ModifyTime   time.Time     `orm:"column(modify_time);type(datetime);default(null);auto_now" json:"modify_time"`
+	ModifyAt     int           `orm:"column(modify_at);type(int)" json:"-"`
+	Version      int64         `orm:"type(bigint);column(version)" json:"version"`
+	AttachList   []*Attachment `orm:"-" json:"attach"`
+	Vcnt         int           `orm:"column(vcnt);default(0)" json:"vcnt"` //文档项目被浏览次数
+	Markdown     string        `orm:"-" json:"markdown"`
 }
 
 // 多字段唯一键
@@ -444,5 +445,67 @@ func (m *Document) BookStackAuto(bookId, docId int) (md, cont string) {
 	}
 	md = strings.Join(newMd, "\n")
 	cont = "<ul>" + strings.Join(newCont, "") + "</ul>"
+	return
+}
+
+//爬虫批量采集
+//@param		html				html
+//@param		md					markdown内容
+//@return		content,markdown	把链接替换为标识后的内容
+func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, markdown string, err error) {
+	var gq *goquery.Document
+	content = html
+	markdown = md
+	//执行采集
+	if gq, err = goquery.NewDocumentFromReader(strings.NewReader(content)); err == nil {
+		//采集模式mode
+		CrawlByChrome := false
+		if strings.ToLower(gq.Find("mode").Text()) == "chrome" {
+			CrawlByChrome = true
+		}
+		beego.Error("chome", CrawlByChrome)
+		//内容选择器selector
+		selector := ""
+		if selector = strings.ToLower(gq.Find("selector").Text()); selector == "" {
+			err = errors.New("内容选择器不能为空")
+			return
+		}
+
+		gq.Find("a").Each(func(i int, selection *goquery.Selection) {
+			if href, ok := selection.Attr("href"); ok {
+				hrefLower := strings.ToLower(href)
+				//以http或者https开头
+				if strings.HasPrefix(hrefLower, "http://") || strings.HasPrefix(hrefLower, "https://") {
+					//采集文章内容成功，创建文档，填充内容，替换链接为标识
+					if retmd, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector); err == nil {
+						var doc Document
+						identify := strconv.Itoa(i) + ".md"
+						doc.Identify = identify
+						doc.BookId = bookId
+						doc.Version = time.Now().Unix()
+						doc.ModifyAt = int(time.Now().Unix())
+						doc.DocumentName = selection.Text()
+						doc.MemberId = uid
+
+						if docId, err := doc.InsertOrUpdate(); err != nil {
+							beego.Error("InsertOrUpdate => ", err)
+						} else {
+							var ds DocumentStore
+							ds.DocumentId = int(docId)
+							ds.Markdown = retmd
+							if err := new(DocumentStore).InsertOrUpdate(ds, "markdown", "content"); err != nil {
+								beego.Error(err)
+							}
+						}
+						selection = selection.SetAttr("href", "$"+identify)
+						markdown = strings.Replace(markdown, href, "$"+identify, -1)
+					} else {
+						beego.Error(err.Error())
+					}
+				}
+			}
+		})
+		content, _ = gq.Find("body").Html()
+	}
 	return
 }
