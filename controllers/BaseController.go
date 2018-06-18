@@ -238,7 +238,7 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 }
 
 //在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
-func (this *BaseController) sortBySummary(htmlstr string, book_id int) {
+func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id int) {
 	debug := beego.AppConfig.String("runmod") != "prod"
 	o := orm.NewOrm()
 	qs := o.QueryTable("md_documents").Filter("book_id", book_id)
@@ -292,17 +292,18 @@ func (this *BaseController) sortBySummary(htmlstr string, book_id int) {
 				})
 			}
 		}
+
 	}
 
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 		doc_name := selection.Text()
-		if docid, exist := selection.Attr("data-bookstack"); exist {
+		pid := 0
+		if docid, exist := selection.Attr("data-pid"); exist {
 			doc_id, _ := strconv.Atoi(docid)
 			eleParent := selection.Parent().Parent().Parent()
-			pid := 0
 			if eleParent.Is("li") {
 				fst := eleParent.Find("a").First()
-				pidstr, _ := fst.Attr("data-bookstack")
+				pidstr, _ := fst.Attr("data-pid")
 				//如果这里的pid为0，表示数据库还没存在这个标识，需要创建
 				pid, _ = strconv.Atoi(pidstr)
 			}
@@ -314,7 +315,6 @@ func (this *BaseController) sortBySummary(htmlstr string, book_id int) {
 			}
 		} else if href, ok := selection.Attr("href"); ok && strings.HasPrefix(href, "$") {
 			identify := strings.TrimPrefix(href, "$") //文档标识
-			pid := 0                                  //默认上一级id，即pid
 			eleParent := selection.Parent().Parent().Parent()
 			if eleParent.Is("li") {
 				if parentHref, ok := eleParent.Find("a").First().Attr("href"); ok {
@@ -333,6 +333,9 @@ func (this *BaseController) sortBySummary(htmlstr string, book_id int) {
 		}
 		idx++
 	})
+	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
+		this.replaceLinks(bookIdentify, htmlstr, true)
+	}
 }
 
 //排序
@@ -375,13 +378,13 @@ func (this *BaseController) replaceLinks(book_identify string, doc_html string, 
 							if newHref, ok := Links[strings.ToLower(slice[0])]; ok {
 								arr := strings.Split(newHref, "||") //整理的arr数组长度，肯定为2，所以不做数组长度判断
 								selection.SetAttr("href", arr[0]+"#"+strings.Join(slice[1:], "#"))
-								selection.SetAttr("data-bookstack", arr[1])
+								selection.SetAttr("data-pid", arr[1])
 							}
 						} else {
 							if newHref, ok := Links[strings.ToLower(href)]; ok {
 								arr := strings.Split(newHref, "||") //整理的arr数组长度，肯定为2，所以不做数组长度判断
 								selection.SetAttr("href", arr[0])
-								selection.SetAttr("data-bookstack", arr[1])
+								selection.SetAttr("data-pid", arr[1])
 							}
 						}
 					}
@@ -390,7 +393,7 @@ func (this *BaseController) replaceLinks(book_identify string, doc_html string, 
 				if newHtml, err := gq.Find("body").Html(); err == nil {
 					doc_html = newHtml
 					if len(is_summary) > 0 && is_summary[0] == true { //更新排序
-						this.sortBySummary(doc_html, book.BookId) //更新排序
+						this.sortBySummary(book_identify, doc_html, book.BookId) //更新排序
 					}
 				}
 			} else {
