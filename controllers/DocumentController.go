@@ -828,8 +828,12 @@ func (this *DocumentController) Content() {
 			}
 		}
 
-		//替换文档中的url链接
-		if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
+		//爬虫采集
+		access := this.Member.IsAdministrator()
+		if op, err := new(models.Option).FindByKey("SPIDER"); err == nil {
+			access = access && op.OptionValue == "true"
+		}
+		if access && strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
 			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
 			is_summary = true
 			//要清除，避免每次保存的时候都要重新排序

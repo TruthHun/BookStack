@@ -454,7 +454,6 @@ func (this *ManagerController) Setting() {
 		this.Abort("500")
 	}
 	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
-
 	for _, item := range options {
 		this.Data[item.OptionName] = item
 	}
