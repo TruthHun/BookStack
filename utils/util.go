@@ -139,7 +139,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 
 	if err == nil {
 		//http://www.bookstack.cn/login.html
-		slice := strings.Split(strings.TrimRight(urlstr, "/")+"/", "/")
+		slice := strings.Split(strings.TrimSpace(urlstr), "/")
 		if sliceLen := len(slice); sliceLen > 2 {
 			var doc *goquery.Document
 			if doc, err = goquery.NewDocumentFromReader(strings.NewReader(cont)); err == nil {
