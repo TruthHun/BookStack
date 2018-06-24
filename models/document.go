@@ -337,6 +337,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 
 				}
 			})
+			gq.Find(".markdown-toc").Remove()
 			doc.Release, _ = gq.Find("body").Html()
 		}
 
