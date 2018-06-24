@@ -493,7 +493,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 						} else {
 							var ds DocumentStore
 							ds.DocumentId = int(docId)
-							ds.Markdown = retmd
+							ds.Markdown = "[TOC]\n\r\n\r" + retmd
 							if err := new(DocumentStore).InsertOrUpdate(ds, "markdown", "content"); err != nil {
 								beego.Error(err)
 							}

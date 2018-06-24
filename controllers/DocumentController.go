@@ -842,7 +842,6 @@ func (this *DocumentController) Content() {
 				markdown = strings.Replace(markdown, r, "", -1)
 			}
 			content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, book_id, this.Member.MemberId)
-			markdown = "[TOC]\n\r\n\r" + markdown
 		}
 
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
