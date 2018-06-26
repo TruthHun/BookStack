@@ -37,8 +37,6 @@ sessionproviderconfig=store/session
 # 静态目录。这个是站点地图的静态目录
 StaticDir = sitemap:sitemap
 
-#生成下载文档的时间间隔。也就是距离用户第一次点击生成下载文档到第二次点击生成下载文档的时间间隔，避免用户频繁点击生成下载文档而导致大量耗费服务器资源导致服务器宕机
-GenerateInterval=300
 
 # 站点可直接访问的静态文件【注意，这里千万不能配置.conf文件扩展名，否则会把.conf文件当做静态文件而被外部访问，导致数据库账号密码等泄露。按照默认的来即可】
 StaticExt=.txt,.xml,.ico,.png,.jpg,.jpeg,.gif,.html
