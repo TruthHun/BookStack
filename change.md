@@ -3,6 +3,9 @@
 - [V1.2开发升级预告](#v1.2)
 - [V1.1升级日志](#v1.1)
 
+
+采集内容，图片不正确
+
 # 开发日志
 
 <a name="v2.0"></a>
@@ -12,11 +15,20 @@
 <a name="v1.4"></a>
 ## V1.4 升级日志
 - [x] 修复：由于js使用严格模式(`use strict`)，导致文档目录收起之后无法展开
+- [x] 修复：采集内容，URL链接和图片链接补全不正确
 - [x] 优化：书籍离线文档生成加锁优化，移除`app.conf`中的`GenerateInterval`配置项
-- [x] 优化：PDF、epub和mobi等电子书生成优化
-- [x] 优化：强化爬虫采集功能，一键采集文档项目的所有章节
-- [ ] 优化：`<bookstack-summary>`标签的一键排序功能
-- [x] 新增：Docker镜像，方便部署
+- [x] 优化：PDF、epub和mobi等电子书生成工具 [Converter](https://github.com/TruthHun/converter)，在生成电子书时，自动生成封面。
+- [x] 优化：`<bookstack-summary>`标签的一键排序和批量创建文档的功能。
+- [x] 移除：生成PDF的时候，移除HTML中的Markdown TOC。
+- [x] 新增：提供`Dockerfile`，让部署程序更快更简单。在下载`BookStack`程序的时候，请下载Docker版，压缩包内含有`Dockerfile`文件。
+- [x] 新增：爬虫一键采集功能，采集整理书籍，一步到位！
+
+
+---------
+
+本次更新，新增了数据表初始数据，旧版本用户，直接执行`./BookStack install`操作，对数据库表进行升级（不会影响原有表数据和结构）。
+
+
 
 <a name="v1.3"></a>
 ## V1.3 开发升级预告
