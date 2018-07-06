@@ -459,7 +459,9 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 	content = html
 	markdown = md
 	project := ""
-
+	if book, err := NewBook().Find(bookId); err == nil {
+		project = book.Identify
+	}
 	//执行采集
 	if gq, err = goquery.NewDocumentFromReader(strings.NewReader(content)); err == nil {
 		//采集模式mode
