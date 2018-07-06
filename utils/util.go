@@ -162,7 +162,6 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					//存在href，且不以http://和https://开头
 					if src, ok := selection.Attr("src"); ok && (!strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://")) {
 						if strings.HasPrefix(src, "/") { //以斜杠开头
-							//TODO: 域名+src
 							selection.SetAttr("src", strings.Join(slice[0:3], "/")+src)
 						} else {
 							l := strings.Count(src, "../")
@@ -208,14 +207,14 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					} else {
 						switch contType {
 						case 1: //=>html
-							cont = htmlstr + "\n\n\n原文：\n> " + urlstr
+							cont = htmlstr + "\n\r\n\r> 原文： " + urlstr
 						case 2: //=>text
-							cont = doc.Find(diySelecter).Text() + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
+							cont = doc.Find(diySelecter).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 						default: //0 && other=>markdown
-							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
+							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: [%v](%v)", urlstr, urlstr)
 						}
 					}
-				} else {
+				} else { //全文
 					//移除body中的所有js标签
 					doc.Find("script").Each(func(i int, selection *goquery.Selection) {
 						selection.Remove()
@@ -224,12 +223,12 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					switch contType {
 					case 1: //=>html
 						htmlstr, _ := doc.Find("body").Html()
-						cont = htmlstr + "\n\n\n原文：\n> " + urlstr
+						cont = htmlstr + "\n\n\n> 原文：" + urlstr
 					case 2: //=>text
-						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
+						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 					default: //0 && other=>markdown
 						htmlstr, _ := doc.Find("body").Html()
-						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
+						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: [%v](%v)", urlstr, urlstr)
 					}
 				}
 
