@@ -163,16 +163,29 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 				//遍历替换图片相对链接
 				doc.Find("img").Each(func(i int, selection *goquery.Selection) {
 					//存在href，且不以http://和https://开头
-					if src, ok := selection.Attr("src"); ok && (!strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://")) {
-						if strings.HasPrefix(src, "/") { //以斜杠开头
-							src = strings.Join(slice[0:3], "/") + src
-						} else {
-							l := strings.Count(src, "../")
-							//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-							src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
+					if src, ok := selection.Attr("src"); ok {
+						//链接补全
+						if !strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://") {
+							if strings.HasPrefix(src, "/") { //以斜杠开头
+								src = strings.Join(slice[0:3], "/") + src
+							} else {
+								l := strings.Count(src, "../")
+								//需要多减1，因为"http://"或"https://"后面多带一个斜杠
+								src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
+							}
 						}
+
 						//TODO:采集并下载图片
 						ext := strings.ToLower(filepath.Ext(src))
+						if strings.HasPrefix(ext, ".jpeg") {
+							ext = ".jpeg"
+						} else if strings.HasPrefix(ext, ".jpg") {
+							ext = ".jpg"
+						} else if strings.HasPrefix(ext, ".png") {
+							ext = ".png"
+						} else if strings.HasPrefix(ext, ".gif") {
+							ext = ".gif"
+						}
 						save := src
 						if (ext == ".jpeg" || ext == ".jpg" || ext == ".png" || ext == ".gif") && len(headers) > 0 {
 							project := ""
