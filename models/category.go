@@ -3,6 +3,7 @@ package models
 import (
 	"strings"
 
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego/orm"
 	"github.com/kataras/iris/core/errors"
@@ -55,9 +56,9 @@ func (this *Category) Del(id int) (err error) {
 	if err == nil { //删除分类图标
 		switch utils.StoreType {
 		case utils.StoreOss:
-			ModelStoreOss.DelFromOss(cate.Icon)
+			store.ModelStoreOss.DelFromOss(cate.Icon)
 		case utils.StoreLocal:
-			ModelStoreLocal.DelFiles(cate.Icon)
+			store.ModelStoreLocal.DelFiles(cate.Icon)
 		}
 	}
 	return

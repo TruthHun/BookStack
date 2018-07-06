@@ -22,6 +22,7 @@ import (
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -594,13 +595,13 @@ func (this *DocumentController) Upload() {
 	osspath := fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
 	switch utils.StoreType {
 	case utils.StoreOss:
-		if err := models.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
+		if err := store.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
 			beego.Error(err.Error())
 		}
 		attachment.HttpPath = this.OssDomain + "/" + osspath
 	case utils.StoreLocal:
 		osspath = "uploads/" + osspath
-		if err := models.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
+		if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
 			beego.Error(err.Error())
 		}
 		attachment.HttpPath = "/" + osspath
@@ -941,7 +942,7 @@ func (this *DocumentController) Export() {
 			obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
 			switch utils.StoreType {
 			case utils.StoreOss:
-				if err := models.ModelStoreOss.IsObjectExist(obj); err != nil {
+				if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
 					beego.Error(err, obj)
 					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 				} else {
@@ -949,7 +950,7 @@ func (this *DocumentController) Export() {
 				}
 			case utils.StoreLocal:
 				obj = "uploads/" + obj
-				if err := models.ModelStoreLocal.IsObjectExist(obj); err != nil {
+				if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
 					beego.Error(err, obj)
 					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 				} else {

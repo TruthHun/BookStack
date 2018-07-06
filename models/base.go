@@ -12,14 +12,10 @@ import (
 
 	"net/url"
 
-	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/gotil/sitemap"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
-
-var ModelStoreOss = new(store.Oss)
-var ModelStoreLocal = new(store.Local)
 
 //设置增减
 //@param            table           需要处理的数据表

@@ -18,6 +18,7 @@ import (
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -784,10 +785,10 @@ func (this *ManagerController) UpdateCateIcon() {
 			if err = this.SaveToFile("icon", tmpfile); err == nil {
 				switch utils.StoreType {
 				case utils.StoreOss:
-					models.ModelStoreOss.MoveToOss(tmpfile, tmpfile, true, false)
-					models.ModelStoreOss.DelFromOss(cate.Icon)
+					store.ModelStoreOss.MoveToOss(tmpfile, tmpfile, true, false)
+					store.ModelStoreOss.DelFromOss(cate.Icon)
 				case utils.StoreLocal:
-					models.ModelStoreLocal.DelFiles(cate.Icon)
+					store.ModelStoreLocal.DelFiles(cate.Icon)
 				}
 				err = Model.UpdateByField(cate.Id, "icon", "/"+tmpfile)
 			}

@@ -15,6 +15,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/graphics"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/russross/blackfriday"
 
 	"github.com/TruthHun/BookStack/commands"
@@ -380,22 +381,22 @@ func (this *BookController) UploadCover() {
 		os.Remove("." + old_cover)
 		switch utils.StoreType {
 		case utils.StoreOss:
-			models.ModelStoreOss.DelFromOss(old_cover) //从OSS执行一次删除
+			store.ModelStoreOss.DelFromOss(old_cover) //从OSS执行一次删除
 		case utils.StoreLocal:
-			models.ModelStoreLocal.DelFiles(old_cover) //从本地执行一次删除
+			store.ModelStoreLocal.DelFiles(old_cover) //从本地执行一次删除
 		}
 
 	}
 	switch utils.StoreType {
 	case utils.StoreOss: //oss
-		if err := models.ModelStoreOss.MoveToOss("."+url, osspath, true, false); err != nil {
+		if err := store.ModelStoreOss.MoveToOss("."+url, osspath, true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + osspath + "/cover"
 		}
 	case utils.StoreLocal:
 		save := book.Cover
-		if err := models.ModelStoreLocal.MoveToStore("."+url, save); err != nil {
+		if err := store.ModelStoreLocal.MoveToStore("."+url, save); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = book.Cover
@@ -858,11 +859,11 @@ func (this *BookController) unzipToData(book_id int, identify, zipfile, originFi
 					if ok, _ := imgMap[ext]; ok { //图片，录入oss
 						switch utils.StoreType {
 						case utils.StoreOss:
-							if err := models.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
+							if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
 								beego.Error(err)
 							}
 						case utils.StoreLocal:
-							if err := models.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
+							if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
 								beego.Error(err)
 							}
 						}

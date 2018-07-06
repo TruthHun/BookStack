@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/TruthHun/BookStack/graphics"
+	"github.com/TruthHun/BookStack/models/store"
 
 	"fmt"
 
@@ -138,13 +139,13 @@ func (this *SettingController) Qrcode() {
 		url := ""
 		switch utils.StoreType {
 		case utils.StoreOss:
-			if err := models.ModelStoreOss.MoveToOss(savepath, savepath, true, false); err != nil {
+			if err := store.ModelStoreOss.MoveToOss(savepath, savepath, true, false); err != nil {
 				beego.Error(err.Error())
 			} else {
 				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savepath
 			}
 		case utils.StoreLocal:
-			if err := models.ModelStoreLocal.MoveToStore(savepath, savepath); err != nil {
+			if err := store.ModelStoreLocal.MoveToStore(savepath, savepath); err != nil {
 				beego.Error(err.Error())
 			} else {
 				url = "/" + savepath
@@ -167,9 +168,9 @@ func (this *SettingController) Qrcode() {
 			if _, err := o.Update(&member, "wxpay", "alipay"); err == nil {
 				switch utils.StoreType {
 				case utils.StoreOss:
-					go models.ModelStoreOss.DelFromOss(dels...)
+					go store.ModelStoreOss.DelFromOss(dels...)
 				case utils.StoreLocal:
-					go models.ModelStoreLocal.DelFiles(dels...)
+					go store.ModelStoreLocal.DelFiles(dels...)
 				}
 			}
 		}
@@ -270,13 +271,13 @@ func (this *SettingController) Upload() {
 	}
 	switch utils.StoreType {
 	case utils.StoreOss: //oss存储
-		if err := models.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
+		if err := store.ModelStoreOss.MoveToOss("."+url, strings.TrimLeft(url, "./"), true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + url + "/avatar"
 		}
 	case utils.StoreLocal: //本地存储
-		if err := models.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./")); err != nil {
+		if err := store.ModelStoreLocal.MoveToStore("."+url, strings.TrimLeft(url, "./")); err != nil {
 			beego.Error(err.Error())
 		} else {
 			url = "/" + strings.TrimLeft(url, "./")

@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/TruthHun/BookStack/conf"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -281,9 +282,9 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 		//删除oss中项目对应的文件夹
 		switch utils.StoreType {
 		case utils.StoreLocal: //删除本地存储，记得加上uploads
-			go ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
+			go store.ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
 		case utils.StoreOss:
-			go ModelStoreOss.DelOssFolder("projects/" + m.Identify)
+			go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
 		}
 	}
 	return err

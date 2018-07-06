@@ -19,6 +19,9 @@ import (
 	"github.com/astaxie/beego"
 )
 
+var ModelStoreOss = NewOss()
+var ModelStoreLocal = new(Local)
+
 //OSS配置【这个不再作为数据库表，直接在oss.conf文件中进行配置】
 type Oss struct {
 	EndpointInternal string //内网的endpoint
@@ -28,6 +31,19 @@ type Oss struct {
 	Bucket           string //供文档预览的bucket
 	IsInternal       bool   //是否内网，内网则启用内网endpoint，否则启用外网endpoint
 	Domain           string
+}
+
+func NewOss() (oss *Oss) {
+	oss = &Oss{
+		IsInternal:       beego.AppConfig.DefaultBool("oss::IsInternal", false),
+		EndpointInternal: beego.AppConfig.String("oss::EndpointInternal"),
+		EndpointOuter:    beego.AppConfig.String("oss::EndpointOuter"),
+		AccessKeyId:      beego.AppConfig.String("oss::AccessKeyId"),
+		AccessKeySecret:  beego.AppConfig.String("oss::AccessKeySecret"),
+		Bucket:           beego.AppConfig.String("oss::Bucket"),
+		Domain:           strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ "),
+	}
+	return oss
 }
 
 //获取oss的配置[如果使用到多个Bucket，则这里定义一个new方法，生成不同oss配置的OSS对象]

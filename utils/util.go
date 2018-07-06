@@ -10,6 +10,7 @@ import (
 	html1 "html/template"
 
 	"github.com/TruthHun/BookStack/conf"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/html2article"
 	"github.com/alexcesaro/mail/mailer"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/huichen/sego"
 
+	"github.com/TruthHun/gotil/cryptil"
 	"github.com/TruthHun/html2md"
 )
 
@@ -126,6 +128,7 @@ func CrawlByChrome(urlstr string) (b []byte, err error) {
 //force:是否是强力采集
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
 //diySelecter:自定义选择器
+//注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
 func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelecter string, headers ...map[string]string) (cont string, err error) {
 	if force { //强力模式
 		var b []byte
@@ -162,12 +165,42 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					//存在href，且不以http://和https://开头
 					if src, ok := selection.Attr("src"); ok && (!strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://")) {
 						if strings.HasPrefix(src, "/") { //以斜杠开头
-							selection.SetAttr("src", strings.Join(slice[0:3], "/")+src)
+							src = strings.Join(slice[0:3], "/") + src
 						} else {
 							l := strings.Count(src, "../")
 							//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-							selection.SetAttr("src", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(src, "./"))
+							src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
 						}
+						//TODO:采集并下载图片
+						ext := strings.ToLower(filepath.Ext(src))
+						save := src
+						if (ext == ".jpeg" || ext == ".jpg" || ext == ".png" || ext == ".gif") && len(headers) > 0 {
+							project := ""
+							for _, header := range headers {
+								if val, ok := header["project"]; ok {
+									project = val
+								}
+							}
+							if project != "" {
+								reqImg := util.BuildRequest("get", src, urlstr, "", "", true, false, headers...)
+
+								file := cryptil.Md5Crypt(src) + ext
+								tmpfile := "cache/" + file
+								if err = reqImg.SetTimeout(10*time.Second, 10*time.Second).ToFile(tmpfile); err == nil {
+									defer os.Remove(tmpfile) //删除文件
+									switch StoreType {
+									case StoreLocal:
+										save = "/uploads/projects/" + project + "/" + file
+										store.ModelStoreLocal.MoveToStore(tmpfile, strings.TrimPrefix(save, "/"))
+									case StoreOss:
+										save = "projects/" + project + "/" + file
+										store.ModelStoreOss.MoveToOss(tmpfile, save, true)
+										save = store.ModelStoreOss.Domain + "/" + save
+									}
+								}
+							}
+						}
+						selection.SetAttr("src", save)
 					}
 				})
 

@@ -18,6 +18,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
+	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/TruthHun/converter/converter"
 	"github.com/TruthHun/gotil/cryptil"
@@ -383,13 +384,13 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		switch utils.StoreType {
 		case utils.StoreOss:
 			//不要开启gzip压缩，否则会出现文件损坏的情况
-			if err := ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBook+ext, true, false); err != nil {
+			if err := store.ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBook+ext, true, false); err != nil {
 				beego.Error(err)
 			} else { //设置下载头
-				ModelStoreOss.SetObjectMeta(newBook+ext, book.BookName+ext)
+				store.ModelStoreOss.SetObjectMeta(newBook+ext, book.BookName+ext)
 			}
 		case utils.StoreLocal: //本地存储
-			ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext)
+			store.ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext)
 		}
 
 	}
@@ -397,11 +398,11 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 	//删除旧文件
 	switch utils.StoreType {
 	case utils.StoreOss:
-		if err := ModelStoreOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
+		if err := store.ModelStoreOss.DelFromOss(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
 			beego.Error(err)
 		}
 	case utils.StoreLocal: //本地存储
-		if err := ModelStoreLocal.DelFiles(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
+		if err := store.ModelStoreLocal.DelFiles(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
 			beego.Error(err)
 		}
 	}
