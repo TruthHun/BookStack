@@ -458,6 +458,10 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 	var gq *goquery.Document
 	content = html
 	markdown = md
+	project := ""
+	if book, err := NewBook().Find(bookId); err == nil {
+		project = book.Identify
+	}
 	//执行采集
 	if gq, err = goquery.NewDocumentFromReader(strings.NewReader(content)); err == nil {
 		//采集模式mode
@@ -479,7 +483,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 				//以http或者https开头
 				if strings.HasPrefix(hrefLower, "http://") || strings.HasPrefix(hrefLower, "https://") {
 					//采集文章内容成功，创建文档，填充内容，替换链接为标识
-					if retmd, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector); err == nil {
+					if retmd, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector,map[string]string{"project":project}); err == nil {
 						var doc Document
 						identify := strconv.Itoa(i) + ".md"
 						doc.Identify = identify
