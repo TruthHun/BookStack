@@ -241,12 +241,25 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 	if err := o.Read(m); err != nil {
 		return err
 	}
+	var (
+		docs  []Document
+		docId []string
+	)
+	o.QueryTable(new(Document)).Filter("book_id", id).Limit(10000).All(&docs, "document_id")
+	if len(docs) > 0 {
+		for _, doc := range docs {
+			docId = append(docId, strconv.Itoa(doc.DocumentId))
+		}
+	}
 	o.Begin()
 
 	//删除md_document_store中的文档
-	sql := "delete from md_document_store where document_id in(select document_id from md_documents where book_id=?)"
-	if _, err := o.Raw(sql, m.BookId).Exec(); err != nil {
-		beego.Error(err)
+	if len(docId) > 0 {
+		sql1 := fmt.Sprintf("delete from md_document_store where document_id in(%v)", strings.Join(docId, ","))
+		if _, err1 := o.Raw(sql1).Exec(); err1 != nil {
+			o.Rollback()
+			return err1
+		}
 	}
 
 	sql2 := "DELETE FROM " + NewDocument().TableNameWithPrefix() + " WHERE book_id = ?"
