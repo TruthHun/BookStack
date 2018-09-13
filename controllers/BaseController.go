@@ -18,12 +18,13 @@ import (
 
 	"time"
 
+	"errors"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/kataras/iris/core/errors"
 )
 
 type BaseController struct {

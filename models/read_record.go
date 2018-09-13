@@ -7,8 +7,9 @@ import (
 
 	"fmt"
 
+	"errors"
+
 	"github.com/astaxie/beego/orm"
-	"github.com/kataras/iris/core/errors"
 )
 
 //增加一个重新阅读的功能，即重置阅读，清空所有阅读记录

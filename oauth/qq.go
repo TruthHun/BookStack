@@ -3,13 +3,13 @@ package oauth
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"strings"
 
 	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
-	"github.com/kataras/iris/core/errors"
 )
 
 var debug = beego.AppConfig.String("runmode") == "dev"

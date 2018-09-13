@@ -3,10 +3,11 @@ package models
 import (
 	"strings"
 
+	"errors"
+
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego/orm"
-	"github.com/kataras/iris/core/errors"
 )
 
 var tableCategory = "md_category"

@@ -16,6 +16,8 @@ import (
 
 	"strconv"
 
+	"errors"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models/store"
@@ -26,7 +28,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/orm"
-	"github.com/kataras/iris/core/errors"
 )
 
 // Document struct.
