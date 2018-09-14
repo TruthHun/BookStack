@@ -178,28 +178,28 @@ $(function () {
 
     initHighlighting();
 
-    window.jsTree = $("#sidebar").jstree({
-        'plugins':["wholerow","types"],
-        "types": {
-            "default" : {
-                "icon" : false  // 删除默认图标
-            }
-        },
-        'core' : {
-            'check_callback' : true,
-            "multiple" : false ,
-            'animation' : 0
-        }
-    }).on('select_node.jstree',function (node,selected,event) {
-        $(".m-manual").removeClass('manual-mobile-show-left');
-        var url = selected.node.a_attr.href;
-
-        if(url === window.location.href){
-            return false;
-        }
-        loadDocument(url,selected.node.id);
-
-    });
+    // window.jsTree = $("#sidebar").jstree({
+    //     'plugins':["wholerow","types"],
+    //     "types": {
+    //         "default" : {
+    //             "icon" : false  // 删除默认图标
+    //         }
+    //     },
+    //     'core' : {
+    //         'check_callback' : true,
+    //         "multiple" : false ,
+    //         'animation' : 0
+    //     }
+    // }).on('select_node.jstree',function (node,selected,event) {
+    //     $(".m-manual").removeClass('manual-mobile-show-left');
+    //     var url = selected.node.a_attr.href;
+    //
+    //     if(url === window.location.href){
+    //         return false;
+    //     }
+    //     loadDocument(url,selected.node.id);
+    //
+    // });
 
     $("#slidebar").on("click",function () {
         $(".m-manual").addClass('manual-mobile-show-left');
@@ -291,18 +291,18 @@ $(function () {
     });
 
 
-    $(".hung-read-link a").click(function (e) {
-        //使用笨方法解决无刷新的问题。
-        var $selector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
-        if($selector.length>0){
-            e.preventDefault();
-            var CurSelector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
-            if (CurSelector.parent().hasClass("jstree-closed")){
-                CurSelector.parent().find(".jstree-icon").trigger("click");
-            }
-            $('a.jstree-anchor[href="'+$(this).attr("href")+'"]').trigger("click");
-        }
-    });
+    // $(".hung-read-link a").click(function (e) {
+    //     //使用笨方法解决无刷新的问题。
+    //     var $selector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
+    //     if($selector.length>0){
+    //         e.preventDefault();
+    //         var CurSelector=$('a.jstree-anchor[href="'+$(this).attr("href")+'"]');
+    //         if (CurSelector.parent().hasClass("jstree-closed")){
+    //             CurSelector.parent().find(".jstree-icon").trigger("click");
+    //         }
+    //         $('a.jstree-anchor[href="'+$(this).attr("href")+'"]').trigger("click");
+    //     }
+    // });
 
     $(".navg-item[data-mode]").on("click",function () {
         var mode = $(this).data('mode');
@@ -403,59 +403,59 @@ $(function () {
     /**
      * 项目内搜索
      */
-    $("#searchForm").ajaxForm({
-        beforeSubmit : function () {
-            var keyword = $.trim($("#searchForm").find("input[name='keyword']").val());
-            if(keyword === ""){
-                $(".search-empty").show();
-                $("#searchList").html("");
-                return false;
-            }
-            $("#btnSearch").attr("disabled","disabled").find("i").removeClass("fa-search").addClass("loading");
-            window.keyword = keyword;
-        },
-        success :function (res) {
-            var html = "";
-            if(res.errcode === 0){
-                for(var i in res.data){
-                    var item = res.data[i];
-                    html += '<li><a href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.doc_id+'"> '+ item.doc_name +' </a></li>';
-                }
-            }
-            if(html !== ""){
-                $(".search-empty").hide();
-            }else{
-                $(".search-empty").show();
-            }
-            $("#searchList").html(html);
-        },
-        complete : function () {
-            $("#btnSearch").removeAttr("disabled").find("i").removeClass("loading").addClass("fa-search");
-        }
-    });
+    // $("#searchForm").ajaxForm({
+    //     beforeSubmit : function () {
+    //         var keyword = $.trim($("#searchForm").find("input[name='keyword']").val());
+    //         if(keyword === ""){
+    //             $(".search-empty").show();
+    //             $("#searchList").html("");
+    //             return false;
+    //         }
+    //         $("#btnSearch").attr("disabled","disabled").find("i").removeClass("fa-search").addClass("loading");
+    //         window.keyword = keyword;
+    //     },
+    //     success :function (res) {
+    //         var html = "";
+    //         if(res.errcode === 0){
+    //             for(var i in res.data){
+    //                 var item = res.data[i];
+    //                 html += '<li><a href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.doc_id+'"> '+ item.doc_name +' </a></li>';
+    //             }
+    //         }
+    //         if(html !== ""){
+    //             $(".search-empty").hide();
+    //         }else{
+    //             $(".search-empty").show();
+    //         }
+    //         $("#searchList").html(html);
+    //     },
+    //     complete : function () {
+    //         $("#btnSearch").removeAttr("disabled").find("i").removeClass("loading").addClass("fa-search");
+    //     }
+    // });
 
-    window.onpopstate = function (e) {
-
-        var $param = e.state;
-        if($param.hasOwnProperty("$url")) {
-            window.jsTree.jstree().deselect_all();
-
-            window.jsTree.jstree().select_node({ id : $param.$id });
-            $param.$init = false;
-            //events.trigger('article.open', $param );
-        }else{
-            console.log($param);
-        }
-    };
-    try {
-        var $node = window.jsTree.jstree().get_selected();
-        if (typeof $node === "object") {
-            $node = window.jsTree.jstree().get_node({id: $node[0]});
-            events.trigger('article.open', {$url: $node.a_attr.href, $init: true, $id: $node.a_attr.id});
-        }
-    }catch (e){
-        console.log(e);
-    }
+    // window.onpopstate = function (e) {
+    //
+    //     var $param = e.state;
+    //     if($param.hasOwnProperty("$url")) {
+    //         window.jsTree.jstree().deselect_all();
+    //
+    //         window.jsTree.jstree().select_node({ id : $param.$id });
+    //         $param.$init = false;
+    //         //events.trigger('article.open', $param );
+    //     }else{
+    //         console.log($param);
+    //     }
+    // };
+    // try {
+    //     var $node = window.jsTree.jstree().get_selected();
+    //     if (typeof $node === "object") {
+    //         $node = window.jsTree.jstree().get_node({id: $node[0]});
+    //         events.trigger('article.open', {$url: $node.a_attr.href, $init: true, $id: $node.a_attr.id});
+    //     }
+    // }catch (e){
+    //     console.log(e);
+    // }
 
     //滚动到相应高度
     var top = $(".jstree-clicked").offset().top;
