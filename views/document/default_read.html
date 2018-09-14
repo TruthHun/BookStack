@@ -156,6 +156,9 @@
                             <button type="submit"><i class="fa fa-search"></i></button>
                         </span>
                     </div>
+                    <div class="pull-right hidden-xs">
+                        <i class="fa fa-align-justify"></i>
+                    </div>
                 </div>
                 <div class="article-menu">
                 {{.Result}}
@@ -172,7 +175,6 @@
     <div class="manual-mask"></div>
 </div>
 <div id="menu-hidden" style="display: none;">
-    {{.Result}}
     <!--站点统计代码-->
     {{str2html $.TONGJI}}
 </div>

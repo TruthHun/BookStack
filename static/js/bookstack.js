@@ -232,25 +232,6 @@ $(function () {
         }
         initHighlighting();
         $(".manual-right").scrollTop(0);
-        //上一篇和下一篇的链接
-        var links=$("#menu-hidden a"),link_active=location.pathname,l=links.length;
-        for(var i=0;i<l;i++){
-            if (encodeURI($(links[i]).attr("href"))==link_active){
-                $(".hung-read-link .col-xs-12").hide();
-                var link_pre=$(links[i-1]),link_next=$(links[i+1]);
-                if(link_pre && link_pre.text()){
-                    $(".hung-pre a").attr("href",link_pre.attr("href"));
-                    $(".hung-pre a").text(link_pre.text());
-                    $(".hung-pre").show();
-                }
-                if(link_next  && link_next.text()){
-                    $(".hung-next a").attr("href",link_next.attr("href"));
-                    $(".hung-next a").text(link_next.text());
-                    $(".hung-next").show();
-                }
-                i=l;
-            }
-        }
     });
 
     //展开右下角菜单
@@ -265,6 +246,26 @@ $(function () {
             $(".bars-menu-toggle .fa-plus-circle").removeClass("hide");
         }
     });
+
+    //上一篇和下一篇的链接
+    var links=$(".article-menu a"),link_active=location.pathname,l=links.length;
+    for(var i=0;i<l;i++){
+        if (encodeURI($(links[i]).attr("href"))==link_active){
+            $(".hung-read-link .col-xs-12").hide();
+            var link_pre=$(links[i-1]),link_next=$(links[i+1]);
+            if(link_pre && link_pre.text()){
+                $(".hung-pre a").attr("href",link_pre.attr("href"));
+                $(".hung-pre a").text(link_pre.text());
+                $(".hung-pre").show();
+            }
+            if(link_next  && link_next.text()){
+                $(".hung-next a").attr("href",link_next.attr("href"));
+                $(".hung-next a").text(link_next.text());
+                $(".hung-next").show();
+            }
+            i=l;
+        }
+    }
 
     //添加或者移除书签
     $(".bookmark-action").click(function (e) {
@@ -377,6 +378,16 @@ $(function () {
                $(".bookmark-action .bookmark-remove").addClass("hide");
            }
        });
+    });
+
+    $(".article-search .pull-right").click(function () {
+        if($(".manual-left").hasClass("manual-left-toggle")){
+            $(".manual-left").removeClass("manual-left-toggle");
+            $(".manual-right").removeClass("manual-right-toggle");
+        }else{
+            $(".manual-left").addClass("manual-left-toggle");
+            $(".manual-right").addClass("manual-right-toggle");
+        }
     });
 
     //删除阅读记录
