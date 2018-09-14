@@ -1213,3 +1213,15 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 
 #ModalHistory .progress{border-radius: 10px;height: 16px;}
 #ModalHistory .text-muted{color: #999}
+
+
+.article-menu{overflow:auto;padding-left: 13px;position: fixed;top:55px;bottom: 33px;width: 278px;}
+.article-menu ul,.article-menu li{list-style: none;padding: 0px;margin: 0px;}
+.article-menu li{padding-left: 1em;}
+.article-menu a{display: block;white-space: nowrap;line-height: 250%;color: #666666;}
+.article-menu a:hover{color: #008cff;}
+.article-menu a.jstree-clicked{color:#008cff !important;}
+.article-menu .readed>a:first-child{color: #999999;}
+.article-menu .readed>a:first-child:before{content:url("../images/readed.png");margin-left: -19px;
+    position: relative;top: 3px;margin-right: 3px;}
+/*.article-menu a:hover{color: #008cff;}*/

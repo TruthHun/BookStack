@@ -18,7 +18,7 @@ func (this *RecordController) Prepare() {
 	}
 }
 
-//获取书签列表
+//获取阅读记录列表
 func (this *RecordController) List() {
 	var (
 		lists   []map[string]interface{}

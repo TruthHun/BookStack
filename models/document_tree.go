@@ -69,16 +69,16 @@ func (m *Document) FindDocumentTree(book_id int, isEdit ...bool) ([]*DocumentTre
 	return trees, nil
 }
 
-func (m *Document) CreateDocumentTreeForHtml(book_id, selected_id int) (string, error) {
-	trees, err := m.FindDocumentTree(book_id)
+func (m *Document) CreateDocumentTreeForHtml(bookId, selectedId int) (string, error) {
+	trees, err := m.FindDocumentTree(bookId)
 	if err != nil {
 		return "", err
 	}
-	parent_id := getSelectedNode(trees, selected_id)
+	parentId := getSelectedNode(trees, selectedId)
 
 	buf := bytes.NewBufferString("")
 
-	getDocumentTree(trees, 0, selected_id, parent_id, buf)
+	getDocumentTree(trees, 0, selectedId, parentId, buf)
 
 	return buf.String(), nil
 
@@ -99,7 +99,7 @@ func getSelectedNode(array []*DocumentTree, parent_id int) int {
 	return 0
 }
 
-func getDocumentTree(array []*DocumentTree, parent_id int, selected_id int, selected_parent_id int, buf *bytes.Buffer) {
+func getDocumentTree(array []*DocumentTree, parentId int, selected_id int, selected_parent_id int, buf *bytes.Buffer) {
 	buf.WriteString("<ul>")
 
 	for _, item := range array {
@@ -108,7 +108,7 @@ func getDocumentTree(array []*DocumentTree, parent_id int, selected_id int, sele
 		if p, ok := item.ParentId.(int); ok {
 			pid = p
 		}
-		if pid == parent_id {
+		if pid == parentId {
 
 			selected := ""
 			if item.DocumentId == selected_id {
@@ -142,7 +142,6 @@ func getDocumentTree(array []*DocumentTree, parent_id int, selected_id int, sele
 				}
 			}
 			buf.WriteString("</li>")
-
 		}
 	}
 	buf.WriteString("</ul>")

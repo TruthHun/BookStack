@@ -254,6 +254,29 @@ func (this *DocumentController) Read() {
 		beego.Error(err)
 		this.Abort("500")
 	}
+
+	// 查询用户哪些文档阅读了
+	if this.Member.MemberId > 0 {
+		modelRecord := new(models.ReadRecord)
+		lists, cnt, _ := modelRecord.List(this.Member.MemberId, bookResult.BookId)
+		if cnt > 0 {
+			var readMap = make(map[string]bool)
+			for _, item := range lists {
+				readMap[strconv.Itoa(item.DocId)] = true
+			}
+			if doc, err := goquery.NewDocumentFromReader(strings.NewReader(tree)); err == nil {
+				doc.Find("li").Each(func(i int, selection *goquery.Selection) {
+					if id, exist := selection.Attr("id"); exist {
+						if _, ok := readMap[id]; ok {
+							selection.AddClass("readed")
+						}
+					}
+				})
+				tree, _ = doc.Find("body").Html()
+			}
+		}
+	}
+
 	this.Data["Bookmark"] = existBookmark
 	this.Data["Model"] = bookResult
 	this.Data["Book"] = bookResult //文档下载需要用到Book变量
@@ -582,8 +605,6 @@ func (this *DocumentController) Upload() {
 		beego.Error("Attachment Insert => ", err)
 		this.JsonResult(6006, "文件保存失败")
 	}
-	//TODO:移除debug
-	beego.Debug(attachment)
 	if attachment.HttpPath == "" {
 		attachment.HttpPath = beego.URLFor("DocumentController.DownloadAttachment", ":key", identify, ":attach_id", attachment.AttachmentId)
 
