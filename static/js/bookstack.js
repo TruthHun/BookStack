@@ -267,6 +267,8 @@ $(function () {
         }
     }
 
+
+
     //添加或者移除书签
     $(".bookmark-action").click(function (e) {
         e.preventDefault();
@@ -454,4 +456,12 @@ $(function () {
     }catch (e){
         console.log(e);
     }
+
+    //滚动到相应高度
+    var top = $(".jstree-clicked").offset().top;
+    if (top !=undefined && top>0){
+        $('.article-menu').animate({scrollTop: top-200}, 500);
+    }
+
+
 });
