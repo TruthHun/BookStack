@@ -149,61 +149,22 @@
         </div>
 
         <div class="manual-left">
-            {{/**/}}
-            {{/*<div class="manual-tab">*/}}
-                {{/*<div class="tab-navg">*/}}
-                    {{/*<span data-mode="view" class="navg-item active"><i class="fa fa-align-justify"></i><b class="text">目录</b></span>*/}}
-                    {{/*<span data-mode="search" class="navg-item"><i class="fa fa-search"></i><b class="text">搜索</b></span>*/}}
-                {{/*</div>*/}}
-                {{/*<div class="tab-util">*/}}
-                    {{/*<span class="manual-fullscreen-switch">*/}}
-                        {{/*<b class="open fa fa-angle-right" title="展开"></b>*/}}
-                        {{/*<b class="close fa fa-angle-left" title="关闭"></b>*/}}
-                    {{/*</span>*/}}
-                {{/*</div>*/}}
-                {{/*<div class="tab-wrap">*/}}
-                    {{/*<div class="tab-item manual-catalog">*/}}
-                        {{/*<div class="catalog-list read-book-preview" id="sidebar">*/}}
-                        {{/*{{.Result}}*/}}
-                        {{/*</div>*/}}
-
-                    {{/*</div>*/}}
-                    {{/*<div class="tab-item manual-search">*/}}
-                        {{/*<div class="search-container">*/}}
-                            {{/*<div class="search-form">*/}}
-                                {{/*<form id="searchForm" action="{{urlfor "DocumentController.Search" ":key" .Model.Identify}}" method="post">*/}}
-                                    {{/*<div class="form-group">*/}}
-                                        {{/*<input type="search" placeholder="请输入搜索关键字" class="form-control" name="keyword">*/}}
-                                        {{/*<button type="submit" class="btn btn-default btn-search" id="btnSearch">*/}}
-                                            {{/*<i class="fa fa-search"></i>*/}}
-                                        {{/*</button>*/}}
-                                    {{/*</div>*/}}
-                                {{/*</form>*/}}
-                            {{/*</div>*/}}
-                            {{/*<div class="search-result">*/}}
-                                {{/*<div class="search-empty">*/}}
-                                    {{/*<i class="fa fa-search-plus" aria-hidden="true"></i>*/}}
-                                    {{/*<b class="text">暂无相关搜索结果！</b>*/}}
-                                {{/*</div>*/}}
-                                {{/*<ul class="search-list" id="searchList">*/}}
-                                {{/*</ul>*/}}
-                            {{/*</div>*/}}
-                        {{/*</div>*/}}
-                    {{/*</div>*/}}
-                {{/*</div>*/}}
-            {{/*</div>*/}}
-            {{/**/}}
-            {{/**/}}
-
+                <div class="article-search">
+                    <div class="input-group">
+                        <input type="text" name="wd" placeholder="Search..." autocomplete="off" class="form-control">
+                        <span class="input-group-addon">
+                            <button type="submit"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </div>
                 <div class="article-menu">
                 {{.Result}}
                 </div>
-
-            <div class="m-copyright">
-                <p>
-                    本文档使用 <a href="//www.bookstack.cn" style="color: #0e8c8c;font-weight: bold" target="_blank">书栈(BookStack.CN)</a> 构建
-                </p>
-            </div>
+                <div class="m-copyright">
+                    <p>
+                        本文档使用 <a href="//www.bookstack.cn" style="color: #0e8c8c;font-weight: bold" target="_blank">书栈(BookStack.CN)</a> 构建
+                    </p>
+                </div>
         </div>
 
         <div class="manual-progress"><b class="progress-bar"></b></div>
