@@ -23,6 +23,8 @@ func (this *HomeController) Index() {
 		tab       string
 		cid       int //分类，如果只是一级分类，则忽略，二级分类，则根据二级分类查找内容
 		urlPrefix = "/"
+		cate      models.Category
+		tabName   = map[string]string{"recommend": "站长推荐", "latest": "最新发布", "popular": "热门书籍"}
 	)
 	tab = strings.ToLower(this.GetString("tab"))
 	switch tab {
@@ -32,7 +34,7 @@ func (this *HomeController) Index() {
 	}
 	if cid, _ = this.GetInt("cid"); cid > 0 {
 		ModelCate := new(models.Category)
-		cate := ModelCate.Find(cid)
+		cate = ModelCate.Find(cid)
 		this.Data["Cate"] = cate
 	}
 	this.Data["Cid"] = cid
@@ -67,10 +69,14 @@ func (this *HomeController) Index() {
 
 	this.Data["Tab"] = tab
 
+	title := this.Sitename
+	if cid > 0 {
+		title = "[分类] " + cate.Title + " - " + tabName[tab] + " - " + title
+	}
 	this.GetSeoByPage("index", map[string]string{
-		"title":       this.Sitename,
+		"title":       title,
 		"keywords":    "文档托管,在线创作,文档在线管理,在线知识管理,文档托管平台,在线写书,文档在线转换,在线编辑,在线阅读,开发手册,api手册,文档在线学习,技术文档,在线编辑",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-
+	this.Data["SeoTitle"] = title
 }
