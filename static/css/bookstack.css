@@ -1246,6 +1246,10 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .article-menu .search-empty .text{font-weight: normal !important;}
 .article-menu .search-empty .fa-search-plus{display: block;font-size: 40px;margin-bottom: 15px;}
 
-
+#nprogress .bar{z-index: 9999;}
+#nprogress .spinner{left: 45%;top:15px;z-index: 9999;}
+#nprogress .spinner-icon{width: 30px;height: 30px;border: solid 2px transparent;
+    border-top-color: #29d;
+    border-left-color: #29d;}
 
 /*.article-menu a:hover{color: #008cff;}*/

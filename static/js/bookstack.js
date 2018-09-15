@@ -330,6 +330,7 @@ $(function () {
     });
 
     $("#searchForm [type=submit]").click(function (e) {
+        NProgress.start();
         e.preventDefault();
         var form=$("#searchForm");
         var wd=$.trim(form.find("[name=keyword]").val());
@@ -339,7 +340,7 @@ $(function () {
             if(res.errcode === 0){
                 for(var i in res.data){
                     var item = res.data[i];
-                    html += '<li><a data-wd="'+wd+'" href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.doc_id+'"> '+ item.doc_name +' </a></li>';
+                    html += '<li><a data-wd="'+wd+'" href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.identify+'"> '+ item.doc_name +' </a></li>';
                 }
             }
             $("#searchList").html(html);
@@ -352,6 +353,7 @@ $(function () {
                 $(".search-result").show();
                 $(".search-empty").show();
             }
+            NProgress.done();
         })
     });
 
@@ -370,69 +372,5 @@ $(function () {
                 }
         };
     });
-
-    /**
-     * 项目内搜索
-     */
-    // $("#searchForm").ajaxForm({
-    //     beforeSubmit : function () {
-    //         var keyword = $.trim($("#searchForm").find("input[name='keyword']").val());
-    //         if(keyword === ""){
-    //             $(".search-empty").show();
-    //             $("#searchList").html("");
-    //             return false;
-    //         }
-    //         $("#btnSearch").attr("disabled","disabled").find("i").removeClass("fa-search").addClass("loading");
-    //         window.keyword = keyword;
-    //     },
-    //     success :function (res) {
-    //         var html = "";
-    //         if(res.errcode === 0){
-    //             for(var i in res.data){
-    //                 var item = res.data[i];
-    //                 html += '<li><a href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.doc_id+'"> '+ item.doc_name +' </a></li>';
-    //             }
-    //         }
-    //         if(html !== ""){
-    //             $(".search-empty").hide();
-    //         }else{
-    //             $(".search-empty").show();
-    //         }
-    //         $("#searchList").html(html);
-    //     },
-    //     complete : function () {
-    //         $("#btnSearch").removeAttr("disabled").find("i").removeClass("loading").addClass("fa-search");
-    //     }
-    // });
-
-    // window.onpopstate = function (e) {
-    //
-    //     var $param = e.state;
-    //     if($param.hasOwnProperty("$url")) {
-    //         window.jsTree.jstree().deselect_all();
-    //
-    //         window.jsTree.jstree().select_node({ id : $param.$id });
-    //         $param.$init = false;
-    //         //events.trigger('article.open', $param );
-    //     }else{
-    //         console.log($param);
-    //     }
-    // };
-    // try {
-    //     var $node = window.jsTree.jstree().get_selected();
-    //     if (typeof $node === "object") {
-    //         $node = window.jsTree.jstree().get_node({id: $node[0]});
-    //         events.trigger('article.open', {$url: $node.a_attr.href, $init: true, $id: $node.a_attr.id});
-    //     }
-    // }catch (e){
-    //     console.log(e);
-    // }
-
-    //滚动到相应高度
-    // var top = $(".jstree-clicked").offset().top;
-    // if (top !=undefined && top>0){
-    //     $('.article-menu').animate({scrollTop: top-200}, 500);
-    // }
-
 
 });

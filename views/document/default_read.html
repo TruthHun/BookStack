@@ -248,13 +248,14 @@ $(function () {
                 }
                 history.pushState({},title,url);
                 $(".markdown-body").highlight(_this.attr("data-wd"));
+                NProgress.done();
             }else{
                 // location.href=$url;
                 //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
                 layer.msg("加载失败");
+                NProgress.done();
             }
         })
-        NProgress.done();
     });
     //以https或者http开头的url链接，加上target='_blank'
     $(".markdown-body").on("click","a",function (e) {
