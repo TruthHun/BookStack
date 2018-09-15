@@ -383,12 +383,15 @@ $(function () {
     });
 
     $(".article-search .pull-right").click(function () {
+        var bookId=$(".article-search").attr("data-bookid");
         if($(".manual-left").hasClass("manual-left-toggle")){
             $(".manual-left").removeClass("manual-left-toggle");
             $(".manual-right").removeClass("manual-right-toggle");
+            closeMenu(false);
         }else{
             $(".manual-left").addClass("manual-left-toggle");
             $(".manual-right").addClass("manual-right-toggle");
+            closeMenu(true);
         }
     });
 
@@ -399,6 +402,11 @@ $(function () {
             _this.parent().remove();
         });
     });
+
+    function closeMenu(close) {
+        var key = 'close_menu';
+        document.cookie=key+"="+close;
+    }
 
     /**
      * 项目内搜索
@@ -458,10 +466,10 @@ $(function () {
     // }
 
     //滚动到相应高度
-    var top = $(".jstree-clicked").offset().top;
-    if (top !=undefined && top>0){
-        $('.article-menu').animate({scrollTop: top-200}, 500);
-    }
+    // var top = $(".jstree-clicked").offset().top;
+    // if (top !=undefined && top>0){
+    //     $('.article-menu').animate({scrollTop: top-200}, 500);
+    // }
 
 
 });

@@ -78,18 +78,13 @@
     </header>
     <article class="container-fluid manual-body">
 
-        <div class="manual-right">
+        <div class="manual-right {{if eq .CloseMenu "true"}}manual-right-toggle{{end}}">
             <div class="manual-article">
                 <div class="article-head">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-2">
-
-                            </div>
-                            <div class="col-md-8 text-center">
+                            <div class="col-md-10 col-md-offset-1 text-center">
                                 <h1 id="article-title">{{.Title}}</h1>
-                            </div>
-                            <div class="col-md-2">
                             </div>
                         </div>
                     </div>
@@ -148,8 +143,8 @@
             </div>
         </div>
 
-        <div class="manual-left">
-                <div class="article-search">
+        <div class="manual-left {{if eq .CloseMenu "true"}}manual-left-toggle{{end}}">
+                <div class="article-search" data-bookid="{{.Model.BookId}}">
                     <div class="input-group">
                         <input type="text" name="wd" placeholder="Search..." autocomplete="off" class="form-control">
                         <span class="input-group-addon">
