@@ -357,19 +357,26 @@ $(function () {
         })
     });
 
+
     // 左右方向键，切换上下章节
     $(document).keydown(function (event) {
         switch (event.keyCode) {
             case 37:
-                console.log("left");
-                if(!$(".hung-pre").hasClass("hidden")){
-                    location.href=$(".hung-pre a").attr("href");
+                var href=$(".hung-pre a").attr("href");
+                console.log("left",href);
+                if(!$(".hung-pre").hasClass("hidden") && href!="#"){
+                    NProgress.start();
+                    location.href=href;
                 }
+                break;
             case 39:
-                console.log("right");
-                if(!$(".hung-next").hasClass("hidden")){
-                    location.href=$(".hung-next a").attr("href");
+                var href=$(".hung-next a").attr("href");
+                console.log("right",href);
+                if(!$(".hung-next").hasClass("hidden") && href!="#"){
+                    NProgress.start();
+                    location.href=href;
                 }
+                break;
         };
     });
 
