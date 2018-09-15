@@ -145,19 +145,32 @@
 
         <div class="manual-left {{if eq .CloseMenu "true"}}manual-left-toggle{{end}}">
                 <div class="article-search" data-bookid="{{.Model.BookId}}">
-                    <div class="input-group">
-                        <input type="text" name="wd" placeholder="Search..." autocomplete="off" class="form-control">
-                        <span class="input-group-addon">
-                            <button type="submit"><i class="fa fa-search"></i></button>
-                        </span>
-                    </div>
+                    <form id="searchForm" action="/read/{{.Model.Identify}}/search" method="post">
+                        <div class="input-group">
+                            <input type="text" name="keyword" placeholder="Search..." autocomplete="off" class="form-control">
+                            <span class="input-group-addon input-group-addon-clear"><i class="fa fa-remove"></i></span>
+                            <span class="input-group-addon">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>
                     <div class="pull-right hidden-xs">
                         <i class="fa fa-align-justify"></i>
                     </div>
                 </div>
                 <div class="article-menu">
-                {{.Result}}
+                <div class="article-menu-detail">
+                    {{.Result}}
                 </div>
+                <div class="search-result">
+                    <div class="search-empty" style="display: block;">
+                        <i class="fa fa-search-plus" aria-hidden="true"></i>
+                        <b class="text">暂无相关搜索结果！</b>
+                    </div>
+                    <ul class="search-list" id="searchList"></ul>
+                </div>
+                </div>
+
                 <div class="m-copyright">
                     <p>
                         本文档使用 <a href="//www.bookstack.cn" style="color: #0e8c8c;font-weight: bold" target="_blank">书栈(BookStack.CN)</a> 构建
@@ -193,7 +206,7 @@
 
 {{/*<script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>*/}}
 {{/*<script src="{{$.StaticDomain}}/static/jstree/3.3.4/jstree.min.js" type="text/javascript"></script>*/}}
-{{/*<script type="text/javascript" src="{{$.StaticDomain}}/static/nprogress/nprogress.js"></script>*/}}
+<script type="text/javascript" src="{{$.StaticDomain}}/static/nprogress/nprogress.js"></script>
 <script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlight.js"></script>
 <script type="text/javascript" src="{{$.StaticDomain}}/static/highlight/highlightjs-line-numbers.min.js"></script>
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/jquery.highlight.js"></script>
@@ -207,13 +220,41 @@
 <script type="text/javascript">
 $(function () {
     $("#searchList").on("click","a",function () {
+        NProgress.start();
         var id = $(this).attr("data-id");
-        var url = "{{urlfor "DocumentController.Read" ":key" .Model.Identify ":id" ""}}/" + id;
-        $(this).parent("li").siblings().find("a").removeClass("active");
-        $(this).addClass("active");
-        loadDocument(url,id,function (body) {
-            return $(body).highlight(window.keyword);
-        });
+        var url = "{{urlfor "DocumentController.Read" ":key" .Model.Identify ":id" ""}}" + id;
+        var _this=$(this);
+        _this.parent("li").siblings().find("a").removeClass("active");
+        _this.addClass("active");
+
+        $.get(url,function (res) {
+            if(res.errcode === 0){
+                var body = res.data.body;
+                var doc_title = res.data.doc_title;
+                var title = res.data.title;
+                var $body = body;
+                $("#page-content").html($body);
+                // RenderByMarkdown($body);
+                $("title").text(title);
+                $("#article-title").text(doc_title);
+
+                $(".bookmark-action").attr("data-docid",res.data.doc_id);
+                if (res.data.bookmark){//已添加书签
+                    $(".bookmark-action .bookmark-add").addClass("hide");
+                    $(".bookmark-action .bookmark-remove").removeClass("hide");
+                }else{//未添加书签
+                    $(".bookmark-action .bookmark-add").removeClass("hide");
+                    $(".bookmark-action .bookmark-remove").addClass("hide");
+                }
+                history.pushState({},title,url);
+                $(".markdown-body").highlight(_this.attr("data-wd"));
+            }else{
+                // location.href=$url;
+                //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
+                layer.msg("加载失败");
+            }
+        })
+        NProgress.done();
     });
     //以https或者http开头的url链接，加上target='_blank'
     $(".markdown-body").on("click","a",function (e) {
