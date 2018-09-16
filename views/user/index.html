@@ -24,7 +24,7 @@
                         <ul>
                             {{range .Books}}
                             <li class="clearfix">
-                                <div class="col-sm-2 col-md-2 col-lg-1 col-xs-3" style="padding: 0px;">
+                                <div class="col-sm-2 col-md-2 col-lg-1 col-xs-3 {{if gt .OrderIndex 0}}recommend-book{{end}}" style="padding: 0px;">
                                     <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank" title="{{.BookName}}">
                                         <img onerror="this.src='/static/images/book.png'" src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
                                     </a>

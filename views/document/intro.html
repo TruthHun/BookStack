@@ -12,11 +12,14 @@
                  {{if eq $.Member.MemberId $.Book.MemberId}}
                     <a href="{{urlfor "DocumentController.Edit" ":key" .Book.Identify ":id" ""}}" class="tooltips" title="编辑文档"> &nbsp;<small><i class="fa fa-edit"></i></small> </a>
                     <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="项目设置"> &nbsp;<small><i class="fa fa-cog"></i></small> </a>
+                    <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="设为推荐"> &nbsp;<small><i class="fa fa-hand-peace-o"></i></small> </a>
                 {{end}}
             </h1>
         </div>
         <div class="col-sm-3 col-xs-6">
-            <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
+            <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}}">
+                <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
+            </div>
         </div>
         <div class="col-sm-9 col-xs-6">
             <ul class="none-listyle">

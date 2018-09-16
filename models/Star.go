@@ -35,6 +35,7 @@ type StarResult struct {
 	CntComment  int    `json:"cnt_comment"`
 	CntScore    int    `json:"cnt_score"`
 	ScoreFloat  string `json:"score_float"`
+	OrderIndex  int    `json:"order_index"`
 }
 
 //收藏或者取消收藏
