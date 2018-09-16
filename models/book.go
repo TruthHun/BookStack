@@ -358,7 +358,7 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, cid int, f
 	condStr := "" //查询条件
 	cond := []string{"b.privately_owned=0"}
 	if len(fields) == 0 {
-		fields = append(fields, "book_id", "book_name", "identify", "cover")
+		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index")
 	}
 	switch orderType {
 	case OrderRecommend: //推荐
