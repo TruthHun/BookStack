@@ -10,9 +10,11 @@
         <div class="col-xs-12">
             <h1>{{.Book.BookName}}
                  {{if eq $.Member.MemberId $.Book.MemberId}}
-                    <a href="{{urlfor "DocumentController.Edit" ":key" .Book.Identify ":id" ""}}" class="tooltips" title="编辑文档"> &nbsp;<small><i class="fa fa-edit"></i></small> </a>
-                    <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="项目设置"> &nbsp;<small><i class="fa fa-cog"></i></small> </a>
-                    <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="设为推荐"> &nbsp;<small><i class="fa fa-hand-peace-o"></i></small> </a>
+                     <a href="{{urlfor "DocumentController.Edit" ":key" .Book.Identify ":id" ""}}" class="tooltips" title="编辑文档"> &nbsp;<small><i class="fa fa-edit"></i></small> </a>
+                     <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="项目设置"> &nbsp;<small><i class="fa fa-cog"></i></small> </a>
+                 {{end}}
+                {{if lt $.Member.Role 2}}
+                    <a href="{{urlfor "ManagerController.EditBook" ":key" .Book.Identify}}" class="tooltips" title="管理员项目设置"> &nbsp;<small><i class="fa fa-cogs"></i></small> </a>
                 {{end}}
             </h1>
         </div>
