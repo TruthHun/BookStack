@@ -20,78 +20,42 @@ function RenderByMarkdown($content) {
     });
 }
 
-/***
- * 加载文档到阅读区
- * @param $url
- * @param $id
- * @param $callback
-//  */
-// function loadDocument($url,$id,$callback) {
-//     $.ajax({
-//         url : $url+"?fr=BookStack",
-//         type : "GET",
-//         beforeSend :function (xhr) {
-//             var body = events.data('body_' + $id);
-//             var title = events.data('title_' + $id);
-//             var doc_title = events.data('doc_title_' + $id);
-//
-//             if(body && title && doc_title){
-//
-//                 if (typeof $callback === "function") {
-//                     body = $callback(body);
-//                 }
-//                 // RenderByMarkdown(body);
-//                 $("#page-content").html(body);
-//                 $("title").text(title);
-//                 $("#article-title").text(doc_title);
-//
-//
-//                 events.trigger('article.open',{ $url : $url, $init : false , $id : $id });
-//
-//                 return false;
-//             }
-//             NProgress.start();
-//         },
-//         success : function (res) {
-//             if(res.errcode === 0){
-//                 console.log("BookStack");
-//                 var body = res.data.body;
-//                 var doc_title = res.data.doc_title;
-//                 var title = res.data.title;
-//                 var $body = body;
-//                 if (typeof $callback === "function" ){
-//                     $body = $callback(body);
-//                 }
-//                 $("#page-content").html($body);
-//                 // RenderByMarkdown($body);
-//                 $("title").text(title);
-//                 $("#article-title").text(doc_title);
-//
-//                 $(".bookmark-action").attr("data-docid",res.data.doc_id);
-//                 if (res.data.bookmark){//已添加书签
-//                     $(".bookmark-action .bookmark-add").addClass("hide");
-//                     $(".bookmark-action .bookmark-remove").removeClass("hide");
-//                 }else{//未添加书签
-//                     $(".bookmark-action .bookmark-add").removeClass("hide");
-//                     $(".bookmark-action .bookmark-remove").addClass("hide");
-//                 }
-//                 //
-//                 // events.data('body_' + $id,body);
-//                 // events.data('title_' + $id,title);
-//                 // events.data('doc_title_' + $id,doc_title);
-//                 // events.trigger('article.open',{ $url : $url, $init : true, $id : $id });
-//             }else{
-//                 location.href=$url;
-//                 //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
-//                 // layer.msg("加载失败");
-//             }
-//         },
-//         complete : function () {
-//             NProgress.done();
-//         }
-//     });
-// }
-//
+function load_doc(url,wd) {
+    NProgress.start();
+    $.get(url+"?fr=bookstack",function (res) {
+        if(res.errcode === 0){
+            var body = res.data.body;
+            var doc_title = res.data.doc_title;
+            var title = res.data.title;
+            var $body = body;
+            $("#page-content").html($body);
+            // RenderByMarkdown($body);
+            $("title").text(title);
+            $("#article-title").text(doc_title);
+
+            $(".bookmark-action").attr("data-docid",res.data.doc_id);
+            if (res.data.bookmark){//已添加书签
+                $(".bookmark-action .bookmark-add").addClass("hide");
+                $(".bookmark-action .bookmark-remove").removeClass("hide");
+            }else{//未添加书签
+                $(".bookmark-action .bookmark-add").removeClass("hide");
+                $(".bookmark-action .bookmark-remove").addClass("hide");
+            }
+            change_url_state(url,title);
+            active_readed_menu(url);
+            NProgress.done();
+            pre_and_next_link();
+
+            if(wd) $(".markdown-body").highlight(wd);
+        }else{
+            // location.href=$url;
+            //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
+            layer.msg("加载失败");
+            NProgress.done();
+        }
+    })
+}
+
 function initHighlighting() {
     $('pre code').each(function (i, block) {
         hljs.highlightBlock(block);
@@ -100,6 +64,49 @@ function initHighlighting() {
 }
 
 var events = $("body");
+
+function change_url_state(url,title){
+    history.pushState({},title,url);
+}
+
+function active_readed_menu(url){
+    var links=$(".article-menu-detail a");
+    var href ="";
+    $.each(links,function () {
+        href=$(this).attr("href");
+        if (href==url) {
+            $(this).addClass("jstree-clicked");
+            $(this).parent().addClass("readed");
+        }else{
+            $(this).removeClass("jstree-clicked");
+        }
+    });
+    var offset_top=$(".article-menu-detail a.jstree-clicked").offset().top;
+    var scroll_top =$('.article-menu').scrollTop();
+    $('.article-menu').animate({scrollTop:scroll_top+offset_top-180}, 300);
+}
+
+function pre_and_next_link(){
+    //上一篇和下一篇的链接
+    var links=$(".article-menu a"),link_active=location.pathname,l=links.length;
+    for(var i=0;i<l;i++){
+        if (encodeURI($(links[i]).attr("href"))==link_active){
+            $(".hung-read-link .col-xs-12").hide();
+            var link_pre=$(links[i-1]),link_next=$(links[i+1]);
+            if(link_pre && link_pre.text()){
+                $(".hung-pre a").attr("href",link_pre.attr("href"));
+                $(".hung-pre a").text(link_pre.text());
+                $(".hung-pre").show();
+            }
+            if(link_next  && link_next.text()){
+                $(".hung-next a").attr("href",link_next.attr("href"));
+                $(".hung-next a").text(link_next.text());
+                $(".hung-next").show();
+            }
+            i=l;
+        }
+    }
+}
 
 $(function () {
     $(".view-backtop").on("click", function () {
@@ -162,25 +169,7 @@ $(function () {
         }
     });
 
-    //上一篇和下一篇的链接
-    var links=$(".article-menu a"),link_active=location.pathname,l=links.length;
-    for(var i=0;i<l;i++){
-        if (encodeURI($(links[i]).attr("href"))==link_active){
-            $(".hung-read-link .col-xs-12").hide();
-            var link_pre=$(links[i-1]),link_next=$(links[i+1]);
-            if(link_pre && link_pre.text()){
-                $(".hung-pre a").attr("href",link_pre.attr("href"));
-                $(".hung-pre a").text(link_pre.text());
-                $(".hung-pre").show();
-            }
-            if(link_next  && link_next.text()){
-                $(".hung-next a").attr("href",link_next.attr("href"));
-                $(".hung-next a").text(link_next.text());
-                $(".hung-next").show();
-            }
-            i=l;
-        }
-    }
+
 
     //添加或者移除书签
     $(".bookmark-action").click(function (e) {
@@ -256,6 +245,16 @@ $(function () {
         })
     });
 
+    pre_and_next_link();
+    $(".article-menu-detail a").click(function (e) {
+        e.preventDefault();
+        load_doc($(this).attr("href"),"");
+    });
+    $(".hung-read-link").on("click","a",function (e) {
+        e.preventDefault();
+        load_doc($(this).attr("href"),"");
+    });
+
     //重置阅读记录
     $(".reset-history").click(function (e) {
         e.preventDefault();
@@ -263,7 +262,7 @@ $(function () {
        if(confirm("重置阅读进度，会清空所有阅读记录，您确定要执行该操作吗？")){
            $.get(href,function (res) {
                $("#ModalHistory").modal("hide");
-               alertTips("success","重置阅读进度成功",3000,"");
+               alertTips("success","重置阅读进度成功",1500,location.href);
            });
        }
     });
@@ -365,19 +364,20 @@ $(function () {
                 var href=$(".hung-pre a").attr("href");
                 console.log("left",href);
                 if(!$(".hung-pre").hasClass("hidden") && href!="#"){
-                    NProgress.start();
-                    location.href=href;
+                    load_doc(href,"");
                 }
                 break;
             case 39:
                 var href=$(".hung-next a").attr("href");
                 console.log("right",href);
                 if(!$(".hung-next").hasClass("hidden") && href!="#"){
-                    NProgress.start();
-                    location.href=href;
+                    load_doc(href,"");
                 }
                 break;
         };
     });
+
+
+    $('.article-menu').animate({scrollTop:$('.article-menu a.jstree-clicked').offset().top-180}, 300);
 
 });
