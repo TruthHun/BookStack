@@ -58,6 +58,11 @@
                     <a title="首页" href="/" class="btn btn-default"><i class="fa fa-home"></i> 首页</a>
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-default"><i class="fa fa-cloud-download"></i> 下载</a>
                     <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>
+
+                    <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
+
+
+                    {{/*<a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-info"></i> 帮助</a>*/}}
                     <div class="btn-group">
                         <a rel="nofollow" href="{{urlfor "BookmarkController.List" ":book_id" .Model.BookId}}" title="查看书签" rel="nofollow" data-bookid="{{.Model.BookId}}" class="btn btn-default showModalBookmark">
                             <img src="/static/images/icon-bookmark-list.png" alt="书签"> 书签
@@ -67,8 +72,6 @@
                             <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"> 移除</span>
                         </a>
                     </div>
-                    <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
-
                     {{if eq $.Member.MemberId $.Model.MemberId}}
                         <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
                     {{end}}
