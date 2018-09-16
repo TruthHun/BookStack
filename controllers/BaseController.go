@@ -32,7 +32,7 @@ type BaseController struct {
 	Member                *models.Member
 	Option                map[string]string
 	EnableAnonymous       bool
-	EnableDocumentHistory bool
+	EnableDocumentHistory int
 	Sitename              string
 	OssDomain             string
 }
@@ -83,8 +83,8 @@ func (this *BaseController) Prepare() {
 			if strings.EqualFold(item.OptionName, "ENABLE_ANONYMOUS") && item.OptionValue == "true" {
 				this.EnableAnonymous = true
 			}
-			if strings.EqualFold(item.OptionName, "ENABLE_DOCUMENT_HISTORY") && item.OptionValue == "true" {
-				this.EnableDocumentHistory = true
+			if verNum, _ := strconv.Atoi(item.OptionValue); strings.EqualFold(item.OptionName, "ENABLE_DOCUMENT_HISTORY") && verNum > 0 {
+				this.EnableDocumentHistory = verNum
 			}
 		}
 	}

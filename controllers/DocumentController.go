@@ -895,8 +895,7 @@ func (this *DocumentController) Content() {
 			}
 		}
 		//如果启用了文档历史，则添加历史文档
-		if this.EnableDocumentHistory {
-
+		if this.EnableDocumentHistory > 0 {
 			history := models.NewDocumentHistory()
 			history.DocumentId = doc_id
 			history.Content = ds.Content

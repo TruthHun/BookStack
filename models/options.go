@@ -110,9 +110,9 @@ func (m *Option) Init() error {
 	}
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLE_DOCUMENT_HISTORY").Exist() {
 		option := NewOption()
-		option.OptionValue = "false"
+		option.OptionValue = "100"
 		option.OptionName = "ENABLE_DOCUMENT_HISTORY"
-		option.OptionTitle = "是否启用文档历史"
+		option.OptionTitle = "版本控制"
 		if _, err := o.Insert(option); err != nil {
 			return err
 		}

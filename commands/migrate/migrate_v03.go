@@ -75,7 +75,7 @@ func (m *MigrationVersion03) MigrationNewTableData() error {
 	if err != nil {
 		return err
 	}
-	_, err = o.Raw("INSERT INTO md_options (option_title, option_name, option_value) SELECT '是否启用文档历史','ENABLE_DOCUMENT_HISTORY','true' WHERE NOT exists(SELECT * FROM md_options WHERE option_name = 'ENABLE_DOCUMENT_HISTORY');").Exec()
+	_, err = o.Raw("INSERT INTO md_options (option_title, option_name, option_value) SELECT '版本控制','ENABLE_DOCUMENT_HISTORY','true' WHERE NOT exists(SELECT * FROM md_options WHERE option_name = 'ENABLE_DOCUMENT_HISTORY');").Exec()
 	if err != nil {
 		return err
 	}

@@ -99,16 +99,17 @@
             <a href="javascript:;" data-toggle="tooltip" data-title="GFM 任务列表"><i class="fa fa-tasks item" name="tasks" aria-hidden="true"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="引用"><i class="fa fa-quote-right item" name="quote" unselectable="on"></i></a>
         {{/*<a href="javascript:;" data-toggle="tooltip" data-title="附件"><i class="fa fa-paperclip item" aria-hidden="true" name="attachment"></i></a>*/}}
-        {{/*<a href="javascript:;" data-toggle="tooltip" data-title="模板"><i class="fa fa-tachometer last" name="template"></i></a>*/}}
             <a href="javascript:;" data-toggle="tooltip" data-title="边栏"><i class="fa fa-columns item" aria-hidden="true" name="sidebar"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="模板"><i class="fa fa-tachometer item" name="template"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="版本控制"><i class="fa fa-history item" name="history" aria-hidden="true"></i></a>
             <a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>
         </div>
 
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title="爬虫采集"><i class="fa fa-bug first" name="spider" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="批量创建"><i class="fa fa-plus-square item" name="multi" unselectable="on"></i></a>
+            {{/*<a href="javascript:;" data-toggle="tooltip" data-title="批量创建"><i class="fa fa-plus-square item" name="multi" unselectable="on"></i></a>*/}}
             <a href="javascript:;" data-toggle="tooltip" data-title="自动生成"><i class="fa fa-tripadvisor item" name="auto" unselectable="on"></i></a>
-            <a href="javascript:;" data-toggle="tooltip" data-title="目录排序"><i class="fa fa-sort last" name="summary" unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="目录排序"><i class="fa fa-sort-amount-asc last" name="summary" unselectable="on"></i></a>
         </div>
 
         {{/*<div class="editormd-group pull-right">*/}}
@@ -237,65 +238,65 @@
     </div>
 </div>
 <!-- Modal -->
-{{/*<div class="modal fade" id="documentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="documentHistoryModalModalLabel">*/}}
-    {{/*<div class="modal-dialog" role="document">*/}}
-        {{/*<div class="modal-content">*/}}
-            {{/*<div class="modal-header">*/}}
-                {{/*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>*/}}
-                {{/*<h4 class="modal-title">文档历史记录</h4>*/}}
-            {{/*</div>*/}}
-            {{/*<div class="modal-body text-center" id="historyList">*/}}
+<div class="modal fade" id="documentHistoryModal" tabindex="-1" role="dialog" aria-labelledby="documentHistoryModalModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">文档历史记录</h4>
+            </div>
+            <div class="modal-body text-center" id="historyList">
 
-            {{/*</div>*/}}
-            {{/*<div class="modal-footer">*/}}
-                {{/*<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>*/}}
-            {{/*</div>*/}}
-        {{/*</div>*/}}
-    {{/*</div>*/}}
-{{/*</div>*/}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-{{/*<div class="modal fade" id="documentTemplateModal" tabindex="-1" role="dialog" aria-labelledby="请选择模板类型" aria-hidden="true">*/}}
-    {{/*<div class="modal-dialog">*/}}
-        {{/*<div class="modal-content">*/}}
-            {{/*<div class="modal-header">*/}}
-                {{/*<h4 class="modal-title" id="modal-title">请选择模板类型</h4>*/}}
-            {{/*</div>*/}}
-            {{/*<div class="modal-body template-list">*/}}
-                {{/*<div class="container">*/}}
-                    {{/*<div class="section">*/}}
-                        {{/*<a data-type="normal" href="javascript:;"><i class="fa fa-file-o"></i></a>*/}}
-                        {{/*<h3><a data-type="normal" href="javascript:;">普通文档</a></h3>*/}}
-                        {{/*<ul>*/}}
-                            {{/*<li>默认类型</li>*/}}
-                            {{/*<li>简单的文本文档</li>*/}}
-                        {{/*</ul>*/}}
-                    {{/*</div>*/}}
-                    {{/*<div class="section">*/}}
-                        {{/*<a data-type="api" href="javascript:;"><i class="fa fa-file-code-o"></i></a>*/}}
-                        {{/*<h3><a data-type="api" href="javascript:;">API文档</a></h3>*/}}
-                        {{/*<ul>*/}}
-                            {{/*<li>用于API文档速写</li>*/}}
-                            {{/*<li>支持代码高亮</li>*/}}
-                        {{/*</ul>*/}}
-                    {{/*</div>*/}}
-                    {{/*<div class="section">*/}}
-                        {{/*<a data-type="code" href="javascript:;"><i class="fa fa-book"></i></a>*/}}
+<div class="modal fade" id="documentTemplateModal" tabindex="-1" role="dialog" aria-labelledby="请选择模板类型" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title">请选择模板类型</h4>
+            </div>
+            <div class="modal-body template-list">
+                <div class="container">
+                    <div class="section">
+                        <a data-type="normal" href="javascript:;"><i class="fa fa-file-o"></i></a>
+                        <h3><a data-type="normal" href="javascript:;">普通文档</a></h3>
+                        <ul>
+                            <li>默认类型</li>
+                            <li>简单的文本文档</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <a data-type="api" href="javascript:;"><i class="fa fa-file-code-o"></i></a>
+                        <h3><a data-type="api" href="javascript:;">API文档</a></h3>
+                        <ul>
+                            <li>用于API文档速写</li>
+                            <li>支持代码高亮</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <a data-type="code" href="javascript:;"><i class="fa fa-book"></i></a>
 
-                        {{/*<h3><a data-type="code" href="javascript:;">数据字典</a></h3>*/}}
-                        {{/*<ul>*/}}
-                            {{/*<li>用于数据字典显示</li>*/}}
-                            {{/*<li>表格支持</li>*/}}
-                        {{/*</ul>*/}}
-                    {{/*</div>*/}}
-                {{/*</div>*/}}
+                        <h3><a data-type="code" href="javascript:;">数据字典</a></h3>
+                        <ul>
+                            <li>用于数据字典显示</li>
+                            <li>表格支持</li>
+                        </ul>
+                    </div>
+                </div>
 
-            {{/*</div>*/}}
-            {{/*<div class="modal-footer">*/}}
-                {{/*<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>*/}}
-            {{/*</div>*/}}
-        {{/*</div>*/}}
-    {{/*</div>*/}}
-{{/*</div>*/}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="ModalSpider" tabindex="-1" role="dialog" aria-labelledby="ModalSpiderLabel">
@@ -421,13 +422,13 @@
 
 
 <template id="template-normal">
-{{/*{{template "document/template_normal.html"}}*/}}
+{{template "document/template_normal.html"}}
 </template>
 <template id="template-api">
-{{/*{{template "document/template_api.html"}}*/}}
+{{template "document/template_api.html"}}
 </template>
 <template id="template-code">
-{{/*{{template "document/template_code.html"}}*/}}
+{{template "document/template_code.html"}}
 </template>
 
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}

@@ -27,10 +27,16 @@
                                 <label>网站备案</label>
                                 <input type="text" class="form-control" name="ICP" id="ICP" placeholder="网站备案" value="{{.ICP.OptionValue}}">
                             </div>
+                        <div class="form-group">
+                            <label>版本控制</label>
+                            <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">
+                            <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
+                        </div>
                             <div class="form-group">
                                 <label>站点统计</label>
                                 <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="3">{{.TONGJI.OptionValue}}</textarea>
                             </div>
+
 
                             {{/*肯定要允许游客进行访问*/}}
                             <div class="form-group hide">
@@ -81,17 +87,7 @@
                             </div>
                         </div>
 
-                        <!--<div class="form-group">-->
-                            <!--<label>启用文档历史</label>-->
-                            <!--<div class="radio">-->
-                                <!--<label class="radio-inline">-->
-                                    <!--<input type="radio" {{if eq .ENABLE_DOCUMENT_HISTORY.OptionValue "true"}}checked{{end}} name="ENABLE_DOCUMENT_HISTORY" value="true">开启<span class="text"></span>-->
-                                <!--</label>-->
-                                <!--<label class="radio-inline">-->
-                                    <!--<input type="radio" {{if eq .ENABLE_DOCUMENT_HISTORY.OptionValue "false"}}checked{{end}} name="ENABLE_DOCUMENT_HISTORY" value="false">关闭<span class="text"></span>-->
-                                <!--</label>-->
-                            <!--</div>-->
-                        <!--</div>-->
+
                         <div class="form-group">
                             <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
                             <span id="form-error-message" class="error-message"></span>
