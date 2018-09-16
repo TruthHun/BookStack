@@ -46,7 +46,7 @@ type CookieRemember struct {
 func (this *BaseController) Prepare() {
 	this.Member = models.NewMember() //初始化
 	this.EnableAnonymous = false
-	this.EnableDocumentHistory = false
+	this.EnableDocumentHistory = 0
 	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
 	this.Data["OssDomain"] = this.OssDomain
 	this.Data["StaticDomain"] = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")

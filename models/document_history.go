@@ -14,8 +14,6 @@ type DocumentHistory struct {
 	DocumentId   int       `orm:"column(document_id);type(int);index" json:"doc_id"`
 	DocumentName string    `orm:"column(document_name);size(500)" json:"doc_name"`
 	ParentId     int       `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
-	Markdown     string    `orm:"column(markdown);type(text);null" json:"markdown"`
-	Content      string    `orm:"column(content);type(text);null" json:"content"`
 	MemberId     int       `orm:"column(member_id);type(int)" json:"member_id"`
 	ModifyTime   time.Time `orm:"column(modify_time);type(datetime);auto_now" json:"modify_time"`
 	ModifyAt     int       `orm:"column(modify_at);type(int)" json:"-"`
@@ -76,43 +74,36 @@ func (m *DocumentHistory) Delete(history_id, doc_id int) error {
 }
 
 //恢复指定历史的文档.
-func (m *DocumentHistory) Restore(history_id, doc_id, uid int) error {
+func (history *DocumentHistory) Restore(history_id, doc_id, uid int) error {
 	o := orm.NewOrm()
 
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter("history_id", history_id).Filter("document_id", doc_id).One(m)
-
+	err := o.QueryTable(history.TableNameWithPrefix()).Filter("history_id", history_id).Filter("document_id", doc_id).One(history)
 	if err != nil {
 		return err
 	}
-	doc, err := NewDocument().Find(m.DocumentId)
 
+	doc, err := NewDocument().Find(history.DocumentId)
 	if err != nil {
 		return err
 	}
-	var ds=DocumentStore{DocumentId:doc_id}
-	o.Read(&ds)
-	history := NewDocumentHistory()
-	history.DocumentId = doc_id
-	history.Content = ds.Content
-	history.Markdown = ds.Markdown
-	history.DocumentName = doc.DocumentName
-	history.ModifyAt = uid
-	history.MemberId = doc.MemberId
-	history.ParentId = doc.ParentId
-	history.Version = time.Now().Unix()
-	history.Action = "restore"
-	history.ActionName = "恢复文档"
 
-	history.InsertOrUpdate()
+	ds := DocumentStore{DocumentId: doc_id}
+	if err = o.Read(&ds); err != nil {
+		return err
+	}
 
-	doc.DocumentName = m.DocumentName
-	ds.Content = m.Content
-	ds.Markdown = m.Markdown
-	doc.Release = m.Content
-	doc.Version = time.Now().Unix()
+	vc := NewVersionControl(doc_id, history.Version)
+
+	html := vc.GetVersionContent(true)
+	md := vc.GetVersionContent(false)
+	ds.Markdown = md                        //markdown内容
+	ds.Content = html                       //HTML内容
+	doc.Release = html                      //HTML内容
+	doc.DocumentName = history.DocumentName //文件名
+	doc.Version = time.Now().Unix()         //版本
 
 	_, err = o.Update(doc)
-	_, err = o.Update(ds)
+	_, err = o.Update(&ds)
 
 	return err
 }
@@ -120,7 +111,6 @@ func (m *DocumentHistory) Restore(history_id, doc_id, uid int) error {
 func (m *DocumentHistory) InsertOrUpdate() (history *DocumentHistory, err error) {
 	o := orm.NewOrm()
 	history = m
-
 	if m.HistoryId > 0 {
 		_, err = o.Update(m)
 	} else {

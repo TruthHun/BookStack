@@ -894,12 +894,11 @@ func (this *DocumentController) Content() {
 				beego.Error(err)
 			}
 		}
+		// TODO:内容存储为文档
 		//如果启用了文档历史，则添加历史文档
 		if this.EnableDocumentHistory > 0 {
 			history := models.NewDocumentHistory()
 			history.DocumentId = doc_id
-			history.Content = ds.Content
-			history.Markdown = ds.Markdown
 			history.DocumentName = doc.DocumentName
 			history.ModifyAt = this.Member.MemberId
 			history.MemberId = doc.MemberId
@@ -907,6 +906,10 @@ func (this *DocumentController) Content() {
 			history.Version = time.Now().Unix()
 			history.Action = "modify"
 			history.ActionName = "修改文档"
+
+			vc := models.NewVersionControl(doc_id, history.Version)
+			vc.SaveVersion(ds.Content, ds.Markdown)
+
 			_, err = history.InsertOrUpdate()
 			if err != nil {
 				beego.Error("DocumentHistory InsertOrUpdate => ", err)
@@ -1342,13 +1345,11 @@ func (this *DocumentController) RestoreHistory() {
 }
 
 func (this *DocumentController) Compare() {
-	this.Prepare()
 	this.TplName = "document/compare.html"
 	history_id, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
 	identify := this.Ctx.Input.Param(":key")
 
 	book_id := 0
-	editor := "markdown"
 
 	//如果是超级管理员则忽略权限判断
 	if this.Member.IsAdministrator() {
@@ -1360,7 +1361,6 @@ func (this *DocumentController) Compare() {
 		}
 		book_id = book.BookId
 		this.Data["Model"] = book
-		editor = book.Editor
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
@@ -1371,7 +1371,6 @@ func (this *DocumentController) Compare() {
 		}
 		book_id = bookResult.BookId
 		this.Data["Model"] = bookResult
-		editor = bookResult.Editor
 	}
 
 	if history_id <= 0 {
@@ -1388,16 +1387,12 @@ func (this *DocumentController) Compare() {
 	if doc.BookId != book_id {
 		this.ShowErrorPage(60002, "参数错误")
 	}
+	vc := models.NewVersionControl(doc.DocumentId, history.Version)
 	this.Data["HistoryId"] = history_id
 	this.Data["DocumentId"] = doc.DocumentId
 	ModelStore := new(models.DocumentStore)
-	if editor == "markdown" {
-		this.Data["HistoryContent"] = history.Markdown
-		this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId, "markdown")
-	} else {
-		this.Data["HistoryContent"] = template.HTML(history.Content)
-		this.Data["Content"] = template.HTML(ModelStore.GetFiledById(doc.DocumentId, "content"))
-	}
+	this.Data["HistoryContent"] = vc.GetVersionContent(false)
+	this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 }
 
 //递归生成文档序列数组.
