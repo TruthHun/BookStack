@@ -45,8 +45,8 @@ function load_doc(url,wd) {
             active_readed_menu(url);
             NProgress.done();
             pre_and_next_link();
-
             if(wd) $(".markdown-body").highlight(wd);
+            $('.m-manual .manual-right').animate({scrollTop:0}, 100);
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
@@ -376,7 +376,6 @@ $(function () {
                 break;
         };
     });
-
 
     $('.article-menu').animate({scrollTop:$('.article-menu a.jstree-clicked').offset().top-180}, 300);
 
