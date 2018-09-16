@@ -16,7 +16,7 @@
                 <div class="col-xs-6 col-sm-3 col-md-2">
                     <dl class="manual-item-standard">
                         <dt>
-                            <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" class="tooltips" target="_blank">
+                            <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" class="tooltips {{if gt $item.OrderIndex 0}}recommend-book{{end}}" target="_blank">
                                 <img onerror="this.src='/static/images/book.png'"  src="{{showImg $item.Cover "cover"}}" class="cover img-responsive border-cover-img" alt="{{$item.BookName}}">
                             </a>
                         </dt>
