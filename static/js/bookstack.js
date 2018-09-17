@@ -20,7 +20,7 @@ function RenderByMarkdown($content) {
     });
 }
 
-function load_doc(url,wd) {
+function load_doc(url,wd,without_history) {
     NProgress.start();
     $.get(url+"?fr=bookstack",function (res) {
         if(res.errcode === 0){
@@ -41,7 +41,9 @@ function load_doc(url,wd) {
                 $(".bookmark-action .bookmark-add").removeClass("hide");
                 $(".bookmark-action .bookmark-remove").addClass("hide");
             }
-            change_url_state(url,title);
+            if (!without_history){
+                change_url_state(url,title);
+            }
             active_readed_menu(url);
             NProgress.done();
             pre_and_next_link();
@@ -379,4 +381,7 @@ $(function () {
 
     $('.article-menu').animate({scrollTop:$('.article-menu a.jstree-clicked').offset().top-180}, 300);
 
+    window.onpopstate=function(e){
+        load_doc(location.pathname,"",true)
+    }
 });
