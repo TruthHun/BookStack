@@ -25,6 +25,7 @@ type DocumentHistorySimpleResult struct {
 	ActionName string    `json:"action_name"`
 	MemberId   int       `json:"member_id"`
 	Account    string    `json:"account"`
+	Nickname   string    `json:"nickname"`
 	ModifyAt   int       `json:"modify_at"`
 	ModifyName string    `json:"modify_name"`
 	ModifyTime time.Time `json:"modify_time"`
@@ -73,6 +74,48 @@ func (m *DocumentHistory) Delete(history_id, doc_id int) error {
 	return err
 }
 
+func (m *DocumentHistory) InsertOrUpdate() (history *DocumentHistory, err error) {
+	o := orm.NewOrm()
+	history = m
+	if m.HistoryId > 0 {
+		_, err = o.Update(m)
+	} else {
+		_, err = o.Insert(m)
+	}
+	return
+}
+
+//分页查询指定文档的历史.
+func (m *DocumentHistory) FindToPager(doc_id, page_index, page_size int) (docs []*DocumentHistorySimpleResult, totalCount int, err error) {
+
+	o := orm.NewOrm()
+
+	offset := (page_index - 1) * page_size
+
+	totalCount = 0
+
+	sql := `SELECT history.*,m1.account,m1.nickname,m2.account as modify_name
+FROM md_document_history AS history
+LEFT JOIN md_members AS m1 ON history.member_id = m1.member_id
+LEFT JOIN md_members AS m2 ON history.modify_at = m2.member_id
+WHERE history.document_id = ? ORDER BY history.history_id DESC LIMIT ?,?;`
+
+	_, err = o.Raw(sql, doc_id, offset, page_size).QueryRows(&docs)
+
+	if err != nil {
+		return
+	}
+	var count int64
+	count, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).Count()
+
+	if err != nil {
+		return
+	}
+	totalCount = int(count)
+
+	return
+}
+
 //恢复指定历史的文档.
 func (history *DocumentHistory) Restore(history_id, doc_id, uid int) error {
 	o := orm.NewOrm()
@@ -108,44 +151,61 @@ func (history *DocumentHistory) Restore(history_id, doc_id, uid int) error {
 	return err
 }
 
-func (m *DocumentHistory) InsertOrUpdate() (history *DocumentHistory, err error) {
+// 根据文档id删除记录
+func (history *DocumentHistory) DeleteByDocumentId(docId int) (err error) {
+	var histories []DocumentHistory
 	o := orm.NewOrm()
-	history = m
-	if m.HistoryId > 0 {
-		_, err = o.Update(m)
-	} else {
-		_, err = o.Insert(m)
+	filter := o.QueryTable(history.TableNameWithPrefix()).Filter("document_id", docId)
+	filter.All(&histories)
+	for _, item := range histories {
+		ver := NewVersionControl(docId, item.Version)
+		ver.DeleteVersion() //删除版本文件
 	}
+	_, err = filter.Delete()
 	return
 }
 
-//分页查询指定文档的历史.
-func (m *DocumentHistory) FindToPager(doc_id, page_index, page_size int) (docs []*DocumentHistorySimpleResult, totalCount int, err error) {
+// 根据history id 删除记录
+func (history *DocumentHistory) DeleteByHistoryId(historyId int) (err error) {
+	history, err = history.Find(historyId)
+	if history.Version > 0 {
+		ver := NewVersionControl(history.DocumentId, history.Version)
+		ver.DeleteVersion()
+	}
+	_, err = orm.NewOrm().QueryTable(history.TableNameWithPrefix()).Filter("history_id", historyId).Delete()
+	return
+}
 
-	o := orm.NewOrm()
+// 根据文档id删除
+func (history *DocumentHistory) DeleteByLimit(docId, limit int) (err error) {
+	if limit <= 0 {
+		return
+	}
 
-	offset := (page_index - 1) * page_size
+	filter := orm.NewOrm().QueryTable(history.TableNameWithPrefix()).Filter("document_id", docId)
 
-	totalCount = 0
-
-	sql := `SELECT history.*,m1.account,m2.account as modify_name
-FROM md_document_history AS history
-LEFT JOIN md_members AS m1 ON history.member_id = m1.member_id
-LEFT JOIN md_members AS m2 ON history.modify_at = m2.member_id
-WHERE history.document_id = ? ORDER BY history.history_id DESC LIMIT ?,?;`
-
-	_, err = o.Raw(sql, doc_id, offset, page_size).QueryRows(&docs)
-
+	var cnt int64
+	cnt, err = filter.Count()
 	if err != nil {
 		return
 	}
-	var count int64
-	count, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).Count()
 
-	if err != nil {
-		return
+	l := int64(limit)
+
+	if cnt > l {
+
+		var histories []DocumentHistory
+		var historyIds []interface{}
+
+		filter2 := filter.OrderBy("history_id").Limit(cnt - l)
+		filter2.All(&histories, "document_id", "version", "history_id")
+
+		for _, item := range histories {
+			ver := NewVersionControl(item.DocumentId, item.Version)
+			ver.DeleteVersion()
+			historyIds = append(historyIds, item.HistoryId)
+		}
+		filter.Filter("history_id__in", historyIds).Delete()
 	}
-	totalCount = int(count)
-
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -90,6 +91,7 @@ func (v *versionControl) DeleteVersion() (err error) {
 	if utils.StoreType == utils.StoreLocal { //本地存储
 		os.Remove(v.HtmlFile)
 		os.Remove(v.MdFile)
+		os.Remove(filepath.Dir(v.HtmlFile))
 	} else { // OSS 存储
 		bucket, err := store.NewOss().GetBucket()
 		if err != nil {

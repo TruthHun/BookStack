@@ -171,6 +171,18 @@ $(function () {
                }
                cm.replaceSelection(selectionText.join("\n"));
            }
+       }else if(name=="commit"){//自动生成内容
+           var cm = window.editor.cm;
+           var selection = cm.getSelection();
+           if (selection === "") {
+               cm.replaceSelection("\n<bookstack-git></bookstack-git>" + selection);
+           }else {
+               var selectionText = selection.split("\n");
+               for (var i = 0, len = selectionText.length; i < len; i++) {
+                   selectionText[i] = (selectionText[i] === "") ? "" : "\n<bookstack-git></bookstack-git>" + selectionText[i];
+               }
+               cm.replaceSelection(selectionText.join("\n"));
+           }
        }else if(name=="multi"){//批量创建文档
             $("#ModalMulti").modal("show");
        }else if(name=="spider"){//爬虫采集

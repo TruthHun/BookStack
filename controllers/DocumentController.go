@@ -38,17 +38,21 @@ type DocumentController struct {
 // 解析并提取版本控制的commit内容
 func parseGitCommit(str string) (cont, commit string) {
 	var slice []string
-	arr := strings.Split(str, "<git>")
+	arr := strings.Split(str, "<bookstack-git>")
 	if len(arr) > 1 {
 		slice = append(slice, arr[0])
+		str = strings.Join(arr[1:], "")
 	}
-	str = strings.Join(arr[1:], "")
-	arr = strings.Split(str, "</git>")
+	arr = strings.Split(str, "</bookstack-git>")
 	if len(arr) > 1 {
 		slice = append(slice, arr[1:]...)
 		commit = arr[0]
 	}
-	cont = strings.Join(slice, "")
+	if len(slice) > 0 {
+		cont = strings.Join(slice, "")
+	} else {
+		cont = str
+	}
 	return
 }
 
@@ -905,11 +909,14 @@ func (this *DocumentController) Content() {
 
 		ds.Markdown, actionName = parseGitCommit(ds.Markdown)
 		ds.Content, _ = parseGitCommit(content)
+
 		if actionName == "" {
-			actionName = "修改文档"
+			actionName = "--"
 		} else {
 			is_auto = true
 		}
+
+		beego.Debug(ds.Markdown, ds.Content)
 
 		doc.Version = time.Now().Unix()
 		if doc_id, err := doc.InsertOrUpdate(); err != nil {
@@ -922,11 +929,9 @@ func (this *DocumentController) Content() {
 			}
 		}
 
-		// TODO:内容存储为文档
 		//如果启用了文档历史，则添加历史文档
 		if this.EnableDocumentHistory > 0 {
-			dom, err := goquery.NewDocumentFromReader(strings.NewReader(ds.Content))
-			if err == nil && len(dom.Text()) > 0 { //空内容不存储版本
+			if len(strings.TrimSpace(ds.Markdown)) > 0 { //空内容不存储版本
 				history := models.NewDocumentHistory()
 				history.DocumentId = doc_id
 				history.DocumentName = doc.DocumentName
@@ -937,12 +942,13 @@ func (this *DocumentController) Content() {
 				history.Action = "modify"
 				history.ActionName = actionName
 
-				vc := models.NewVersionControl(doc_id, history.Version)
-				vc.SaveVersion(ds.Content, ds.Markdown)
-
 				_, err = history.InsertOrUpdate()
 				if err != nil {
 					beego.Error("DocumentHistory InsertOrUpdate => ", err)
+				} else {
+					vc := models.NewVersionControl(doc_id, history.Version)
+					vc.SaveVersion(ds.Content, ds.Markdown)
+					history.DeleteByLimit(doc_id, this.EnableDocumentHistory)
 				}
 			}
 
@@ -954,10 +960,6 @@ func (this *DocumentController) Content() {
 			errMsg = "true"
 		}
 
-		beego.Error("IS_AUTO====", is_auto, actionName, ds.Content)
-
-		//
-		//doc.Content = ""
 		doc.Release = ""
 		//注意：如果errMsg的值是true，则表示更新了目录排序，需要刷新，否则不刷新
 		this.JsonResult(0, errMsg, doc)
@@ -1097,7 +1099,7 @@ func (this *DocumentController) Search() {
 
 //文档历史列表.
 func (this *DocumentController) History() {
-	this.Prepare()
+
 	this.TplName = "document/history.html"
 
 	identify := this.GetString("identify")
@@ -1208,7 +1210,8 @@ func (this *DocumentController) DeleteHistory() {
 	if doc.BookId != book_id {
 		this.JsonResult(6001, "参数错误")
 	}
-	err = models.NewDocumentHistory().Delete(history_id, doc_id)
+	//err = models.NewDocumentHistory().Delete(history_id, doc_id)
+	err = models.NewDocumentHistory().DeleteByHistoryId(history_id)
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6002, "删除失败")

@@ -32,9 +32,9 @@
             <thead>
             <tr>
                 <td>#</td>
-                <td class="col-sm-6">修改时间</td>
                 <td class="col-sm-2">修改人</td>
-                <td class="col-sm=2">版本</td>
+                <td class="col-sm-6">COMMIT</td>
+                <td class="col-sm=2">时间</td>
                 <td class="col-sm-2">操作</td>
             </tr>
             </thead>
@@ -42,18 +42,20 @@
             {{range $index,$item := .List}}
             <tr>
                 <td>{{$item.HistoryId}}</td>
-                <td>{{date $item.ModifyTime "Y-m-d H:i:s"}}</td>
-                <td>{{$item.ModifyName}}</td>
-                <td>{{$item.Version}}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="{{$item.HistoryId}}" data-loading-text="删除中...">
+                    <a href="{{urlfor "UserController.Index" ":username" $item.ModifyName}}" target="_blank">{{$item.Nickname}}</a>
+                </td>
+                <td>{{$item.ActionName}}</td>
+                <td>{{date $item.ModifyTime "Y-m-d H:i:s"}} <br><small class="text-muted">版本:{{$item.Version}}</small></td>
+                <td>
+                    <button class="btn btn-danger btn-xs delete-btn" data-id="{{$item.HistoryId}}" data-loading-text="删除中...">
                         删除
                     </button>
-                    <button class="btn btn-success btn-sm restore-btn" data-id="{{$item.HistoryId}}" data-loading-text="恢复中...">
+                    <button class="btn btn-success btn-xs restore-btn" data-id="{{$item.HistoryId}}" data-loading-text="恢复中...">
                         恢复
                     </button>
                     {{if eq $.Model.Editor "markdown"}}
-                    <button class="btn btn-success btn-sm compare-btn" data-id="{{$item.HistoryId}}">
+                    <button class="btn btn-success btn-xs compare-btn" data-id="{{$item.HistoryId}}">
                         合并
                     </button>
                     {{end}}
