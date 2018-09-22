@@ -298,7 +298,6 @@ func (this *DocumentController) Read() {
 		}
 	}
 
-	this.Data["CloseMenu"] = this.Ctx.GetCookie("close_menu")
 	this.Data["Bookmark"] = existBookmark
 	this.Data["Model"] = bookResult
 	this.Data["Book"] = bookResult //文档下载需要用到Book变量

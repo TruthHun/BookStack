@@ -81,7 +81,7 @@
     </header>
     <article class="container-fluid manual-body">
 
-        <div class="manual-right {{if eq .CloseMenu "true"}}manual-right-toggle{{end}}">
+        <div class="manual-right">
             <div class="manual-article">
                 <div class="article-head">
                     <div class="container-fluid">
@@ -146,7 +146,7 @@
             </div>
         </div>
 
-        <div class="manual-left {{if eq .CloseMenu "true"}}manual-left-toggle{{end}}">
+        <div class="manual-left">
                 <div class="article-search" data-bookid="{{.Model.BookId}}">
                     <form id="searchForm" action="/read/{{.Model.Identify}}/search" method="post">
                         <div class="input-group">
