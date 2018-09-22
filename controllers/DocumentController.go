@@ -35,6 +35,23 @@ type DocumentController struct {
 	BaseController
 }
 
+// 解析并提取版本控制的commit内容
+func parseGitCommit(str string) (cont, commit string) {
+	var slice []string
+	arr := strings.Split(str, "<git>")
+	if len(arr) > 1 {
+		slice = append(slice, arr[0])
+	}
+	str = strings.Join(arr[1:], "")
+	arr = strings.Split(str, "</git>")
+	if len(arr) > 1 {
+		slice = append(slice, arr[1:]...)
+		commit = arr[0]
+	}
+	cont = strings.Join(slice, "")
+	return
+}
+
 //判断用户是否可以阅读文档.
 func isReadable(identify, token string, this *DocumentController) *models.BookResult {
 	book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -877,14 +894,24 @@ func (this *DocumentController) Content() {
 		content = this.replaceLinks(identify, content, is_summary)
 
 		var ds = models.DocumentStore{}
+		var actionName string
 
+		// 替换掉<git></git>标签内容
 		if markdown == "" && content != "" {
 			ds.Markdown = content
 		} else {
 			ds.Markdown = markdown
 		}
+
+		ds.Markdown, actionName = parseGitCommit(ds.Markdown)
+		ds.Content, _ = parseGitCommit(content)
+		if actionName == "" {
+			actionName = "修改文档"
+		} else {
+			is_auto = true
+		}
+
 		doc.Version = time.Now().Unix()
-		ds.Content = content
 		if doc_id, err := doc.InsertOrUpdate(); err != nil {
 			beego.Error("InsertOrUpdate => ", err)
 			this.JsonResult(6006, "保存失败")
@@ -894,32 +921,40 @@ func (this *DocumentController) Content() {
 				beego.Error(err)
 			}
 		}
+
 		// TODO:内容存储为文档
 		//如果启用了文档历史，则添加历史文档
 		if this.EnableDocumentHistory > 0 {
-			history := models.NewDocumentHistory()
-			history.DocumentId = doc_id
-			history.DocumentName = doc.DocumentName
-			history.ModifyAt = this.Member.MemberId
-			history.MemberId = doc.MemberId
-			history.ParentId = doc.ParentId
-			history.Version = time.Now().Unix()
-			history.Action = "modify"
-			history.ActionName = "修改文档"
+			dom, err := goquery.NewDocumentFromReader(strings.NewReader(ds.Content))
+			if err == nil && len(dom.Text()) > 0 { //空内容不存储版本
+				history := models.NewDocumentHistory()
+				history.DocumentId = doc_id
+				history.DocumentName = doc.DocumentName
+				history.ModifyAt = this.Member.MemberId
+				history.MemberId = doc.MemberId
+				history.ParentId = doc.ParentId
+				history.Version = time.Now().Unix()
+				history.Action = "modify"
+				history.ActionName = actionName
 
-			vc := models.NewVersionControl(doc_id, history.Version)
-			vc.SaveVersion(ds.Content, ds.Markdown)
+				vc := models.NewVersionControl(doc_id, history.Version)
+				vc.SaveVersion(ds.Content, ds.Markdown)
 
-			_, err = history.InsertOrUpdate()
-			if err != nil {
-				beego.Error("DocumentHistory InsertOrUpdate => ", err)
+				_, err = history.InsertOrUpdate()
+				if err != nil {
+					beego.Error("DocumentHistory InsertOrUpdate => ", err)
+				}
 			}
+
 		}
+
 		if is_auto {
 			errMsg = "auto"
 		} else if is_summary {
 			errMsg = "true"
 		}
+
+		beego.Error("IS_AUTO====", is_auto, actionName, ds.Content)
 
 		//
 		//doc.Content = ""
@@ -988,117 +1023,6 @@ func (this *DocumentController) Export() {
 	}
 
 }
-
-//导出文件
-//func (this *DocumentController) Export() {
-//	this.TplName = "document/export.html"
-//	identify := this.Ctx.Input.Param(":key")
-//	output := this.GetString("output")
-//	token := this.GetString("token")
-//	if identify == "" {
-//		this.Abort("404")
-//	}
-//
-//	//如果没有开启你们访问则跳转到登录
-//	if !this.EnableAnonymous && this.Member == nil {
-//		this.Redirect(beego.URLFor("AccountController.Login"), 302)
-//		return
-//	}
-//	bookResult := models.NewBookResult()
-//	if this.Member != nil && this.Member.IsAdministrator() {
-//		book, err := models.NewBook().FindByIdentify(identify)
-//		if err != nil {
-//			beego.Error(err)
-//			this.Abort("500")
-//		}
-//		bookResult = book.ToBookResult()
-//	} else {
-//		bookResult = isReadable(identify, token, this)
-//	}
-//
-//	if bookResult.PrivatelyOwned == 0 {
-//		//TODO 私有项目禁止导出
-//	}
-//
-//	docs, err := models.NewDocument().FindListByBookId(bookResult.BookId)
-//
-//	if err != nil {
-//		beego.Error(err)
-//		this.Abort("500")
-//	}
-//
-//	if output == "pdf" {
-//
-//		exe := beego.AppConfig.String("wkhtmltopdf")
-//
-//		if exe == "" {
-//			this.TplName = "errors/error.html"
-//			this.Data["ErrorMessage"] = "没有配置PDF导出程序"
-//			this.Data["ErrorCode"] = 50010
-//			return
-//		}
-//		dpath := "cache/" + bookResult.Identify
-//
-//		os.MkdirAll(dpath, 0766)
-//
-//		pathList := list.New()
-//
-//		RecursiveFun(0, "", dpath, this, bookResult, docs, pathList)
-//
-//		defer os.RemoveAll(dpath)
-//
-//		os.MkdirAll("./cache", 0766)
-//		pdfpath := filepath.Join("cache", identify+"_"+this.CruSession.SessionID()+".pdf")
-//
-//		if _, err := os.Stat(pdfpath); os.IsNotExist(err) {
-//
-//			wkhtmltopdf.SetPath(beego.AppConfig.String("wkhtmltopdf"))
-//			pdfg, err := wkhtmltopdf.NewPDFGenerator()
-//			pdfg.PageSize.Set(wkhtmltopdf.PageSizeA4)
-//			pdfg.MarginBottom.Set(25)
-//
-//			if err != nil {
-//				beego.Error(err)
-//				this.Abort("500")
-//			}
-//
-//			for e := pathList.Front(); e != nil; e = e.Next() {
-//				if page, ok := e.Value.(string); ok {
-//					pdfg.AddPage(wkhtmltopdf.NewPage(page))
-//				}
-//			}
-//			pdfg.MoreArgs = append(pdfg.MoreArgs,
-//				"--header-font-size", "8",
-//				"--footer-right", "[page] / [toPage]",
-//				"--footer-spacing", "5",
-//				"--footer-html", "views/widgets/pdf_footer.html",
-//				"--footer-font-size", "8",
-//			)
-//			//beego.Debug(pdfg.ArgString())
-//			//TODO 处理页码和footer、header问题
-//			//this.JsonResult(0, "1", pdfg.ArgString())
-//
-//			err = pdfg.Create()
-//			if err != nil {
-//				beego.Error(err)
-//				this.Abort("500")
-//			}
-//
-//			err = pdfg.WriteFile(pdfpath)
-//			if err != nil {
-//				beego.Error(err)
-//			}
-//		}
-//
-//		this.Ctx.Output.Download(pdfpath, bookResult.BookName+".pdf")
-//
-//		defer os.Remove(pdfpath)
-//
-//		this.StopRun()
-//	}
-//
-//	this.Abort("404")
-//}
 
 //生成项目访问的二维码.
 
