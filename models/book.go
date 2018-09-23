@@ -299,6 +299,16 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 		case utils.StoreOss:
 			go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
 		}
+
+		// 删除历史记录
+		go func() {
+			history := NewDocumentHistory()
+			for _, id := range docId {
+				idInt, _ := strconv.Atoi(id)
+				history.DeleteByDocumentId(idInt)
+			}
+		}()
+
 	}
 	return err
 }

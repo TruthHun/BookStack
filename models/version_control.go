@@ -23,8 +23,8 @@ type versionControl struct {
 }
 
 func NewVersionControl(docId int, version int64) *versionControl {
-	t := time.Unix(version, 0).Format("2006/01/02/15/04/05")
-	folder := fmt.Sprintf("./version_control/%v/%v/", t, docId)
+	t := time.Unix(version, 0).Format("2006/01/02/%v/15/04/05")
+	folder := "./version_control/" + fmt.Sprintf(t, docId)
 	if utils.StoreType == utils.StoreLocal {
 		os.MkdirAll(folder, os.ModePerm)
 	}
