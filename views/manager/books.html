@@ -44,7 +44,9 @@
                                         <a href="{{urlfor "DocumentController.Edit" ":key" $item.Identify ":id" ""}}" title="编辑文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-edit" aria-hidden="true"></i> 编辑文档</a>
                                         <a href="{{urlfor "ManagerController.EditBook" ":key" $item.Identify}}" title="项目设置" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs" aria-hidden="true"></i> 项目设置</a>
                                         <a href="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除项目" class="btn btn-danger ajax-get confirm" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除项目</a>
+
                                     </div>
+
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="desc-text">

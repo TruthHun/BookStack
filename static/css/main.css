@@ -346,6 +346,14 @@ textarea{
     display: inline-block;
     padding-right: 10px;
 }
+
+.book-list .list-item .btns .btn-group{
+    position: relative;top:-3px;
+}
+.book-list .list-item .btns .btn-group .btn{
+    padding: 7px 12px;
+}
+
 /************文档概述*****************/
 .dashboard{
 
