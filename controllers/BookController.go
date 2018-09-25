@@ -463,14 +463,16 @@ func (this *BookController) Create() {
 		if identify == "" {
 			this.JsonResult(6002, "项目标识不能为空")
 		}
-		if ok, err := regexp.MatchString(`[a-zA-Z0-9_\-]*$`, identify); !ok || err != nil {
-			this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号头，且不能是纯数字")
+		ok, err1 := regexp.MatchString(`^[a-zA-Z0-9_\-]*$`, identify)
+		if !ok || err1 != nil {
+			this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号，且不能是纯数字")
 		}
+
 		if num, _ := strconv.Atoi(identify); strconv.Itoa(num) == identify {
-			this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号头，且不能是纯数字")
+			this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号，且不能是纯数字")
 		}
 		if strings.Count(identify, "") > 50 {
-			this.JsonResult(6004, "文档标识不能超过50字")
+			this.JsonResult(6004, "项目标识不能超过50字")
 		}
 		if strings.Count(description, "") > 500 {
 			this.JsonResult(6004, "项目描述不能大于500字")
