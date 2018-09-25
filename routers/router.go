@@ -128,5 +128,6 @@ func init() {
 	beego.Router("/cate", &controllers.CateController{}, "get:List")
 	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap")
 	beego.Router("/local-render", &controllers.LocalhostController{}, "get,post:RenderMarkdown")
+	beego.Router("/projects/*", &controllers.BaseController{}, "get:ProjectsFile")
 	beego.Router("/*", &controllers.BaseController{}, "get:StaticFile")
 }

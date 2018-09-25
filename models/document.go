@@ -316,7 +316,11 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 					if srcLower := strings.ToLower(src); strings.HasPrefix(srcLower, "http://") || strings.HasPrefix(srcLower, "https://") {
 						pic = src
 					} else {
-						pic = base_url + src
+						if utils.StoreType == utils.StoreOss {
+							pic = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + strings.TrimLeft(src, "./")
+						} else {
+							pic = base_url + src
+						}
 					}
 					//下载图片，放到folder目录下
 					ext := ""

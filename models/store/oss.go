@@ -1,6 +1,7 @@
 package store
 
 import (
+	"io"
 	"strings"
 
 	"os"
@@ -206,5 +207,15 @@ func (o *Oss) DelOssFolder(folder string) (err error) {
 		}
 		o.DelFromOss(folder)
 	}
+	return
+}
+
+func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
+	var bucket *oss.Bucket
+	bucket, err = o.GetBucket()
+	if err != nil {
+		return
+	}
+	reader, err = bucket.GetObject(objKey)
 	return
 }

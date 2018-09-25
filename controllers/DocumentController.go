@@ -201,15 +201,18 @@ func (this *DocumentController) Read() {
 		doc.AttachList = attach
 	}
 
-	cdnimg := beego.AppConfig.String("cdnimg")
-	if doc.Release != "" && cdnimg != "" {
+	if doc.Release != "" {
 		query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(doc.Release))
 		if err != nil {
 			beego.Error(err)
 		} else {
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
-				if src, ok := contentSelection.Attr("src"); ok && strings.HasPrefix(src, "/uploads/") {
-					contentSelection.SetAttr("src", utils.JoinURI(cdnimg, src))
+				if src, ok := contentSelection.Attr("src"); ok {
+					beego.Debug(src)
+					if utils.StoreType == utils.StoreOss && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
+						src = this.OssDomain + "/" + strings.TrimLeft(src, "./")
+						contentSelection.SetAttr("src", src)
+					}
 				}
 			})
 			html, err := query.Html()
@@ -640,7 +643,8 @@ func (this *DocumentController) Upload() {
 		if err := store.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
 			beego.Error(err.Error())
 		}
-		attachment.HttpPath = this.OssDomain + "/" + osspath
+		//attachment.HttpPath = this.OssDomain + "/" + osspath
+		attachment.HttpPath = "/" + osspath
 	case utils.StoreLocal:
 		osspath = "uploads/" + osspath
 		if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {

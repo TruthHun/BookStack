@@ -1012,7 +1012,8 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	case utils.StoreLocal:
 		imgBaseUrl = "/uploads/projects/" + identify
 	case utils.StoreOss:
-		imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
+		//imgBaseUrl = this.BaseController.OssDomain + "/projects/" + identify
+		imgBaseUrl = "/projects/" + identify
 	}
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
