@@ -59,9 +59,10 @@ func (m *DocumentHistory) Find(id int) (*DocumentHistory, error) {
 //清空指定文档的历史.
 func (m *DocumentHistory) Clear(doc_id int) error {
 	o := orm.NewOrm()
-
 	_, err := o.Raw("DELETE from md_document_history WHERE document_id = ?", doc_id).Exec()
-
+	if err==nil{
+		m.DeleteByDocumentId(doc_id)
+	}
 	return err
 }
 
