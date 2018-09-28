@@ -17,7 +17,7 @@ type BookMemberController struct {
 func (this *BookMemberController) AddMember() {
 	identify := this.GetString("identify")
 	account := this.GetString("account")
-	role_id, _ := this.GetInt("role_id", 3)
+	roleId, _ := this.GetInt("role_id", 3)
 
 	if identify == "" || account == "" {
 		this.JsonResult(6001, "参数错误")
@@ -44,34 +44,34 @@ func (this *BookMemberController) AddMember() {
 	relationship := models.NewRelationship()
 	relationship.BookId = book.BookId
 	relationship.MemberId = member.MemberId
-	relationship.RoleId = role_id
+	relationship.RoleId = roleId
 
-	if err := relationship.Insert(); err == nil {
-		memberRelationshipResult := models.NewMemberRelationshipResult().FromMember(member)
-		memberRelationshipResult.RoleId = role_id
-		memberRelationshipResult.RelationshipId = relationship.RelationshipId
-		memberRelationshipResult.BookId = book.BookId
-		memberRelationshipResult.ResolveRoleName()
-
-		this.JsonResult(0, "ok", memberRelationshipResult)
+	if err := relationship.Insert(); err != nil {
+		this.JsonResult(500, err.Error())
 	}
-	this.JsonResult(500, err.Error())
+
+	result := models.NewMemberRelationshipResult().FromMember(member)
+	result.RoleId = roleId
+	result.RelationshipId = relationship.RelationshipId
+	result.BookId = book.BookId
+	result.ResolveRoleName()
+	this.JsonResult(0, "ok", result)
 }
 
 // 变更指定用户在指定项目中的权限
 func (this *BookMemberController) ChangeRole() {
 	identify := this.GetString("identify")
-	member_id, _ := this.GetInt("member_id", 0)
+	memberId, _ := this.GetInt("member_id", 0)
 	role, _ := this.GetInt("role_id", 0)
 
-	if identify == "" || member_id <= 0 {
+	if identify == "" || memberId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
-	if member_id == this.Member.MemberId {
+	if memberId == this.Member.MemberId {
 		this.JsonResult(6006, "不能变更自己的权限")
 	}
-	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
+	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 	if err != nil {
 		if err == models.ErrPermissionDenied {
 			this.JsonResult(403, "权限不足")
@@ -81,44 +81,46 @@ func (this *BookMemberController) ChangeRole() {
 		}
 		this.JsonResult(6002, err.Error())
 	}
+
 	if book.RoleId != 0 && book.RoleId != 1 {
 		this.JsonResult(403, "权限不足")
 	}
 
 	member := models.NewMember()
 
-	if _, err := member.Find(member_id); err != nil {
+	if _, err := member.Find(memberId); err != nil {
 		this.JsonResult(6003, "用户不存在")
 	}
+
 	if member.Status == 1 {
 		this.JsonResult(6004, "用户已被禁用")
 	}
 
-	relationship, err := models.NewRelationship().UpdateRoleId(book.BookId, member_id, role)
+	relationship, err := models.NewRelationship().UpdateRoleId(book.BookId, memberId, role)
 
 	if err != nil {
 		logs.Error("变更用户在项目中的权限 => ", err)
 		this.JsonResult(6005, err.Error())
 	}
 
-	memberRelationshipResult := models.NewMemberRelationshipResult().FromMember(member)
-	memberRelationshipResult.RoleId = relationship.RoleId
-	memberRelationshipResult.RelationshipId = relationship.RelationshipId
-	memberRelationshipResult.BookId = book.BookId
-	memberRelationshipResult.ResolveRoleName()
+	result := models.NewMemberRelationshipResult().FromMember(member)
+	result.RoleId = relationship.RoleId
+	result.RelationshipId = relationship.RelationshipId
+	result.BookId = book.BookId
+	result.ResolveRoleName()
 
-	this.JsonResult(0, "ok", memberRelationshipResult)
+	this.JsonResult(0, "ok", result)
 }
 
 // 删除参与者.
 func (this *BookMemberController) RemoveMember() {
 	identify := this.GetString("identify")
-	member_id, _ := this.GetInt("member_id", 0)
+	memberId, _ := this.GetInt("member_id", 0)
 
-	if identify == "" || member_id <= 0 {
+	if identify == "" || memberId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
-	if member_id == this.Member.MemberId {
+	if memberId == this.Member.MemberId {
 		this.JsonResult(6006, "不能删除自己")
 	}
 	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
@@ -136,8 +138,8 @@ func (this *BookMemberController) RemoveMember() {
 	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
 		this.JsonResult(403, "权限不足")
 	}
-	err = models.NewRelationship().DeleteByBookIdAndMemberId(book.BookId, member_id)
 
+	err = models.NewRelationship().DeleteByBookIdAndMemberId(book.BookId, memberId)
 	if err != nil {
 		this.JsonResult(6007, err.Error())
 	}

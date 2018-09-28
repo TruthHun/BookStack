@@ -60,8 +60,10 @@ func (this *BaseController) Prepare() {
 		//如果Cookie中存在登录信息，从cookie中获取用户信息
 		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
 			var remember CookieRemember
-			if err := utils.Decode(cookie, &remember); err == nil {
-				if member, err := models.NewMember().Find(remember.MemberId); err == nil {
+			err := utils.Decode(cookie, &remember)
+			if err == nil {
+				member, err := models.NewMember().Find(remember.MemberId)
+				if err == nil {
 					this.SetMember(*member)
 					this.Member = member
 				}
@@ -130,7 +132,7 @@ func (this *BaseController) JsonResult(errCode int, errMsg string, data ...inter
 		w := gzip.NewWriter(this.Ctx.ResponseWriter)
 		defer w.Close()
 		w.Write(returnJSON)
-		err = w.Flush()
+		w.Flush()
 	} else {
 		io.WriteString(this.Ctx.ResponseWriter, string(returnJSON))
 	}
@@ -170,9 +172,8 @@ func (this *BaseController) ShowErrorPage(errCode int, errMsg string) {
 //@param			page			页面标识
 //@param			defSeo			默认的seo的map，必须有title、keywords和description字段
 func (this *BaseController) GetSeoByPage(page string, defSeo map[string]string) {
-	var (
-		seo models.Seo
-	)
+	var seo models.Seo
+
 	orm.NewOrm().QueryTable(models.TableSeo).Filter("Page", page).One(&seo)
 	defSeo["sitename"] = this.Sitename
 	if seo.Id > 0 {
@@ -223,30 +224,29 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 		return errors.New("用户不存在")
 	}
 	//如果没有数据
-	if err == nil {
-		member.LastLoginTime = time.Now()
-		member.Update()
-		this.SetMember(*member)
-		var remember CookieRemember
-		remember.MemberId = member.MemberId
-		remember.Account = member.Account
-		remember.Time = time.Now()
-		v, err := utils.Encode(remember)
-		if err == nil {
-			this.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
-		}
-	} else {
+	if err != nil {
 		return err
 	}
-	return
+	member.LastLoginTime = time.Now()
+	member.Update()
+	this.SetMember(*member)
+	var remember CookieRemember
+	remember.MemberId = member.MemberId
+	remember.Account = member.Account
+	remember.Time = time.Now()
+	v, err := utils.Encode(remember)
+	if err == nil {
+		this.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
+	}
+	return err
 }
 
 //在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
-func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id int) {
+func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) {
 	debug := beego.AppConfig.String("runmod") != "prod"
 	o := orm.NewOrm()
-	qs := o.QueryTable("md_documents").Filter("book_id", book_id)
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr))
+	qs := o.QueryTable("md_documents").Filter("book_id", bookId)
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
 	if err != nil {
 		beego.Error(err)
 	}
@@ -281,17 +281,17 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id 
 	}
 	if len(hrefs) > 0 { //存在未创建的文档，先创建
 		ModelStore := new(models.DocumentStore)
-		for identify, doc_name := range hrefs {
+		for identify, docName := range hrefs {
 			doc := models.Document{
-				BookId:       book_id,
+				BookId:       bookId,
 				Identify:     identify,
-				DocumentName: doc_name,
+				DocumentName: docName,
 				CreateTime:   time.Now(),
 				ModifyTime:   time.Now(),
 			}
-			if doc_id, err := doc.InsertOrUpdate(); err == nil {
+			if docId, err := doc.InsertOrUpdate(); err == nil {
 				ModelStore.InsertOrUpdate(models.DocumentStore{
-					DocumentId: int(doc_id),
+					DocumentId: int(docId),
 					Markdown:   "[TOC]\n\r\n\r",
 				})
 			}
@@ -300,10 +300,10 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id 
 	}
 
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-		doc_name := selection.Text()
+		docName := selection.Text()
 		pid := 0
-		if docid, exist := selection.Attr("data-pid"); exist {
-			doc_id, _ := strconv.Atoi(docid)
+		if docId, exist := selection.Attr("data-pid"); exist {
+			did, _ := strconv.Atoi(docId)
 			eleParent := selection.Parent().Parent().Parent()
 			if eleParent.Is("li") {
 				fst := eleParent.Find("a").First()
@@ -311,9 +311,9 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id 
 				//如果这里的pid为0，表示数据库还没存在这个标识，需要创建
 				pid, _ = strconv.Atoi(pidstr)
 			}
-			if doc_id > 0 {
-				qs.Filter("document_id", doc_id).Update(orm.Params{
-					"parent_id": pid, "document_name": doc_name,
+			if did > 0 {
+				qs.Filter("document_id", did).Update(orm.Params{
+					"parent_id": pid, "document_name": docName,
 					"order_sort": idx, "modify_time": time.Now(),
 				})
 			}
@@ -329,7 +329,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id 
 			}
 
 			if _, err := qs.Filter("identify", identify).Update(orm.Params{
-				"parent_id": pid, "document_name": doc_name,
+				"parent_id": pid, "document_name": docName,
 				"order_sort": idx, "modify_time": time.Now(),
 			}); err != nil {
 				beego.Error(err)
@@ -338,7 +338,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlstr string, book_id 
 		idx++
 	})
 	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
-		this.replaceLinks(bookIdentify, htmlstr, true)
+		this.replaceLinks(bookIdentify, htmlStr, true)
 	}
 }
 
@@ -352,29 +352,29 @@ type Sort struct {
 
 //替换链接
 //如果是summary，则根据这个进行排序调整
-func (this *BaseController) replaceLinks(book_identify string, doc_html string, is_summary ...bool) string {
+func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, isSummary ...bool) string {
 	var (
 		book models.Book
 		docs []models.Document
 		o    = orm.NewOrm()
 	)
-	o.QueryTable("md_books").Filter("identify", book_identify).One(&book, "book_id")
+	o.QueryTable("md_books").Filter("identify", bookIdentify).One(&book, "book_id")
 	if book.BookId > 0 {
 		o.QueryTable("md_documents").Filter("book_id", book.BookId).Limit(5000).All(&docs, "identify", "document_id")
 		if len(docs) > 0 {
 			Links := make(map[string]string)
 			for _, doc := range docs {
-				idstr := strconv.Itoa(doc.DocumentId)
+				idStr := strconv.Itoa(doc.DocumentId)
 				if len(doc.Identify) > 0 {
-					Links["$"+strings.ToLower(doc.Identify)] = beego.URLFor("DocumentController.Read", ":key", book_identify, ":id", doc.Identify) + "||" + idstr
+					Links["$"+strings.ToLower(doc.Identify)] = beego.URLFor("DocumentController.Read", ":key", bookIdentify, ":id", doc.Identify) + "||" + idStr
 				}
 				if doc.DocumentId > 0 {
-					Links["$"+strconv.Itoa(doc.DocumentId)] = beego.URLFor("DocumentController.Read", ":key", book_identify, ":id", doc.DocumentId) + "||" + idstr
+					Links["$"+strconv.Itoa(doc.DocumentId)] = beego.URLFor("DocumentController.Read", ":key", bookIdentify, ":id", doc.DocumentId) + "||" + idStr
 				}
 			}
 
 			//替换文档内容中的链接
-			if gq, err := goquery.NewDocumentFromReader(strings.NewReader(doc_html)); err == nil {
+			if gq, err := goquery.NewDocumentFromReader(strings.NewReader(docHtml)); err == nil {
 
 				gq.Find("a").Each(func(i int, selection *goquery.Selection) {
 					if href, ok := selection.Attr("href"); ok && strings.HasPrefix(href, "$") {
@@ -395,9 +395,9 @@ func (this *BaseController) replaceLinks(book_identify string, doc_html string, 
 				})
 
 				if newHtml, err := gq.Find("body").Html(); err == nil {
-					doc_html = newHtml
-					if len(is_summary) > 0 && is_summary[0] == true { //更新排序
-						this.sortBySummary(book_identify, doc_html, book.BookId) //更新排序
+					docHtml = newHtml
+					if len(isSummary) > 0 && isSummary[0] == true { //更新排序
+						this.sortBySummary(bookIdentify, docHtml, book.BookId) //更新排序
 					}
 				}
 			} else {
@@ -405,7 +405,7 @@ func (this *BaseController) replaceLinks(book_identify string, doc_html string, 
 			}
 		}
 	}
-	return doc_html
+	return docHtml
 }
 
 //内容采集
@@ -416,19 +416,18 @@ func (this *BaseController) Crawl() {
 		}
 		this.SetSession("crawl", "1")
 		defer this.DelSession("crawl")
-		urlstr := this.GetString("url")
+		urlStr := this.GetString("url")
 		force, _ := this.GetBool("force")              //是否是强力采集，强力采集，使用Chrome
 		intelligence, _ := this.GetInt("intelligence") //是否是强力采集，强力采集，使用Chrome
 		contType, _ := this.GetInt("type")
 		diySel := this.GetString("diy")
-		if content, err := utils.CrawlHtml2Markdown(urlstr, contType, force, intelligence, diySel); err != nil {
+		content, err := utils.CrawlHtml2Markdown(urlStr, contType, force, intelligence, diySel)
+		if err != nil {
 			this.JsonResult(1, "采集失败："+err.Error())
-		} else {
-			this.JsonResult(0, "采集成功", content)
 		}
-	} else {
-		this.JsonResult(1, "请先登录再操作")
+		this.JsonResult(0, "采集成功", content)
 	}
+	this.JsonResult(1, "请先登录再操作")
 }
 
 //搜索
@@ -454,9 +453,8 @@ func (this *BaseController) SetFollow() {
 	cancel, _ = new(models.Fans).FollowOrCancle(uid, this.Member.MemberId)
 	if cancel {
 		this.JsonResult(0, "您已经成功取消了关注")
-	} else {
-		this.JsonResult(0, "您已经成功关注了Ta")
 	}
+	this.JsonResult(0, "您已经成功关注了Ta")
 }
 
 // 项目静态文件

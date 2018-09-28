@@ -91,7 +91,7 @@ func (this *ManagerController) CreateMember() {
 	email := strings.TrimSpace(this.GetString("email"))
 	phone := strings.TrimSpace(this.GetString("phone"))
 	role, _ := this.GetInt("role", 1)
-	status, _ := this.GetInt("status", 0)
+	//status, _ := this.GetInt("status", 0)
 
 	if ok, err := regexp.MatchString(conf.RegexpAccount, account); account == "" || !ok || err != nil {
 		this.JsonResult(6001, "账号只能由英文字母数字组成，且在3-50个字符")
@@ -111,9 +111,9 @@ func (this *ManagerController) CreateMember() {
 	if role != 0 && role != 1 && role != 2 {
 		role = 1
 	}
-	if status != 0 && status != 1 {
-		status = 0
-	}
+	//if status != 0 && status != 1 {
+	//	status = 0
+	//}
 
 	member := models.NewMember()
 

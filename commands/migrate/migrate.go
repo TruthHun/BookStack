@@ -106,7 +106,7 @@ func RunMigration() {
 				}
 			}
 		}
-		fmt.Println("Migration successfull.")
+		fmt.Println("Migration successful.")
 		os.Exit(0)
 	}
 }

@@ -26,9 +26,7 @@ func ImageCopy(src image.Image, x, y, w, h int) (image.Image, error) {
 	return subImg, nil
 }
 
-func ImageCopyFromFile(p string, x, y, w, h int) (image.Image, error) {
-	var src image.Image
-
+func ImageCopyFromFile(p string, x, y, w, h int) (src image.Image, err error) {
 	file, err := os.Open(p)
 	if err != nil {
 		return src, err

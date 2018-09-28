@@ -66,7 +66,7 @@ func init() {
 	beego.Router("/book/:key/generate", &controllers.BookController{}, "get,post:Generate")
 	beego.Router("/book/:key/sort", &controllers.BookController{}, "post:SaveSort")
 
-	beego.Router("/book/create", &controllers.BookController{}, "*:Create")
+	beego.Router("/book/create", &controllers.BookController{}, "post:Create")
 	beego.Router("/book/users/create", &controllers.BookMemberController{}, "post:AddMember")
 	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")
 	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember")

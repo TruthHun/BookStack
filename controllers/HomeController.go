@@ -26,20 +26,24 @@ func (this *HomeController) Index() {
 		cate      models.Category
 		tabName   = map[string]string{"recommend": "站长推荐", "latest": "最新发布", "popular": "热门书籍"}
 	)
+
 	tab = strings.ToLower(this.GetString("tab"))
 	switch tab {
 	case "recommend", "popular", "latest":
 	default:
 		tab = "latest"
 	}
+
 	if cid, _ = this.GetInt("cid"); cid > 0 {
 		ModelCate := new(models.Category)
 		cate = ModelCate.Find(cid)
 		this.Data["Cate"] = cate
 	}
+
 	this.Data["Cid"] = cid
 	this.TplName = "home/index.html"
 	this.Data["IsHome"] = true
+
 	//如果没有开启匿名访问，则跳转到登录页面
 	if !this.EnableAnonymous && this.Member == nil {
 		this.Redirect(beego.URLFor("AccountController.Login"), 302)
@@ -63,13 +67,12 @@ func (this *HomeController) Index() {
 	} else {
 		this.Data["PageHtml"] = ""
 	}
+
 	this.Data["TotalPages"] = int(math.Ceil(float64(totalCount) / float64(pageSize)))
-
 	this.Data["Lists"] = books
-
 	this.Data["Tab"] = tab
-
 	title := this.Sitename
+
 	if cid > 0 {
 		title = "[分类] " + cate.Title + " - " + tabName[tab] + " - " + title
 	}

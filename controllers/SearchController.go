@@ -16,7 +16,6 @@ type SearchController struct {
 }
 
 func (this *SearchController) Index() {
-	this.Prepare()
 	this.TplName = "search/index.html"
 
 	//如果没有开启你们访问则跳转到登录

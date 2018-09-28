@@ -85,14 +85,14 @@ func ScoreFloat(score int) string {
 //@param            body            邮件内容
 func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
 	msg := &mail.Message{
-		mail.Header{
+		Header: mail.Header{
 			"From":         {conf.FormUserName},
 			"To":           {email},
 			"Reply-To":     {conf.ReplyUserName},
 			"Subject":      {subject},
 			"Content-Type": {"text/html"},
 		},
-		strings.NewReader(body),
+		Body: strings.NewReader(body),
 	}
 	port := conf.SmtpPort
 	host := conf.SmtpHost
