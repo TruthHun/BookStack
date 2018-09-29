@@ -78,94 +78,89 @@ func NewBook() *Book {
 	return &Book{}
 }
 
-func (m *Book) Insert() error {
+func (m *Book) Insert() (err error) {
 	o := orm.NewOrm()
-	_, err := o.Insert(m)
-	if err == nil {
-		if m.Label != "" {
-			NewLabel().InsertOrUpdateMulti(m.Label)
+	if _, err = o.Insert(m); err != nil {
+		return
+	}
+
+	if m.Label != "" {
+		NewLabel().InsertOrUpdateMulti(m.Label)
+	}
+
+	relationship := NewRelationship()
+	relationship.BookId = m.BookId
+	relationship.RoleId = 0
+	relationship.MemberId = m.MemberId
+
+	if err = relationship.Insert(); err != nil {
+		logs.Error("插入项目与用户关联 => ", err)
+		return err
+	}
+
+	document := NewDocument()
+	document.BookId = m.BookId
+	document.DocumentName = "空白文档"
+	document.Identify = "blank"
+	document.MemberId = m.MemberId
+
+	var id int64
+	if id, err = document.InsertOrUpdate(); err == nil {
+		var ds = DocumentStore{
+			DocumentId: int(id),
+			Markdown:   "[TOC]\n\r\n\r", //默认内容
 		}
-		relationship := NewRelationship()
-		relationship.BookId = m.BookId
-		relationship.RoleId = 0
-		relationship.MemberId = m.MemberId
-		if err = relationship.Insert(); err != nil {
-			logs.Error("插入项目与用户关联 => ", err)
-			return err
-		}
-		document := NewDocument()
-		document.BookId = m.BookId
-		document.DocumentName = "空白文档"
-		document.Identify = "blank"
-		document.MemberId = m.MemberId
-		if id, err := document.InsertOrUpdate(); err == nil {
-			var ds = DocumentStore{
-				DocumentId: int(id),
-				Markdown:   "[TOC]\n\r\n\r", //默认内容
-			}
-			err = new(DocumentStore).InsertOrUpdate(ds)
-			return err
-		}
+		err = new(DocumentStore).InsertOrUpdate(ds)
 	}
 	return err
 }
 
-func (m *Book) Find(id int) (*Book, error) {
+func (m *Book) Find(id int) (book *Book, err error) {
 	if id <= 0 {
-		return m, ErrInvalidParameter
+		return
 	}
+
 	o := orm.NewOrm()
-
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(m)
-
-	return m, err
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(book)
+	return
 }
 
-func (m *Book) Update(cols ...string) error {
+func (m *Book) Update(cols ...string) (err error) {
 	o := orm.NewOrm()
 
 	temp := NewBook()
 	temp.BookId = m.BookId
 
-	if err := o.Read(temp); err != nil {
+	if err = o.Read(temp); err != nil {
 		return err
 	}
 
 	if (m.Label + temp.Label) != "" {
-
 		go NewLabel().InsertOrUpdateMulti(m.Label + "," + temp.Label)
 	}
 
-	_, err := o.Update(m, cols...)
+	_, err = o.Update(m, cols...)
 	return err
 }
 
 //根据指定字段查询结果集.
-func (m *Book) FindByField(field string, value interface{}) ([]*Book, error) {
+func (m *Book) FindByField(field string, value interface{}) (books []*Book, err error) {
 	o := orm.NewOrm()
-
-	var books []*Book
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).All(&books)
-
-	return books, err
+	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).All(&books)
+	return
 }
 
 //根据指定字段查询一个结果.
-func (m *Book) FindByFieldFirst(field string, value interface{}) (*Book, error) {
+func (m *Book) FindByFieldFirst(field string, value interface{}) (book *Book, err error) {
 	o := orm.NewOrm()
-
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(m)
-
-	return m, err
-
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(book)
+	return
 }
 
-func (m *Book) FindByIdentify(identify string) (*Book, error) {
+func (m *Book) FindByIdentify(identify string) (book *Book, err error) {
 	o := orm.NewOrm()
-
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter("identify", identify).One(m)
-
-	return m, err
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("identify", identify).One(book)
+	return
 }
 
 //分页查询指定用户的项目
@@ -175,28 +170,28 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	relationship := NewRelationship()
 
 	o := orm.NewOrm()
-
 	sql1 := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
 		relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? WHERE rel.relationship_id > 0 "
 	if len(PrivatelyOwned) > 0 {
 		sql1 = sql1 + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
 	}
-	err = o.Raw(sql1, memberId).QueryRow(&totalCount)
 
+	err = o.Raw(sql1, memberId).QueryRow(&totalCount)
 	if err != nil {
 		return
 	}
 
 	offset := (pageIndex - 1) * pageSize
-
 	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
 		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ?" +
 		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel1 ON book.book_id=rel1.book_id  AND rel1.role_id=0" +
 		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel1.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
+
 	if len(PrivatelyOwned) > 0 {
 		sql2 = fmt.Sprintf(sql2, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
 	}
+
 	_, err = o.Raw(sql2, memberId).QueryRows(&books)
 	if err != nil {
 		logs.Error("分页查询项目列表 => ", err)
@@ -212,10 +207,11 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 				ModifyTime time.Time
 			}
 
-			err1 := o.Raw(sql, book.BookId).QueryRow(&text)
-			if err1 == nil {
+			err = o.Raw(sql, book.BookId).QueryRow(&text)
+			if err == nil {
 				books[index].LastModifyText = text.Account + " 于 " + text.ModifyTime.Format("2006-01-02 15:04:05")
 			}
+
 			if book.RoleId == 0 {
 				book.RoleName = "创始人"
 			} else if book.RoleId == 1 {
@@ -231,26 +227,30 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 }
 
 // 彻底删除项目.
-func (m *Book) ThoroughDeleteBook(id int) error {
+func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if id <= 0 {
 		return ErrInvalidParameter
 	}
+
 	o := orm.NewOrm()
 
 	m.BookId = id
-	if err := o.Read(m); err != nil {
+	if err = o.Read(m); err != nil {
 		return err
 	}
+
 	var (
 		docs  []Document
 		docId []string
 	)
+
 	o.QueryTable(new(Document)).Filter("book_id", id).Limit(10000).All(&docs, "document_id")
 	if len(docs) > 0 {
 		for _, doc := range docs {
 			docId = append(docId, strconv.Itoa(doc.DocumentId))
 		}
 	}
+
 	o.Begin()
 
 	//删除md_document_store中的文档
@@ -263,9 +263,7 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 	}
 
 	sql2 := "DELETE FROM " + NewDocument().TableNameWithPrefix() + " WHERE book_id = ?"
-
-	_, err := o.Raw(sql2, m.BookId).Exec()
-
+	_, err = o.Raw(sql2, m.BookId).Exec()
 	if err != nil {
 		o.Rollback()
 		return err
@@ -273,13 +271,12 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 	sql3 := "DELETE FROM " + m.TableNameWithPrefix() + " WHERE book_id = ?"
 
 	_, err = o.Raw(sql3, m.BookId).Exec()
-
 	if err != nil {
 		o.Rollback()
 		return err
 	}
-	sql4 := "DELETE FROM " + NewRelationship().TableNameWithPrefix() + " WHERE book_id = ?"
 
+	sql4 := "DELETE FROM " + NewRelationship().TableNameWithPrefix() + " WHERE book_id = ?"
 	_, err = o.Raw(sql4, m.BookId).Exec()
 
 	if err != nil {
@@ -291,26 +288,28 @@ func (m *Book) ThoroughDeleteBook(id int) error {
 		NewLabel().InsertOrUpdateMulti(m.Label)
 	}
 
-	if err = o.Commit(); err == nil {
-		//删除oss中项目对应的文件夹
-		switch utils.StoreType {
-		case utils.StoreLocal: //删除本地存储，记得加上uploads
-			go store.ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
-		case utils.StoreOss:
-			go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
-		}
-
-		// 删除历史记录
-		go func() {
-			history := NewDocumentHistory()
-			for _, id := range docId {
-				idInt, _ := strconv.Atoi(id)
-				history.DeleteByDocumentId(idInt)
-			}
-		}()
-
+	if err = o.Commit(); err != nil {
+		return err
 	}
-	return err
+
+	//删除oss中项目对应的文件夹
+	switch utils.StoreType {
+	case utils.StoreLocal: //删除本地存储，记得加上uploads
+		go store.ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
+	case utils.StoreOss:
+		go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)
+	}
+
+	// 删除历史记录
+	go func() {
+		history := NewDocumentHistory()
+		for _, id := range docId {
+			idInt, _ := strconv.Atoi(id)
+			history.DeleteByDocumentId(idInt)
+		}
+	}()
+
+	return
 }
 
 //首页数据
@@ -415,11 +414,11 @@ func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType 
 	//如果是登录用户
 	if member_id > 0 {
 		sql1 := "SELECT COUNT(*) FROM md_books AS book LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ? WHERE relationship_id > 0 OR book.privately_owned = 0"
-
 		err = o.Raw(sql1, member_id).QueryRow(&totalCount)
 		if err != nil {
 			return
 		}
+
 		sql2 := `SELECT book.*,rel1.*,member.account AS create_name FROM md_books AS book
 			LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ?
 			LEFT JOIN md_relationship AS rel1 ON rel1.book_id = book.book_id AND rel1.role_id = 0
@@ -427,75 +426,63 @@ func (m *Book) FindForHomeToPager(pageIndex, pageSize, member_id int, orderType 
 			WHERE rel.relationship_id > 0 OR book.privately_owned = 0 ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
 
 		_, err = o.Raw(sql2, member_id, offset, pageSize).QueryRows(&books)
-
 		return
+	}
 
-	} else {
-		count, err1 := o.QueryTable(m.TableNameWithPrefix()).Filter("privately_owned", 0).Count()
+	count, errCount := o.QueryTable(m.TableNameWithPrefix()).Filter("privately_owned", 0).Count()
+	if errCount != nil {
+		err = errCount
+		return
+	}
+	totalCount = int(count)
 
-		if err1 != nil {
-			err = err1
-			return
-		}
-		totalCount = int(count)
-
-		sql := `SELECT book.*,rel.*,member.account AS create_name FROM md_books AS book
+	sql := `SELECT book.*,rel.*,member.account AS create_name FROM md_books AS book
 			LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.role_id = 0
 			LEFT JOIN md_members AS member ON rel.member_id = member.member_id
 			WHERE book.privately_owned = 0 ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
 
-		_, err = o.Raw(sql, offset, pageSize).QueryRows(&books)
-
-		return
-
-	}
-
+	_, err = o.Raw(sql, offset, pageSize).QueryRows(&books)
+	return
 }
 
 //分页全局搜索.
-func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, member_id int) (books []*BookResult, totalCount int, err error) {
+func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, memberId int) (books []*BookResult, totalCount int, err error) {
 	o := orm.NewOrm()
 
 	keyword = "%" + keyword + "%"
 	offset := (pageIndex - 1) * pageSize
 	//如果是登录用户
-	if member_id > 0 {
+	if memberId > 0 {
 		sql1 := "SELECT COUNT(*) FROM md_books AS book LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ? WHERE (relationship_id > 0 OR book.privately_owned = 0) AND (book.label LIKE ? or book.book_name like ?) limit 1"
-
-		if err = o.Raw(sql1, member_id, keyword, keyword).QueryRow(&totalCount); err != nil {
+		if err = o.Raw(sql1, memberId, keyword, keyword).QueryRow(&totalCount); err != nil {
 			return
 		}
+
 		sql2 := `SELECT book.*,rel1.*,member.account AS create_name FROM md_books AS book
 			LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.member_id = ?
 			LEFT JOIN md_relationship AS rel1 ON rel1.book_id = book.book_id AND rel1.role_id = 0
 			LEFT JOIN md_members AS member ON rel1.member_id = member.member_id
 			WHERE (rel.relationship_id > 0 OR book.privately_owned = 0) AND  (book.label LIKE ? or book.book_name like ?) ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
 
-		_, err = o.Raw(sql2, member_id, keyword, keyword, offset, pageSize).QueryRows(&books)
-
+		_, err = o.Raw(sql2, memberId, keyword, keyword, offset, pageSize).QueryRows(&books)
 		return
+	}
 
-	} else {
-		sql1 := "select COUNT(*) from md_books where privately_owned=0 and (label LIKE ? or book_name like ?) limit 1"
-		if err = o.Raw(sql1, keyword, keyword).QueryRow(&totalCount); err != nil {
-			return
-		}
+	sql1 := "select COUNT(*) from md_books where privately_owned=0 and (label LIKE ? or book_name like ?) limit 1"
+	if err = o.Raw(sql1, keyword, keyword).QueryRow(&totalCount); err != nil {
+		return
+	}
 
-		sql := `SELECT book.*,rel.*,member.account AS create_name FROM md_books AS book
+	sql := `SELECT book.*,rel.*,member.account AS create_name FROM md_books AS book
 			LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id AND rel.role_id = 0
 			LEFT JOIN md_members AS member ON rel.member_id = member.member_id
 			WHERE book.privately_owned = 0 AND (book.label LIKE ? or book.book_name LIKE ?) ORDER BY order_index DESC ,book.book_id DESC LIMIT ?,?`
 
-		_, err = o.Raw(sql, keyword, keyword, offset, pageSize).QueryRows(&books)
-
-		return
-
-	}
+	_, err = o.Raw(sql, keyword, keyword, offset, pageSize).QueryRows(&books)
+	return
 }
 
-func (book *Book) ToBookResult() *BookResult {
-
-	m := NewBookResult()
+func (book *Book) ToBookResult() (m *BookResult) {
 
 	m.BookId = book.BookId
 	m.BookName = book.BookName
@@ -525,6 +512,7 @@ func (book *Book) ToBookResult() *BookResult {
 	if book.Theme == "" {
 		m.Theme = "default"
 	}
+
 	if book.Editor == "" {
 		m.Editor = "markdown"
 	}
@@ -532,12 +520,11 @@ func (book *Book) ToBookResult() *BookResult {
 }
 
 //重置文档数量
-func (m *Book) ResetDocumentNumber(book_id int) {
+func (m *Book) ResetDocumentNumber(bookId int) {
 	o := orm.NewOrm()
-
-	totalCount, err := o.QueryTable(NewDocument().TableNameWithPrefix()).Filter("book_id", book_id).Count()
+	totalCount, err := o.QueryTable(NewDocument().TableNameWithPrefix()).Filter("book_id", bookId).Count()
 	if err == nil {
-		o.Raw("UPDATE md_books SET doc_count = ? WHERE book_id = ?", int(totalCount), book_id).Exec()
+		o.Raw("UPDATE md_books SET doc_count = ? WHERE book_id = ?", int(totalCount), bookId).Exec()
 	} else {
 		beego.Error(err)
 	}

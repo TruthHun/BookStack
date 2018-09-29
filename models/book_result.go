@@ -51,70 +51,66 @@ func NewBookResult() *BookResult {
 }
 
 // 根据项目标识查询项目以及指定用户权限的信息.
-func (m *BookResult) FindByIdentify(identify string, member_id int) (*BookResult, error) {
-	if identify == "" || member_id <= 0 {
-		return m, ErrInvalidParameter
+func (m *BookResult) FindByIdentify(identify string, memberId int) (result *BookResult, err error) {
+	if identify == "" || memberId <= 0 {
+		return result, ErrInvalidParameter
 	}
 	o := orm.NewOrm()
 
 	book := NewBook()
 
-	err := o.QueryTable(book.TableNameWithPrefix()).Filter("identify", identify).One(book)
-
+	err = o.QueryTable(book.TableNameWithPrefix()).Filter("identify", identify).One(book)
 	if err != nil {
-		return m, err
+		return
 	}
 
 	relationship := NewRelationship()
 
-	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("member_id", member_id).One(relationship)
-
+	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("member_id", memberId).One(relationship)
 	if err != nil {
-		return m, err
+		return
 	}
+
 	var relationship2 Relationship
 
 	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("role_id", 0).One(&relationship2)
-
 	if err != nil {
 		logs.Error("根据项目标识查询项目以及指定用户权限的信息 => ", err)
-		return m, ErrPermissionDenied
+		return result, ErrPermissionDenied
 	}
 
 	member, err := NewMember().Find(relationship2.MemberId)
 	if err != nil {
-		return m, err
+		return result, err
 	}
 
-	m = book.ToBookResult()
+	result = book.ToBookResult()
 
-	m.CreateName = member.Account
-	m.MemberId = relationship.MemberId
-	m.RoleId = relationship.RoleId
-	m.RelationshipId = relationship.RelationshipId
+	result.CreateName = member.Account
+	result.MemberId = relationship.MemberId
+	result.RoleId = relationship.RoleId
+	result.RelationshipId = relationship.RelationshipId
 
-	if m.RoleId == conf.BookFounder {
-		m.RoleName = "创始人"
-	} else if m.RoleId == conf.BookAdmin {
-		m.RoleName = "管理员"
-	} else if m.RoleId == conf.BookEditor {
-		m.RoleName = "编辑者"
-	} else if m.RoleId == conf.BookObserver {
-		m.RoleName = "观察者"
+	switch result.RoleId {
+	case conf.BookFounder:
+		result.RoleName = "创始人"
+	case conf.BookAdmin:
+		result.RoleName = "管理员"
+	case conf.BookEditor:
+		result.RoleName = "编辑者"
+	case conf.BookObserver:
+		result.RoleName = "观察者"
 	}
 
 	doc := NewDocument()
 
 	err = o.QueryTable(doc.TableNameWithPrefix()).Filter("book_id", book.BookId).OrderBy("modify_time").One(doc)
-
 	if err == nil {
 		member2 := NewMember()
 		member2.Find(doc.ModifyAt)
-
-		m.LastModifyText = member2.Account + " 于 " + doc.ModifyTime.Format("2006-01-02 15:04:05")
+		result.LastModifyText = member2.Account + " 于 " + doc.ModifyTime.Format("2006-01-02 15:04:05")
 	}
-
-	return m, nil
+	return
 }
 
 func (m *BookResult) FindToPager(pageIndex, pageSize int, private ...int) (books []*BookResult, totalCount int, err error) {
@@ -123,11 +119,12 @@ func (m *BookResult) FindToPager(pageIndex, pageSize int, private ...int) (books
 	if len(private) > 0 {
 		pri = private[0]
 	}
-	count, err := o.QueryTable(NewBook().TableNameWithPrefix()).Filter("privately_owned", pri).Count()
 
+	count, err := o.QueryTable(NewBook().TableNameWithPrefix()).Filter("privately_owned", pri).Count()
 	if err != nil {
 		return
 	}
+
 	totalCount = int(count)
 
 	sql := `SELECT
@@ -142,8 +139,6 @@ func (m *BookResult) FindToPager(pageIndex, pageSize int, private ...int) (books
 	}
 	sql = fmt.Sprintf(sql, condition)
 	offset := (pageIndex - 1) * pageSize
-
 	_, err = o.Raw(sql, offset, pageSize).QueryRows(&books)
-
 	return
 }

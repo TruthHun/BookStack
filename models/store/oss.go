@@ -171,8 +171,8 @@ func (o *Oss) HandleContent(htmlStr string, forPreview bool) (str string) {
 }
 
 //从HTML中提取图片文件，并删除
-func (o *Oss) DelByHtmlPics(htmlstr string) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr))
+func (o *Oss) DelByHtmlPics(htmlStr string) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
 	if err != nil {
 		beego.Error(err.Error())
 		return

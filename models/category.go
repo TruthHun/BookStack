@@ -3,10 +3,11 @@ package models
 import (
 	"strings"
 
-	"errors"
-
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
+
+	"errors"
+
 	"github.com/astaxie/beego/orm"
 )
 
@@ -26,18 +27,21 @@ type Category struct {
 
 //新增分类
 func (this *Category) AddCates(pid int, cates string) (err error) {
-	if slice := strings.Split(cates, "\n"); len(slice) > 0 {
-		o := orm.NewOrm()
-		for _, item := range slice {
-			if item = strings.TrimSpace(item); item != "" {
-				var cate = Category{
-					Pid:    pid,
-					Title:  item,
-					Status: true,
-				}
-				if o.Read(&cate, "title"); cate.Id == 0 {
-					_, err = orm.NewOrm().Insert(&cate)
-				}
+	slice := strings.Split(cates, "\n")
+	if len(slice) == 0 {
+		return
+	}
+
+	o := orm.NewOrm()
+	for _, item := range slice {
+		if item = strings.TrimSpace(item); item != "" {
+			var cate = Category{
+				Pid:    pid,
+				Title:  item,
+				Status: true,
+			}
+			if o.Read(&cate, "title"); cate.Id == 0 {
+				_, err = orm.NewOrm().Insert(&cate)
 			}
 		}
 	}
@@ -46,21 +50,26 @@ func (this *Category) AddCates(pid int, cates string) (err error) {
 
 //删除分类（如果分类下的文档项目不为0，则不允许删除）
 func (this *Category) Del(id int) (err error) {
-	o := orm.NewOrm()
 	var cate = Category{Id: id}
+
+	o := orm.NewOrm()
 	if err = o.Read(&cate); cate.Cnt > 0 { //当前分类下文档项目数量不为0，不允许删除
 		return errors.New("删除失败，当前分类下的问下项目不为0，不允许删除")
 	}
-	if _, err = o.Delete(&cate, "id"); err == nil {
-		_, err = o.QueryTable(tableCategory).Filter("pid", id).Delete()
+
+	if _, err = o.Delete(&cate, "id"); err != nil {
+		return
 	}
-	if err == nil { //删除分类图标
-		switch utils.StoreType {
-		case utils.StoreOss:
-			store.ModelStoreOss.DelFromOss(cate.Icon)
-		case utils.StoreLocal:
-			store.ModelStoreLocal.DelFiles(cate.Icon)
-		}
+	_, err = o.QueryTable(tableCategory).Filter("pid", id).Delete()
+	if err != nil { //删除分类图标
+		return
+	}
+
+	switch utils.StoreType {
+	case utils.StoreOss:
+		store.ModelStoreOss.DelFromOss(cate.Icon)
+	case utils.StoreLocal:
+		store.ModelStoreLocal.DelFiles(cate.Icon)
 	}
 	return
 }
@@ -73,6 +82,7 @@ func (this *Category) GetCates(pid int, status int) (cates []Category, err error
 	if pid > -1 {
 		qs = qs.Filter("pid", pid)
 	}
+
 	if status == 0 || status == 1 {
 		qs = qs.Filter("status", status)
 	}

@@ -48,19 +48,20 @@ type SitemapDocs struct {
 func SitemapData(page, listRows int) (totalRows int64, sitemaps []SitemapDocs) {
 	//获取公开的项目
 	var (
-		books    []Book
-		docs     []Document
-		maps     = make(map[int]string)
-		books_id []interface{}
+		books   []Book
+		docs    []Document
+		maps    = make(map[int]string)
+		booksId []interface{}
 	)
+
 	o := orm.NewOrm()
 	o.QueryTable("md_books").Filter("privately_owned", 0).Limit(100000).All(&books, "book_id", "identify")
 	if len(books) > 0 {
 		for _, book := range books {
-			books_id = append(books_id, book.BookId)
+			booksId = append(booksId, book.BookId)
 			maps[book.BookId] = book.Identify
 		}
-		q := o.QueryTable("md_documents").Filter("BookId__in", books_id...)
+		q := o.QueryTable("md_documents").Filter("BookId__in", booksId...)
 		totalRows, _ = q.Count()
 		q.Limit(listRows).Offset((page-1)*listRows).All(&docs, "document_id", "document_name", "book_id")
 		if len(docs) > 0 {

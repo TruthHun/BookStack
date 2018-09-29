@@ -62,19 +62,18 @@ func (m *Comment) Find(id int) (*Comment, error) {
 	return m, err
 }
 
-func (m *Comment) Update(cols ...string) error {
+func (m *Comment) Update(cols ...string) (err error) {
 	o := orm.NewOrm()
-
-	_, err := o.Update(m, cols...)
-
+	_, err = o.Update(m, cols...)
 	return err
 }
 
 //Insert 添加一条评论.
-func (m *Comment) Insert() error {
+func (m *Comment) Insert() (err error) {
 	if m.DocumentId <= 0 {
 		return errors.New("评论文档不存在")
 	}
+
 	if m.Content == "" {
 		return ErrCommentContentNotEmpty
 	}
@@ -84,35 +83,40 @@ func (m *Comment) Insert() error {
 	if m.CommentId > 0 {
 		comment := NewComment()
 		//如果父评论不存在
-		if err := o.Read(comment); err != nil {
+		if err = o.Read(comment); err != nil {
 			return err
 		}
 	}
 
 	document := NewDocument()
 	//如果评论的文档不存在
-	if _, err := document.Find(m.DocumentId); err != nil {
+	if _, err = document.Find(m.DocumentId); err != nil {
 		return err
 	}
-	book, err := NewBook().Find(document.BookId)
-	//如果评论的项目不存在
-	if err != nil {
+
+	var book *Book
+	book, err = NewBook().Find(document.BookId)
+	if err != nil { //如果评论的项目不存在
 		return err
 	}
+
 	//如果已关闭评论
 	if book.CommentStatus == "closed" {
 		return ErrCommentClosed
 	}
+
 	if book.CommentStatus == "registered_only" && m.MemberId <= 0 {
 		return ErrPermissionDenied
 	}
+
 	//如果仅参与者评论
 	if book.CommentStatus == "group_only" {
 		if m.MemberId <= 0 {
 			return ErrPermissionDenied
 		}
+
 		rel := NewRelationship()
-		if _, err := rel.FindForRoleId(book.BookId, m.MemberId); err != nil {
+		if _, err = rel.FindForRoleId(book.BookId, m.MemberId); err != nil {
 			return ErrPermissionDenied
 		}
 	}
@@ -120,9 +124,10 @@ func (m *Comment) Insert() error {
 	if m.MemberId > 0 {
 		member := NewMember()
 		//如果用户不存在
-		if _, err := member.Find(m.MemberId); err != nil {
+		if _, err = member.Find(m.MemberId); err != nil {
 			return ErrMemberNoExist
 		}
+
 		//如果用户被禁用
 		if member.Status == 1 {
 			return ErrMemberDisabled
@@ -132,6 +137,5 @@ func (m *Comment) Insert() error {
 	}
 	m.BookId = book.BookId
 	_, err = o.Insert(m)
-
 	return err
 }

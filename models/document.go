@@ -77,17 +77,18 @@ func NewDocument() *Document {
 }
 
 //根据文档ID查询指定文档.
-func (m *Document) Find(id int) (*Document, error) {
+func (m *Document) Find(id int) (doc *Document, err error) {
 	if id <= 0 {
 		return m, ErrInvalidParameter
 	}
+
 	o := orm.NewOrm()
 
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", id).One(m)
-
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", id).One(m)
 	if err == orm.ErrNoRows {
 		return m, ErrDataNotExist
 	}
+
 	return m, nil
 }
 
@@ -99,18 +100,19 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	m.ModifyTime = time.Now()
 	if m.DocumentId > 0 { //文档id存在，则更新
 		_, err = o.Update(m, cols...)
-	} else {
-		var mm Document
-		//直接查询一个字段，优化MySQL IO
-		o.QueryTable("md_documents").Filter("identify", m.Identify).Filter("book_id", m.BookId).One(&mm, "document_id")
-		if mm.DocumentId == 0 {
-			m.CreateTime = time.Now()
-			id, err = o.Insert(m)
-			NewBook().ResetDocumentNumber(m.BookId)
-		} else { //identify存在，则执行更新
-			_, err = o.Update(m)
-			id = int64(mm.DocumentId)
-		}
+		return
+	}
+
+	var mm Document
+	//直接查询一个字段，优化MySQL IO
+	o.QueryTable("md_documents").Filter("identify", m.Identify).Filter("book_id", m.BookId).One(&mm, "document_id")
+	if mm.DocumentId == 0 {
+		m.CreateTime = time.Now()
+		id, err = o.Insert(m)
+		NewBook().ResetDocumentNumber(m.BookId)
+	} else { //identify存在，则执行更新
+		_, err = o.Update(m)
+		id = int64(mm.DocumentId)
 	}
 	return
 }
@@ -118,9 +120,7 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 //根据指定字段查询一条文档.
 func (m *Document) FindByFieldFirst(field string, v interface{}) (*Document, error) {
 	o := orm.NewOrm()
-
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter(field, v).One(m)
-
 	return m, err
 }
 
@@ -131,41 +131,39 @@ func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Do
 }
 
 //递归删除一个文档.
-func (m *Document) RecursiveDocument(doc_id int) error {
+func (m *Document) RecursiveDocument(docId int) error {
 
 	o := orm.NewOrm()
 	modelStore := new(DocumentStore)
 
-	if doc, err := m.Find(doc_id); err == nil {
+	if doc, err := m.Find(docId); err == nil {
 		o.Delete(doc)
-		modelStore.DeleteById(doc_id)
-		NewDocumentHistory().Clear(doc_id)
+		modelStore.DeleteById(docId)
+		NewDocumentHistory().Clear(docId)
 	}
 
 	var docs []*Document
 
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("parent_id", doc_id).All(&docs)
-
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("parent_id", docId).All(&docs)
 	if err != nil {
 		beego.Error("RecursiveDocument => ", err)
 		return err
 	}
 
 	for _, item := range docs {
-		doc_id := item.DocumentId
-		o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).Delete()
+		docId := item.DocumentId
+		o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", docId).Delete()
 		//删除document_store表的文档
-		modelStore.DeleteById(doc_id)
-		m.RecursiveDocument(doc_id)
+		modelStore.DeleteById(docId)
+		m.RecursiveDocument(docId)
 	}
-
 	return nil
 }
 
 //发布文档
-func (m *Document) ReleaseContent(book_id int, base_url string) {
-	utils.BooksRelease.Set(book_id)
-	defer utils.BooksRelease.Delete(book_id)
+func (m *Document) ReleaseContent(bookId int, baseUrl string) {
+	utils.BooksRelease.Set(bookId)
+	defer utils.BooksRelease.Delete(bookId)
 
 	//发布的时间戳
 	releaseTime := time.Now()
@@ -177,16 +175,18 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 		tableBooks = "md_books"
 		releaseNum = 0 //发布的文档数量，用于生成PDF、epub、mobi文档
 	)
-	qs := o.QueryTable(tableBooks).Filter("book_id", book_id)
+
+	qs := o.QueryTable(tableBooks).Filter("book_id", bookId)
 	qs.One(&book)
 	//查询更新时间大于项目发布时间的文档
 	//_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("modify_time__gt", book.ReleaseTime).All(&docs, "document_id")
 	//全部重新发布
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).All(&docs, "document_id")
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).All(&docs, "document_id")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
 	}
+
 	idx := 1
 	ModelStore := new(DocumentStore)
 	for _, item := range docs {
@@ -201,10 +201,10 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 			idx++
 		} else {
 			item.Release = content
-			attach_list, err := NewAttachment().FindListByDocumentId(item.DocumentId)
-			if err == nil && len(attach_list) > 0 {
+			attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
+			if err == nil && len(attachList) > 0 {
 				content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
-				for _, attach := range attach_list {
+				for _, attach := range attachList {
 					li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
 					content.WriteString(li)
 				}
@@ -227,10 +227,11 @@ func (m *Document) ReleaseContent(book_id int, base_url string) {
 	}); err != nil {
 		beego.Error(err.Error())
 	}
+
 }
 
 //离线文档生成
-func (m *Document) GenerateBook(book *Book, base_url string) {
+func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	//将书籍id加入进去，表示正在生成离线文档
 	utils.BooksGenerate.Set(book.BookId)
 	defer utils.BooksGenerate.Delete(book.BookId) //最后移除
@@ -319,7 +320,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 						if utils.StoreType == utils.StoreOss {
 							pic = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + strings.TrimLeft(src, "./")
 						} else {
-							pic = base_url + src
+							pic = baseUrl + src
 						}
 					}
 					//下载图片，放到folder目录下
@@ -348,7 +349,7 @@ func (m *Document) GenerateBook(book *Book, base_url string) {
 		}
 
 		//生成html
-		if htmlstr, err := utils.ExecuteViewPathTemplate("document/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": base_url, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+		if htmlstr, err := utils.ExecuteViewPathTemplate("document/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": baseUrl, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
 			htmlname := folder + toc.Link
 			ioutil.WriteFile(htmlname, []byte(htmlstr), os.ModePerm)
 		} else {

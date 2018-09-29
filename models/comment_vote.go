@@ -37,15 +37,13 @@ func (u *CommentVote) TableUnique() [][]string {
 func NewCommentVote() *CommentVote {
 	return &CommentVote{}
 }
-func (m *CommentVote) InsertOrUpdate() (*CommentVote, error) {
+
+func (m *CommentVote) InsertOrUpdate() (cv *CommentVote, err error) {
 	o := orm.NewOrm()
-
 	if m.VoteId > 0 {
-		_, err := o.Update(m)
-		return m, err
-	} else {
-		_, err := o.Insert(m)
-
+		_, err = o.Update(m)
 		return m, err
 	}
+	_, err = o.Insert(m)
+	return m, err
 }

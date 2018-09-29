@@ -2,15 +2,13 @@
 package models
 
 import (
-	"time"
-
 	"os"
+	"time"
 
 	"strings"
 
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/utils"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -47,9 +45,7 @@ func NewAttachment() *Attachment {
 
 func (m *Attachment) Insert() error {
 	o := orm.NewOrm()
-
 	_, err := o.Insert(m)
-
 	return err
 }
 func (m *Attachment) Update() error {
@@ -58,18 +54,14 @@ func (m *Attachment) Update() error {
 	return err
 }
 
-func (m *Attachment) Delete() error {
+func (m *Attachment) Delete() (err error) {
 	o := orm.NewOrm()
 
-	_, err := o.Delete(m)
-
-	if err == nil {
-		if err1 := os.Remove(m.FilePath); err1 != nil {
-			beego.Error(err1)
-		}
+	if _, err = o.Delete(m); err != nil {
+		return err
 	}
 
-	return err
+	return os.Remove(m.FilePath)
 }
 
 func (m *Attachment) Find(id int) (*Attachment, error) {
@@ -77,15 +69,12 @@ func (m *Attachment) Find(id int) (*Attachment, error) {
 		return m, ErrInvalidParameter
 	}
 	o := orm.NewOrm()
-
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter("attachment_id", id).One(m)
-
 	return m, err
 }
 
 func (m *Attachment) FindListByDocumentId(doc_id int) (attaches []*Attachment, err error) {
 	o := orm.NewOrm()
-
 	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).OrderBy("-attachment_id").All(&attaches)
 	return
 }
@@ -95,14 +84,13 @@ func (m *Attachment) FindToPager(pageIndex, pageSize int) (attachList []*Attachm
 	o := orm.NewOrm()
 
 	totalCount, err = o.QueryTable(m.TableNameWithPrefix()).Count()
-
 	if err != nil {
 		return
 	}
+
 	offset := (pageIndex - 1) * pageSize
 
 	var list []*Attachment
-
 	_, err = o.QueryTable(m.TableNameWithPrefix()).OrderBy("-attachment_id").Offset(offset).Limit(pageSize).All(&list)
 
 	if err != nil {
@@ -115,21 +103,19 @@ func (m *Attachment) FindToPager(pageIndex, pageSize int) (attachList []*Attachm
 		attach.FileShortSize = utils.FormatBytes(int64(attach.FileSize))
 
 		book := NewBook()
-
 		if e := o.QueryTable(book.TableNameWithPrefix()).Filter("book_id", item.BookId).One(book, "book_name"); e == nil {
 			attach.BookName = book.BookName
 		} else {
 			attach.BookName = "[不存在]"
 		}
-		doc := NewDocument()
 
+		doc := NewDocument()
 		if e := o.QueryTable(doc.TableNameWithPrefix()).Filter("document_id", item.DocumentId).One(doc, "document_name"); e == nil {
 			attach.DocumentName = doc.DocumentName
 		} else {
 			attach.DocumentName = "[不存在]"
 		}
 		attach.LocalHttpPath = strings.Replace(item.FilePath, "\\", "/", -1)
-
 		attachList = append(attachList, attach)
 	}
 
