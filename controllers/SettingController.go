@@ -27,9 +27,6 @@ type SettingController struct {
 
 //基本信息
 func (this *SettingController) Index() {
-	this.Data["SeoTitle"] = "基本信息 - " + this.Sitename
-	this.TplName = "setting/index.html"
-	this.Data["SettingBasic"] = true
 	if this.Ctx.Input.IsPost() {
 		email := strings.TrimSpace(this.GetString("email", ""))
 		phone := strings.TrimSpace(this.GetString("phone"))
@@ -47,14 +44,13 @@ func (this *SettingController) Index() {
 		this.SetMember(*member)
 		this.JsonResult(0, "ok")
 	}
+	this.Data["SeoTitle"] = "基本信息 - " + this.Sitename
+	this.Data["SettingBasic"] = true
+	this.TplName = "setting/index.html"
 }
 
 //修改密码
 func (this *SettingController) Password() {
-
-	this.TplName = "setting/password.html"
-	this.Data["SettingPwd"] = true
-	this.Data["SeoTitle"] = "修改密码 - " + this.Sitename
 
 	if this.Ctx.Input.IsPost() {
 		if this.Member.AuthMethod == conf.AuthMethodLDAP {
@@ -63,7 +59,6 @@ func (this *SettingController) Password() {
 		password1 := this.GetString("password1")
 		password2 := this.GetString("password2")
 		password3 := this.GetString("password3")
-
 		if password1 == "" {
 			this.JsonResult(6003, "原密码不能为空")
 		}
@@ -71,28 +66,39 @@ func (this *SettingController) Password() {
 		if password2 == "" {
 			this.JsonResult(6004, "新密码不能为空")
 		}
+
 		if count := strings.Count(password2, ""); count < 6 || count > 18 {
 			this.JsonResult(6009, "密码必须在6-18字之间")
 		}
+
 		if password2 != password3 {
 			this.JsonResult(6003, "确认密码不正确")
 		}
+
 		if ok, _ := utils.PasswordVerify(this.Member.Password, password1); !ok {
 			this.JsonResult(6005, "原始密码不正确")
 		}
+
 		if password1 == password2 {
 			this.JsonResult(6006, "新密码不能和原始密码相同")
 		}
+
 		pwd, err := utils.PasswordHash(password2)
 		if err != nil {
 			this.JsonResult(6007, "密码加密失败")
 		}
+
 		this.Member.Password = pwd
 		if err := this.Member.Update(); err != nil {
 			this.JsonResult(6008, err.Error())
 		}
+
 		this.JsonResult(0, "ok")
 	}
+
+	this.Data["SettingPwd"] = true
+	this.Data["SeoTitle"] = "修改密码 - " + this.Sitename
+	this.TplName = "setting/password.html"
 }
 
 //收藏
@@ -101,19 +107,21 @@ func (this *SettingController) Star() {
 	if page < 1 {
 		page = 1
 	}
-	this.TplName = "setting/star.html"
-	this.Data["SettingStar"] = true
-	this.Data["SeoTitle"] = "我的收藏 - " + this.Sitename
+
 	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, conf.PageSize)
 	if cnt > 1 {
 		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, page, listRows, int(cnt))
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(cnt), conf.PageSize, page, beego.URLFor("SettingController.Star"), "")
 	}
 	this.Data["Books"] = books
+	this.Data["SettingStar"] = true
+	this.Data["SeoTitle"] = "我的收藏 - " + this.Sitename
+	this.TplName = "setting/star.html"
 }
 
 //二维码
 func (this *SettingController) Qrcode() {
+
 	if this.Ctx.Input.IsPost() {
 		file, moreFile, err := this.GetFile("qrcode")
 		alipay := true
@@ -131,24 +139,24 @@ func (this *SettingController) Qrcode() {
 			this.JsonResult(500, "不支持的图片格式")
 		}
 
-		savepath := fmt.Sprintf("uploads/qrcode/%v/%v%v", this.Member.MemberId, time.Now().Unix(), ext)
-		os.MkdirAll(filepath.Dir(savepath), 0777)
-		if err = this.SaveToFile("qrcode", savepath); err != nil {
-			this.JsonResult(1, "二维码保存失败", savepath)
+		savePath := fmt.Sprintf("uploads/qrcode/%v/%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+		os.MkdirAll(filepath.Dir(savePath), 0777)
+		if err = this.SaveToFile("qrcode", savePath); err != nil {
+			this.JsonResult(1, "二维码保存失败", savePath)
 		}
 		url := ""
 		switch utils.StoreType {
 		case utils.StoreOss:
-			if err := store.ModelStoreOss.MoveToOss(savepath, savepath, true, false); err != nil {
+			if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
 				beego.Error(err.Error())
 			} else {
-				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savepath
+				url = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/" + savePath
 			}
 		case utils.StoreLocal:
-			if err := store.ModelStoreLocal.MoveToStore(savepath, savepath); err != nil {
+			if err := store.ModelStoreLocal.MoveToStore(savePath, savePath); err != nil {
 				beego.Error(err.Error())
 			} else {
-				url = "/" + savepath
+				url = "/" + savePath
 			}
 		}
 
@@ -160,10 +168,10 @@ func (this *SettingController) Qrcode() {
 
 			if alipay {
 				dels = append(dels, member.Alipay)
-				member.Alipay = savepath
+				member.Alipay = savePath
 			} else {
 				dels = append(dels, member.Wxpay)
-				member.Wxpay = savepath
+				member.Wxpay = savePath
 			}
 			if _, err := o.Update(&member, "wxpay", "alipay"); err == nil {
 				switch utils.StoreType {
@@ -180,26 +188,25 @@ func (this *SettingController) Qrcode() {
 			"alipay": alipay,
 		}
 		this.JsonResult(0, "二维码上传成功", data)
-	} else {
-		this.TplName = "setting/qrcode.html"
-		this.Data["SeoTitle"] = "二维码管理 - " + this.Sitename
-		this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(this.Member.MemberId)
-		this.Data["SettingQrcode"] = true
 	}
+
+	this.TplName = "setting/qrcode.html"
+	this.Data["SeoTitle"] = "二维码管理 - " + this.Sitename
+	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(this.Member.MemberId)
+	this.Data["SettingQrcode"] = true
 }
 
 // Upload 上传图片
 func (this *SettingController) Upload() {
-	file, moreFile, err := this.GetFile("image-file")
-	defer file.Close()
 
+	file, moreFile, err := this.GetFile("image-file")
 	if err != nil {
 		logs.Error("", err.Error())
 		this.JsonResult(500, "读取文件异常")
 	}
+	defer file.Close()
 
 	ext := filepath.Ext(moreFile.Filename)
-
 	if !strings.EqualFold(ext, ".png") && !strings.EqualFold(ext, ".jpg") && !strings.EqualFold(ext, ".gif") && !strings.EqualFold(ext, ".jpeg") {
 		this.JsonResult(500, "不支持的图片格式")
 	}
@@ -256,18 +263,16 @@ func (this *SettingController) Upload() {
 	}
 
 	if member, err := models.NewMember().Find(this.Member.MemberId); err == nil {
-		avater := member.Avatar
-
+		avatar := member.Avatar
 		member.Avatar = url
-		err := member.Update()
-		if err == nil {
-			if strings.HasPrefix(avater, "/uploads/") {
-				os.Remove(filepath.Join(commands.WorkingDirectory, avater))
-			}
-			this.SetMember(*member)
-		} else {
+		err = member.Update()
+		if err != nil {
 			this.JsonResult(60001, "保存头像失败")
 		}
+		if strings.HasPrefix(avatar, "/uploads/") {
+			os.Remove(filepath.Join(commands.WorkingDirectory, avatar))
+		}
+		this.SetMember(*member)
 	}
 	switch utils.StoreType {
 	case utils.StoreOss: //oss存储

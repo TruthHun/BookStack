@@ -14,13 +14,13 @@ type UserController struct {
 
 func (this *UserController) Prepare() {
 	this.BaseController.Prepare()
+
 	username := this.GetString(":username")
 	this.UcenterMember, _ = new(models.Member).GetByUsername(username)
 	if this.UcenterMember.MemberId == 0 {
 		this.Abort("404")
 		return
 	}
-
 	this.Data["IsSelf"] = this.UcenterMember.MemberId == this.Member.MemberId
 	this.Data["User"] = this.UcenterMember
 	this.Data["Tab"] = "share"
@@ -126,9 +126,4 @@ func (this *UserController) Fans() {
 	this.Data["Fans"] = fans
 	this.Data["Tab"] = "fans"
 	this.TplName = "user/fans.html"
-}
-
-//笔记列表
-func (this *UserController) NoteList() {
-
 }

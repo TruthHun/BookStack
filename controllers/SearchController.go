@@ -17,7 +17,6 @@ type SearchController struct {
 
 func (this *SearchController) Index() {
 	this.TplName = "search/index.html"
-
 	//如果没有开启你们访问则跳转到登录
 	if !this.EnableAnonymous && this.Member == nil {
 		this.Redirect(beego.URLFor("AccountController.Login"), 302)
@@ -27,35 +26,33 @@ func (this *SearchController) Index() {
 	keyword := this.GetString("keyword")
 	this.Redirect(beego.URLFor("LabelController.Index", ":key", keyword), 302)
 	return
+
 	//当搜索文档时，直接搜索标签
-
 	pageIndex, _ := this.GetInt("page", 1)
-
 	this.Data["BaseUrl"] = this.BaseUrl()
 
 	if keyword != "" {
 		this.Data["Keyword"] = keyword
-		member_id := 0
+		memberId := 0
 		if this.Member != nil {
-			member_id = this.Member.MemberId
+			memberId = this.Member.MemberId
 		}
-		search_result, totalCount, err := models.NewDocumentSearchResult().FindToPager(keyword, pageIndex, conf.PageSize, member_id)
-
+		searchResult, totalCount, err := models.NewDocumentSearchResult().FindToPager(keyword, pageIndex, conf.PageSize, memberId)
 		if err != nil {
 			beego.Error(err)
 			return
 		}
+
 		if totalCount > 0 {
 			html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
-
 			this.Data["PageHtml"] = html
 		} else {
 			this.Data["PageHtml"] = ""
 		}
-		if len(search_result) > 0 {
-			for _, item := range search_result {
-				item.DocumentName = strings.Replace(item.DocumentName, keyword, "<em>"+keyword+"</em>", -1)
 
+		if len(searchResult) > 0 {
+			for _, item := range searchResult {
+				item.DocumentName = strings.Replace(item.DocumentName, keyword, "<em>"+keyword+"</em>", -1)
 				if item.Description != "" {
 					src := item.Description
 
@@ -97,6 +94,6 @@ func (this *SearchController) Index() {
 				}
 			}
 		}
-		this.Data["Lists"] = search_result
+		this.Data["Lists"] = searchResult
 	}
 }

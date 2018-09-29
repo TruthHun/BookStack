@@ -34,38 +34,26 @@ func (this *LabelController) Index() {
 	if labelName == "" {
 		this.Abort("404")
 	}
-	//_, err := models.NewLabel().FindFirst("label_name", labelName)
-	//
-	//if err != nil {
-	//	if err == orm.ErrNoRows {
-	//		this.Abort("404")
-	//	} else {
-	//		beego.Error(err)
-	//		this.Abort("500")
-	//	}
-	//}
-
 	pageSize := 24
-	member_id := 0
+	memberId := 0
 	if this.Member != nil {
-		member_id = this.Member.MemberId
+		memberId = this.Member.MemberId
 	}
-	search_result, totalCount, err := models.NewBook().FindForLabelToPager(labelName, pageIndex, pageSize, member_id)
+	searchResult, totalCount, err := models.NewBook().FindForLabelToPager(labelName, pageIndex, pageSize, memberId)
 
 	if err != nil {
 		beego.Error(err)
 		return
 	}
+
 	if totalCount > 0 {
 		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, beego.URLFor("LabelController.Index", ":key", labelName), "")
 		this.Data["PageHtml"] = html
 	} else {
 		this.Data["PageHtml"] = ""
 	}
-	this.Data["Lists"] = search_result
-
+	this.Data["Lists"] = searchResult
 	this.Data["LabelName"] = labelName
-
 	this.GetSeoByPage("label_list", map[string]string{
 		"title":       "[标签]" + labelName,
 		"keywords":    "标签," + labelName,
@@ -82,7 +70,6 @@ func (this *LabelController) List() {
 	pageSize := 200
 
 	labels, totalCount, err := models.NewLabel().FindToPager(pageIndex, pageSize)
-
 	if err != nil {
 		this.ShowErrorPage(50001, err.Error())
 	}
@@ -95,7 +82,6 @@ func (this *LabelController) List() {
 	this.Data["TotalPages"] = int(math.Ceil(float64(totalCount) / float64(pageSize)))
 
 	this.Data["Labels"] = labels
-
 	this.GetSeoByPage("label_list", map[string]string{
 		"title":       "标签",
 		"keywords":    "标签",

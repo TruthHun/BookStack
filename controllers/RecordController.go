@@ -25,7 +25,7 @@ func (this *RecordController) List() {
 		err     error
 		rl      []models.RecordList
 		rp      models.ReadProgress
-		errcode int
+		errCode int
 		message string = "数据查询成功"
 		count   int64
 	)
@@ -45,10 +45,10 @@ func (this *RecordController) List() {
 		}
 	}
 	if len(lists) == 0 {
-		errcode = 1
+		errCode = 1
 		message = "您当前没有阅读记录"
 	}
-	this.JsonResult(errcode, message, map[string]interface{}{
+	this.JsonResult(errCode, message, map[string]interface{}{
 		"lists":    lists,
 		"count":    count,
 		"progress": rp,

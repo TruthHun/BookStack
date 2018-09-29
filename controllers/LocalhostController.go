@@ -38,11 +38,11 @@ func (this *LocalhostController) RenderMarkdown() {
 				//这里要指定更新字段，否则markdown内容会被置空
 				ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: id, Content: content}, "content")
 				this.JsonResult(0, "成功")
-			} else {
-				this.Data["Markdown"] = ModelStore.GetFiledById(id, "markdown")
-				this.TplName = "widgets/render.html"
-				return
 			}
+
+			this.Data["Markdown"] = ModelStore.GetFiledById(id, "markdown")
+			this.TplName = "widgets/render.html"
+			return
 		}
 	}
 	this.Abort("404")
