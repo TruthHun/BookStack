@@ -192,11 +192,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	for _, item := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
 		if len(utils.GetTextFromHtml(content)) == 0 {
-			//达到5个协程，休息3秒
-			//if idx%5 == 0 {
-			//	time.Sleep(3 * time.Second)
-			//}
-			//采用单线程去发布，避免用户多操作，避免Chrome启动过多导致内存、CPU等资源耗费致使服务器宕机
 			utils.RenderDocumentById(item.DocumentId)
 			idx++
 		} else {
@@ -249,6 +244,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		beego.Error(err)
 		return
 	}
+
 	var ExpCfg = converter.Config{
 		Contributor: beego.AppConfig.String("exportCreator"),
 		Cover:       "",
@@ -271,6 +267,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			"--pdf-page-margin-top", beego.AppConfig.DefaultString("exportMarginTop", "72"),
 		},
 	}
+
 	folder := fmt.Sprintf("cache/books/%v/", book.Identify)
 	os.MkdirAll(folder, os.ModePerm)
 	if !debug {
@@ -278,9 +275,9 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 
 	//生成致谢信内容
-	if htmlstr, err := utils.ExecuteViewPathTemplate("document/tpl_statement.html", map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+	if htmlStr, err := utils.ExecuteViewPathTemplate("document/tpl_statement.html", map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
 		h1Title := "说明"
-		if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr)); err == nil {
+		if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
 			h1Title = doc.Find("h1").Text()
 		}
 		toc := converter.Toc{
@@ -290,7 +287,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			Link:  "statement.html",
 		}
 		htmlname := folder + toc.Link
-		ioutil.WriteFile(htmlname, []byte(htmlstr), os.ModePerm)
+		ioutil.WriteFile(htmlname, []byte(htmlStr), os.ModePerm)
 		ExpCfg.Toc = append(ExpCfg.Toc, toc)
 	}
 	ModelStore := new(DocumentStore)
@@ -325,17 +322,17 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 					}
 					//下载图片，放到folder目录下
 					ext := ""
-					if picslice := strings.Split(pic, "?"); len(picslice) > 0 {
-						ext = filepath.Ext(picslice[0])
+					if picSlice := strings.Split(pic, "?"); len(picSlice) > 0 {
+						ext = filepath.Ext(picSlice[0])
 					}
 					filename := cryptil.Md5Crypt(pic) + ext
-					localpic := folder + filename
+					localPic := folder + filename
 					req := httplib.Get(pic).SetTimeout(5*time.Second, 5*time.Second)
 					if strings.HasPrefix(pic, "https") {
 						req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 					}
 					req.Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3298.4 Safari/537.36")
-					if err := req.ToFile(localpic); err == nil { //成功下载图片
+					if err := req.ToFile(localPic); err == nil { //成功下载图片
 						s.SetAttr("src", filename)
 					} else {
 						beego.Error("错误:", err, filename, pic)
@@ -349,9 +346,9 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		}
 
 		//生成html
-		if htmlstr, err := utils.ExecuteViewPathTemplate("document/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": baseUrl, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
-			htmlname := folder + toc.Link
-			ioutil.WriteFile(htmlname, []byte(htmlstr), os.ModePerm)
+		if htmlStr, err := utils.ExecuteViewPathTemplate("document/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": baseUrl, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+			htmlName := folder + toc.Link
+			ioutil.WriteFile(htmlName, []byte(htmlStr), os.ModePerm)
 		} else {
 			beego.Error(err.Error())
 		}
@@ -364,9 +361,9 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	} else {
 		beego.Error("css样式不存在", err)
 	}
-	cfgfile := folder + "config.json"
-	ioutil.WriteFile(cfgfile, []byte(util.InterfaceToJson(ExpCfg)), os.ModePerm)
-	if Convert, err := converter.NewConverter(cfgfile, debug); err == nil {
+	cfgFile := folder + "config.json"
+	ioutil.WriteFile(cfgFile, []byte(util.InterfaceToJson(ExpCfg)), os.ModePerm)
+	if Convert, err := converter.NewConverter(cfgFile, debug); err == nil {
 		if err := Convert.Convert(); err != nil {
 			beego.Error(err.Error())
 		}
@@ -412,25 +409,21 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			beego.Error(err)
 		}
 	}
-
-	//if _, err = orm.NewOrm().QueryTable("md_books").Filter("book_id", book.BookId).Update(orm.Params{"generate_time": NewGenerateTime}); err != nil {
-	//	beego.Error(err.Error())
-	//}
 }
 
 //根据项目ID查询文档列表.
-func (m *Document) FindListByBookId(book_id int) (docs []*Document, err error) {
+func (m *Document) FindListByBookId(bookId int) (docs []*Document, err error) {
 	o := orm.NewOrm()
-	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).OrderBy("order_sort").All(&docs)
+	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort").All(&docs)
 	return
 }
 
 //根据项目ID查询文档一级目录.
-func (m *Document) GetMenuTop(book_id int) (docs []*Document, err error) {
+func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	var docsAll []*Document
 	o := orm.NewOrm()
 	cols := []string{"document_id", "document_name", "member_id", "parent_id", "book_id", "identify"}
-	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("parent_id", 0).OrderBy("order_sort").Limit(5000).All(&docsAll, cols...)
+	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Filter("parent_id", 0).OrderBy("order_sort").Limit(5000).All(&docsAll, cols...)
 	//以"."开头的文档标识，不在阅读目录显示
 	for _, doc := range docsAll {
 		if !strings.HasPrefix(doc.Identify, ".") {
@@ -447,9 +440,9 @@ func (m *Document) BookStackAuto(bookId, docId int) (md, cont string) {
 	orm.NewOrm().QueryTable("md_documents").Filter("book_id", bookId).Filter("parent_id", docId).OrderBy("order_sort").All(&docs, "document_id", "document_name", "identify")
 	var newCont []string //新HTML内容
 	var newMd []string   //新markdown内容
-	for _, idoc := range docs {
-		newMd = append(newMd, fmt.Sprintf(`- [%v]($%v)`, idoc.DocumentName, idoc.Identify))
-		newCont = append(newCont, fmt.Sprintf(`<li><a href="$%v">%v</a></li>`, idoc.Identify, idoc.DocumentName))
+	for _, doc := range docs {
+		newMd = append(newMd, fmt.Sprintf(`- [%v]($%v)`, doc.DocumentName, doc.Identify))
+		newCont = append(newCont, fmt.Sprintf(`<li><a href="$%v">%v</a></li>`, doc.Identify, doc.DocumentName))
 	}
 	md = strings.Join(newMd, "\n")
 	cont = "<ul>" + strings.Join(newCont, "") + "</ul>"
@@ -489,7 +482,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 				//以http或者https开头
 				if strings.HasPrefix(hrefLower, "http://") || strings.HasPrefix(hrefLower, "https://") {
 					//采集文章内容成功，创建文档，填充内容，替换链接为标识
-					if retmd, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, map[string]string{"project": project}); err == nil {
+					if retMD, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, map[string]string{"project": project}); err == nil {
 						var doc Document
 						identify := strconv.Itoa(i) + ".md"
 						doc.Identify = identify
@@ -504,7 +497,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 						} else {
 							var ds DocumentStore
 							ds.DocumentId = int(docId)
-							ds.Markdown = "[TOC]\n\r\n\r" + retmd
+							ds.Markdown = "[TOC]\n\r\n\r" + retMD
 							if err := new(DocumentStore).InsertOrUpdate(ds, "markdown", "content"); err != nil {
 								beego.Error(err)
 							}

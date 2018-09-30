@@ -55,7 +55,7 @@ func (m *MemberRelationshipResult) ResolveRoleName() *MemberRelationshipResult {
 	return m
 }
 
-func (m *MemberRelationshipResult) FindForUsersByBookId(book_id, pageIndex, pageSize int) ([]*MemberRelationshipResult, int, error) {
+func (m *MemberRelationshipResult) FindForUsersByBookId(bookId, pageIndex, pageSize int) ([]*MemberRelationshipResult, int, error) {
 	o := orm.NewOrm()
 
 	var members []*MemberRelationshipResult
@@ -66,7 +66,7 @@ func (m *MemberRelationshipResult) FindForUsersByBookId(book_id, pageIndex, page
 
 	var total_count int
 
-	err := o.Raw(sql2, book_id).QueryRow(&total_count)
+	err := o.Raw(sql2, bookId).QueryRow(&total_count)
 
 	if err != nil {
 		return members, 0, err
@@ -74,7 +74,7 @@ func (m *MemberRelationshipResult) FindForUsersByBookId(book_id, pageIndex, page
 
 	offset := (pageIndex - 1) * pageSize
 
-	_, err = o.Raw(sql1, book_id, offset, pageSize).QueryRows(&members)
+	_, err = o.Raw(sql1, bookId, offset, pageSize).QueryRows(&members)
 
 	if err != nil {
 		return members, 0, err

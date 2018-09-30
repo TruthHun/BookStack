@@ -30,26 +30,26 @@ func (this *Fans) TableUnique() [][]string {
 }
 
 //关注和取消关注
-func (this *Fans) FollowOrCancle(uid, fans_id int) (cancel bool, err error) {
+func (this *Fans) FollowOrCancel(uid, fansId int) (cancel bool, err error) {
 	var fans Fans
 	o := orm.NewOrm()
-	qs := o.QueryTable(tableFans).Filter("uid", uid).Filter("fans_id", fans_id)
+	qs := o.QueryTable(tableFans).Filter("uid", uid).Filter("fans_id", fansId)
 	qs.One(&fans)
 	if fans.Id > 0 { //已关注，则取消关注
 		_, err = qs.Delete()
 		cancel = true
 	} else { //未关注，则新增关注
 		fans.Uid = uid
-		fans.FansId = fans_id
+		fans.FansId = fansId
 		_, err = o.Insert(&fans)
 	}
 	return
 }
 
 //查询是否已经关注了用户
-func (this *Fans) Relation(uid, fans_id interface{}) (ok bool) {
+func (this *Fans) Relation(uid, fansId interface{}) (ok bool) {
 	var fans Fans
-	orm.NewOrm().QueryTable(tableFans).Filter("uid", uid).Filter("fans_id", fans_id).One(&fans)
+	orm.NewOrm().QueryTable(tableFans).Filter("uid", uid).Filter("fans_id", fansId).One(&fans)
 	return fans.Id != 0
 }
 
@@ -68,15 +68,15 @@ func (this *Fans) GetFansList(uid, page, pageSize int) (fans []FansResult, total
 }
 
 //查询用户的关注（用户id作为fans_id）
-func (this *Fans) GetFollowList(fans_id, page, pageSize int) (fans []FansResult, total int64, err error) {
+func (this *Fans) GetFollowList(fansId, page, pageSize int) (fans []FansResult, total int64, err error) {
 	o := orm.NewOrm()
-	total, _ = o.QueryTable(tableFans).Filter("fans_id", fans_id).Count()
+	total, _ = o.QueryTable(tableFans).Filter("fans_id", fansId).Count()
 	if total > 0 {
 		sql := fmt.Sprintf(
 			"select m.member_id uid,m.avatar,m.account,m.nickname from md_members m left join md_fans f on m.member_id=f.uid where f.fans_id=?  order by f.id desc limit %v offset %v",
 			pageSize, (page-1)*pageSize,
 		)
-		_, err = o.Raw(sql, fans_id).QueryRows(&fans)
+		_, err = o.Raw(sql, fansId).QueryRows(&fans)
 	}
 	return
 }

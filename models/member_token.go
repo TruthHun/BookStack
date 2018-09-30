@@ -55,10 +55,10 @@ func (m *MemberToken) FindByFieldFirst(field string, value interface{}) (*Member
 	return m, err
 }
 
-func (m *MemberToken) FindSendCount(mail string, start_time time.Time, end_time time.Time) (int, error) {
+func (m *MemberToken) FindSendCount(mail string, startTime time.Time, endTime time.Time) (int, error) {
 	o := orm.NewOrm()
 
-	c, err := o.QueryTable(m.TableNameWithPrefix()).Filter("send_time__gte", start_time.Format("2006-01-02 15:04:05")).Filter("send_time__lte", end_time.Format("2006-01-02 15:04:05")).Count()
+	c, err := o.QueryTable(m.TableNameWithPrefix()).Filter("send_time__gte", startTime.Format("2006-01-02 15:04:05")).Filter("send_time__lte", endTime.Format("2006-01-02 15:04:05")).Count()
 
 	if err != nil {
 		return 0, err

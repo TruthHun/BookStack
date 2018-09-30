@@ -7,10 +7,9 @@ import (
 )
 
 type DocumentSearchResult struct {
-	DocumentId   int    `json:"doc_id"`
-	DocumentName string `json:"doc_name"`
-	// Identify 文档唯一标识
-	Identify     string    `json:"identify"`
+	DocumentId   int       `json:"doc_id"`
+	DocumentName string    `json:"doc_name"`
+	Identify     string    `json:"identify"` // Identify 文档唯一标识
 	Description  string    `json:"description"`
 	Author       string    `json:"author"`
 	ModifyTime   time.Time `json:"modify_time"`

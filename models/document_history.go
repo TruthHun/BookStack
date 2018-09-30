@@ -52,46 +52,43 @@ func NewDocumentHistory() *DocumentHistory {
 func (m *DocumentHistory) Find(id int) (*DocumentHistory, error) {
 	o := orm.NewOrm()
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter("history_id", id).One(m)
-
 	return m, err
 }
 
 //清空指定文档的历史.
-func (m *DocumentHistory) Clear(doc_id int) error {
+func (m *DocumentHistory) Clear(docId int) error {
 	o := orm.NewOrm()
-	_, err := o.Raw("DELETE from md_document_history WHERE document_id = ?", doc_id).Exec()
-	if err==nil{
-		m.DeleteByDocumentId(doc_id)
+	_, err := o.Raw("DELETE from md_document_history WHERE document_id = ?", docId).Exec()
+	if err == nil {
+		m.DeleteByDocumentId(docId)
 	}
 	return err
 }
 
 //删除历史.
-func (m *DocumentHistory) Delete(history_id, doc_id int) error {
+func (m *DocumentHistory) Delete(historyId, docId int) error {
 	o := orm.NewOrm()
-
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("history_id", history_id).Filter("document_id", doc_id).Delete()
-
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("history_id", historyId).Filter("document_id", docId).Delete()
 	return err
 }
 
 func (m *DocumentHistory) InsertOrUpdate() (history *DocumentHistory, err error) {
 	o := orm.NewOrm()
 	history = m
-	if m.HistoryId > 0 {
-		_, err = o.Update(m)
+	if history.HistoryId > 0 {
+		_, err = o.Update(history)
 	} else {
-		_, err = o.Insert(m)
+		_, err = o.Insert(history)
 	}
 	return
 }
 
 //分页查询指定文档的历史.
-func (m *DocumentHistory) FindToPager(doc_id, page_index, page_size int) (docs []*DocumentHistorySimpleResult, totalCount int, err error) {
+func (m *DocumentHistory) FindToPager(docId, pageIndex, pageSize int) (docs []*DocumentHistorySimpleResult, totalCount int, err error) {
 
 	o := orm.NewOrm()
 
-	offset := (page_index - 1) * page_size
+	offset := (pageIndex - 1) * pageSize
 
 	totalCount = 0
 
@@ -101,13 +98,13 @@ LEFT JOIN md_members AS m1 ON history.member_id = m1.member_id
 LEFT JOIN md_members AS m2 ON history.modify_at = m2.member_id
 WHERE history.document_id = ? ORDER BY history.history_id DESC LIMIT ?,?;`
 
-	_, err = o.Raw(sql, doc_id, offset, page_size).QueryRows(&docs)
+	_, err = o.Raw(sql, docId, offset, pageSize).QueryRows(&docs)
 
 	if err != nil {
 		return
 	}
 	var count int64
-	count, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).Count()
+	count, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", docId).Count()
 
 	if err != nil {
 		return
@@ -118,10 +115,10 @@ WHERE history.document_id = ? ORDER BY history.history_id DESC LIMIT ?,?;`
 }
 
 //恢复指定历史的文档.
-func (history *DocumentHistory) Restore(history_id, doc_id, uid int) error {
+func (history *DocumentHistory) Restore(historyId, docId, uid int) error {
 	o := orm.NewOrm()
 
-	err := o.QueryTable(history.TableNameWithPrefix()).Filter("history_id", history_id).Filter("document_id", doc_id).One(history)
+	err := o.QueryTable(history.TableNameWithPrefix()).Filter("history_id", historyId).Filter("document_id", docId).One(history)
 	if err != nil {
 		return err
 	}
@@ -131,12 +128,12 @@ func (history *DocumentHistory) Restore(history_id, doc_id, uid int) error {
 		return err
 	}
 
-	ds := DocumentStore{DocumentId: doc_id}
+	ds := DocumentStore{DocumentId: docId}
 	if err = o.Read(&ds); err != nil {
 		return err
 	}
 
-	vc := NewVersionControl(doc_id, history.Version)
+	vc := NewVersionControl(docId, history.Version)
 
 	html := vc.GetVersionContent(true)
 	md := vc.GetVersionContent(false)

@@ -450,7 +450,7 @@ func (this *BaseController) SetFollow() {
 	if uid == this.Member.MemberId {
 		this.JsonResult(1, "自己不能关注自己")
 	}
-	cancel, _ = new(models.Fans).FollowOrCancle(uid, this.Member.MemberId)
+	cancel, _ = new(models.Fans).FollowOrCancel(uid, this.Member.MemberId)
 	if cancel {
 		this.JsonResult(0, "您已经成功取消了关注")
 	}

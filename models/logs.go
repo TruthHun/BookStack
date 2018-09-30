@@ -9,11 +9,11 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-var loggerQueue = &logQueue{channel: make(chan *Logger, 100), isRuning: 0}
+var loggerQueue = &logQueue{channel: make(chan *Logger, 100), isRunning: 0}
 
 type logQueue struct {
-	channel  chan *Logger
-	isRuning int32
+	channel   chan *Logger
+	isRunning int32
 }
 
 // Logger struct .
@@ -58,15 +58,15 @@ func (m *Logger) Add() error {
 		return errors.New("日志内容不能为空")
 	}
 	loggerQueue.channel <- m
-	if atomic.LoadInt32(&(loggerQueue.isRuning)) <= 0 {
-		atomic.AddInt32(&(loggerQueue.isRuning), 1)
+	if atomic.LoadInt32(&(loggerQueue.isRunning)) <= 0 {
+		atomic.AddInt32(&(loggerQueue.isRunning), 1)
 		go addLoggerAsync()
 	}
 	return nil
 }
 
 func addLoggerAsync() {
-	defer atomic.AddInt32(&(loggerQueue.isRuning), -1)
+	defer atomic.AddInt32(&(loggerQueue.isRunning), -1)
 	o := orm.NewOrm()
 
 	for {

@@ -24,18 +24,18 @@ type DocumentSelected struct {
 }
 
 //获取项目的文档树状结构
-func (m *Document) FindDocumentTree(book_id int, isEdit ...bool) ([]*DocumentTree, error) {
+func (m *Document) FindDocumentTree(bookId int, isEdit ...bool) ([]*DocumentTree, error) {
 	o := orm.NewOrm()
 
 	trees := make([]*DocumentTree, 0)
 
 	var docs []*Document
 
-	count, err := o.QueryTable(m).Filter("book_id", book_id).OrderBy("order_sort", "identify").Limit(5000).All(&docs, "document_id", "version", "document_name", "parent_id", "identify")
+	count, err := o.QueryTable(m).Filter("book_id", bookId).OrderBy("order_sort", "identify").Limit(5000).All(&docs, "document_id", "version", "document_name", "parent_id", "identify")
 	if err != nil {
 		return trees, err
 	}
-	book, _ := NewBook().Find(book_id)
+	book, _ := NewBook().Find(bookId)
 
 	trees = make([]*DocumentTree, count)
 
@@ -85,12 +85,12 @@ func (m *Document) CreateDocumentTreeForHtml(bookId, selectedId int) (string, er
 }
 
 //使用递归的方式获取指定ID的顶级ID
-func getSelectedNode(array []*DocumentTree, parent_id int) int {
+func getSelectedNode(array []*DocumentTree, parentId int) int {
 	for _, item := range array {
-		if _, ok := item.ParentId.(string); ok && item.DocumentId == parent_id {
+		if _, ok := item.ParentId.(string); ok && item.DocumentId == parentId {
 			return item.DocumentId
-		} else if pid, ok := item.ParentId.(int); ok && item.DocumentId == parent_id {
-			if pid == parent_id {
+		} else if pid, ok := item.ParentId.(int); ok && item.DocumentId == parentId {
+			if pid == parentId {
 				return 0
 			}
 			return getSelectedNode(array, pid)
@@ -99,7 +99,7 @@ func getSelectedNode(array []*DocumentTree, parent_id int) int {
 	return 0
 }
 
-func getDocumentTree(array []*DocumentTree, parentId int, selected_id int, selected_parent_id int, buf *bytes.Buffer) {
+func getDocumentTree(array []*DocumentTree, parentId int, selectedId int, selectedParentId int, buf *bytes.Buffer) {
 	buf.WriteString("<ul>")
 
 	for _, item := range array {
@@ -111,11 +111,11 @@ func getDocumentTree(array []*DocumentTree, parentId int, selected_id int, selec
 		if pid == parentId {
 
 			selected := ""
-			if item.DocumentId == selected_id {
+			if item.DocumentId == selectedId {
 				selected = ` class="jstree-clicked"`
 			}
 			selected_li := ""
-			if item.DocumentId == selected_parent_id {
+			if item.DocumentId == selectedParentId {
 				selected_li = ` class="jstree-open"`
 			}
 			buf.WriteString("<li id=\"")
@@ -137,7 +137,7 @@ func getDocumentTree(array []*DocumentTree, parentId int, selected_id int, selec
 
 			for _, sub := range array {
 				if p, ok := sub.ParentId.(int); ok && p == item.DocumentId {
-					getDocumentTree(array, p, selected_id, selected_parent_id, buf)
+					getDocumentTree(array, p, selectedId, selectedParentId, buf)
 					break
 				}
 			}

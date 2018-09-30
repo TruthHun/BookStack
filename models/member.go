@@ -286,7 +286,7 @@ func (m *Member) FindByFieldFirst(field string, value interface{}) (*Member, err
 }
 
 //校验用户.
-func (m *Member) Valid(is_hash_password bool) error {
+func (m *Member) Valid(isHashPassword bool) error {
 
 	//邮箱不能为空
 	if m.Email == "" {
@@ -307,7 +307,7 @@ func (m *Member) Valid(is_hash_password bool) error {
 		return ErrMemberEmailFormatError
 	}
 	//如果是未加密密码，需要校验密码格式
-	if !is_hash_password {
+	if !isHashPassword {
 		if l := strings.Count(m.Password, ""); m.Password == "" || l > 50 || l < 6 {
 			return ErrMemberPasswordFormatError
 		}
@@ -397,12 +397,12 @@ func (m *Member) Delete(oldId int, newId int) error {
 	//		return err
 	//	}
 	//}
-	var relationship_list []*Relationship
+	var relationshipList []*Relationship
 
-	_, err = o.QueryTable(NewRelationship().TableNameWithPrefix()).Filter("member_id", oldId).All(&relationship_list)
+	_, err = o.QueryTable(NewRelationship().TableNameWithPrefix()).Filter("member_id", oldId).All(&relationshipList)
 
 	if err == nil {
-		for _, relationship := range relationship_list {
+		for _, relationship := range relationshipList {
 			//如果存在创始人，则删除
 			if relationship.RoleId == 0 {
 				rel := NewRelationship()
