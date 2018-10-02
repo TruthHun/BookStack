@@ -52,7 +52,6 @@ func (m *Label) InsertOrUpdate(labelName string) error {
 	m.LabelName = labelName
 
 	if err == orm.ErrNoRows {
-		err = nil
 		m.LabelName = labelName
 		_, err = o.Insert(m)
 	} else {

@@ -385,23 +385,23 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 		}
 
 	} else {
-		index_min := index - rollPage/2
-		index_max := index + rollPage/2
-		page_slice := make([]int, 0)
-		if index_min > 0 && index_max < pages_len { //切片索引未越界
-			page_slice = pages[index_min:index_max]
+		var pageSlice []int
+		indexMin := index - rollPage/2
+		indexMax := index + rollPage/2
+		if indexMin > 0 && indexMax < pages_len { //切片索引未越界
+			pageSlice = pages[indexMin:indexMax]
 		} else {
-			if index_min < 0 {
-				page_slice = pages[0:rollPage]
-			} else if index_max > pages_len {
-				page_slice = pages[(pages_len - rollPage):pages_len]
+			if indexMin < 0 {
+				pageSlice = pages[0:rollPage]
+			} else if indexMax > pages_len {
+				pageSlice = pages[(pages_len - rollPage):pages_len]
 			} else {
-				page_slice = pages[index_min:index_max]
+				pageSlice = pages[indexMin:indexMax]
 			}
 
 		}
 
-		for _, v := range page_slice {
+		for _, v := range pageSlice {
 			if v == currentPage {
 				htmlPage += fmt.Sprintf(`<li class="active"><a href="javascript:void(0);">%d</a></li>`, v)
 			} else {
@@ -425,8 +425,8 @@ func InMap(maps map[int]bool, key int) (ret bool) {
 	return
 }
 
-func GetTextFromHtml(htmlstr string) (txt string) {
-	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlstr)); err == nil {
+func GetTextFromHtml(htmlStr string) (txt string) {
+	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
 		txt = strings.TrimSpace(doc.Find("body").Text())
 	}
 	return

@@ -175,9 +175,10 @@ func (this *DocumentController) Read() {
 
 	this.TplName = "document/" + bookResult.Theme + "_read.html"
 
-	doc := models.NewDocument()
+	var err error
 
-	if docId, err := strconv.Atoi(id); err == nil {
+	doc := models.NewDocument()
+	if docId, _ := strconv.Atoi(id); docId > 0 {
 		doc, err = doc.Find(docId) //文档id
 		if err != nil {
 			beego.Error(err)
@@ -758,9 +759,9 @@ func (this *DocumentController) RemoveAttachment() {
 func (this *DocumentController) Delete() {
 
 	identify := this.GetString("identify")
-	doc_id, err := this.GetInt("doc_id", 0)
+	docId, _ := this.GetInt("doc_id", 0)
 
-	book_id := 0
+	bookId := 0
 	//如果是超级管理员则忽略权限判断
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -768,39 +769,39 @@ func (this *DocumentController) Delete() {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "项目不存在或权限不足")
 		}
-		book_id = book.BookId
+		bookId = book.BookId
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
-
 		if err != nil || bookResult.RoleId == conf.BookObserver {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "项目不存在或权限不足")
 		}
-		book_id = bookResult.BookId
+		bookId = bookResult.BookId
 	}
 
-	if doc_id <= 0 {
+	if docId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
 
-	doc, err := models.NewDocument().Find(doc_id)
-
+	doc, err := models.NewDocument().Find(docId)
 	if err != nil {
 		beego.Error("Delete => ", err)
 		this.JsonResult(6003, "删除失败")
 	}
+
 	//如果文档所属项目错误
-	if doc.BookId != book_id {
+	if doc.BookId != bookId {
 		this.JsonResult(6004, "参数错误")
 	}
 	//递归删除项目下的文档以及子文档
 	err = doc.RecursiveDocument(doc.DocumentId)
 	if err != nil {
+		beego.Error(err.Error())
 		this.JsonResult(6005, "删除失败")
 	}
+
 	//重置文档数量统计
 	models.NewBook().ResetDocumentNumber(doc.BookId)
-
 	this.JsonResult(0, "ok")
 }
 
@@ -1098,7 +1099,7 @@ func (this *DocumentController) History() {
 	this.TplName = "document/history.html"
 
 	identify := this.GetString("identify")
-	docId, err := this.GetInt("doc_id", 0)
+	docId, _ := this.GetInt("doc_id", 0)
 	pageIndex, _ := this.GetInt("page", 1)
 
 	bookId := 0
@@ -1164,7 +1165,7 @@ func (this *DocumentController) DeleteHistory() {
 	this.TplName = "document/history.html"
 
 	identify := this.GetString("identify")
-	docId, err := this.GetInt("doc_id", 0)
+	docId, _ := this.GetInt("doc_id", 0)
 	historyId, _ := this.GetInt("history_id", 0)
 
 	if historyId <= 0 {
@@ -1339,7 +1340,7 @@ func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, 
 			}
 
 			buf := bytes.NewReader([]byte(html))
-			doc, err := goquery.NewDocumentFromReader(buf)
+			doc, _ := goquery.NewDocumentFromReader(buf)
 			doc.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				if src, ok := contentSelection.Attr("src"); ok && strings.HasPrefix(src, "/uploads/") {
 					contentSelection.SetAttr("src", this.BaseUrl()+src)

@@ -176,13 +176,13 @@ func (this *ReadRecord) Delete(uid, docId int) (err error) {
 		err = errors.New("用户id和文档id不能为空")
 		return
 	}
+
+	var record ReadRecord
+
 	o := orm.NewOrm()
-	var (
-		record ReadRecord
-	)
 	o.QueryTable(tableReadRecord).Filter("uid", uid).Filter("doc_id", docId).One(&record, "book_id", "id")
 	if record.BookId > 0 { //存在，则删除该阅读记录
-		if cnt, err := o.QueryTable(tableReadRecord).Filter("id", record.Id).Delete(); err == nil && cnt > 0 {
+		if _, err = o.QueryTable(tableReadRecord).Filter("id", record.Id).Delete(); err == nil {
 			err = SetIncreAndDecre(tableReadCount, "cnt", "book_id="+strconv.Itoa(record.BookId)+" and uid="+strconv.Itoa(uid), false, 1)
 		}
 	}

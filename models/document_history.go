@@ -115,15 +115,26 @@ WHERE history.document_id = ? ORDER BY history.history_id DESC LIMIT ?,?;`
 }
 
 //恢复指定历史的文档.
-func (history *DocumentHistory) Restore(historyId, docId, uid int) error {
+func (history *DocumentHistory) Restore(historyId, docId, uid int) (err error) {
 	o := orm.NewOrm()
 
-	err := o.QueryTable(history.TableNameWithPrefix()).Filter("history_id", historyId).Filter("document_id", docId).One(history)
+	o.Begin()
+	defer func() {
+		if err != nil {
+			o.Rollback()
+		} else {
+			o.Commit()
+		}
+	}()
+
+	err = o.QueryTable(history.TableNameWithPrefix()).Filter("history_id", historyId).Filter("document_id", docId).One(history)
 	if err != nil {
 		return err
 	}
 
-	doc, err := NewDocument().Find(history.DocumentId)
+	var doc *Document
+
+	doc, err = NewDocument().Find(history.DocumentId)
 	if err != nil {
 		return err
 	}
@@ -137,6 +148,7 @@ func (history *DocumentHistory) Restore(historyId, docId, uid int) error {
 
 	html := vc.GetVersionContent(true)
 	md := vc.GetVersionContent(false)
+
 	ds.Markdown = md                        //markdown内容
 	ds.Content = html                       //HTML内容
 	doc.Release = html                      //HTML内容
@@ -144,6 +156,9 @@ func (history *DocumentHistory) Restore(historyId, docId, uid int) error {
 	doc.Version = time.Now().Unix()         //版本
 
 	_, err = o.Update(doc)
+	if err != nil {
+		return
+	}
 	_, err = o.Update(&ds)
 
 	return err
