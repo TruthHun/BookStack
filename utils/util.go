@@ -328,12 +328,12 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 	if totalPage < 2 {
 		return ""
 	}
-	params_len := len(urlParams)
-	if params_len > 0 {
-		if params_len%2 > 0 {
-			params_len = params_len - 1
+	paramsLen := len(urlParams)
+	if paramsLen > 0 {
+		if paramsLen%2 > 0 {
+			paramsLen = paramsLen - 1
 		}
-		for i := 0; i < params_len; {
+		for i := 0; i < paramsLen; {
 			key := strings.TrimSpace(fmt.Sprintf("%v", urlParams[i]))
 			val := strings.TrimSpace(fmt.Sprintf("%v", urlParams[i+1]))
 			//键存在，同时值不为0也不为空

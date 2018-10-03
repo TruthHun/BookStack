@@ -666,18 +666,18 @@ func (this *DocumentController) DownloadAttachment() {
 	this.Prepare()
 
 	identify := this.Ctx.Input.Param(":key")
-	attach_id, _ := strconv.Atoi(this.Ctx.Input.Param(":attach_id"))
+	attachId, _ := strconv.Atoi(this.Ctx.Input.Param(":attach_id"))
 	token := this.GetString("token")
 
-	member_id := 0
+	memberId := 0
 
 	if this.Member != nil {
-		member_id = this.Member.MemberId
+		memberId = this.Member.MemberId
 	}
-	book_id := 0
+	bookId := 0
 
 	//判断用户是否参与了项目
-	bookResult, err := models.NewBookResult().FindByIdentify(identify, member_id)
+	bookResult, err := models.NewBookResult().FindByIdentify(identify, memberId)
 
 	if err != nil {
 		//判断项目公开状态
@@ -693,12 +693,12 @@ func (this *DocumentController) DownloadAttachment() {
 			}
 		}
 
-		book_id = book.BookId
+		bookId = book.BookId
 	} else {
-		book_id = bookResult.BookId
+		bookId = bookResult.BookId
 	}
 	//查找附件
-	attachment, err := models.NewAttachment().Find(attach_id)
+	attachment, err := models.NewAttachment().Find(attachId)
 
 	if err != nil {
 		beego.Error("DownloadAttachment => ", err)
@@ -708,7 +708,7 @@ func (this *DocumentController) DownloadAttachment() {
 			this.Abort("500")
 		}
 	}
-	if attachment.BookId != book_id {
+	if attachment.BookId != bookId {
 		this.Abort("404")
 	}
 	this.Ctx.Output.Download(filepath.Join(commands.WorkingDirectory, attachment.FilePath), attachment.FileName)
@@ -808,19 +808,19 @@ func (this *DocumentController) Delete() {
 //获取或更新文档内容.
 func (this *DocumentController) Content() {
 	identify := this.Ctx.Input.Param(":key")
-	doc_id, err := this.GetInt("doc_id")
+	docId, err := this.GetInt("doc_id")
 	errMsg := "ok"
 	if err != nil {
-		doc_id, _ = strconv.Atoi(this.Ctx.Input.Param(":id"))
+		docId, _ = strconv.Atoi(this.Ctx.Input.Param(":id"))
 	}
-	book_id := 0
+	bookId := 0
 	//如果是超级管理员，则忽略权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
 			this.JsonResult(6002, "项目不存在或权限不足")
 		}
-		book_id = book.BookId
+		bookId = book.BookId
 	} else {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 
@@ -828,10 +828,10 @@ func (this *DocumentController) Content() {
 			beego.Error("FindByIdentify => ", err)
 			this.JsonResult(6002, "项目不存在或权限不足")
 		}
-		book_id = bookResult.BookId
+		bookId = bookResult.BookId
 	}
 
-	if doc_id <= 0 {
+	if docId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
 	ModelStore := new(models.DocumentStore)
@@ -840,27 +840,27 @@ func (this *DocumentController) Content() {
 		content := this.GetString("html")
 
 		version, _ := this.GetInt64("version", 0)
-		is_cover := this.GetString("cover")
+		isCover := this.GetString("cover")
 
-		doc, err := models.NewDocument().Find(doc_id)
+		doc, err := models.NewDocument().Find(docId)
 
 		if err != nil {
 			this.JsonResult(6003, "读取文档错误")
 		}
-		if doc.BookId != book_id {
+		if doc.BookId != bookId {
 			this.JsonResult(6004, "保存的文档不属于指定项目")
 		}
-		if doc.Version != version && !strings.EqualFold(is_cover, "yes") {
+		if doc.Version != version && !strings.EqualFold(isCover, "yes") {
 			beego.Info("%d|", version, doc.Version)
 			this.JsonResult(6005, "文档已被修改确定要覆盖吗？")
 		}
 
-		is_summary := false
-		is_auto := false
+		isSummary := false
+		isAuto := false
 		//替换文档中的url链接
 		if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<bookstack-summary></bookstack-summary>") || strings.Contains(doc.Markdown, "<bookstack-summary/>")) {
 			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
-			is_summary = true
+			isSummary = true
 			//要清除，避免每次保存的时候都要重新排序
 			replaces := []string{"<bookstack-summary></bookstack-summary>", "<bookstack-summary/>"}
 			for _, r := range replaces {
@@ -875,23 +875,23 @@ func (this *DocumentController) Content() {
 		}
 		if access && strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
 			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
-			is_summary = true
+			isSummary = true
 			//要清除，避免每次保存的时候都要重新排序
 			replaces := []string{"<spider></spider>", "<spider/>"}
 			for _, r := range replaces {
 				markdown = strings.Replace(markdown, r, "", -1)
 			}
-			content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, book_id, this.Member.MemberId)
+			content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, bookId, this.Member.MemberId)
 		}
 
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
 			//自动生成文档内容
-			imd, icont := new(models.Document).BookStackAuto(book_id, doc_id)
+			imd, icont := new(models.Document).BookStackAuto(bookId, docId)
 			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
 			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
-			is_auto = true
+			isAuto = true
 		}
-		content = this.replaceLinks(identify, content, is_summary)
+		content = this.replaceLinks(identify, content, isSummary)
 
 		var ds = models.DocumentStore{}
 		var actionName string
@@ -909,17 +909,17 @@ func (this *DocumentController) Content() {
 		if actionName == "" {
 			actionName = "--"
 		} else {
-			is_auto = true
+			isAuto = true
 		}
 
 		beego.Debug(ds.Markdown, ds.Content)
 
 		doc.Version = time.Now().Unix()
-		if doc_id, err := doc.InsertOrUpdate(); err != nil {
+		if docId, err := doc.InsertOrUpdate(); err != nil {
 			beego.Error("InsertOrUpdate => ", err)
 			this.JsonResult(6006, "保存失败")
 		} else {
-			ds.DocumentId = int(doc_id)
+			ds.DocumentId = int(docId)
 			if err := ModelStore.InsertOrUpdate(ds, "markdown", "content"); err != nil {
 				beego.Error(err)
 			}
@@ -929,7 +929,7 @@ func (this *DocumentController) Content() {
 		if this.EnableDocumentHistory > 0 {
 			if len(strings.TrimSpace(ds.Markdown)) > 0 { //空内容不存储版本
 				history := models.NewDocumentHistory()
-				history.DocumentId = doc_id
+				history.DocumentId = docId
 				history.DocumentName = doc.DocumentName
 				history.ModifyAt = this.Member.MemberId
 				history.MemberId = doc.MemberId
@@ -942,17 +942,17 @@ func (this *DocumentController) Content() {
 				if err != nil {
 					beego.Error("DocumentHistory InsertOrUpdate => ", err)
 				} else {
-					vc := models.NewVersionControl(doc_id, history.Version)
+					vc := models.NewVersionControl(docId, history.Version)
 					vc.SaveVersion(ds.Content, ds.Markdown)
-					history.DeleteByLimit(doc_id, this.EnableDocumentHistory)
+					history.DeleteByLimit(docId, this.EnableDocumentHistory)
 				}
 			}
 
 		}
 
-		if is_auto {
+		if isAuto {
 			errMsg = "auto"
-		} else if is_summary {
+		} else if isSummary {
 			errMsg = "true"
 		}
 
@@ -960,7 +960,8 @@ func (this *DocumentController) Content() {
 		//注意：如果errMsg的值是true，则表示更新了目录排序，需要刷新，否则不刷新
 		this.JsonResult(0, errMsg, doc)
 	}
-	doc, err := models.NewDocument().Find(doc_id)
+
+	doc, err := models.NewDocument().Find(docId)
 
 	if err != nil {
 		this.JsonResult(6003, "文档不存在")

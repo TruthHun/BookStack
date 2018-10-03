@@ -422,19 +422,19 @@ func (this *AccountController) FindPassword() {
 			this.JsonResult(6008, "发送次数太多，请稍候再试")
 		}
 
-		member_token := models.NewMemberToken()
+		memberToken := models.NewMemberToken()
 
-		member_token.Token = string(utils.Krand(32, utils.KC_RAND_KIND_ALL))
-		member_token.Email = email
-		member_token.MemberId = member.MemberId
-		member_token.IsValid = false
-		if _, err := member_token.InsertOrUpdate(); err != nil {
+		memberToken.Token = string(utils.Krand(32, utils.KC_RAND_KIND_ALL))
+		memberToken.Email = email
+		memberToken.MemberId = member.MemberId
+		memberToken.IsValid = false
+		if _, err := memberToken.InsertOrUpdate(); err != nil {
 			this.JsonResult(6009, "邮件发送失败")
 		}
 
 		data := map[string]interface{}{
 			"SITE_NAME": this.Option["SITE_NAME"],
-			"url":       this.BaseUrl() + beego.URLFor("AccountController.FindPassword", "token", member_token.Token, "mail", email),
+			"url":       this.BaseUrl() + beego.URLFor("AccountController.FindPassword", "token", memberToken.Token, "mail", email),
 		}
 
 		body, err := this.ExecuteViewPathTemplate("account/mail_template.html", data)
@@ -461,7 +461,7 @@ func (this *AccountController) FindPassword() {
 	mail := this.GetString("mail")
 
 	if token != "" && mail != "" {
-		member_token, err := models.NewMemberToken().FindByFieldFirst("token", token)
+		memberToken, err := models.NewMemberToken().FindByFieldFirst("token", token)
 
 		if err != nil {
 			beego.Error(err)
@@ -469,15 +469,15 @@ func (this *AccountController) FindPassword() {
 			this.TplName = "errors/error.html"
 			return
 		}
-		subTime := member_token.SendTime.Sub(time.Now())
+		subTime := memberToken.SendTime.Sub(time.Now())
 
-		if !strings.EqualFold(member_token.Email, mail) || subTime.Minutes() > float64(mailConf.MailExpired) || !member_token.ValidTime.IsZero() {
+		if !strings.EqualFold(memberToken.Email, mail) || subTime.Minutes() > float64(mailConf.MailExpired) || !memberToken.ValidTime.IsZero() {
 			this.Data["ErrorMessage"] = "验证码已过期，请重新操作。"
 			this.TplName = "errors/error.html"
 			return
 		}
-		this.Data["Email"] = member_token.Email
-		this.Data["Token"] = member_token.Token
+		this.Data["Email"] = memberToken.Email
+		this.Data["Token"] = memberToken.Token
 		this.TplName = "account/find_password_setp2.html"
 
 	}
@@ -512,20 +512,20 @@ func (this *AccountController) ValidEmail() {
 		this.JsonResult(6001, "验证码不正确")
 	}
 
-	mail_conf := conf.GetMailConfig()
-	member_token, err := models.NewMemberToken().FindByFieldFirst("token", token)
+	mailConf := conf.GetMailConfig()
+	memberToken, err := models.NewMemberToken().FindByFieldFirst("token", token)
 
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6007, "邮件已失效")
 	}
-	sub_time := member_token.SendTime.Sub(time.Now())
+	subTime := memberToken.SendTime.Sub(time.Now())
 
-	if !strings.EqualFold(member_token.Email, mail) || sub_time.Minutes() > float64(mail_conf.MailExpired) || !member_token.ValidTime.IsZero() {
+	if !strings.EqualFold(memberToken.Email, mail) || subTime.Minutes() > float64(mailConf.MailExpired) || !memberToken.ValidTime.IsZero() {
 
 		this.JsonResult(6008, "验证码已过期，请重新操作。")
 	}
-	member, err := models.NewMember().Find(member_token.MemberId)
+	member, err := models.NewMember().Find(memberToken.MemberId)
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6005, "用户不存在")
@@ -540,9 +540,9 @@ func (this *AccountController) ValidEmail() {
 	member.Password = hash
 
 	err = member.Update("password")
-	member_token.ValidTime = time.Now()
-	member_token.IsValid = true
-	member_token.InsertOrUpdate()
+	memberToken.ValidTime = time.Now()
+	memberToken.IsValid = true
+	memberToken.InsertOrUpdate()
 
 	if err != nil {
 		beego.Error(err)

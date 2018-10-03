@@ -17,6 +17,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+// member
 type Member struct {
 	MemberId      int       `orm:"pk;auto;column(member_id)" json:"member_id"`
 	Account       string    `orm:"size(30);unique;column(account)" json:"account"`
@@ -64,13 +65,12 @@ func (m *Member) Login(account string, password string) (*Member, error) {
 	err := o.QueryTable(m.TableNameWithPrefix()).Filter("account", account).Filter("status", 0).One(member)
 
 	if err != nil {
+		beego.Error("用户登录 => " + err.Error())
 		if beego.AppConfig.DefaultBool("ldap_enable", false) == true {
 			logs.Info("转入LDAP登陆")
 			return member.ldapLogin(account, password)
-		} else {
-			logs.Error("用户登录 => ", err)
-			return member, ErrMemberNoExist
 		}
+		return member, ErrMemberNoExist
 	}
 
 	switch member.AuthMethod {
@@ -212,7 +212,6 @@ func (m *Member) Update(cols ...string) error {
 
 func (m *Member) Find(id int) (*Member, error) {
 	o := orm.NewOrm()
-
 	m.MemberId = id
 	if err := o.Read(m); err != nil {
 		return m, err
@@ -269,11 +268,11 @@ func (m *Member) FindToPager(pageIndex, pageSize int) ([]*Member, int64, error) 
 	return members, totalCount, nil
 }
 
-func (c *Member) IsAdministrator() bool {
-	if c == nil || c.MemberId <= 0 {
+func (m *Member) IsAdministrator() bool {
+	if m == nil || m.MemberId <= 0 {
 		return false
 	}
-	return c.Role == 0 || c.Role == 1
+	return m.Role == 0 || m.Role == 1
 }
 
 //根据指定字段查找用户.

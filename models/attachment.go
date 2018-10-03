@@ -73,9 +73,9 @@ func (m *Attachment) Find(id int) (*Attachment, error) {
 	return m, err
 }
 
-func (m *Attachment) FindListByDocumentId(doc_id int) (attaches []*Attachment, err error) {
+func (m *Attachment) FindListByDocumentId(docId int) (attaches []*Attachment, err error) {
 	o := orm.NewOrm()
-	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", doc_id).OrderBy("-attachment_id").All(&attaches)
+	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("document_id", docId).OrderBy("-attachment_id").All(&attaches)
 	return
 }
 

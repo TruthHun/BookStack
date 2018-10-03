@@ -32,7 +32,7 @@ func (this *BookCategory) GetByBookId(book_id int) (cates []Category, rows int64
 }
 
 //处理书籍分类
-func (this *BookCategory) SetBookCates(book_id int, cids []string) {
+func (this *BookCategory) SetBookCates(bookId int, cids []string) {
 	var (
 		cates []Category
 		bc    []BookCategory
@@ -48,7 +48,7 @@ func (this *BookCategory) SetBookCates(book_id int, cids []string) {
 		cids = append(cids, strconv.Itoa(cate.Pid))
 	}
 	//2、删除原有的分类关系，并减少计数
-	qs := o.QueryTable(tableBookCategory).Filter("book_id", book_id)
+	qs := o.QueryTable(tableBookCategory).Filter("book_id", bookId)
 	qs.All(&bc) //查询
 	qs.Delete() //删除
 	//减少计数
@@ -62,7 +62,7 @@ func (this *BookCategory) SetBookCates(book_id int, cids []string) {
 		cidNum, _ := strconv.Atoi(cid)
 		var bookCate = BookCategory{
 			CategoryId: cidNum,
-			BookId:     book_id,
+			BookId:     bookId,
 		}
 		o.Insert(&bookCate)
 	}

@@ -113,17 +113,16 @@ func RunMigration() {
 
 //导出数据库的表结构
 func ExportDatabaseTable() ([]string, error) {
-	db_adapter := beego.AppConfig.String("db_adapter")
-	db_database := beego.AppConfig.String("db_database")
+	dbAdapter := beego.AppConfig.String("db_adapter")
+	dbDatabase := beego.AppConfig.String("db_database")
 	tables := make([]string, 0)
 
 	o := orm.NewOrm()
-	switch db_adapter {
+	switch dbAdapter {
 	case "mysql":
 		{
 			var lists []orm.Params
-
-			_, err := o.Raw(fmt.Sprintf("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '%s'", db_database)).Values(&lists)
+			_, err := o.Raw(fmt.Sprintf("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '%s'", dbDatabase)).Values(&lists)
 			if err != nil {
 				return tables, err
 			}

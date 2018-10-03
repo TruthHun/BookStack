@@ -114,14 +114,14 @@ func getDocumentTree(array []*DocumentTree, parentId int, selectedId int, select
 			if item.DocumentId == selectedId {
 				selected = ` class="jstree-clicked"`
 			}
-			selected_li := ""
+			selectedLi := ""
 			if item.DocumentId == selectedParentId {
-				selected_li = ` class="jstree-open"`
+				selectedLi = ` class="jstree-open"`
 			}
 			buf.WriteString("<li id=\"")
 			buf.WriteString(strconv.Itoa(item.DocumentId))
 			buf.WriteString("\"")
-			buf.WriteString(selected_li)
+			buf.WriteString(selectedLi)
 			buf.WriteString("><a href=\"")
 			if item.Identify != "" {
 				uri := beego.URLFor("DocumentController.Read", ":key", item.BookIdentify, ":id", item.Identify)

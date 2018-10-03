@@ -24,13 +24,13 @@ func NewDocumentSearchResult() *DocumentSearchResult {
 }
 
 //分页全局搜索.
-func (m *DocumentSearchResult) FindToPager(keyword string, page_index, page_size, member_id int) (search_result []*DocumentSearchResult, total_count int, err error) {
+func (m *DocumentSearchResult) FindToPager(keyword string, pageIndex, pageSize, memberId int) (searchResult []*DocumentSearchResult, totalCount int, err error) {
 	o := orm.NewOrm()
 
-	offset := (page_index - 1) * page_size
+	offset := (pageIndex - 1) * pageSize
 	keyword = "%" + keyword + "%"
 
-	if member_id <= 0 {
+	if memberId <= 0 {
 		sql1 := `SELECT count(doc.document_id) as total_count FROM md_documents AS doc
   LEFT JOIN md_books as book ON doc.book_id = book.book_id
 WHERE book.privately_owned = 0 AND (doc.document_name LIKE ? OR doc.release LIKE ?) `
@@ -42,11 +42,11 @@ WHERE book.privately_owned = 0 AND (doc.document_name LIKE ? OR doc.release LIKE
 WHERE book.privately_owned = 0 AND (doc.document_name LIKE ? OR doc.release LIKE ?)
  ORDER BY doc.document_id DESC LIMIT ?,? `
 
-		err = o.Raw(sql1, keyword, keyword).QueryRow(&total_count)
+		err = o.Raw(sql1, keyword, keyword).QueryRow(&totalCount)
 		if err != nil {
 			return
 		}
-		_, err = o.Raw(sql2, keyword, keyword, offset, page_size).QueryRows(&search_result)
+		_, err = o.Raw(sql2, keyword, keyword, offset, pageSize).QueryRows(&searchResult)
 		if err != nil {
 			return
 		}
@@ -65,11 +65,11 @@ WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_
 WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_name LIKE ? OR doc.release LIKE ?)
  ORDER BY doc.document_id DESC LIMIT ?,? `
 
-		err = o.Raw(sql1, member_id, keyword, keyword).QueryRow(&total_count)
+		err = o.Raw(sql1, memberId, keyword, keyword).QueryRow(&totalCount)
 		if err != nil {
 			return
 		}
-		_, err = o.Raw(sql2, member_id, keyword, keyword, offset, page_size).QueryRows(&search_result)
+		_, err = o.Raw(sql2, memberId, keyword, keyword, offset, pageSize).QueryRows(&searchResult)
 		if err != nil {
 			return
 		}
@@ -78,13 +78,13 @@ WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_
 }
 
 //项目内搜索.
-func (m *DocumentSearchResult) SearchDocument(keyword string, book_id int) (docs []*DocumentSearchResult, err error) {
+func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int) (docs []*DocumentSearchResult, err error) {
 	o := orm.NewOrm()
 
 	sql := "SELECT * FROM md_documents WHERE book_id = ? AND (document_name LIKE ? OR `release` LIKE ?) "
 	keyword = "%" + keyword + "%"
 
-	_, err = o.Raw(sql, book_id, keyword, keyword).QueryRows(&docs)
+	_, err = o.Raw(sql, bookId, keyword, keyword).QueryRows(&docs)
 
 	return
 }

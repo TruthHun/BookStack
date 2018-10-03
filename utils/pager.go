@@ -328,15 +328,15 @@ func setDefault(po *PageOptions, totalpages int) *PageOptions {
 /**
  *判断首页尾页  上一页下一页是否能用
  */
-func judgeDisable(po *PageOptions, totalpages int, h_f int) string {
+func judgeDisable(po *PageOptions, totalPages int, hasHeader int) string {
 	var rs string = ""
 	//判断头部
-	if h_f == 0 {
+	if hasHeader == 0 {
 		if po.CurrentPage == 1 {
 			rs = " "
 		}
 	} else {
-		if po.CurrentPage == totalpages {
+		if po.CurrentPage == totalPages {
 			rs = " "
 		}
 	}

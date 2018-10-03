@@ -13,6 +13,7 @@ type LabelController struct {
 	BaseController
 }
 
+// Prepare
 func (this *LabelController) Prepare() {
 	this.BaseController.Prepare()
 
@@ -23,7 +24,7 @@ func (this *LabelController) Prepare() {
 	}
 }
 
-//查看包含标签的文档列表.
+// 查看包含标签的文档列表.
 func (this *LabelController) Index() {
 	this.TplName = "label/index.html"
 	this.Data["IsLabel"] = true
@@ -40,7 +41,6 @@ func (this *LabelController) Index() {
 		memberId = this.Member.MemberId
 	}
 	searchResult, totalCount, err := models.NewBook().FindForLabelToPager(labelName, pageIndex, pageSize, memberId)
-
 	if err != nil {
 		beego.Error(err)
 		return
@@ -59,9 +59,9 @@ func (this *LabelController) Index() {
 		"keywords":    "标签," + labelName,
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-
 }
 
+// 标签列表
 func (this *LabelController) List() {
 	this.Data["IsLabel"] = true
 	this.TplName = "label/list.html"

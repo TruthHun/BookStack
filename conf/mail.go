@@ -19,24 +19,24 @@ type SmtpConf struct {
 }
 
 func GetMailConfig() *SmtpConf {
-	user_name := beego.AppConfig.String("smtp_user_name")
+	username := beego.AppConfig.String("smtp_user_name")
 	password := beego.AppConfig.String("smtp_password")
-	smtp_host := beego.AppConfig.String("smtp_host")
-	smtp_port := beego.AppConfig.DefaultInt("smtp_port", 25)
-	form_user_name := beego.AppConfig.String("form_user_name")
-	reply_user_name := beego.AppConfig.String("reply_user_name")
-	enable_mail := beego.AppConfig.String("enable_mail")
-	mail_number := beego.AppConfig.DefaultInt("mail_number", 5)
+	smtpHost := beego.AppConfig.String("smtp_host")
+	smtpPort := beego.AppConfig.DefaultInt("smtp_port", 25)
+	formUsername := beego.AppConfig.String("form_user_name")
+	replyUsername := beego.AppConfig.String("reply_user_name")
+	enableMail := beego.AppConfig.String("enable_mail")
+	mailNumber := beego.AppConfig.DefaultInt("mail_number", 5)
 
 	c := &SmtpConf{
-		EnableMail:    strings.EqualFold(enable_mail, "true"),
-		MailNumber:    mail_number,
-		SmtpUserName:  user_name,
-		SmtpHost:      smtp_host,
+		EnableMail:    strings.EqualFold(enableMail, "true"),
+		MailNumber:    mailNumber,
+		SmtpUserName:  username,
+		SmtpHost:      smtpHost,
 		SmtpPassword:  password,
-		FormUserName:  form_user_name,
-		ReplyUserName: reply_user_name,
-		SmtpPort:      smtp_port,
+		FormUserName:  formUsername,
+		ReplyUserName: replyUsername,
+		SmtpPort:      smtpPort,
 	}
 	return c
 }

@@ -1,11 +1,13 @@
 package utils
 
 import (
-	"gopkg.in/ldap.v2"
-	"fmt"
 	"errors"
+	"fmt"
+
 	"github.com/astaxie/beego"
+	"gopkg.in/ldap.v2"
 )
+
 /*
 对应的config
 ldap:
@@ -19,45 +21,48 @@ ldap:
 */
 
 func ValidLDAPLogin(password string) (result bool, err error) {
-	result = false
-	err = nil
+
 	lc, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "192.168.3.104", 389))
 	if err != nil {
-		beego.Error("Dial => ",err)
+		beego.Error("Dial => ", err)
+		return
+	}
+	defer lc.Close()
+
+	err = lc.Bind("cn=admin,dc=minho,dc=com", "123456")
+	if err != nil {
+		beego.Error("Bind => ", err)
 		return
 	}
 
-	defer lc.Close()
-	err = lc.Bind("cn=admin,dc=minho,dc=com", "123456")
-	if err != nil {
-		beego.Error("Bind => ",err)
-		return
-	}
 	searchRequest := ldap.NewSearchRequest(
 		"DC=minho,DC=com",
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf("(&(objectClass=User)(%s=%s))","mail", "longfei6671@163.com"),
+		fmt.Sprintf("(&(objectClass=User)(%s=%s))", "mail", "longfei6671@163.com"),
 		[]string{"dn"},
 		nil,
 	)
+
 	searchResult, err := lc.Search(searchRequest)
 	if err != nil {
 		beego.Error("Search => ", err)
 		return
 	}
+
 	if len(searchResult.Entries) != 1 {
 		err = errors.New("ldap.no_user_found_or_many_users_found")
 		return
 	}
-	fmt.Printf("%+v = %d",searchResult.Entries,len(searchResult.Entries))
 
-	userdn := searchResult.Entries[0].DN
+	fmt.Printf("%+v = %d", searchResult.Entries, len(searchResult.Entries))
 
-	err = lc.Bind(userdn, password)
+	userDN := searchResult.Entries[0].DN
+
+	err = lc.Bind(userDN, password)
 	if err == nil {
 		result = true
 	} else {
-		beego.Error("Bind2 => ",err)
+		beego.Error("Bind2 => ", err)
 		err = nil
 	}
 	return
@@ -66,12 +71,12 @@ func ValidLDAPLogin(password string) (result bool, err error) {
 func AddMember(account, password string) error {
 	lc, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "192.168.3.104", 389))
 	if err != nil {
-		beego.Error("Dial => ",err)
+		beego.Error("Dial => ", err)
 		return err
 	}
 
 	defer lc.Close()
-	user := fmt.Sprintf("cn=%s,dc=minho,dc=com",account)
+	user := fmt.Sprintf("cn=%s,dc=minho,dc=com", account)
 
 	member := ldap.NewAddRequest(user)
 
@@ -81,56 +86,44 @@ func AddMember(account, password string) error {
 
 	if err == nil {
 
-		err = lc.Bind(user,"")
+		err = lc.Bind(user, "")
 		if err != nil {
-			beego.Error("Bind => ",err)
+			beego.Error("Bind => ", err)
 			return err
 		}
 		passwordModifyRequest := ldap.NewPasswordModifyRequest(user, "", "1q2w3e__ABC")
 		_, err = lc.PasswordModify(passwordModifyRequest)
 
 		if err != nil {
-			beego.Error("PasswordModify => ",err)
+			beego.Error("PasswordModify => ", err)
 			return err
 		}
 		return nil
 	}
-	beego.Error("Add => ",err)
+	beego.Error("Add => ", err)
 	return err
 }
 
-func ModifyPassword(account, old_password, new_password string) error {
+// 修改密码
+func ModifyPassword(account, oldPassword, newPassword string) error {
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", "192.168.3.104", 389))
 	if err != nil {
-		beego.Error("Dial => ",err)
+		beego.Error("Dial => ", err)
 	}
 	defer l.Close()
 
-	user := fmt.Sprintf("cn=%s,dc=minho,dc=com",account)
-	err = l.Bind(user, old_password)
+	user := fmt.Sprintf("cn=%s,dc=minho,dc=com", account)
+	err = l.Bind(user, oldPassword)
 	if err != nil {
-		beego.Error("Bind => ",err)
+		beego.Error("Bind => ", err)
 		return err
 	}
 
-	passwordModifyRequest := ldap.NewPasswordModifyRequest(user, old_password, new_password)
+	passwordModifyRequest := ldap.NewPasswordModifyRequest(user, oldPassword, newPassword)
 	_, err = l.PasswordModify(passwordModifyRequest)
-
 	if err != nil {
 		beego.Error(fmt.Sprintf("Password could not be changed: %s", err.Error()))
 		return err
 	}
 	return nil
 }
-
-
-
-
-
-
-
-
-
-
-
-

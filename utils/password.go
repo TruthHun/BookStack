@@ -1,53 +1,55 @@
 package utils
 
-
 import (
-	"crypto/rand"
-	mt "math/rand"
 	"crypto/md5"
+	"crypto/rand"
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/base64"
 	"encoding/hex"
 	"io"
+	mt "math/rand"
 	"strconv"
 	"strings"
 )
 
 const (
-	saltSize            = 16
-	delmiter            = "$"
-	stretching_password = 500
-	salt_local_secret   = "ahfw*&TGdsfnbi*^Wt"
+	saltSize           = 16
+	delimiter          = "$"
+	stretchingPassword = 500
+	saltLocalSecret    = "ahfw*&TGdsfnbi*^Wt"
 )
+
 //加密密码
 func PasswordHash(pass string) (string, error) {
 
-	salt_secret, err := salt_secret()
+	saltSecret, err := saltSecret()
 	if err != nil {
 		return "", err
 	}
 
-	salt, err := salt(salt_local_secret + salt_secret)
+	salt, err := salt(saltLocalSecret + saltSecret)
 	if err != nil {
 		return "", err
 	}
 
 	interation := randInt(1, 20)
 
-	hash, err := hash(pass, salt_secret, salt, int64(interation))
+	hash, err := hash(pass, saltSecret, salt, int64(interation))
 	if err != nil {
 		return "", err
 	}
-	interation_string := strconv.Itoa(interation)
-	password := salt_secret + delmiter + interation_string + delmiter + hash + delmiter + salt
+
+	interationStr := strconv.Itoa(interation)
+	password := saltSecret + delimiter + interationStr + delimiter + hash + delimiter + salt
 
 	return password, nil
 
 }
+
 //校验密码是否有效
-func  PasswordVerify(hashing string, pass string) (bool, error) {
-	data := trim_salt_hash(hashing)
+func PasswordVerify(hashing string, pass string) (bool, error) {
+	data := trimSaltHash(hashing)
 
 	interation, _ := strconv.ParseInt(data["interation_string"], 10, 64)
 
@@ -56,51 +58,48 @@ func  PasswordVerify(hashing string, pass string) (bool, error) {
 		return false, err
 	}
 
-	if (data["salt_secret"]+delmiter+data["interation_string"]+delmiter+has+delmiter+data["salt"]) == hashing {
+	if (data["salt_secret"] + delimiter + data["interation_string"] + delimiter + has + delimiter + data["salt"]) == hashing {
 		return true, nil
-	} else {
-		return false, nil
 	}
-
+	return false, nil
 }
 
-func hash(pass string, salt_secret string, salt string, interation int64) (string, error) {
-	var pass_salt string = salt_secret + pass + salt + salt_secret + pass + salt + pass + pass + salt
+func hash(pass string, saltSecret string, salt string, interation int64) (string, error) {
+	var passSalt = saltSecret + pass + salt + saltSecret + pass + salt + pass + pass + salt
 	var i int
 
-	hash_pass := salt_local_secret
-	hash_start := sha512.New()
-	hash_center := sha256.New()
-	hash_output := sha256.New224()
+	hashPass := saltLocalSecret
+	hashStart := sha512.New()
+	hashCenter := sha256.New()
+	hashOutput := sha256.New224()
 
 	i = 0
-	for i <= stretching_password {
+	for i <= stretchingPassword {
 		i = i + 1
-		hash_start.Write([]byte(pass_salt + hash_pass))
-		hash_pass = hex.EncodeToString(hash_start.Sum(nil))
+		hashStart.Write([]byte(passSalt + hashPass))
+		hashPass = hex.EncodeToString(hashStart.Sum(nil))
 	}
 
 	i = 0
 	for int64(i) <= interation {
 		i = i + 1
-		hash_pass = hash_pass + hash_pass
+		hashPass = hashPass + hashPass
 	}
 
 	i = 0
-	for i <= stretching_password {
+	for i <= stretchingPassword {
 		i = i + 1
-		hash_center.Write([]byte(hash_pass + salt_secret))
-		hash_pass = hex.EncodeToString(hash_center.Sum(nil))
+		hashCenter.Write([]byte(hashPass + saltSecret))
+		hashPass = hex.EncodeToString(hashCenter.Sum(nil))
 	}
-	hash_output.Write([]byte(hash_pass + salt_local_secret))
-	hash_pass = hex.EncodeToString(hash_output.Sum(nil))
+	hashOutput.Write([]byte(hashPass + saltLocalSecret))
+	hashPass = hex.EncodeToString(hashOutput.Sum(nil))
 
-	return hash_pass, nil
+	return hashPass, nil
 }
 
-func trim_salt_hash(hash string) map[string]string {
-	str := strings.Split(hash, delmiter)
-
+func trimSaltHash(hash string) map[string]string {
+	str := strings.Split(hash, delimiter)
 	return map[string]string{
 		"salt_secret":       str[0],
 		"interation_string": str[1],
@@ -110,7 +109,7 @@ func trim_salt_hash(hash string) map[string]string {
 }
 func salt(secret string) (string, error) {
 
-	buf := make([]byte, saltSize, saltSize + md5.Size)
+	buf := make([]byte, saltSize, saltSize+md5.Size)
 	_, err := io.ReadFull(rand.Reader, buf)
 	if err != nil {
 		return "", err
@@ -122,7 +121,7 @@ func salt(secret string) (string, error) {
 	return hex.EncodeToString(hash.Sum(buf)), nil
 }
 
-func salt_secret() (string, error) {
+func saltSecret() (string, error) {
 	rb := make([]byte, randInt(10, 100))
 	_, err := rand.Read(rb)
 	if err != nil {
