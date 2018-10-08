@@ -119,7 +119,7 @@ func (m *Book) Find(id int) (book *Book, err error) {
 	if id <= 0 {
 		return
 	}
-
+	book = &Book{}
 	o := orm.NewOrm()
 	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(book)
 	return
@@ -153,8 +153,8 @@ func (m *Book) FindByField(field string, value interface{}) (books []*Book, err 
 //根据指定字段查询一个结果.
 func (m *Book) FindByFieldFirst(field string, value interface{}) (book *Book, err error) {
 	o := orm.NewOrm()
-	err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(book)
-	return
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter(field, value).One(m)
+	return m, err
 }
 
 func (m *Book) FindByIdentify(identify string) (book *Book, err error) {
@@ -483,7 +483,7 @@ func (m *Book) FindForLabelToPager(keyword string, pageIndex, pageSize, memberId
 }
 
 func (book *Book) ToBookResult() (m *BookResult) {
-
+	m = &BookResult{}
 	m.BookId = book.BookId
 	m.BookName = book.BookName
 	m.Identify = book.Identify
