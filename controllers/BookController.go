@@ -970,6 +970,8 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 		return
 	}
 
+	this.replaceToAbs(folder, identify)
+
 	ModelStore := new(models.DocumentStore)
 
 	//文档对应的标识

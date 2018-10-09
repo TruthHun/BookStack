@@ -437,6 +437,5 @@ func GetTextFromHtml(htmlStr string) (txt string) {
 func GitClone(url, folder string) error {
 	os.RemoveAll(folder)
 	args := []string{"clone", url, folder}
-	beego.Debug(args)
 	return exec.Command("git", args...).Run()
 }
