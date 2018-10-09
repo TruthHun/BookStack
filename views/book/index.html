@@ -133,17 +133,16 @@
                                             </ul>
                                         </div>
                                         <!-- Split button -->
-                                        <div class="btn-group">
+                                        <div class="btn-group btn-group-download">
                                             <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出项目</button>
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="caret"></span>
                                                 <span class="sr-only">Toggle Dropdown</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a href="#">导出 PDF</a></li>
-                                                <li><a href="#">导出 MOBI</a></li>
-                                                <li><a href="#">导出 EPUB</a></li>
-                                                {{/*<li><a href="#">导出 MD</a></li>*/}}
+                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
+                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
+                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -306,7 +305,17 @@
             }
         });
 
-
+        $(".btn-group-download a").click(function (e) {
+            e.preventDefault();
+            var href=$(this).attr("href");
+            $.get(href,function (res) {
+                if(res.errcode==1){
+                    alertTips("error",res.message,3000);
+                }else{
+                    location.href=res.data.url;
+                }
+            });
+        });
 
     });
 </script>

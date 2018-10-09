@@ -808,12 +808,12 @@ func (this *BookController) GitPull() {
 	}
 	//GitHub项目链接
 	link := this.GetString("link")
-	folder := "store/" + identify
-	err := utils.GitClone(link, folder)
-	if err != nil {
-		this.JsonResult(1, err.Error())
-	}
 	go func() {
+		folder := "store/" + identify
+		err := utils.GitClone(link, folder)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
 		this.loadByFolder(book.BookId, identify, folder)
 	}()
 
