@@ -425,9 +425,18 @@ func InMap(maps map[int]bool, key int) (ret bool) {
 	return
 }
 
+// 从HTML中获取text
 func GetTextFromHtml(htmlStr string) (txt string) {
 	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
 		txt = strings.TrimSpace(doc.Find("body").Text())
 	}
 	return
+}
+
+// Git Clone
+func GitClone(url, folder string) error {
+	os.RemoveAll(folder)
+	args := []string{"clone", url, folder}
+	beego.Debug(args)
+	return exec.Command("git", args...).Run()
 }

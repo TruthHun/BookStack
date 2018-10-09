@@ -21,3 +21,27 @@
         </form>
     </div>
 </div>
+
+<div class="modal fade" id="ModalPullByGit" tabindex="-1" role="dialog" aria-labelledby="ModalPullLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="ajax-form" action="{{urlfor "BookController.GitPull"}}" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="ModalPullByGitLabel">拉取项目</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="text" name="link" required class="form-control" placeholder="请输入Git仓库地址">
+                        <input type="hidden" value="" name="identify">
+                    </div>
+                    <div class="help-block">从Git仓库拉取markdown项目</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

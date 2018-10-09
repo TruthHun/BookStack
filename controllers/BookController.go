@@ -785,6 +785,41 @@ func (this *BookController) DownloadProject() {
 	this.JsonResult(0, "提交成功。下载任务已交由后台执行")
 }
 
+// 从Git仓库拉取项目
+func (this *BookController) GitPull() {
+	//处理步骤
+	//1、接受上传上来的zip文件，并存放到store/temp目录下
+	//2、解压zip到当前目录，然后移除非图片文件
+	//3、将文件夹移动到uploads目录下
+
+	if _, err := this.IsPermission(); err != nil {
+		this.JsonResult(1, err.Error())
+	}
+
+	//普通用户没有权限
+	if this.Member.Role > 1 {
+		this.JsonResult(1, "您没有操作权限")
+	}
+
+	identify := this.GetString("identify")
+	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
+	if book.BookId == 0 {
+		this.JsonResult(1, "导入失败，只有项目创建人才有权限导入项目")
+	}
+	//GitHub项目链接
+	link := this.GetString("link")
+	folder := "store/" + identify
+	err := utils.GitClone(link, folder)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	go func() {
+		this.loadByFolder(book.BookId, identify, folder)
+	}()
+
+	this.JsonResult(0, "提交成功，请耐心等待。")
+}
+
 //上传项目
 func (this *BookController) UploadProject() {
 	//处理步骤
@@ -914,6 +949,79 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 			}
 		}
 
+	}
+}
+
+func (this *BookController) loadByFolder(bookId int, identify, folder string) {
+	//说明：
+
+	imgMap := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".bmp": true, ".svg": true, ".webp": true}
+
+	defer func() {
+		os.RemoveAll(folder) //删除解压后的文件夹
+	}()
+
+	//注意：这里的prefix必须是判断是否是GitHub之前的prefix
+
+	//读取文件，把图片文档录入oss
+	files, err := filetil.ScanFiles(folder)
+	if err != nil {
+		beego.Error(err)
+		return
+	}
+
+	ModelStore := new(models.DocumentStore)
+
+	//文档对应的标识
+	for _, file := range files {
+		if !file.IsDir {
+			ext := strings.ToLower(filepath.Ext(file.Path))
+
+			if ok, _ := imgMap[ext]; ok { //图片，录入oss
+				switch utils.StoreType {
+				case utils.StoreOss:
+					if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, folder), false, false); err != nil {
+						beego.Error(err)
+					}
+				case utils.StoreLocal:
+					if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, folder)); err != nil {
+						beego.Error(err)
+					}
+				}
+			} else if ext == ".md" || ext == ".markdown" { //markdown文档，提取文档内容，录入数据库
+				doc := new(models.Document)
+				if b, err := ioutil.ReadFile(file.Path); err == nil {
+					mdCont := strings.TrimSpace(string(b))
+					if !strings.HasPrefix(mdCont, "[TOC]") {
+						mdCont = "[TOC]\r\n\r\n" + mdCont
+					}
+					htmlStr := mdtil.Md2html(mdCont)
+					doc.DocumentName = utils.ParseTitleFromMdHtml(htmlStr)
+					doc.BookId = bookId
+					//文档标识
+					doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, folder), "/"), "/", "-", -1)
+					doc.MemberId = this.Member.MemberId
+					doc.OrderSort = 1
+					if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
+						doc.OrderSort = 0
+					}
+					if docId, err := doc.InsertOrUpdate(); err == nil {
+						if err := ModelStore.InsertOrUpdate(models.DocumentStore{
+							DocumentId: int(docId),
+							Markdown:   mdCont,
+						}, "markdown"); err != nil {
+							beego.Error(err)
+						}
+					} else {
+						beego.Error(err.Error())
+					}
+
+				} else {
+					beego.Error("读取文档失败：", file.Path, "错误信息：", err)
+				}
+
+			}
+		}
 	}
 }
 

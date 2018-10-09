@@ -99,7 +99,7 @@
                                         {{/*<a href="javascript:void(0);" class="btn btn-default btn-upload-zip  btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">*/}}
                                             {{/*<i class="fa fa-cloud-upload"></i> 导入<span class="hidden-xs">项目</span>*/}}
                                         {{/*</a>*/}}
-                                        {{/*<a href="javascript:void(0);" class="btn btn-default btn-pull-project-from-github btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">*/}}
+                                        {{/*<a href="javascript:void(0);" class="btn btn-default btn-pull-project-by-zip btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">*/}}
                                             {{/*<i class="fa fa-link"></i> 拉取<span class="hidden-xs">项目</span>*/}}
                                         {{/*</a>*/}}
 
@@ -121,13 +121,13 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:void(0);" class="btn-pull-project-from-github" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
+                                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
                                                         <i class="fa fa-link"></i> ZIP 拉取导入
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:void(0);" class="btn-pull-project-from-github" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
-                                                        <i class="fa fa-git"></i> Git Clone 导入（TODO）
+                                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown项目">
+                                                        <i class="fa fa-git"></i> Git Clone 导入
                                                     </a>
                                                 </li>
                                             </ul>
@@ -143,7 +143,7 @@
                                                 <li><a href="#">导出 PDF</a></li>
                                                 <li><a href="#">导出 MOBI</a></li>
                                                 <li><a href="#">导出 EPUB</a></li>
-                                                <li><a href="#">导出 MD</a></li>
+                                                {{/*<li><a href="#">导出 MD</a></li>*/}}
                                             </ul>
                                         </div>
                                     </div>
@@ -282,9 +282,14 @@
             $("[data-toggle='tooltip']").tooltip();
         });
 
-        $(".btn-pull-project-from-github").click(function(){
+        $(".btn-pull-by-zip").click(function(){
            $("#ModalPull").modal("show");
             $("#ModalPull form").find("[name=identify]").val($(this).attr("data-identify"));
+        });
+
+        $(".btn-pull-by-git").click(function(){
+            $("#ModalPullByGit").modal("show");
+            $("#ModalPullByGit form").find("[name=identify]").val($(this).attr("data-identify"));
         });
 
         //批量上传文档图片[要放在vue执行代码的后面，否则获取不到identify的值]
