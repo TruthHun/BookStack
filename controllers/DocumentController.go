@@ -937,7 +937,6 @@ func (this *DocumentController) Content() {
 				history.Version = time.Now().Unix()
 				history.Action = "modify"
 				history.ActionName = actionName
-
 				_, err = history.InsertOrUpdate()
 				if err != nil {
 					beego.Error("DocumentHistory InsertOrUpdate => ", err)

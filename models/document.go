@@ -476,6 +476,24 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 			return
 		}
 
+		var links = make(map[string]string) //map[url]identify
+
+		gq.Find("a").Each(func(i int, selection *goquery.Selection) {
+			if href, ok := selection.Attr("href"); ok {
+				if !strings.HasPrefix(href, "$") {
+					identify := strconv.Itoa(i) + ".md"
+					links[href] = identify
+				}
+			}
+		})
+
+		replaceMD := func(mdCont string, links map[string]string) string {
+			for link, identify := range links {
+				mdCont = strings.Replace(mdCont, "("+link+")", "($"+identify+")", -1)
+			}
+			return mdCont
+		}
+
 		gq.Find("a").Each(func(i int, selection *goquery.Selection) {
 			if href, ok := selection.Attr("href"); ok {
 				hrefLower := strings.ToLower(href)
@@ -497,13 +515,16 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 						} else {
 							var ds DocumentStore
 							ds.DocumentId = int(docId)
-							ds.Markdown = "[TOC]\n\r\n\r" + retMD
+							//ds.Markdown = "[TOC]\n\r\n\r" + retMD
+							ds.Markdown = "[TOC]\n\r\n\r" + replaceMD(retMD, links)
 							if err := new(DocumentStore).InsertOrUpdate(ds, "markdown", "content"); err != nil {
 								beego.Error(err)
 							}
 						}
 						selection = selection.SetAttr("href", "$"+identify)
-						markdown = strings.Replace(markdown, href, "$"+identify, -1)
+						if _, ok := links[href]; ok {
+							markdown = strings.Replace(markdown, "("+href+")", "($"+identify+")", -1)
+						}
 					} else {
 						beego.Error(err.Error())
 					}
