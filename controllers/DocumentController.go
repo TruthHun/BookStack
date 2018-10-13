@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/html2md"
+
 	"image/png"
 
 	"bytes"
@@ -886,7 +888,17 @@ func (this *DocumentController) Content() {
 
 		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
 			//自动生成文档内容
-			imd, icont := new(models.Document).BookStackAuto(bookId, docId)
+
+			var imd, icont string
+			newDoc := models.NewDocument()
+			if strings.ToLower(doc.Identify) == "summary.md" {
+				icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
+				imd = html2md.Convert(icont)
+				imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
+			} else {
+				imd, icont = newDoc.BookStackAuto(bookId, docId)
+			}
+
 			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
 			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
 			isAuto = true
