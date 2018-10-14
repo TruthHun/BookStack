@@ -125,7 +125,7 @@
                                                     <input type="number" name="sort" class="form-control change-update" data-url="{{urlfor "ManagerController.UpdateCate"}}?id={{$child.Id}}" value="{{$child.Sort}}">
                                                 </div>
                                             </td>
-                                            <td>{{$item.Cnt}}</td>
+                                            <td>{{$child.Cnt}}</td>
                                             <td>
                                             {{if eq $child.Status true}}
                                                 <span class="text-success">启用</span>
