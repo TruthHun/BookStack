@@ -117,6 +117,9 @@ func RenderDocumentById(id int) {
 
 //使用chrome采集网页HTML
 func CrawlByChrome(urlstr string) (b []byte, err error) {
+	if strings.Contains(urlstr, "bookstack") {
+		return
+	}
 	chrome := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlstr}
 	cmd := exec.Command(chrome, args...)
@@ -129,7 +132,10 @@ func CrawlByChrome(urlstr string) (b []byte, err error) {
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
 //diySelecter:自定义选择器
 //注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
-func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelecter string, headers ...map[string]string) (cont string, err error) {
+func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, headers ...map[string]string) (cont string, err error) {
+	if strings.Contains(urlstr, "bookstack") {
+		return
+	}
 	if force { //强力模式
 		var b []byte
 		b, err = CrawlByChrome(urlstr)
@@ -175,7 +181,6 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 							}
 						}
 
-						//TODO:采集并下载图片
 						ext := strings.ToLower(filepath.Ext(src))
 						if strings.HasPrefix(ext, ".jpeg") {
 							ext = ".jpeg"
@@ -226,7 +231,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					})
 				}
 
-				diySelecter = strings.TrimSpace(diySelecter)
+				diySelector = strings.TrimSpace(diySelector)
 
 				cont, err = doc.Html()
 
@@ -245,19 +250,19 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					case 2: //=>text
 						cont = article.Content + fmt.Sprintf("\n原文：\n> %v", urlstr)
 					default: //0 && other=>markdown
-						cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> [%v](%v)", urlstr, urlstr)
+						cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
 					}
-				} else if intelligence == 2 && diySelecter != "" { //自定义提取
-					if htmlstr, err := doc.Find(diySelecter).Html(); err != nil {
+				} else if intelligence == 2 && diySelector != "" { //自定义提取
+					if htmlstr, err := doc.Find(diySelector).Html(); err != nil {
 						return "", err
 					} else {
 						switch contType {
 						case 1: //=>html
 							cont = htmlstr + "\n\r\n\r> 原文： " + urlstr
 						case 2: //=>text
-							cont = doc.Find(diySelecter).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
+							cont = doc.Find(diySelector).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 						default: //0 && other=>markdown
-							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: [%v](%v)", urlstr, urlstr)
+							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 						}
 					}
 				} else { //全文
@@ -274,7 +279,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 					default: //0 && other=>markdown
 						htmlstr, _ := doc.Find("body").Html()
-						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: [%v](%v)", urlstr, urlstr)
+						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 					}
 				}
 
