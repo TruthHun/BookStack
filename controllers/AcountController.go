@@ -383,7 +383,6 @@ func (this *AccountController) FindPassword() {
 	if this.Ctx.Input.IsPost() {
 
 		email := this.GetString("email")
-		captcha := this.GetString("code")
 
 		if email == "" {
 			this.JsonResult(6005, "邮箱地址不能为空")
@@ -392,12 +391,17 @@ func (this *AccountController) FindPassword() {
 			this.JsonResult(6004, "未启用邮件服务")
 		}
 
+		//captcha := this.GetString("code")
 		//如果开启了验证码
-		if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
-			v, ok := this.GetSession(conf.CaptchaSessionName).(string)
-			if !ok || !strings.EqualFold(v, captcha) {
-				this.JsonResult(6001, "验证码不正确")
-			}
+		//if v, ok := this.Option["ENABLED_CAPTCHA"]; ok && strings.EqualFold(v, "true") {
+		//	v, ok := this.GetSession(conf.CaptchaSessionName).(string)
+		//	if !ok || !strings.EqualFold(v, captcha) {
+		//		this.JsonResult(6001, "验证码不正确")
+		//	}
+		//}
+
+		if !cpt.VerifyReq(this.Ctx.Request) {
+			this.JsonResult(6001, "验证码不正确")
 		}
 
 		member, err := models.NewMember().FindByFieldFirst("email", email)
@@ -488,7 +492,6 @@ func (this *AccountController) FindPassword() {
 func (this *AccountController) ValidEmail() {
 	password1 := this.GetString("password1")
 	password2 := this.GetString("password2")
-	captcha := this.GetString("code")
 	token := this.GetString("token")
 	mail := this.GetString("mail")
 
@@ -504,11 +507,8 @@ func (this *AccountController) ValidEmail() {
 	if password1 != password2 {
 		this.JsonResult(6003, "确认密码输入不正确")
 	}
-	if captcha == "" {
-		this.JsonResult(6004, "验证码不能为空")
-	}
-	v, ok := this.GetSession(conf.CaptchaSessionName).(string)
-	if !ok || !strings.EqualFold(v, captcha) {
+
+	if !cpt.VerifyReq(this.Ctx.Request) {
 		this.JsonResult(6001, "验证码不正确")
 	}
 

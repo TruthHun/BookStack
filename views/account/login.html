@@ -55,9 +55,11 @@
                             </div>
                             <div class="form-group">
                                 <div class="help-block">
-                                   使用以下方式一键登录 <span class="pull-right"> 还没有账号？ <a href="{{urlfor "AccountController.Oauth" ":oauth" "email"}}" title="使用邮箱注册" class="tooltips text-primary">邮箱注册</a></span>
+                                    <span>没有账号？ <a href="{{urlfor "AccountController.Oauth" ":oauth" "email"}}" title="使用邮箱注册" class="tooltips text-primary">邮箱注册</a></span>
+                                    <span class="pull-right"> 忘记密码？<a href="{{urlfor "AccountController.FindPassword"}}" title="找回密码" class="tooltips text-primary">找回密码</a></span>
                                 </div>
-
+                                <hr>
+                                <div class="help-block">您还可以使用以下方式一键登录</div>
                                 <div class="login-by-third">
                                     <a class="tooltips" href="https://graph.qq.com/oauth2.0/authorize?client_id={{.QQClientId}}&redirect_uri={{.QQCallback}}&response_type=code&state=bookstack.cn{{.RandomStr}}" rel="nofollow" title="使用QQ一键登录">
                                         <img src="/static/images/qq.png" alt="QQ">
