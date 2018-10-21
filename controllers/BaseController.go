@@ -157,6 +157,13 @@ func (this *BaseController) ExecuteViewPathTemplate(tplName string, data interfa
 }
 
 func (this *BaseController) BaseUrl() string {
+	host := beego.AppConfig.String("sitemap_host")
+	if len(host) > 0 {
+		if strings.HasPrefix(host, "http://") || strings.HasPrefix(host, "https://") {
+			return host
+		}
+		return this.Ctx.Input.Scheme() + "://" + host
+	}
 	return this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
 }
 
