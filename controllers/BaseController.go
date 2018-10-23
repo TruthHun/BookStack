@@ -75,7 +75,7 @@ func (this *BaseController) Prepare() {
 		this.Member.ResolveRoleName()
 	}
 	this.Data["Member"] = this.Member
-	this.Data["BaseUrl"] = this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
+	this.Data["BaseUrl"] = this.BaseUrl()
 
 	if options, err := models.NewOption().All(); err == nil {
 		this.Option = make(map[string]string, len(options))
