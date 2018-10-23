@@ -84,6 +84,8 @@ static_domain=
 # 谷歌浏览器，用于发布内容的时候渲染未被渲染的markdown。建议安装最新版的Chrome浏览器，并把Chrome浏览器加入系统环境变量。
 # 使用Chrome的headless去处理。之前考虑使用phantomjs的，但是phantomjs有些小问题，不如Chrome强大。
 chrome=chromium-browser
+# 如果使用 puppeteer，则忽略chrome
+puppeteer = false
 
 #项目默认封面
 cover=/static/images/book.png

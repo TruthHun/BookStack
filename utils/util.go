@@ -107,22 +107,33 @@ func RenderDocumentById(id int) {
 	//使用chromium-browser
 	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
 	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8080") + "/local-render?id=" + strconv.Itoa(id)
-	chrome := beego.AppConfig.DefaultString("chrome", "chromium-browser")
+	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
-	cmd := exec.Command(chrome, args...)
+	if ok, _ := beego.AppConfig.Bool("puppeteer"); ok {
+		name = "node"
+		args = []string{"crawl.js", "--url", link}
+	}
+	cmd := exec.Command(name, args...)
 	if err := cmd.Run(); err != nil {
 		beego.Error(err)
 	}
 }
 
 //使用chrome采集网页HTML
-func CrawlByChrome(urlstr string) (b []byte, err error) {
-	if strings.Contains(urlstr, "bookstack") {
+func CrawlByChrome(urlStr string) (b []byte, err error) {
+	if strings.Contains(urlStr, "bookstack") {
 		return
 	}
-	chrome := beego.AppConfig.DefaultString("chrome", "chromium-browser")
-	args := []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlstr}
-	cmd := exec.Command(chrome, args...)
+	var args []string
+	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
+	if ok, _ := beego.AppConfig.Bool("puppeteer"); ok {
+		name = "node"
+		args = []string{"crawl.js", "--url", urlStr}
+	} else { // chrome
+		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
+	}
+	cmd := exec.Command(name, args...)
+	beego.Debug("------", cmd.Args)
 	return cmd.Output()
 }
 
