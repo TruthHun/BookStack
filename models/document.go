@@ -425,7 +425,7 @@ func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	var docsAll []*Document
 	o := orm.NewOrm()
 	cols := []string{"document_id", "document_name", "member_id", "parent_id", "book_id", "identify"}
-	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Filter("parent_id", 0).OrderBy("order_sort").Limit(5000).All(&docsAll, cols...)
+	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Filter("parent_id", 0).OrderBy("order_sort", "document_id").Limit(5000).All(&docsAll, cols...)
 	//以"."开头的文档标识，不在阅读目录显示
 	for _, doc := range docsAll {
 		if !strings.HasPrefix(doc.Identify, ".") {
