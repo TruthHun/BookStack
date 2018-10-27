@@ -455,3 +455,8 @@ func GitClone(url, folder string) error {
 	args := []string{"clone", url, folder}
 	return exec.Command("git", args...).Run()
 }
+
+type SplitMD struct {
+	Identify string
+	Cont     string
+}

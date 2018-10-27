@@ -836,157 +836,174 @@ func (this *DocumentController) Content() {
 	if docId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
+
 	ModelStore := new(models.DocumentStore)
-	if this.Ctx.Input.IsPost() { //更新文档内容
-		markdown := strings.TrimSpace(this.GetString("markdown", ""))
-		content := this.GetString("html")
 
-		version, _ := this.GetInt64("version", 0)
-		isCover := this.GetString("cover")
-
+	if !this.Ctx.Input.IsPost() {
 		doc, err := models.NewDocument().Find(docId)
 
 		if err != nil {
-			this.JsonResult(6003, "读取文档错误")
+			this.JsonResult(6003, "文档不存在")
 		}
-		if doc.BookId != bookId {
-			this.JsonResult(6004, "保存的文档不属于指定项目")
-		}
-		if doc.Version != version && !strings.EqualFold(isCover, "yes") {
-			beego.Info("%d|", version, doc.Version)
-			this.JsonResult(6005, "文档已被修改确定要覆盖吗？")
+		attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
+		if err == nil {
+			doc.AttachList = attach
 		}
 
-		isSummary := false
-		isAuto := false
-		//替换文档中的url链接
-		if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<bookstack-summary></bookstack-summary>") || strings.Contains(doc.Markdown, "<bookstack-summary/>")) {
-			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
-			isSummary = true
-			//要清除，避免每次保存的时候都要重新排序
-			replaces := []string{"<bookstack-summary></bookstack-summary>", "<bookstack-summary/>"}
-			for _, r := range replaces {
-				markdown = strings.Replace(markdown, r, "", -1)
-			}
-		}
-
-		//爬虫采集
-		access := this.Member.IsAdministrator()
-		if op, err := new(models.Option).FindByKey("SPIDER"); err == nil {
-			access = access && op.OptionValue == "true"
-		}
-		if access && strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
-			//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
-			isSummary = true
-			//要清除，避免每次保存的时候都要重新排序
-			replaces := []string{"<spider></spider>", "<spider/>"}
-			for _, r := range replaces {
-				markdown = strings.Replace(markdown, r, "", -1)
-			}
-			content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, bookId, this.Member.MemberId)
-		}
-
-		if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
-			//自动生成文档内容
-
-			var imd, icont string
-			newDoc := models.NewDocument()
-			if strings.ToLower(doc.Identify) == "summary.md" {
-				icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
-				imd = html2md.Convert(icont)
-				imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
-			} else {
-				imd, icont = newDoc.BookStackAuto(bookId, docId)
-			}
-
-			markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
-			content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
-			isAuto = true
-		}
-		content = this.replaceLinks(identify, content, isSummary)
-
-		var ds = models.DocumentStore{}
-		var actionName string
-
-		// 替换掉<git></git>标签内容
-		if markdown == "" && content != "" {
-			ds.Markdown = content
-		} else {
-			ds.Markdown = markdown
-		}
-
-		ds.Markdown, actionName = parseGitCommit(ds.Markdown)
-		ds.Content, _ = parseGitCommit(content)
-
-		if actionName == "" {
-			actionName = "--"
-		} else {
-			isAuto = true
-		}
-
-		beego.Debug(ds.Markdown, ds.Content)
-
-		doc.Version = time.Now().Unix()
-		if docId, err := doc.InsertOrUpdate(); err != nil {
-			beego.Error("InsertOrUpdate => ", err)
-			this.JsonResult(6006, "保存失败")
-		} else {
-			ds.DocumentId = int(docId)
-			if err := ModelStore.InsertOrUpdate(ds, "markdown", "content"); err != nil {
-				beego.Error(err)
-			}
-		}
-
-		//如果启用了文档历史，则添加历史文档
-		if this.EnableDocumentHistory > 0 {
-			if len(strings.TrimSpace(ds.Markdown)) > 0 { //空内容不存储版本
-				history := models.NewDocumentHistory()
-				history.DocumentId = docId
-				history.DocumentName = doc.DocumentName
-				history.ModifyAt = this.Member.MemberId
-				history.MemberId = doc.MemberId
-				history.ParentId = doc.ParentId
-				history.Version = time.Now().Unix()
-				history.Action = "modify"
-				history.ActionName = actionName
-				_, err = history.InsertOrUpdate()
-				if err != nil {
-					beego.Error("DocumentHistory InsertOrUpdate => ", err)
-				} else {
-					vc := models.NewVersionControl(docId, history.Version)
-					vc.SaveVersion(ds.Content, ds.Markdown)
-					history.DeleteByLimit(docId, this.EnableDocumentHistory)
-				}
-			}
-
-		}
-
-		if isAuto {
-			errMsg = "auto"
-		} else if isSummary {
-			errMsg = "true"
-		}
-
-		doc.Release = ""
-		//注意：如果errMsg的值是true，则表示更新了目录排序，需要刷新，否则不刷新
+		//为了减少数据的传输量，这里Release和Content的内容置空，前端会根据markdown文本自动渲染
+		//doc.Release = ""
+		//doc.Content = ""
+		doc.Markdown = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 		this.JsonResult(0, errMsg, doc)
 	}
+
+	//更新文档内容
+	markdown := strings.TrimSpace(this.GetString("markdown", ""))
+	content := this.GetString("html")
+
+	// 文档拆分
+	gq, err := goquery.NewDocumentFromReader(strings.NewReader(content))
+	if err == nil {
+		seg := gq.Find("bookstack-split").Text()
+		if strings.Contains(seg, "#") {
+			markdown = strings.Replace(markdown, fmt.Sprintf("<bookstack-split>%v</bookstack-split>", seg), "", -1)
+			err := new(models.Document).SplitMarkdownAndStore(seg, markdown, docId)
+			if err == nil {
+				this.JsonResult(0, "true")
+			} else {
+				this.JsonResult(1, err.Error())
+			}
+		}
+	}
+
+	version, _ := this.GetInt64("version", 0)
+	isCover := this.GetString("cover")
 
 	doc, err := models.NewDocument().Find(docId)
 
 	if err != nil {
-		this.JsonResult(6003, "文档不存在")
+		this.JsonResult(6003, "读取文档错误")
 	}
-	attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
-	if err == nil {
-		doc.AttachList = attach
+	if doc.BookId != bookId {
+		this.JsonResult(6004, "保存的文档不属于指定项目")
+	}
+	if doc.Version != version && !strings.EqualFold(isCover, "yes") {
+		beego.Info("%d|", version, doc.Version)
+		this.JsonResult(6005, "文档已被修改确定要覆盖吗？")
 	}
 
-	//为了减少数据的传输量，这里Release和Content的内容置空，前端会根据markdown文本自动渲染
-	//doc.Release = ""
-	//doc.Content = ""
-	doc.Markdown = ModelStore.GetFiledById(doc.DocumentId, "markdown")
-	this.JsonResult(0, "ok", doc)
+	isSummary := false
+	isAuto := false
+	//替换文档中的url链接
+	if strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<bookstack-summary></bookstack-summary>") || strings.Contains(doc.Markdown, "<bookstack-summary/>")) {
+		//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
+		isSummary = true
+		//要清除，避免每次保存的时候都要重新排序
+		replaces := []string{"<bookstack-summary></bookstack-summary>", "<bookstack-summary/>"}
+		for _, r := range replaces {
+			markdown = strings.Replace(markdown, r, "", -1)
+		}
+	}
+
+	//爬虫采集
+	access := this.Member.IsAdministrator()
+	if op, err := new(models.Option).FindByKey("SPIDER"); err == nil {
+		access = access && op.OptionValue == "true"
+	}
+	if access && strings.ToLower(doc.Identify) == "summary.md" && (strings.Contains(markdown, "<spider></spider>") || strings.Contains(doc.Markdown, "<spider/>")) {
+		//如果标识是summary.md，并且带有bookstack的标签，则表示更新目录
+		isSummary = true
+		//要清除，避免每次保存的时候都要重新排序
+		replaces := []string{"<spider></spider>", "<spider/>"}
+		for _, r := range replaces {
+			markdown = strings.Replace(markdown, r, "", -1)
+		}
+		content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, bookId, this.Member.MemberId)
+	}
+
+	if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
+		//自动生成文档内容
+
+		var imd, icont string
+		newDoc := models.NewDocument()
+		if strings.ToLower(doc.Identify) == "summary.md" {
+			icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
+			imd = html2md.Convert(icont)
+			imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
+		} else {
+			imd, icont = newDoc.BookStackAuto(bookId, docId)
+		}
+
+		markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
+		content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
+		isAuto = true
+	}
+	content = this.replaceLinks(identify, content, isSummary)
+
+	var ds = models.DocumentStore{}
+	var actionName string
+
+	// 替换掉<git></git>标签内容
+	if markdown == "" && content != "" {
+		ds.Markdown = content
+	} else {
+		ds.Markdown = markdown
+	}
+
+	ds.Markdown, actionName = parseGitCommit(ds.Markdown)
+	ds.Content, _ = parseGitCommit(content)
+
+	if actionName == "" {
+		actionName = "--"
+	} else {
+		isAuto = true
+	}
+
+	doc.Version = time.Now().Unix()
+	if docId, err := doc.InsertOrUpdate(); err != nil {
+		beego.Error("InsertOrUpdate => ", err)
+		this.JsonResult(6006, "保存失败")
+	} else {
+		ds.DocumentId = int(docId)
+		if err := ModelStore.InsertOrUpdate(ds, "markdown", "content"); err != nil {
+			beego.Error(err)
+		}
+	}
+
+	//如果启用了文档历史，则添加历史文档
+	if this.EnableDocumentHistory > 0 {
+		if len(strings.TrimSpace(ds.Markdown)) > 0 { //空内容不存储版本
+			history := models.NewDocumentHistory()
+			history.DocumentId = docId
+			history.DocumentName = doc.DocumentName
+			history.ModifyAt = this.Member.MemberId
+			history.MemberId = doc.MemberId
+			history.ParentId = doc.ParentId
+			history.Version = time.Now().Unix()
+			history.Action = "modify"
+			history.ActionName = actionName
+			_, err = history.InsertOrUpdate()
+			if err != nil {
+				beego.Error("DocumentHistory InsertOrUpdate => ", err)
+			} else {
+				vc := models.NewVersionControl(docId, history.Version)
+				vc.SaveVersion(ds.Content, ds.Markdown)
+				history.DeleteByLimit(docId, this.EnableDocumentHistory)
+			}
+		}
+
+	}
+
+	if isAuto {
+		errMsg = "auto"
+	} else if isSummary {
+		errMsg = "true"
+	}
+
+	doc.Release = ""
+	//注意：如果errMsg的值是true，则表示更新了目录排序，需要刷新，否则不刷新
+	this.JsonResult(0, errMsg, doc)
+
 }
 
 //导出文件

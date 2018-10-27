@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/gotil/mdtil"
+
 	"bytes"
 	"fmt"
 
@@ -532,6 +534,73 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 			}
 		})
 		content, _ = gq.Find("body").Html()
+	}
+	return
+}
+
+// markdown 文档拆分
+func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int) (err error) {
+	var mapReplace = map[string]string{
+		"${7}$": "####### ",
+		"${6}$": "###### ",
+		"${5}$": "##### ",
+		"${4}$": "#### ",
+		"${3}$": "### ",
+		"${2}$": "## ",
+		"${1}$": "# ",
+	}
+
+	m, err = m.Find(docId)
+	if err != nil {
+		return
+	}
+
+	newIdentifyFmt := "spilt.%v." + m.Identify
+
+	seg = fmt.Sprintf("${%v}$", strings.Count(seg, "#"))
+	for i := 7; i > 0; i-- {
+		slice := make([]string, i+1)
+		k := strings.Join(slice, "#")
+		markdown = strings.Replace(markdown, k, fmt.Sprintf("${%v}$", i), -1)
+	}
+	contSlice := strings.Split(markdown, seg)
+
+	for idx, val := range contSlice {
+		var doc = NewDocument()
+
+		if idx != 0 {
+			val = seg + val
+		}
+		for k, v := range mapReplace {
+			val = strings.Replace(val, k, v, -1)
+		}
+
+		doc.Identify = fmt.Sprintf(newIdentifyFmt, idx)
+		if idx == 0 { //不需要使用newIdentify
+			doc = m
+		} else {
+			doc.OrderSort = idx
+			doc.ParentId = m.DocumentId
+		}
+		doc.Release = ""
+		doc.BookId = m.BookId
+		doc.Markdown = val
+		doc.DocumentName = utils.ParseTitleFromMdHtml(mdtil.Md2html(val))
+		doc.Version = time.Now().Unix()
+		doc.MemberId = m.MemberId
+
+		if docId, err := doc.InsertOrUpdate(); err != nil {
+			beego.Error("InsertOrUpdate => ", err)
+		} else {
+			var ds = DocumentStore{
+				DocumentId: int(docId),
+				Markdown:   doc.Markdown,
+			}
+			if err := ds.InsertOrUpdate(ds, "markdown"); err != nil {
+				beego.Error(err)
+			}
+		}
+
 	}
 	return
 }

@@ -8,7 +8,7 @@
     <link href="editormd.css" rel="stylesheet">
 </head>
 <body>
-    <h1 id="article-title">{{.Doc.DocumentName}}</h1>
+    {{/*<h1 id="article-title">{{.Doc.DocumentName}}</h1>*/}}
     <div class="article-body markdown-body editormd-preview-container"  id="page-content">
         {{str2html .Doc.Release}}
     </div>
