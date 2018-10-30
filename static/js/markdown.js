@@ -257,19 +257,13 @@ $(function () {
             type :"post",
             dataType :"json",
             success : function (res) {
-                console.log("1111",res);
                 layer.close(index);
                 if(res.errcode === 0){
-                    if(res.message=="true"){//刷新页面显示最新的排序
-                        location.href=location.origin+location.pathname+"?"+new Date();//刷新当前页面以获取新的排序
-                    }else if(res.message=="auto"){
-                        $(".jstree-wholerow-clicked").trigger("click");
-                    }else{
                         resetEditorChanged(false);
                         for(var i in window.documentCategory){
                             var item = window.documentCategory[i];
 
-                            if(item.id === doc_id){
+                            if(item.id === doc_id && res.data!=undefined && res.data.version!=undefined){
                                 window.documentCategory[i].version = res.data.version;
                                 break;
                             }
@@ -277,7 +271,12 @@ $(function () {
                         if(typeof callback === "function"){
                             callback();
                         }
-                    }
+
+                        if(res.message=="true"){//刷新页面显示最新的排序
+                            location.href=location.origin+location.pathname+"?"+new Date();//刷新当前页面以获取新的排序
+                        }else if(res.message=="auto"){
+                            $(".jstree-wholerow-clicked").trigger("click");
+                        }
                 }else if(res.errcode === 6005){
                     var confirmIndex = layer.confirm('文档已被其他人修改确定覆盖已存在的文档吗？', {
                         btn: ['确定','取消'] //按钮
