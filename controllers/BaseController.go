@@ -428,7 +428,7 @@ func (this *BaseController) Crawl() {
 		intelligence, _ := this.GetInt("intelligence") //是否是强力采集，强力采集，使用Chrome
 		contType, _ := this.GetInt("type")
 		diySel := this.GetString("diy")
-		content, err := utils.CrawlHtml2Markdown(urlStr, contType, force, intelligence, diySel)
+		content, err := utils.CrawlHtml2Markdown(urlStr, contType, force, intelligence, diySel, []string{})
 		if err != nil {
 			this.JsonResult(1, "采集失败："+err.Error())
 		}
