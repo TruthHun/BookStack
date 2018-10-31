@@ -143,7 +143,7 @@ func CrawlByChrome(urlStr string) (b []byte, err error) {
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
 //diySelecter:自定义选择器
 //注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
-func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, headers ...map[string]string) (cont string, err error) {
+func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, headers ...map[string]string) (cont string, err error) {
 	if strings.Contains(urlstr, "bookstack") {
 		return
 	}
@@ -240,6 +240,13 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 						//存在href，且不以http://和https://开头
 						selection.SetText(selection.Text())
 					})
+				}
+
+				//排除标签
+				if len(excludeSelector) > 0 {
+					for _, sel := range excludeSelector {
+						doc.Find(sel).Remove()
+					}
 				}
 
 				diySelector = strings.TrimSpace(diySelector)

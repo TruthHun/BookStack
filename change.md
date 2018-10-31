@@ -24,7 +24,9 @@
 ## V1.6 升级日志
 - [x] `puppeteer` 支持
 - [x] 根据邮箱找回密码
-- [ ] `<bookstack-split></bookstack-split>`，文档拆分功能
+- [x] `<bookstack-split></bookstack-split>`，文档拆分功能
+- [ ] 文档采集，增加元素排除功能
+
 
 ## V1.5 升级日志
 - [x] 修复：文档项目删除时间过长进而导致删除失败的Bug（启用了MySQL的事务，但事务中SQL语句有select字句查询造成的问题）

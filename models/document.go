@@ -470,12 +470,20 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 		if strings.ToLower(gq.Find("mode").Text()) == "chrome" {
 			CrawlByChrome = true
 		}
-		beego.Error("chome", CrawlByChrome)
 		//内容选择器selector
 		selector := ""
 		if selector = strings.ToLower(gq.Find("selector").Text()); selector == "" {
 			err = errors.New("内容选择器不能为空")
 			return
+		}
+
+		//排除的选择器
+		var exclude []string
+		if excludeStr := strings.ToLower(gq.Find("exclude").Text()); excludeStr != "" {
+			slice := strings.Split(excludeStr, ",")
+			for _, item := range slice {
+				exclude = append(exclude, strings.TrimSpace(item))
+			}
 		}
 
 		var links = make(map[string]string) //map[url]identify
@@ -502,7 +510,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 				//以http或者https开头
 				if strings.HasPrefix(hrefLower, "http://") || strings.HasPrefix(hrefLower, "https://") {
 					//采集文章内容成功，创建文档，填充内容，替换链接为标识
-					if retMD, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, map[string]string{"project": project}); err == nil {
+					if retMD, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, exclude, map[string]string{"project": project}); err == nil {
 						var doc Document
 						identify := strconv.Itoa(i) + ".md"
 						doc.Identify = identify
