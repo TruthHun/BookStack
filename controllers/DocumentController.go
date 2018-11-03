@@ -211,7 +211,6 @@ func (this *DocumentController) Read() {
 		} else {
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				if src, ok := contentSelection.Attr("src"); ok {
-					beego.Debug(src)
 					if utils.StoreType == utils.StoreOss && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
 						src = this.OssDomain + "/" + strings.TrimLeft(src, "./")
 						contentSelection.SetAttr("src", src)
