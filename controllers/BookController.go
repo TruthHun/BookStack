@@ -554,6 +554,8 @@ func (this *BookController) CreateToken() {
 		this.JsonResult(6002, err.Error())
 	}
 
+	fmt.Println(bookResult.BookId)
+
 	book := models.NewBook()
 	if _, err := book.Find(bookResult.BookId); err != nil {
 		this.JsonResult(6001, "项目不存在")

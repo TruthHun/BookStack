@@ -120,10 +120,9 @@ func (m *Book) Find(id int) (book *Book, err error) {
 	if id <= 0 {
 		return
 	}
-	book = &Book{}
 	o := orm.NewOrm()
-	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(book)
-	return
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(m)
+	return m, err
 }
 
 func (m *Book) Update(cols ...string) (err error) {
