@@ -12,7 +12,7 @@
                 {{if gt $.Cid 0}}
                     <ol class="breadcrumb">
                         <li><a href="/">首页</a></li>
-                        <li><a href="{{urlfor "CateController.List"}}">分类</a></li>
+                        {{/*<li><a href="{{urlfor "CateController.List"}}">分类</a></li>*/}}
                         <li class="active">{{$.Cate.Title}}</li>
                     </ol>
                 {{end}}

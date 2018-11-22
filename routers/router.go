@@ -6,7 +6,10 @@ import (
 )
 
 func init() {
-	beego.Router("/", &controllers.HomeController{}, "*:Index")
+	beego.Router("/", &controllers.CateController{}, "get:Index")
+	beego.Router("/cate", &controllers.CateController{}, "get:List")
+	//beego.Router("/", &controllers.HomeController{}, "*:Index")
+	beego.Router("/explore", &controllers.HomeController{}, "*:Index")
 
 	beego.Router("/login", &controllers.AccountController{}, "*:Login")
 	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")
@@ -126,7 +129,6 @@ func init() {
 	beego.Router("/tag/:key", &controllers.LabelController{}, "get:Index")
 	beego.Router("/tag", &controllers.LabelController{}, "get:List")
 	beego.Router("/tags", &controllers.LabelController{}, "get:List")
-	beego.Router("/cate", &controllers.CateController{}, "get:List")
 	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap")
 	beego.Router("/local-render", &controllers.LocalhostController{}, "get,post:RenderMarkdown")
 	beego.Router("/projects/*", &controllers.BaseController{}, "get:ProjectsFile")

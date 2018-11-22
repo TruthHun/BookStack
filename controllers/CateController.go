@@ -9,6 +9,10 @@ type CateController struct {
 	BaseController
 }
 
+func (this *CateController) Index() {
+	this.List()
+}
+
 //分类
 func (this *CateController) List() {
 	if cates, err := new(models.Category).GetCates(-1, 1); err == nil {
