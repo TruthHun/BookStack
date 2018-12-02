@@ -10,6 +10,10 @@ type CateController struct {
 }
 
 func (this *CateController) Index() {
+	cid, _ := this.GetInt("cid")
+	if cid > 0 {
+		this.Redirect(beego.URLFor("HomeController.Index")+this.Ctx.Request.RequestURI, 302)
+	}
 	this.List()
 }
 

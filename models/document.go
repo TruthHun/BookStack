@@ -549,13 +549,13 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 // markdown 文档拆分
 func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int) (err error) {
 	var mapReplace = map[string]string{
-		"${7}$": "####### ",
-		"${6}$": "###### ",
-		"${5}$": "##### ",
-		"${4}$": "#### ",
-		"${3}$": "### ",
-		"${2}$": "## ",
-		"${1}$": "# ",
+		"${7}$": "#######",
+		"${6}$": "######",
+		"${5}$": "#####",
+		"${4}$": "####",
+		"${3}$": "###",
+		"${2}$": "##",
+		"${1}$": "#",
 	}
 
 	m, err = m.Find(docId)

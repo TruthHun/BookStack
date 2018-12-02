@@ -20,7 +20,7 @@
                 {{range $idx1,$children:=$.Cates}}
                     {{if and (gt $children.Cnt 0) (eq $cate.Id $children.Pid)}}
                     <div class="col-xs-12 col-sm-6 col-md-4">
-                        <div class="cate-item clearfix">
+                        <div class="cate-item clearfix" data-placement="bottom" title="{{$children.Intro}}">
                             <div>
                                 <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
                                 <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
@@ -40,5 +40,10 @@
     </div>
 </div>
 {{template "widgets/footer.html" .}}
+<script>
+    $(function () {
+        $(".cate-item").tooltip();
+    })
+</script>
 </body>
 </html>

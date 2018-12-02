@@ -22,7 +22,7 @@ func (this *HomeController) Index() {
 	var (
 		tab       string
 		cid       int //分类，如果只是一级分类，则忽略，二级分类，则根据二级分类查找内容
-		urlPrefix = "/"
+		urlPrefix = beego.URLFor("HomeController.Index")
 		cate      models.Category
 		tabName   = map[string]string{"recommend": "站长推荐", "latest": "最新发布", "popular": "热门书籍"}
 	)
