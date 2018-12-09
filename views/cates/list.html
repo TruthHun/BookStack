@@ -16,7 +16,7 @@
                     <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}&tab=popular" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} <!-- （{{$cate.Cnt}}） --></a>
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="panel-body" style="padding-left: 0px;padding-right:0px;margin-left: -9px;margin-right: -9px;">
                 {{range $idx1,$children:=$.Cates}}
                     {{if and (gt $children.Cnt 0) (eq $cate.Id $children.Pid)}}
                     <div class="col-xs-12 col-sm-6 col-md-4">
