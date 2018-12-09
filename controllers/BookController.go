@@ -35,6 +35,29 @@ type BookController struct {
 	BaseController
 }
 
+// 替换字符串
+func (this *BookController) Replace() {
+	identify := this.GetString(":key")
+	src := this.GetString("src")
+	dst := this.GetString("dst")
+
+	if this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+
+	book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			this.JsonResult(1, "内容不存在")
+		}
+		this.JsonResult(1, err.Error())
+	}
+
+	models.NewBook().Replace(book.BookId, src, dst)
+
+	this.JsonResult(0, "替换成功")
+}
+
 func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"

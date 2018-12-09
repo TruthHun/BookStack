@@ -530,3 +530,21 @@ func (m *Book) ResetDocumentNumber(bookId int) {
 		beego.Error(err)
 	}
 }
+
+// 内容替换
+func (m *Book) Replace(bookId int, src, dst string) {
+	var docs []Document
+	o := orm.NewOrm()
+	o.QueryTable(NewDocument()).Filter("book_id", bookId).Limit(10000).All(&docs, "document_id")
+	if len(docs) > 0 {
+		for _, doc := range docs {
+			ds := new(DocumentStore)
+			o.QueryTable(ds).Filter("document_id", doc.DocumentId).One(ds)
+			if ds.DocumentId > 0 {
+				ds.Markdown = strings.Replace(ds.Markdown, src, dst, -1)
+				ds.Content = strings.Replace(ds.Content, src, dst, -1)
+				o.Update(ds)
+			}
+		}
+	}
+}
