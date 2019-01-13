@@ -15,6 +15,7 @@
                 <div class="m-box">
                     <div class="box-head">
                         <strong class="box-title"> 配置管理</strong>
+                        <a href="{{urlfor "ManagerController.RebuildAllIndex"}}" class="ajax-get pull-right btn btn-success">更新全量索引</a>
                     </div>
                 </div>
                 <div class="box-body">
@@ -87,6 +88,22 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label>是否开启全文搜索( <span class="text-muted">开启全文搜索之后，请点击右上角的更新全文索引对内容进行全量索引更新 </span> )</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "true"}}checked{{end}} name="ELASTICSEARCH_ON" value="true">是<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "false"}}checked{{end}} name="ELASTICSEARCH_ON" value="false">否<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>全文搜索地址</label>
+                            <input type="text" name="ELASTICSEARCH_HOST" class="form-control" value="{{.ELASTICSEARCH_HOST.OptionValue}}">
+                        </div>
 
                         <div class="form-group">
                             <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>

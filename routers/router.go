@@ -48,6 +48,7 @@ func init() {
 	beego.Router("/manager/friendlink", &controllers.ManagerController{}, "get:FriendLink") //友链管理
 	beego.Router("/manager/add_friendlink", &controllers.ManagerController{}, "post:AddFriendlink")
 	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendlink")
+	beego.Router("/manager/rebuild-index", &controllers.ManagerController{}, "get:RebuildAllIndex")
 	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendlink")
 
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")

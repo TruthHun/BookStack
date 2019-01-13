@@ -440,6 +440,10 @@ func (this *ManagerController) Setting() {
 			item.OptionValue = this.GetString(item.OptionName)
 			item.InsertOrUpdate()
 		}
+		if err := models.NewElasticSearchClient().Init(); err != nil {
+			this.JsonResult(1, err.Error())
+		}
+
 		this.JsonResult(0, "ok")
 	}
 
@@ -810,4 +814,10 @@ func (this *ManagerController) DelFriendlink() {
 		this.JsonResult(1, "删除失败："+err.Error())
 	}
 	this.JsonResult(0, "删除成功")
+}
+
+// 重建全量索引
+func (this *ManagerController) RebuildAllIndex() {
+	go models.NewElasticSearchClient().RebuildAllIndex()
+	this.JsonResult(0, "提交成功，请耐心等待")
 }

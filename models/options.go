@@ -45,9 +45,7 @@ func (p *Option) Find(id int) (*Option, error) {
 
 func (p *Option) FindByKey(key string) (*Option, error) {
 	o := orm.NewOrm()
-
-	p.OptionName = key
-	if err := o.Read(p); err != nil {
+	if err := o.QueryTable(p).Filter("option_name", key).One(p); err != nil {
 		return p, err
 	}
 	return p, nil
@@ -168,6 +166,26 @@ func (m *Option) Init() error {
 		option.OptionValue = "true"
 		option.OptionName = "SPIDER"
 		option.OptionTitle = "采集器，是否只对管理员开放"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ELASTICSEARCH_ON").Exist() {
+		option := NewOption()
+		option.OptionValue = "false"
+		option.OptionName = "ELASTICSEARCH_ON"
+		option.OptionTitle = "是否开启全文搜索"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ELASTICSEARCH_HOST").Exist() {
+		option := NewOption()
+		option.OptionValue = "http://localhost:9200/"
+		option.OptionName = "ELASTICSEARCH_HOST"
+		option.OptionTitle = "ElasticSearch Host"
 		if _, err := o.Insert(option); err != nil {
 			return err
 		}
