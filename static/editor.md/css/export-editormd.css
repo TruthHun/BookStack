@@ -4461,3 +4461,13 @@ body{background-color: transparent !important;font-size: 15px;line-height: 170%;
 li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .markdown-body img{margin: 8px 0px;}
 .editormd-preview-container, .editormd-html-preview{background-color: transparent;}
+
+
+.editormd-preview-container blockquote, .editormd-html-preview blockquote{
+  color: #2C3E50;font-style: normal !important;
+  border-left: 5px solid #D6DBDF;
+  font-size: 14px;
+  background: none repeat scroll 0 0 rgba(102,128,153,.05);
+  margin: 8px 0;
+  padding: 8px 16px;
+}

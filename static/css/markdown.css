@@ -362,6 +362,14 @@ body{
     color: #8e8d8d
 }
 
+.editormd-preview-container blockquote, .editormd-html-preview blockquote{
+    color: #2C3E50;font-style: normal !important;
+    border-left: 5px solid #D6DBDF;
+    font-size: 14px;
+    background: none repeat scroll 0 0 rgba(102,128,153,.05);
+    margin: 8px 0;
+    padding: 8px 16px;
+}
 
 
 

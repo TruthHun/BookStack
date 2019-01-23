@@ -1252,4 +1252,14 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     border-top-color: #29d;
     border-left-color: #29d;}
 
+
+.editormd-preview-container blockquote, .editormd-html-preview blockquote{
+    color: #2C3E50;font-style: normal !important;
+    border-left: 5px solid #D6DBDF;
+    font-size: 14px;
+    background: none repeat scroll 0 0 rgba(102,128,153,.05);
+    margin: 8px 0;
+    padding: 8px 16px;
+}
+
 /*.article-menu a:hover{color: #008cff;}*/
