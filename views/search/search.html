@@ -23,11 +23,12 @@
     <div class="container manual-body">
         <div class="row">
             <div class="col-sm-8 col-xs-12 col-sm-offset-2">
-                <form method="get" class="search-form">
+                <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
                     <div class="input-group input-group-lg">
                         <input type="text" name="wd" placeholder="Search..." class="form-control">
-                        <span class="input-group-addon"><i class="fa fa-search"></i> 搜索</span>
+                        <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
                     </div>
+                    <div class="hidden-xs" style="margin-bottom: 300px;"></div>
                 </form>
             </div>
         </div>

@@ -57,7 +57,7 @@ textarea{
     margin-bottom: 0;
     background-color: #fff;
     border-bottom: 1px solid #efefef;
-     box-shadow: rgba(0,0,0,.1)0 1px 5px;
+     /*box-shadow: rgba(0,0,0,.1)0 1px 5px;*/
     border-top: 3px solid #009a61
 }
 .manual-header  .navbar-brand,.manual-header a {
@@ -777,3 +777,7 @@ a{color: #333}
     position: absolute;top:5px;left: 22px;
 }
 .book-list .recommend-book:before,.ucenter .recommend-book:before{left: 7px;}
+
+.nav>li>a:focus, .nav>li>a:hover{
+    padding-bottom: 16px !important;
+}
