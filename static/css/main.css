@@ -6,6 +6,7 @@ body {
 }
 a{
     text-decoration: none;
+    color: #06f;
 }
 a:hover{
     text-decoration: none;
@@ -58,7 +59,7 @@ textarea{
     background-color: #fff;
     border-bottom: 1px solid #efefef;
      /*box-shadow: rgba(0,0,0,.1)0 1px 5px;*/
-    border-top: 3px solid #009a61
+    /*border-top: 3px solid #009a61*/
 }
 .manual-header  .navbar-brand,.manual-header a {
     font-weight: normal;
@@ -399,7 +400,7 @@ textarea{
     margin: 10px auto;
     padding-bottom: 15px;
     line-height: 1.5em;
-    border-bottom: 3px solid #EEEEEE;
+    border-bottom: 1px solid #EEEEEE;
 }
 .manual-search-reader .search-head .search-title{
     font-size: 22px;
@@ -615,12 +616,13 @@ textarea{
 
 
 /* 以下是Bookstack的修正样式 */
+.navbar{min-height: 49px;}
 .navbar-brand{padding-left: 0px;}
 a{color: #333}
 .mgt-15px{margin-top: 15px;}
 .none-listyle{list-style: none;padding: 0px;}
 .btn-group.dropdown-menu-right.pull-right.slidebar.visible-xs-inline-block.visible-sm-inline-block{margin-top: 7px;}
-.navbar-nav>li.active a{background-color: #009a61;color: #ffffff;padding-bottom: 16px;}
+.navbar-nav>li.active a{background-color: #EFEFEF;color: #06f;padding-bottom: 16px;}
 .manual-list .list-item .manual-item-standard .cover{box-shadow: none;}
 .manual-list{
     padding-top: 15px;
@@ -694,7 +696,7 @@ a{color: #333}
 
 
 .footer{margin-top: 45px;line-height: 1.7;}
-.footer .container .row{border-top: 2px solid #dddddd;padding-top: 30px;padding-bottom: 30px;}
+.footer .container .row{border-top: 1px solid #dddddd;padding-top: 30px;padding-bottom: 30px;}
 .footer a{display: inline-block;}
 .friend-links .text-muted{margin-right: 5px;}
 
@@ -733,7 +735,7 @@ a{color: #333}
 .cate-list .panel-default{border:0px;margin-bottom: 0px;}
 .cate-list .panel-body{padding-left: 7px;padding-right: 7px;padding-top: 0px;}
 .cate-list .panel-body img{width: 50px;height: 50px;border:1px solid #f1f1f1;}
-.cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 3px;}
+.cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;border-radius: 3px;}
 .cate-list .panel-body .col-xs-12{padding-left: 8px;padding-right: 8px;}
 .cate-list .cate-item>a{display: inline-block;float: left;}
 .cate-list .cate-item>div{display: inline-block;width: 100%;}
@@ -778,6 +780,6 @@ a{color: #333}
 }
 .book-list .recommend-book:before,.ucenter .recommend-book:before{left: 7px;}
 
-.nav>li>a:focus, .nav>li>a:hover{
+.manual-header .nav>li>a:focus, .manual-header .nav>li>a:hover{
     padding-bottom: 16px !important;
 }
