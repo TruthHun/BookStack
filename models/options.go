@@ -191,5 +191,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "RELATE_BOOK_CACHE").Exist() {
+		option := NewOption()
+		option.OptionValue = "0"
+		option.OptionName = "RELATE_BOOK_CACHE"
+		option.OptionTitle = "推荐书籍缓存时长"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

@@ -18,7 +18,7 @@
                         <a href="{{urlfor "ManagerController.RebuildAllIndex"}}" class="ajax-get pull-right btn btn-success">更新全量索引</a>
                     </div>
                 </div>
-                <div class="box-body">
+                <div class="box-body" style="padding-bottom: 200px;">
                     <form method="post" id="gloablEditForm" action="{{urlfor "ManagerController.Setting"}}">
                             <div class="form-group">
                                 <label>网站名称</label>
@@ -33,10 +33,6 @@
                             <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">
                             <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
                         </div>
-                            <div class="form-group">
-                                <label>站点统计</label>
-                                <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="3">{{.TONGJI.OptionValue}}</textarea>
-                            </div>
 
 
                             {{/*肯定要允许游客进行访问*/}}
@@ -101,9 +97,28 @@
                         </div>
 
                         <div class="form-group">
-                            <label>全文搜索地址</label>
+                            <label>ElasticSearch全文搜索地址</label>
                             <input type="text" name="ELASTICSEARCH_HOST" class="form-control" value="{{.ELASTICSEARCH_HOST.OptionValue}}">
                         </div>
+
+                        <div class="form-group">
+                            <label>推荐书籍缓存时长( <span class="text-muted">开启了全文搜索才会生效。</span> )</label>
+                            <select name="RELATE_BOOK_CACHE" class="form-control">
+                                <option value="0">关闭</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "86400"}}selected{{end}} value="86400">一天</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "172800"}}selected{{end}} value="172800">两天</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "432000"}}selected{{end}} value="432000">五天</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "604800"}}selected{{end}} value="604800">一周</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "1296000"}}selected{{end}} value="1296000">半个月</option>
+                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "2592000"}}selected{{end}} value="2592000">一个月</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>站点统计</label>
+                            <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="3">{{.TONGJI.OptionValue}}</textarea>
+                        </div>
+
 
                         <div class="form-group">
                             <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
@@ -124,7 +139,7 @@
 <script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>
 {{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
 <script src="//apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
-
+<script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="/static/js/main.js" type="text/javascript"></script>
 <script type="text/javascript">
