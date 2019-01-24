@@ -472,14 +472,14 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 		}
 		//内容选择器selector
 		selector := ""
-		if selector = strings.ToLower(gq.Find("selector").Text()); selector == "" {
+		if selector = strings.TrimSpace(gq.Find("selector").Text()); selector == "" {
 			err = errors.New("内容选择器不能为空")
 			return
 		}
 
 		//排除的选择器
 		var exclude []string
-		if excludeStr := strings.ToLower(gq.Find("exclude").Text()); excludeStr != "" {
+		if excludeStr := strings.TrimSpace(gq.Find("exclude").Text()); excludeStr != "" {
 			slice := strings.Split(excludeStr, ",")
 			for _, item := range slice {
 				exclude = append(exclude, strings.TrimSpace(item))
