@@ -162,60 +162,53 @@ func (m *Document) RecursiveDocument(docId int) error {
 	return nil
 }
 
-//发布文档
+//发布文档内容为HTML
 func (m *Document) ReleaseContent(bookId int, baseUrl string) {
+	// 加锁
 	utils.BooksRelease.Set(bookId)
 	defer utils.BooksRelease.Delete(bookId)
 
-	//发布的时间戳
-	releaseTime := time.Now()
-
-	o := orm.NewOrm()
 	var (
-		docs       []*Document
-		book       Book
-		tableBooks = "md_books"
-		releaseNum = 0 //发布的文档数量，用于生成PDF、epub、mobi文档
+		o           = orm.NewOrm()
+		docs        []*Document
+		book        Book
+		tableBooks  = "md_books"
+		releaseTime = time.Now() //发布的时间戳
 	)
 
 	qs := o.QueryTable(tableBooks).Filter("book_id", bookId)
 	qs.One(&book)
-	//查询更新时间大于项目发布时间的文档
-	//_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", book_id).Filter("modify_time__gt", book.ReleaseTime).All(&docs, "document_id")
-	//全部重新发布
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).All(&docs, "document_id")
+
+	//全部重新发布。查询该书籍的所有文档id
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
 	}
 
-	idx := 1
 	ModelStore := new(DocumentStore)
 	for _, item := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
 		if len(utils.GetTextFromHtml(content)) == 0 {
+			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
-			idx++
-		} else {
-			item.Release = content
-			attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
-			if err == nil && len(attachList) > 0 {
-				content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
-				for _, attach := range attachList {
-					li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
-					content.WriteString(li)
-				}
-				content.WriteString("</ul></div>")
-				item.Release += content.String()
-			}
-			_, err = o.Update(item, "release")
-			if err != nil {
-				beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
-			} else {
-				releaseNum++
-			}
+			content = strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
 		}
-
+		item.Release = content
+		attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
+		if err == nil && len(attachList) > 0 {
+			content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
+			for _, attach := range attachList {
+				li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
+				content.WriteString(li)
+			}
+			content.WriteString("</ul></div>")
+			item.Release += content.String()
+		}
+		_, err = o.Update(item, "release")
+		if err != nil {
+			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
+		}
 	}
 
 	//最后再更新时间戳

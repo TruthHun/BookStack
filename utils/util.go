@@ -114,6 +114,13 @@ func RenderDocumentById(id int) {
 		args = []string{"crawl.js", "--url", link}
 	}
 	cmd := exec.Command(name, args...)
+	beego.Info("render document by document_id:", cmd.Args)
+	// 超过10秒，杀掉进程，避免长期占用
+	time.AfterFunc(30*time.Second, func() {
+		if cmd.Process.Pid != 0 {
+			cmd.Process.Kill()
+		}
+	})
 	if err := cmd.Run(); err != nil {
 		beego.Error(err)
 	}
@@ -133,6 +140,14 @@ func CrawlByChrome(urlStr string) (b []byte, err error) {
 		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
 	}
 	cmd := exec.Command(name, args...)
+
+	// 超过10秒，杀掉进程，避免长期占用
+	time.AfterFunc(30*time.Second, func() {
+		if cmd.Process.Pid != 0 {
+			cmd.Process.Kill()
+		}
+	})
+
 	beego.Debug("------", cmd.Args)
 	return cmd.Output()
 }
@@ -153,156 +168,159 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		cont = string(b)
 	} else {
 		req := util.BuildRequest("get", urlstr, "", "", "", true, false, headers...)
-		req.SetTimeout(10*time.Second, 30*time.Second)
+		req.SetTimeout(10*time.Second, 10*time.Second)
 		cont, err = req.String()
 	}
 
-	if err == nil {
-		//http://www.bookstack.cn/login.html
-		slice := strings.Split(strings.TrimSpace(urlstr), "/")
-		if sliceLen := len(slice); sliceLen > 2 {
-			var doc *goquery.Document
-			if doc, err = goquery.NewDocumentFromReader(strings.NewReader(cont)); err == nil {
-				//遍历a标签替换相对链接
-				doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-					//存在href，且不以http://和https://开头
-					if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://") && !strings.HasPrefix(strings.ToLower(href), "#")) {
-						if strings.HasPrefix(href, "/") {
-							selection.SetAttr("href", strings.Join(slice[0:3], "/")+href)
-						} else {
-							l := strings.Count(href, "../")
-							//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-							selection.SetAttr("href", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(href, "./"))
-						}
-					}
-				})
+	if err != nil {
+		return
+	}
 
-				//遍历替换图片相对链接
-				doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-					//存在href，且不以http://和https://开头
-					if src, ok := selection.Attr("src"); ok {
-						//链接补全
-						if !strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://") {
-							if strings.HasPrefix(src, "/") { //以斜杠开头
-								src = strings.Join(slice[0:3], "/") + src
-							} else {
-								l := strings.Count(src, "../")
-								//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-								src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
-							}
-						}
+	//http://www.bookstack.cn/login.html
+	slice := strings.Split(strings.TrimSpace(urlstr), "/")
+	if sliceLen := len(slice); sliceLen > 2 {
+		var doc *goquery.Document
+		doc, err = goquery.NewDocumentFromReader(strings.NewReader(cont))
+		if err != nil {
+			return
+		}
 
-						ext := strings.ToLower(filepath.Ext(src))
-						if strings.HasPrefix(ext, ".jpeg") {
-							ext = ".jpeg"
-						} else if strings.HasPrefix(ext, ".jpg") {
-							ext = ".jpg"
-						} else if strings.HasPrefix(ext, ".png") {
-							ext = ".png"
-						} else if strings.HasPrefix(ext, ".gif") {
-							ext = ".gif"
-						}
-						save := src
-						if (ext == ".jpeg" || ext == ".jpg" || ext == ".png" || ext == ".gif") && len(headers) > 0 {
-							project := ""
-							for _, header := range headers {
-								if val, ok := header["project"]; ok {
-									project = val
-								}
-							}
-							if project != "" {
-								reqImg := util.BuildRequest("get", src, urlstr, "", "", true, false, headers...)
-
-								file := cryptil.Md5Crypt(src) + ext
-								tmpfile := "cache/" + file
-								if err = reqImg.SetTimeout(10*time.Second, 10*time.Second).ToFile(tmpfile); err == nil {
-									defer os.Remove(tmpfile) //删除文件
-									switch StoreType {
-									case StoreLocal:
-										save = "/uploads/projects/" + project + "/" + file
-										store.ModelStoreLocal.MoveToStore(tmpfile, strings.TrimPrefix(save, "/"))
-									case StoreOss:
-										save = "projects/" + project + "/" + file
-										store.ModelStoreOss.MoveToOss(tmpfile, save, true)
-										save = store.ModelStoreOss.Domain + "/" + save
-									}
-								}
-							}
-						}
-						selection.SetAttr("src", save)
-					}
-				})
-
-				//h1-h6标题中不要存在链接或者图片，所以提取文本
-				Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
-				for _, tag := range Hs {
-					doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
-						//存在href，且不以http://和https://开头
-						selection.SetText(selection.Text())
-					})
+		//遍历a标签替换相对链接
+		doc.Find("a").Each(func(i int, selection *goquery.Selection) {
+			//存在href，且不以http://和https://开头
+			if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://") && !strings.HasPrefix(strings.ToLower(href), "#")) {
+				if strings.HasPrefix(href, "/") {
+					selection.SetAttr("href", strings.Join(slice[0:3], "/")+href)
+				} else {
+					l := strings.Count(href, "../")
+					//需要多减1，因为"http://"或"https://"后面多带一个斜杠
+					selection.SetAttr("href", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(href, "./"))
 				}
+			}
+		})
 
-				//排除标签
-				if len(excludeSelector) > 0 {
-					for _, sel := range excludeSelector {
-						doc.Find(sel).Remove()
-					}
-				}
-
-				diySelector = strings.TrimSpace(diySelector)
-
-				cont, err = doc.Html()
-
-				if intelligence == 1 { //智能提取
-					ext, err := html2article.NewFromHtml(cont)
-					if err != nil {
-						return cont, err
-					}
-					article, err := ext.ToArticle()
-					if err != nil {
-						return cont, err
-					}
-					switch contType {
-					case 1: //=>html
-						cont = article.Html + "\n原文：\n> " + urlstr
-					case 2: //=>text
-						cont = article.Content + fmt.Sprintf("\n原文：\n> %v", urlstr)
-					default: //0 && other=>markdown
-						cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
-					}
-				} else if intelligence == 2 && diySelector != "" { //自定义提取
-					if htmlstr, err := doc.Find(diySelector).Html(); err != nil {
-						return "", err
+		//遍历替换图片相对链接
+		doc.Find("img").Each(func(i int, selection *goquery.Selection) {
+			//存在href，且不以http://和https://开头
+			if src, ok := selection.Attr("src"); ok {
+				//链接补全
+				if !strings.HasPrefix(strings.ToLower(src), "http://") && !strings.HasPrefix(strings.ToLower(src), "https://") {
+					if strings.HasPrefix(src, "/") { //以斜杠开头
+						src = strings.Join(slice[0:3], "/") + src
 					} else {
-						switch contType {
-						case 1: //=>html
-							cont = htmlstr + "\n\r\n\r> 原文： " + urlstr
-						case 2: //=>text
-							cont = doc.Find(diySelector).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
-						default: //0 && other=>markdown
-							cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
-						}
-					}
-				} else { //全文
-					//移除body中的所有js标签
-					doc.Find("script").Each(func(i int, selection *goquery.Selection) {
-						selection.Remove()
-					})
-
-					switch contType {
-					case 1: //=>html
-						htmlstr, _ := doc.Find("body").Html()
-						cont = htmlstr + "\n\n\n> 原文：" + urlstr
-					case 2: //=>text
-						cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
-					default: //0 && other=>markdown
-						htmlstr, _ := doc.Find("body").Html()
-						cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
+						l := strings.Count(src, "../")
+						//需要多减1，因为"http://"或"https://"后面多带一个斜杠
+						src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
 					}
 				}
 
+				ext := strings.ToLower(filepath.Ext(src))
+				if strings.HasPrefix(ext, ".jpeg") {
+					ext = ".jpeg"
+				} else if strings.HasPrefix(ext, ".jpg") {
+					ext = ".jpg"
+				} else if strings.HasPrefix(ext, ".png") {
+					ext = ".png"
+				} else if strings.HasPrefix(ext, ".gif") {
+					ext = ".gif"
+				}
+				save := src
+				if (ext == ".jpeg" || ext == ".jpg" || ext == ".png" || ext == ".gif") && len(headers) > 0 {
+					project := ""
+					for _, header := range headers {
+						if val, ok := header["project"]; ok {
+							project = val
+						}
+					}
+					if project != "" {
+						reqImg := util.BuildRequest("get", src, urlstr, "", "", true, false, headers...)
+
+						file := cryptil.Md5Crypt(src) + ext
+						tmpfile := "cache/" + file
+						if err = reqImg.SetTimeout(10*time.Second, 10*time.Second).ToFile(tmpfile); err == nil {
+							defer os.Remove(tmpfile) //删除文件
+							switch StoreType {
+							case StoreLocal:
+								save = "/uploads/projects/" + project + "/" + file
+								store.ModelStoreLocal.MoveToStore(tmpfile, strings.TrimPrefix(save, "/"))
+							case StoreOss:
+								save = "projects/" + project + "/" + file
+								store.ModelStoreOss.MoveToOss(tmpfile, save, true)
+								save = store.ModelStoreOss.Domain + "/" + save
+							}
+						}
+					}
+				}
+				selection.SetAttr("src", save)
+			}
+		})
+
+		//h1-h6标题中不要存在链接或者图片，所以提取文本
+		Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
+		for _, tag := range Hs {
+			doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
+				//存在href，且不以http://和https://开头
+				selection.SetText(selection.Text())
+			})
+		}
+
+		//排除标签
+		if len(excludeSelector) > 0 {
+			for _, sel := range excludeSelector {
+				doc.Find(sel).Remove()
+			}
+		}
+
+		diySelector = strings.TrimSpace(diySelector)
+
+		cont, err = doc.Html()
+
+		if intelligence == 1 { //智能提取
+			ext, err := html2article.NewFromHtml(cont)
+			if err != nil {
+				return cont, err
+			}
+			article, err := ext.ToArticle()
+			if err != nil {
+				return cont, err
+			}
+			switch contType {
+			case 1: //=>html
+				cont = article.Html + "\n原文：\n> " + urlstr
+			case 2: //=>text
+				cont = article.Content + fmt.Sprintf("\n原文：\n> %v", urlstr)
+			default: //0 && other=>markdown
+				cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
+			}
+		} else if intelligence == 2 && diySelector != "" { //自定义提取
+			beego.Debug(diySelector, cont)
+			if htmlstr, err := doc.Find(diySelector).Html(); err != nil {
+				return "", err
 			} else {
-				beego.Error(err)
+				switch contType {
+				case 1: //=>html
+					cont = htmlstr + "\n\r\n\r> 原文： " + urlstr
+				case 2: //=>text
+					cont = doc.Find(diySelector).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
+				default: //0 && other=>markdown
+					cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
+				}
+			}
+		} else { //全文
+			//移除body中的所有js标签
+			doc.Find("script").Each(func(i int, selection *goquery.Selection) {
+				selection.Remove()
+			})
+
+			switch contType {
+			case 1: //=>html
+				htmlstr, _ := doc.Find("body").Html()
+				cont = htmlstr + "\n\n\n> 原文：" + urlstr
+			case 2: //=>text
+				cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
+			default: //0 && other=>markdown
+				htmlstr, _ := doc.Find("body").Html()
+				cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 			}
 		}
 	}

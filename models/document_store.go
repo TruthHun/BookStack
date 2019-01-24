@@ -16,6 +16,7 @@ func (this *DocumentStore) InsertOrUpdate(ds DocumentStore, fields ...string) (e
 	o := orm.NewOrm()
 	var one DocumentStore
 	o.QueryTable(TableDocumentStore).Filter("document_id", ds.DocumentId).One(&one, "document_id")
+
 	if one.DocumentId > 0 {
 		_, err = o.Update(&ds, fields...)
 	} else {
