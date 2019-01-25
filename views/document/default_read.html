@@ -38,7 +38,7 @@
             white-space: pre;
         }
         li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
-        .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint{border-color: #efefef;}
+        .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint{border-color: transparent;}
         body{-webkit-overflow-scrolling:touch;}
     </style>
 </head>
@@ -55,25 +55,36 @@
             <div class="navbar-header pull-right manual-menu">
                 <div class="bookstack-item">
                     {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
-                    <a title="首页" href="/" class="btn btn-default"><i class="fa fa-home"></i> 首页</a>
-                    <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-default"><i class="fa fa-cloud-download"></i> 下载</a>
-                    <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>
+                    <a title="首页" href="/" class="btn btn-link"><i class="fa fa-home"></i> 首页</a>
+                    <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-light"><i class="fa fa-cloud-download"></i> 下载</a>
+                    {{/*<a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
 
-                    <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
-
+                    <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-link showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
 
                     {{/*<a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-default showModalHistory"><i class="fa fa-info"></i> 帮助</a>*/}}
-                    <div class="btn-group">
-                        <a rel="nofollow" href="{{urlfor "BookmarkController.List" ":book_id" .Model.BookId}}" title="查看书签" rel="nofollow" data-bookid="{{.Model.BookId}}" class="btn btn-default showModalBookmark">
-                            <img src="/static/images/icon-bookmark-list.png" alt="书签"> 书签
-                        </a>
-                        <a href="{{urlfor "BookmarkController.Bookmark" ":id" ""}}" data-docid="{{.DocId}}" rel="nofollow" class="btn btn-default bookmark-action">
-                            <span class="bookmark-add {{if $.Bookmark}}hide{{end}}"> <img src="/static/images/icon-bookmark-add.png" alt="添加书签"> 添加</span>
-                            <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"> 移除</span>
-                        </a>
-                    </div>
+
+                        <span class="dropdown">
+                            <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                书签管理 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li>
+                                    <a rel="nofollow" href="{{urlfor "BookmarkController.List" ":book_id" .Model.BookId}}" title="查看书签" rel="nofollow" data-bookid="{{.Model.BookId}}" class="showModalBookmark">
+                                        <img src="/static/images/icon-bookmark-list.png" alt="书签"> 我的书签
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{urlfor "BookmarkController.Bookmark" ":id" ""}}" data-docid="{{.DocId}}" rel="nofollow" class="bookmark-action">
+                                        <span class="bookmark-add {{if $.Bookmark}}hide{{end}}"> <img src="/static/images/icon-bookmark-add.png" alt="添加书签"> 添加书签</span>
+                                        <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"> 移除书签</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </span>
+
+
                     {{if eq $.Member.MemberId $.Model.MemberId}}
-                        <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-default"><i class="fa fa-edit"></i> 编辑</a>
+                        <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-link"><i class="fa fa-edit"></i> 编辑文档</a>
                     {{end}}
                 </div>
             </div>
@@ -86,16 +97,26 @@
                 <div class="article-head">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-10 col-md-offset-1 text-center">
+                            <div class="col-md-10 col-md-offset-1 col-xs-12 text-center">
                                 <h1 id="article-title">{{.Title}}</h1>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="article-content">
+                    <div class="help-block article-info">
+                        {{/*<span><i class="fa fa-star"></i> 收藏 122</span>*/}}
+                        <span><i class="fa fa-eye"></i> 阅读 122</span>
+                        <span><i class="fa fa-user-o"></i> <a href="#">原作者: 路人甲</a></span>
+                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-qrcode"></i> 二维码</a></span>
+                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
+                            <span><a href="#"><i class="fa fa-check-square-o"></i> 无广告声明</a></span>
+                            <span class="pull-right"><i class="fa fa-clock-o"></i> 更新 2019-12-21 21:21:03</span>
+                    </div>
                     <div class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
                     </div>
+
                     <div class="row hung-read-link">
                         <div class="col-xs-12 hung-pre">
                             <span class="text-muted">上一篇:</span><a href="#"></a>
@@ -104,6 +125,7 @@
                             <span class="text-muted">下一篇:</span><a href="#"></a>
                         </div>
                     </div>
+
                     {{/*<div class="jump-top">*/}}
                         {{/*<a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>*/}}
                     {{/*</div>*/}}
