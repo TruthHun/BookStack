@@ -233,6 +233,17 @@ $(function () {
     });
 
 
+    $(".btn-pull-by-zip").click(function(){
+        $("#ModalPull").modal("show");
+        $("#ModalPull form").find("[name=identify]").val($(this).attr("data-identify"));
+    });
+
+    $(".btn-pull-by-git").click(function(){
+        $("#ModalPullByGit").modal("show");
+        $("#ModalPullByGit form").find("[name=identify]").val($(this).attr("data-identify"));
+    });
+
+
     //文档下载
     $(".btn-filedown").click(function (e) {
         e.preventDefault();

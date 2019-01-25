@@ -43,6 +43,29 @@
                 <div class="m-box">
                     <div class="box-head">
                         <strong class="box-title"> 项目设置</strong>
+
+                        <div class="btn-group pull-right btn-group-sm" style="margin-left: 5px;">
+                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入项目</button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从任意源拉取zip压缩的markdown项目">
+                                        <i class="fa fa-link"></i> ZIP 拉取导入
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从Git仓库导入markdown项目">
+                                        <i class="fa fa-git"></i> Git Clone 导入
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <a style="margin-left: 5px;" href="/api/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
+
                         {{if eq .Model.RoleId 0}}
                         <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让项目</button>
                         {{if eq .Model.PrivatelyOwned 1}}
@@ -54,8 +77,9 @@
                             生成下载文档
                         </a>
                         <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除项目</button>
-
                         {{end}}
+
+
 
                     </div>
                 </div>
@@ -268,6 +292,9 @@
         </form>
     </div>
 </div>
+
+{{template "widgets/pull.html" .}}
+
 
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
 <script src="//apps.bdimg.com/libs/jquery/1.11.3/jquery.min.js" type="text/javascript"></script>

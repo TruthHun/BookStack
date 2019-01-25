@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>搜索 - {{.SITE_NAME}}</title>
+
+    <link href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/static/css/main.css" rel="stylesheet">
+{{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+{{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
+    <script src="//apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+
+</head>
+<body>
+<div class="manual-reader manual-container manual-search-reader single-search">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="row">
+            <div class="col-sm-8 col-xs-12 col-sm-offset-2">
+                <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="wd" placeholder="Search..." class="form-control">
+                        <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
+                    </div>
+                    <div class="hidden-xs" style="margin-bottom: 300px;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{template "widgets/footer.html" .}}
+</div>
+
+<script>
+    $(function () {
+        $(".search-form .input-group-addon").click(function () {
+           var form=$(this).parents("form"),wd=form.find("[name=wd]").val();
+           if(wd) form.submit();
+        });
+    })
+</script>
+
+</body>
+</html>

@@ -281,15 +281,6 @@
             $("[data-toggle='tooltip']").tooltip();
         });
 
-        $(".btn-pull-by-zip").click(function(){
-           $("#ModalPull").modal("show");
-            $("#ModalPull form").find("[name=identify]").val($(this).attr("data-identify"));
-        });
-
-        $(".btn-pull-by-git").click(function(){
-            $("#ModalPullByGit").modal("show");
-            $("#ModalPullByGit form").find("[name=identify]").val($(this).attr("data-identify"));
-        });
 
         //批量上传文档图片[要放在vue执行代码的后面，否则获取不到identify的值]
         $(".btn-upload-zip").click(function () {
@@ -297,6 +288,7 @@
             form.find("[name=identify]").val(identify);
             form.find("input[type=file]").trigger("click");
         });
+
         //change事件处理
         $("#uploadZip input[type=file]").change(function () {
             if($(this).val() && confirm("您确定要上传 "+$(this).val()+" 吗？")){
