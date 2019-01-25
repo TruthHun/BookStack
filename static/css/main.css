@@ -783,3 +783,17 @@ a{color: #333}
 .manual-header .nav>li>a:focus, .manual-header .nav>li>a:hover{
     padding-bottom: 16px !important;
 }
+
+
+.search-result .search-form{margin: 10px 0px;}
+.result-list ul,.result-list li.clearfix{list-style: none;padding: 0px;}
+.result-list li.clearfix img{width: 80%;}
+.result-list li.clearfix{margin: 15px 0px;border-bottom: 1px dashed #EFEFEF;
+    line-height: 180%;
+}
+.result-list li.clearfix h4{margin-top: 0px;}
+.result-list .book-info{font-size: 12px;}
+.result-list .book-info span{margin-right: 5px;}
+.result-list .book-description{
+    text-overflow: ellipsis;overflow: hidden;word-break: break-all;height: 75px;
+}

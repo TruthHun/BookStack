@@ -418,7 +418,7 @@ table>tbody>tr:hover{
 }
 .manual-article .article-head {
     position: relative;
-    zoom:1;padding: 10px 20px
+    zoom:1;padding: 10px 20px 0px;
 }
 .manual-reader .book-title{
     color: #333333;
@@ -1252,6 +1252,24 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     border-top-color: #29d;
     border-left-color: #29d;}
 
+
+.markdown-body h1{font-size: 1.8em;}
+.markdown-body h2{font-size: 1.6em;}
+.markdown-body h3{font-size: 1.4em;}
+.markdown-body h4{font-size: 1.3em;}
+.markdown-body h5{font-size: 1.2em;}
+.markdown-body h6{font-size: 1.1em;}
+
+
+.article-info{
+    border-top: 1px solid #EFEFEF;padding-top: 10px;padding-bottom: 30px;
+}
+.article-info a,.article-info span{color: #cccccc;font-size: 13px;}
+.article-info:hover a,.article-info:hover span{color: #888;font-size: 13px;text-decoration: none;}
+.article-info a:hover{color: #29d;}
+.article-info span{margin-right: 10px;margin-top: 5px;}
+.article-info span.pull-right{margin-right: 0px;}
+.article-info i{font-style: normal;}
 
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{
     color: #2C3E50;font-style: normal !important;
