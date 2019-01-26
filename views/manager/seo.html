@@ -55,8 +55,8 @@
                             {{range .Lists}}
                                 <tr>
                                     <td>
-                                        <strong>{{.Page}}</strong>
-                                        <div class="help-block">{{.Statement}}</div>
+                                        <strong>{{.Statement}}</strong>
+                                        {{/*<div class="help-block">{{.Page}}</div>*/}}
                                     </td>
                                     <td>
                                         <textarea name="title" rows="3" class="form-control change-update" data-method="post" data-url="{{urlfor "ManagerController.Seo"}}?id={{.Id}}">{{.Title}}</textarea>

@@ -41,7 +41,7 @@ type ElasticSearchData struct {
 	Keywords string `json:"keywords"` //文档或书籍关键字
 	Content  string `json:"content"`  //文档摘要或书籍文本内容
 	Vcnt     int    `json:"vcnt"`     //浏览量
-	Private  int    `json:"Private"`  //书籍或者文档是否是公开的
+	Private  int    `json:"private"`  //书籍或者文档是否是公开的
 }
 
 //统计信息结构
@@ -69,28 +69,16 @@ type ElasticSearchResult struct {
 			Index  string      `json:"_index"`
 			Score  interface{} `json:"_score"`
 			Source struct {
-				Ccnt        int    `json:"Ccnt"`
-				Dcnt        int    `json:"Dcnt"`
-				Description string `json:"Description"`
-				DocType     int    `json:"DocType"`
-				DsID        int    `json:"DsId"`
-				ID          int    `json:"Id"`
-				Keywords    string `json:"Keywords"`
-				Page        int    `json:"Page"`
-				Score       int    `json:"Score"`
-				Size        int    `json:"Size"`
-				Title       string `json:"Title"`
-				Vcnt        int    `json:"Vcnt"`
-				Price       int    `json:"Price"`
-				TimeCreate  int    `json:"TimeCreate"`
+				Id       int    `json:"id"`
+				BookId   int    `json:"book_id"`
+				Title    string `json:"title"`
+				Keywords string `json:"keywords"`
+				Content  string `json:"content"`
+				Vcnt     int    `json:"vcnt"`
+				Private  int    `json:"private"`
 			} `json:"_source"`
-			Type      string `json:"_type"`
-			Highlight struct {
-				Title       []string `json:"Title"`
-				Keywords    []string `json:"Keywords"`
-				Description []string `json:"Description"`
-			} `json:"highlight"`
-			Sort []int `json:"sort"`
+			Type string `json:"_type"`
+			Sort []int  `json:"sort"`
 		} `json:"hits"`
 		MaxScore interface{} `json:"max_score"`
 		Total    int         `json:"total"`
@@ -123,6 +111,8 @@ func (this *ElasticSearchClient) html2Text(htmlStr string) string {
 	for _, tag := range tags {
 		htmlStr = strings.Replace(htmlStr, tag, tag+" ", -1)
 	}
+
+	htmlStr = strings.Replace(htmlStr, "\n", " ", -1)
 
 	gq, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
 	if err != nil {
@@ -190,7 +180,8 @@ func (this *ElasticSearchClient) Init() (err error) {
 
 //搜索内容
 // 如果书籍id大于0，则表示搜索指定的书籍的文档。否则表示搜索书籍
-func (this *ElasticSearchClient) Search(wd string, p, listRows int, bookId ...int) (result ElasticSearchResult, err error) {
+// 如果不指定书籍id，则只能搜索
+func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc bool, bookId ...int) (result ElasticSearchResult, err error) {
 	wd = strings.Replace(wd, "\"", " ", -1)
 	wd = strings.Replace(wd, "\\", " ", -1)
 	bid := 0
@@ -198,30 +189,52 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, bookId ...in
 		bid = bookId[0]
 	}
 
-	//搜索资源类型，0表示全部类型（即不限资源类型）
-	filter := fmt.Sprintf(`,"filter":{"term":{"book_id":%v}}`, bid)
+	var queryBody string
+	// 请求体
+	if bid > 0 { // 搜索指定书籍的文档，不限私有和公有
+		queryBody = `{"query": {"bool": {"filter": [{
+				"term": {
+					"book_id": {$bookId}
+				}
+			}],
+          "must":{"multi_match" : {
+              "query":    "%v", 
+              "fields": [ "title", "keywords","content" ] 
+            }
+          }
+		}},"from": %v,"size": %v}`
+		queryBody = strings.Replace(queryBody, "{$bookId}", strconv.Itoa(bid), 1)
+	} else {
+		if isSearchDoc { //搜索公开的文档
+			queryBody = `{"query": {"bool": {
+			"filter": [
+              {"range": {"book_id": {"gt": 0}}},
+              {"term": {"private": 0}}
+            ],"must":{
+          	"multi_match" : {
+              "query":    "%v", 
+              "fields": [ "title", "keywords","content" ] 
+            }}}},"from": %v,"size": %v}`
+		} else { //搜索公开的书籍
+			queryBody = `{"query": {"bool": {
+			"filter": [
+            	{"term": {"book_id": 0}},
+                {"term": {"private": 0}}
+            ],"must":{
+          	"multi_match" : {
+              "query":    "%v", 
+              "fields": [ "title", "keywords","content" ] 
+            }
+          }}},"from": %v, "size": %v}`
+		}
+	}
 
-	// elasticsearch不熟，只能这么用了...尴尬
-	queryBody := `
-{
-  "query": {
-    "bool":{
-      "must":{
-        "multi_match" : {
-          "query":    "%v", 
-          "fields": [ "title", "keywords","description" ] 
-        }
-      }%v
-    }
-  },
-  "from":%v,
-  "size":%v
-}`
-	queryBody = fmt.Sprintf(queryBody, wd, filter, (p-1)*listRows, listRows)
+	queryBody = fmt.Sprintf(queryBody, wd, (p-1)*listRows, listRows)
+	api := this.Host + this.Index + "/" + this.Type + "/_search"
 	if orm.Debug {
+		beego.Debug(api)
 		beego.Debug(queryBody)
 	}
-	api := this.Host + this.Index + "/" + this.Type + "/_search"
 	if resp, errResp := this.post(api).Body(queryBody).Response(); errResp != nil {
 		err = errResp
 	} else {

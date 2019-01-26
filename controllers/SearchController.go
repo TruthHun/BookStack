@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
@@ -28,12 +29,45 @@ func (this *SearchController) Search() {
 
 // 搜索结果页
 func (this *SearchController) Result() {
+	//TODO: 先判断是否开启了全文搜索
+
 	wd := this.GetString("wd")
 	if wd == "" {
 		this.Redirect(beego.URLFor("SearchController.Search"), 302)
 		return
 	}
+
+	now := time.Now()
+
 	tab := this.GetString("tab", "book")
+	isSearchDoc := false
+	if tab == "doc" {
+		isSearchDoc = true
+	}
+
+	page, _ := this.GetInt("page", 1)
+	size := 10
+	if page < 1 {
+		page = 1
+	}
+
+	client := models.NewElasticSearchClient()
+
+	// TODO:
+	if client.On { // elasticsearch 进行全文搜索
+
+	} else { //MySQL like 查询
+
+	}
+	result, err := models.NewElasticSearchClient().Search(this.GetString("wd"), page, size, isSearchDoc)
+	str := "搜索结果"
+	if err != nil {
+		str = err.Error()
+	}
+
+	this.JsonResult(0, str, result)
+
+	this.Data["SpendTime"] = time.Since(now).Seconds()
 	this.Data["Wd"] = wd
 	this.Data["Tab"] = tab
 	this.Data["IsSearch"] = true

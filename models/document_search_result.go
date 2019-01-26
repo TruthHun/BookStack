@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -78,13 +79,19 @@ WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_
 }
 
 //项目内搜索.
-func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int) (docs []*DocumentSearchResult, err error) {
+func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, size int) (docs []*DocumentSearchResult, err error) {
 	o := orm.NewOrm()
 
 	sql := "SELECT * FROM md_documents WHERE book_id = ? AND (document_name LIKE ? OR `release` LIKE ?) "
+	if bookId == 0 {
+		sql = "SELECT * FROM md_documents WHERE document_name LIKE ? OR `release` LIKE ? "
+	}
+
 	keyword = "%" + keyword + "%"
 
-	_, err = o.Raw(sql, bookId, keyword, keyword).QueryRows(&docs)
+	limit := fmt.Sprintf(" limit %v offset %v", size, (page-1)*size)
+
+	_, err = o.Raw(sql+limit, bookId, keyword, keyword).QueryRows(&docs)
 
 	return
 }

@@ -33,7 +33,7 @@
         </div>
         <div class="row">
             <div class="col-sm-8 col-xs-12 result-list">
-                <div class="help-block">本次搜索耗时 <span class="text-danger">0.32</span> 秒，为您搜索到  <span class="text-success">32</span> 个相关结果.</div>
+                <div class="help-block">本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您搜索到  <span class="text-success">32</span> 个相关结果.</div>
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "book"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=book">搜书籍</a></li>
                     <li {{if eq $.Tab "doc"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a></li>
@@ -248,14 +248,13 @@
 
 
                 {{if eq $.Tab "doc"}}
-                
+
 
                 {{end}}
 
             </div>
-            <div class="col-sm-4 hidden-xs result-right">
-                asdsa
-            </div>
+            {{/*TODO: 右侧显示内容*/}}
+            {{/*<div class="col-sm-4 hidden-xs result-right"></div>*/}}
         </div>
     </div>
     {{template "widgets/footer.html" .}}

@@ -1107,7 +1107,7 @@ func (this *DocumentController) Search() {
 	}
 	bookResult := isReadable(identify, token, this)
 
-	docs, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId)
+	docs, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId, 1, 10000)
 
 	if err != nil {
 		beego.Error(err)
