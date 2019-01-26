@@ -84,7 +84,8 @@ table>tbody>tr:hover{
 
 .m-manual .manual-head {
     min-width: 980px;
-    white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+    /*overflow: hidden;*/
+    white-space: nowrap;text-overflow: ellipsis;
     height: 54px;
     line-height: 54px;
     padding: 0 .8em;
@@ -111,6 +112,7 @@ table>tbody>tr:hover{
     -o-transition-timing-function: linear;
     -o-transition-delay: 0s;
 }
+
 .m-manual .slidebar{
     display: none;
 }
@@ -433,7 +435,7 @@ table>tbody>tr:hover{
     font-size: 20px;
     font-weight: 200;
     text-align: center;
-    line-height: 30px;
+    line-height: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1260,9 +1262,10 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .markdown-body h5{font-size: 1.2em;}
 .markdown-body h6{font-size: 1.1em;}
 
+.btn-link,a.btn-link,a.btn-link:hover{color: #222222 !important;text-decoration: none;}
 
 .article-info{
-    border-top: 1px solid #EFEFEF;padding-top: 10px;padding-bottom: 30px;
+    border-top: 1px solid #EFEFEF;padding-top: 10px;padding-bottom: 30px;margin-top: 0px;
 }
 .article-info a,.article-info span{color: #cccccc;font-size: 13px;}
 .article-info:hover a,.article-info:hover span{color: #888;font-size: 13px;text-decoration: none;}
@@ -1277,7 +1280,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     font-size: 14px;
     background: none repeat scroll 0 0 rgba(102,128,153,.05);
     margin: 8px 0;
-    padding: 8px 16px;
+    padding: 8px;
 }
 
 /*.article-menu a:hover{color: #008cff;}*/

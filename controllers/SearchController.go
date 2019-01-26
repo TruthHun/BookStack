@@ -15,9 +15,34 @@ type SearchController struct {
 	BaseController
 }
 
+//搜索
+func (this *SearchController) Search() {
+	if wd := strings.TrimSpace(this.GetString("wd")); wd != "" {
+		this.Redirect(beego.URLFor("LabelController.Index", ":key", wd), 302)
+		return
+	}
+	this.Data["SeoTitle"] = "搜索 - " + this.Sitename
+	this.Data["IsSearch"] = true
+	this.TplName = "search/search.html"
+}
+
+// 搜索结果页
+func (this *SearchController) Result() {
+	wd := this.GetString("wd")
+	if wd == "" {
+		this.Redirect(beego.URLFor("SearchController.Search"), 302)
+		return
+	}
+	tab := this.GetString("tab", "book")
+	this.Data["Wd"] = wd
+	this.Data["Tab"] = tab
+	this.Data["IsSearch"] = true
+	this.TplName = "search/result.html"
+}
+
 func (this *SearchController) Index() {
 	this.TplName = "search/index.html"
-	//如果没有开启你们访问则跳转到登录
+	//如果没有开启匿名访问则跳转到登录
 	if !this.EnableAnonymous && this.Member == nil {
 		this.Redirect(beego.URLFor("AccountController.Login"), 302)
 		return

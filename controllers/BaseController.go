@@ -437,16 +437,6 @@ func (this *BaseController) Crawl() {
 	this.JsonResult(1, "请先登录再操作")
 }
 
-//搜索
-func (this *BaseController) Search() {
-	if wd := strings.TrimSpace(this.GetString("wd")); wd != "" {
-		this.Redirect(beego.URLFor("LabelController.Index", ":key", wd), 302)
-		return
-	}
-	this.Data["SeoTitle"] = "搜索 - " + this.Sitename
-	this.TplName = "widgets/search.html"
-}
-
 //关注或取消关注
 func (this *BaseController) SetFollow() {
 	var cancel bool

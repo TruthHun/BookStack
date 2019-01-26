@@ -44,7 +44,6 @@
 </head>
 <body>
 <div class="m-manual manual-mode-view manual-reader">
-
     <header class="navbar navbar-static-top manual-head" role="banner">
         <div class="container-fluid">
             <div class="navbar-header pull-left manual-title">
@@ -106,12 +105,15 @@
                 <div class="article-content">
                     <div class="help-block article-info">
                         {{/*<span><i class="fa fa-star"></i> 收藏 122</span>*/}}
-                        <span><i class="fa fa-eye"></i> 阅读 122</span>
-                        <span><i class="fa fa-user-o"></i> <a href="#">原作者: 路人甲</a></span>
-                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-qrcode"></i> 二维码</a></span>
-                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
-                            <span><a href="#"><i class="fa fa-check-square-o"></i> 无广告声明</a></span>
-                            <span class="pull-right"><i class="fa fa-clock-o"></i> 更新 2019-12-21 21:21:03</span>
+                        <span><i class="fa fa-eye"></i> 阅读 <i class="read-count">{{.View}}</i></span>
+                        {{if .Model.Author}}
+                            <span><i class="fa fa-user-o"></i> <a href="{{.Model.AuthorURL}}">原作者: {{.Model.Author}}</a></span>
+                        {{end}}
+
+                        <span><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 文章二维码</a></span>
+                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享给好友</a></span>
+                            {{/*<span><a href="#"><i class="fa fa-check-square-o"></i> 无广告声明</a></span>*/}}
+                            <span class="pull-right"><i class="fa fa-clock-o"></i> 更新 <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
                     <div class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
@@ -214,6 +216,7 @@
 
 
 {{template "widgets/share.html" .}}
+{{template "widgets/qrcode.html" .}}
 
 {{template "widgets/download.html" .}}
 
@@ -238,6 +241,7 @@
 <!-- <script type="text/javascript" src="/static/layer/layer.js"></script> -->
 {{/*<script src="{{cdnjs "/static/editor.md/editormd.min.js"}}" type="text/javascript"></script>*/}}
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
 <script type="text/javascript" src="/static/js/bookstack.js"></script>
 <script type="text/javascript" src="/static/js/main.js"></script>
 <script type="text/javascript" src="//cdn.staticfile.org/KaTeX/0.7.1/katex.min.js"></script>
@@ -274,6 +278,7 @@ $(function () {
        }
     });
     $(".tooltips").tooltip();
+    $("#qrcode").qrcode(location.href);
 });
 </script>
 </body>

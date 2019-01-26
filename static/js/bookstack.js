@@ -49,6 +49,10 @@ function load_doc(url,wd,without_history) {
             pre_and_next_link();
             if(wd) $(".markdown-body").highlight(wd);
             $('.m-manual .manual-right').animate({scrollTop:0}, 100);
+            $("#qrcode").html("");
+            $("#qrcode").qrcode(location.href);
+            $(".read-count").text(res.data.view);
+            $(".updated-at").text(res.data.updated_at);
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】

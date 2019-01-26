@@ -60,6 +60,8 @@ type Book struct {
 	Score             int       `orm:"column(score);default(40)" json:"score"` //文档项目评分，默认40，即4.0星
 	CntScore          int       //评分人数
 	CntComment        int       //评论人数
+	Author            string    `orm:"size(50)"`           //原作者
+	AuthorURL         string    `orm:"column(author_url)"` //原作者链接
 }
 
 // TableName 获取对应数据库表名.
@@ -509,6 +511,8 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.ScoreFloat = utils.ScoreFloat(book.Score)
 	m.CntScore = book.CntScore
 	m.CntComment = book.CntComment
+	m.Author = book.Author
+	m.AuthorURL = book.AuthorURL
 
 	if book.Theme == "" {
 		m.Theme = "default"

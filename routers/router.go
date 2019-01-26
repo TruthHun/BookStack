@@ -117,7 +117,8 @@ func init() {
 	beego.Router("/comment/lists", &controllers.CommentController{}, "get:Lists")
 	beego.Router("/comment/index", &controllers.CommentController{}, "*:Index")
 
-	beego.Router("/search", &controllers.BaseController{}, "get:Search")
+	beego.Router("/search", &controllers.SearchController{}, "get:Search")
+	beego.Router("/search/result", &controllers.SearchController{}, "get:Result")
 	beego.Router("/crawl", &controllers.BaseController{}, "post:Crawl")
 
 	//用户中心 【start】

@@ -111,7 +111,6 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 	case "registered_only":
 		bookResult.IsDisplayComment = true
 	}
-
 	return bookResult
 }
 
@@ -258,17 +257,21 @@ func (this *DocumentController) Read() {
 	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)
 	if this.IsAjax() {
 		var data struct {
-			Id       int    `json:"doc_id"`
-			DocTitle string `json:"doc_title"`
-			Body     string `json:"body"`
-			Title    string `json:"title"`
-			Bookmark bool   `json:"bookmark"` //是否已经添加了书签
+			Id        int    `json:"doc_id"`
+			DocTitle  string `json:"doc_title"`
+			Body      string `json:"body"`
+			Title     string `json:"title"`
+			Bookmark  bool   `json:"bookmark"` //是否已经添加了书签
+			View      int    `json:"view"`
+			UpdatedAt string `json:"updated_at"`
 		}
 		data.DocTitle = doc.DocumentName
 		data.Body = doc.Release
 		data.Id = doc.DocumentId
 		data.Title = this.Data["SeoTitle"].(string)
 		data.Bookmark = existBookmark
+		data.View = doc.Vcnt
+		data.UpdatedAt = doc.ModifyTime.Format("2006-01-02 15:04:05")
 		//data.Body = doc.Markdown
 
 		this.JsonResult(0, "ok", data)
@@ -310,6 +313,8 @@ func (this *DocumentController) Read() {
 	this.Data["Title"] = doc.DocumentName
 	this.Data["DocId"] = doc.DocumentId
 	this.Data["Content"] = template.HTML(doc.Release)
+	this.Data["View"] = doc.Vcnt
+	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
 
 }
 

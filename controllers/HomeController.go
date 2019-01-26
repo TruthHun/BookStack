@@ -74,7 +74,9 @@ func (this *HomeController) Index() {
 	title := this.Sitename
 
 	if cid > 0 {
-		title = "[分类] " + cate.Title + " - " + tabName[tab] + " - " + title
+		title = "[发现] " + cate.Title + " - " + tabName[tab] + " - " + title
+	} else {
+		title = "探索，发现新世界，畅想新知识 - " + this.Sitename
 	}
 	this.GetSeoByPage("index", map[string]string{
 		"title":       title,
