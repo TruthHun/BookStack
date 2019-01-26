@@ -226,6 +226,8 @@ func (this *BookController) SaveBook() {
 	book.CommentStatus = commentStatus
 	book.Label = tag
 	book.Editor = editor
+	book.Author = this.GetString("author")
+	book.AuthorURL = this.GetString("author_url")
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")
@@ -481,6 +483,8 @@ func (this *BookController) Create() {
 	bookName := strings.TrimSpace(this.GetString("book_name", ""))
 	identify := strings.TrimSpace(this.GetString("identify", ""))
 	description := strings.TrimSpace(this.GetString("description", ""))
+	author := strings.TrimSpace(this.GetString("author", ""))
+	authorURL := strings.TrimSpace(this.GetString("author_url", ""))
 	privatelyOwned, _ := strconv.Atoi(this.GetString("privately_owned"))
 	commentStatus := this.GetString("comment_status")
 
@@ -492,13 +496,13 @@ func (this *BookController) Create() {
 		this.JsonResult(6002, "项目标识不能为空")
 	}
 
-	ok, err1 := regexp.MatchString(`^[a-zA-Z0-9_\-]*$`, identify)
+	ok, err1 := regexp.MatchString(`^[a-zA-Z0-9_\-\.]*$`, identify)
 	if !ok || err1 != nil {
-		this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号，且不能是纯数字")
+		this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”、“.”和“_”符号，且不能是纯数字")
 	}
 
 	if num, _ := strconv.Atoi(identify); strconv.Itoa(num) == identify {
-		this.JsonResult(6003, "项目标识只能包含字母、数字，以及“-”和“_”符号，且不能是纯数字")
+		this.JsonResult(6003, "项目标识不能是纯数字")
 	}
 
 	if strings.Count(identify, "") > 50 {
@@ -524,6 +528,8 @@ func (this *BookController) Create() {
 
 	book.Label = utils.SegWord(bookName)
 	book.BookName = bookName
+	book.Author = author
+	book.AuthorURL = authorURL
 	book.Description = description
 	book.CommentCount = 0
 	book.PrivatelyOwned = privatelyOwned

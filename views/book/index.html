@@ -179,13 +179,24 @@
                     <input type="text" class="form-control" placeholder="标题(不超过100字)" name="book_name" id="bookName">
                 </div>
                 <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">原作者</button>
+                        </span>
+                        <input type="text" placeholder="选填" name="author" id="author" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" style="border-left: 0px;border-right: 0px;border-radius: 0px;" type="button">原作者链接</button>
+                        </span>
+                        <input type="text" placeholder="选填" name="author_url" id="author_url" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
                     <div class="pull-left" style="padding: 7px 5px 6px 0">
                         {{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" ""}}
                     </div>
                     <input type="text" class="form-control pull-left" style="width: 220px;vertical-align: middle" placeholder="项目唯一标识(不能超过50字)" name="identify" id="identify">
                     <div class="clearfix"></div>
-                    <p class="text" style="font-size: 12px;color: #999;margin-top: 6px;">项目标识只能包含字母、数字，以及“-”和“_”符号头，且不能是纯数字</p>
-
+                    <p class="text" style="font-size: 12px;color: #999;margin-top: 6px;">项目标识只能包含字母、数字，以及“-”、"."和“_”符号，且不能是纯数字</p>
                 </div>
                 <div class="form-group">
                     <textarea name="description" id="description" class="form-control" placeholder="描述信息不超过500个字符" style="height: 90px;"></textarea>
