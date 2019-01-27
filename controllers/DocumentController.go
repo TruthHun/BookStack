@@ -306,6 +306,9 @@ func (this *DocumentController) Read() {
 		}
 	}
 
+	if wd := this.GetString("wd"); strings.TrimSpace(wd) != "" {
+		this.Data["Keywords"] = models.NewElasticSearchClient().SegWords(wd)
+	}
 	this.Data["Bookmark"] = existBookmark
 	this.Data["Model"] = bookResult
 	this.Data["Book"] = bookResult //文档下载需要用到Book变量
@@ -1092,8 +1095,6 @@ func (this *DocumentController) QrCode() {
 
 //项目内搜索.
 func (this *DocumentController) Search() {
-	this.Prepare()
-
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
 	keyword := strings.TrimSpace(this.GetString("keyword"))
@@ -1107,21 +1108,32 @@ func (this *DocumentController) Search() {
 	}
 	bookResult := isReadable(identify, token, this)
 
-	docs, _, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId, 1, 10000)
+	client := models.NewElasticSearchClient()
+	if client.On { // 全文搜索
+		result, err := client.Search(keyword, 1, 10000, true, bookResult.BookId)
+		if err != nil {
+			beego.Error(err)
+			this.JsonResult(6002, "搜索结果错误")
+		}
 
-	if err != nil {
-		beego.Error(err)
-		this.JsonResult(6002, "搜索结果错误")
+		var ids []int
+		for _, item := range result.Hits.Hits {
+			ids = append(ids, item.Source.Id)
+		}
+		docs, err := models.NewDocumentSearchResult().GetDocsById(ids)
+		if err != nil {
+			beego.Error(err)
+			this.JsonResult(6002, "搜索结果错误")
+		}
+		this.JsonResult(0, client.SegWords(keyword), docs)
+	} else {
+		docs, _, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId, 1, 10000)
+		if err != nil {
+			beego.Error(err)
+			this.JsonResult(6002, "搜索结果错误")
+		}
+		this.JsonResult(0, keyword, docs)
 	}
-
-	//for _, doc := range docs {
-	//	doc.BookId = bookResult.BookId
-	//	doc.BookName = bookResult.BookName
-	//	doc.Description = bookResult.Description
-	//	doc.BookIdentify = bookResult.Identify
-	//}
-
-	this.JsonResult(0, "ok", docs)
 }
 
 //文档历史列表.

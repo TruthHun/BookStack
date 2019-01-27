@@ -125,15 +125,19 @@ func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, 
 }
 
 // 根据id查询搜索结果
-func (m *DocumentSearchResult) GetDocsById(id []int) (docs []DocResult, err error) {
+func (m *DocumentSearchResult) GetDocsById(id []int, withoutCont ...bool) (docs []DocResult, err error) {
 	var idArr []string
 	for _, i := range id {
 		idArr = append(idArr, fmt.Sprint(i))
 	}
 
 	fields := []string{
-		"d.document_id", "d.document_name", "d.identify", "d.release", "d.vcnt", "d.create_time",
-		"b.book_id", "b.identify book_identify", "b.book_name",
+		"d.document_id", "d.document_name", "d.identify", "d.vcnt", "d.create_time", "b.book_id",
+	}
+
+	// 不返回内容
+	if len(withoutCont) == 0 || !withoutCont[0] {
+		fields = append(fields, "b.identify book_identify", "d.release", "b.book_name")
 	}
 
 	sqlFmt := "select " + strings.Join(fields, ",") + " from md_documents d left join md_books b on d.book_id=b.book_id where d.document_id in(%v)"

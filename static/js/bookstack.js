@@ -47,7 +47,12 @@ function load_doc(url,wd,without_history) {
             active_readed_menu(url);
             NProgress.done();
             pre_and_next_link();
-            if(wd) $(".markdown-body").highlight(wd);
+            if(wd) {
+                var wds = wd.split(","),l=wds.length;
+                for (var i = 0; i < l; i++) {
+                    $(".markdown-body").highlight(wds[i].trim());
+                }
+            }
             $('.m-manual .manual-right').animate({scrollTop:0}, 100);
             $("#qrcode").html("");
             $("#qrcode").qrcode(location.href);
@@ -345,7 +350,7 @@ $(function () {
             if(res.errcode === 0){
                 for(var i in res.data){
                     var item = res.data[i];
-                    html += '<li><a data-wd="'+wd+'" href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.identify+'"> '+ item.doc_name +' </a></li>';
+                    html += '<li><a data-wd="'+res.message+'" href="javascript:;" title="'+ item.doc_name +'" data-id="'+ item.identify+'"> '+ item.doc_name +' </a></li>';
                 }
             }
             $("#searchList").html(html);

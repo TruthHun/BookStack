@@ -248,6 +248,15 @@
 
 <script type="text/javascript">
 $(function () {
+
+    var keywords="{{.Keywords}}";
+    if (keywords){
+        var wds =keywords.split(","),l=wds.length;
+        for (var i = 0; i < l; i++) {
+            $(".markdown-body").highlight(wds[i].trim());
+        }
+    }
+
     $("#searchList").on("click","a",function () {
         var id = $(this).attr("data-id");
         var url = "{{urlfor "DocumentController.Read" ":key" .Model.Identify ":id" ""}}" + id;

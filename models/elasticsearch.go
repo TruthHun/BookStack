@@ -55,6 +55,18 @@ type ElasticSearchCount struct {
 	Count int `json:"count"`
 }
 
+// 分词
+type Token struct {
+	EndOffset   int    `json:"end_offset"`
+	Position    int    `json:"position"`
+	StartOffset int    `json:"start_offset"`
+	Token       string `json:"token"`
+	Type        string `json:"type"`
+}
+type Tokens struct {
+	Tokens []Token `json:"tokens"`
+}
+
 //搜索结果结构
 type ElasticSearchResult struct {
 	Shards struct {
@@ -85,10 +97,6 @@ type ElasticSearchResult struct {
 	} `json:"hits"`
 	TimedOut bool `json:"timed_out"`
 	Took     int  `json:"took"`
-}
-
-// 搜索文档展示结果
-type SearchDocResult struct {
 }
 
 //创建全文搜索客户端
@@ -409,6 +417,32 @@ func (this *ElasticSearchClient) BuildIndex(es ElasticSearchData) (err error) {
 		}
 	}
 	return
+}
+
+// 查询分词
+func (this *ElasticSearchClient) SegWords(keyword string) string {
+	api := this.Host + this.Index + "/_analyze"
+	req := this.post(api)
+	keyword = strings.Replace(keyword, "\\", " ", -1)
+	keyword = strings.Replace(keyword, "\"", " ", -1)
+	body := `{"text":"` + keyword + `","tokenizer": "ik_max_word"}`
+	req.Body(body)
+	if orm.Debug {
+		beego.Info(api)
+		beego.Info(body)
+	}
+	if js, err := req.String(); err == nil {
+		var tokens Tokens
+		json.Unmarshal([]byte(js), &tokens)
+		if len(tokens.Tokens) > 0 {
+			var words []string
+			for _, token := range tokens.Tokens {
+				words = append(words, token.Token)
+			}
+			return strings.Join(words, ",")
+		}
+	}
+	return keyword
 }
 
 //查询索引量
