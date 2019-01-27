@@ -2005,7 +2005,7 @@
                 renderer    : editormd.markedRenderer(markdownToC, rendererOptions),
                 gfm         : true,
                 tables      : true,
-                breaks      : true,
+                breaks      : false,
                 pedantic    : false,
                 sanitize    : (settings.htmlDecode) ? false : true,  // 关闭忽略HTML标签，即开启识别HTML标签，默认为false
                 smartLists  : true,
