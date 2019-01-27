@@ -30,6 +30,10 @@ func (this *LabelController) Index() {
 	this.Data["IsLabel"] = true
 
 	labelName := this.Ctx.Input.Param(":key")
+
+	this.Redirect(beego.URLFor("SearchController.Result")+"?wd="+labelName, 302)
+	return
+
 	this.Data["Keyword"] = labelName
 	pageIndex, _ := this.GetInt("page", 1)
 	if labelName == "" {

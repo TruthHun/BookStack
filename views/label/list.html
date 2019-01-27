@@ -15,7 +15,7 @@
             <div class="hide tag-container-outer" style="border: 0;margin-top: 0;padding: 5px 15px;min-height: 200px;">
                 <span class="tags">
                     {{range  $index,$item := .Labels}}
-                    <a href="{{urlfor "LabelController.Index" ":key" $item.LabelName}}">{{$item.LabelName}}<span class="detail">{{$item.BookNumber}}</span></a>
+                    <a href="{{urlfor "LabelController.Index" ":key" $item.LabelName}}">{{$item.LabelName}}</a>
                     {{end}}
                 </span>
             </div>

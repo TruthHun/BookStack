@@ -1189,7 +1189,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .bookstack-bars li:last-child{border-bottom:0px;}
 .bookstack-bars li:hover{background-color: #EFEFEF}
 .bookstack-bars li:hover a{color: #10af88}
-.editormd-preview-container code, .editormd-html-preview code{padding-top: 6px;}
+.editormd-preview-container code, .editormd-html-preview code{padding-top: 6px;border:0px;}
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{font-style: normal;color: #777;}
 
 .bookstack-bars .bars-menu-hide{display: none !important;}

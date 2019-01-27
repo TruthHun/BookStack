@@ -348,6 +348,30 @@ func ShowImg(img string, style ...string) (url string) {
 	return
 }
 
+// Substr returns the substr from start to length.
+func Substr(s string, length int) string {
+	bt := []rune(s)
+	start := 0
+	dot := false
+
+	if start > len(bt) {
+		start = start % len(bt)
+	}
+	var end int
+	if (start + length) > (len(bt) - 1) {
+		end = len(bt)
+	} else {
+		end = start + length
+		dot = true
+	}
+
+	str := string(bt[start:end])
+	if dot {
+		str = str + "..."
+	}
+	return str
+}
+
 //分页函数（这个分页函数不具有通用性）
 //rollPage:展示分页的个数
 //totalRows：总记录

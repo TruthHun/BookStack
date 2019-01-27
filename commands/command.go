@@ -205,6 +205,7 @@ func RegisterFunction() {
 	beego.AddFuncMap("scoreFloat", utils.ScoreFloat)
 	beego.AddFuncMap("showImg", utils.ShowImg)
 	beego.AddFuncMap("IsFollow", new(models.Fans).Relation)
+	beego.AddFuncMap("isubstr", utils.Substr)
 }
 
 func ResolveCommand(args []string) {

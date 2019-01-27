@@ -5,6 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/BookStack/conf"
+	"github.com/TruthHun/BookStack/utils"
+
 	"github.com/TruthHun/BookStack/models"
 	"github.com/astaxie/beego"
 )
@@ -96,10 +99,20 @@ func (this *SearchController) Result() {
 		}
 	}
 
+	this.Data["TotalRows"] = totalRows
+	if totalRows > size {
+		if totalRows > 1000 {
+			totalRows = 1000
+		}
+		urlSuffix := fmt.Sprintf("&tab=%v&wd=%v", tab, wd)
+		html := utils.NewPaginations(conf.RollPage, totalRows, size, page, beego.URLFor("SearchController.Result"), urlSuffix)
+		this.Data["PageHtml"] = html
+	} else {
+		this.Data["PageHtml"] = ""
+	}
 	this.Data["SpendTime"] = fmt.Sprintf("%.3f", time.Since(now).Seconds())
 	this.Data["Wd"] = wd
 	this.Data["Tab"] = tab
 	this.Data["IsSearch"] = true
-	this.Data["TotalRows"] = totalRows
 	this.TplName = "search/result.html"
 }

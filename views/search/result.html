@@ -56,9 +56,13 @@
                                 <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> {{.Star}}</span>
                                 <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> {{dateformat .CreateTime "2006-01-02"}}</span>
                             </div>
-                            <div class="help-block book-description">{{substr .Description 0 180}}</div>
+                            <div class="help-block book-description">{{isubstr .Description 180}}</div>
                         </div>
                     </li>
+                    {{else}}
+                        <li class="clearfix">
+                            <div class="help-block">啊哦，没搜到相关书籍，<a style="font-weight: 600;color: #06f;" href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a> 试下？</div>
+                        </li>
                     {{end}}
 
                 </ul>
@@ -76,15 +80,20 @@
                                     <span class="tooltips" title="发布时间"><i class="fa fa-clock-o"></i> {{dateformat .CreateTime "2006-01-02"}}</span>
                                     <span><a href="{{urlfor "DocumentController.Index" ":key" .BookIdentify}}" target="_blank" class="tooltips" title="查看书籍"><i class="fa fa-book text-muted"></i>《{{.BookName}}》</a></span>
                                 </div>
-                                <div class="help-block book-description">{{substr .Release 0 180}}</div>
+                                <div class="help-block book-description">{{isubstr .Release 180}}</div>
                             </div>
                         </li>
+                        {{else}}
+                            <li class="clearfix">
+                                <div class="help-block">很遗憾，没搜到相关文档，建议您更换关键字重新搜索</div>
+                            </li>
                         {{end}}
 
                     </ul>
 
                 {{end}}
 
+                {{.PageHtml}}
             </div>
             {{/*TODO: 右侧显示内容*/}}
             {{/*<div class="col-sm-4 hidden-xs result-right"></div>*/}}
