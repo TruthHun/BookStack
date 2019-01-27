@@ -1107,21 +1107,19 @@ func (this *DocumentController) Search() {
 	}
 	bookResult := isReadable(identify, token, this)
 
-	docs, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId, 1, 10000)
+	docs, _, err := models.NewDocumentSearchResult().SearchDocument(keyword, bookResult.BookId, 1, 10000)
 
 	if err != nil {
 		beego.Error(err)
 		this.JsonResult(6002, "搜索结果错误")
 	}
-	if len(docs) < 0 {
-		this.JsonResult(404, "没有数据库")
-	}
-	for _, doc := range docs {
-		doc.BookId = bookResult.BookId
-		doc.BookName = bookResult.BookName
-		doc.Description = bookResult.Description
-		doc.BookIdentify = bookResult.Identify
-	}
+
+	//for _, doc := range docs {
+	//	doc.BookId = bookResult.BookId
+	//	doc.BookName = bookResult.BookName
+	//	doc.Description = bookResult.Description
+	//	doc.BookIdentify = bookResult.Identify
+	//}
 
 	this.JsonResult(0, "ok", docs)
 }
@@ -1400,3 +1398,5 @@ func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, 
 		}
 	}
 }
+
+//

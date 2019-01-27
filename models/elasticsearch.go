@@ -87,6 +87,10 @@ type ElasticSearchResult struct {
 	Took     int  `json:"took"`
 }
 
+// 搜索文档展示结果
+type SearchDocResult struct {
+}
+
 //创建全文搜索客户端
 func NewElasticSearchClient() (client *ElasticSearchClient) {
 	client = &ElasticSearchClient{
@@ -202,7 +206,7 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
               "fields": [ "title", "keywords","content" ] 
             }
           }
-		}},"from": %v,"size": %v}`
+		}},"from": %v,"size": %v,"_source":["id"]}`
 		queryBody = strings.Replace(queryBody, "{$bookId}", strconv.Itoa(bid), 1)
 	} else {
 		if isSearchDoc { //搜索公开的文档
@@ -214,7 +218,7 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
           	"multi_match" : {
               "query":    "%v", 
               "fields": [ "title", "keywords","content" ] 
-            }}}},"from": %v,"size": %v}`
+            }}}},"from": %v,"size": %v,"_source":["id"]}`
 		} else { //搜索公开的书籍
 			queryBody = `{"query": {"bool": {
 			"filter": [
@@ -225,7 +229,7 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
               "query":    "%v", 
               "fields": [ "title", "keywords","content" ] 
             }
-          }}},"from": %v, "size": %v}`
+          }}},"from": %v, "size": %v,"_source":["id"]}`
 		}
 	}
 

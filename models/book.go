@@ -552,3 +552,50 @@ func (m *Book) Replace(bookId int, src, dst string) {
 		}
 	}
 }
+
+// 根据书籍id获取书籍
+func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error) {
+
+	var bs []Book
+	var rows int64
+	var idArr []interface{}
+
+	for _, i := range id {
+		idArr = append(idArr, i)
+	}
+
+	rows, err = orm.NewOrm().QueryTable(m).Filter("book_id__in", idArr...).All(&bs, fields...)
+	if rows > 0 {
+		bookMap := make(map[interface{}]Book)
+		for _, book := range bs {
+			bookMap[book.BookId] = book
+		}
+		for _, i := range id {
+			if book, ok := bookMap[i]; ok {
+				books = append(books, book)
+			}
+		}
+	}
+
+	return
+}
+
+// 搜索书籍，这里只返回book_id
+func (n *Book) SearchBook(wd string, page, size int) (books []Book, cnt int, err error) {
+	sqlFmt := "select %v from md_books where privately_owned=0 and (book_name like ? or label like ? or description like ?) order by star desc"
+	sqlCount := fmt.Sprintf(sqlFmt, "count(book_id) cnt")
+	sql := fmt.Sprintf(sqlFmt, "book_id")
+
+	var count struct{ Cnt int }
+	wd = "%" + wd + "%"
+
+	o := orm.NewOrm()
+
+	err = o.Raw(sqlCount, wd, wd, wd).QueryRow(&count)
+	if count.Cnt > 0 {
+		cnt = count.Cnt
+		_, err = o.Raw(sql, wd, wd, wd).QueryRows(&books)
+	}
+
+	return
+}

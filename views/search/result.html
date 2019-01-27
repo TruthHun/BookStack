@@ -26,6 +26,7 @@
                 <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
                     <div class="input-group input-group-lg">
                         <input type="text" name="wd" value="{{.Wd}}" placeholder="Search..." class="form-control">
+                        <input type="hidden" name="tab" value="{{.Tab}}">
                         <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
                     </div>
                 </form>
@@ -33,222 +34,54 @@
         </div>
         <div class="row">
             <div class="col-sm-8 col-xs-12 result-list">
-                <div class="help-block">本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您搜索到  <span class="text-success">32</span> 个相关结果.</div>
+                <div class="help-block">本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您搜索到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "book"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=book">搜书籍</a></li>
                     <li {{if eq $.Tab "doc"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a></li>
                 </ul>
                 {{if eq $.Tab "book"}}
                 <ul >
-
+                    {{range .Books}}
                     <li class="clearfix">
                         <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/mongols" target="_blank" title="mongols 文档手册">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/mongols/uploads/201901/157c7dd7d8b6dd98.png/cover" alt="" class="img-responsive border-cover-img">
+                            <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank" title="{{.BookName}}">
+                                <img onerror="this.src='/static/images/book.png'" src="{{showImg .Cover "cover"}}" alt="{{.BookName}}" class="img-responsive border-cover-img">
                             </a>
                         </div>
                         <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/mongols" target="_blank"><h4>mongols 文档手册</h4></a>
+                            <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank"><h4>{{.BookName}}</h4></a>
                             <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 17</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 36</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-23 21:32:17</span>
+                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
+                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> {{.Star}}</span>
+                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> {{dateformat .CreateTime "2006-01-02"}}</span>
                             </div>
-                            <div class="help-block book-description">
-                                C++服务器基础设施。mongols不依赖于任何事件库，其并发性能却远远强于著名的libevent、libev和libuv。mongols支持三种脚本语言lua,js和chai,你的品味决定你的选择。
-                            </div>
+                            <div class="help-block book-description">{{substr .Description 0 180}}</div>
                         </div>
                     </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/hi-nginx" target="_blank" title="hi-nginx 文档手册">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/hi-nginx/uploads/201901/157c7dbfd85b5377.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/hi-nginx" target="_blank"><h4>hi-nginx 文档手册</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 11</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 17</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-23 21:28:36</span>
-                            </div>
-                            <div class="help-block book-description">
-                                可靠、强劲、稳定的 Web 服务器和 Application 服务器。hi-nginx是nginx的超集，它继承了nginx的优良血统，是能够支持超大并发量的应用服务器
-                                可靠、强劲、稳定的 Web 服务器和 Application 服务器。hi-nginx是nginx的超集，它继承了nginx的优良血统，是能够支持超大并发量的应用服务器
-                                可靠、强劲、稳定的 Web 服务器和 Application 服务器。hi-nginx是nginx的超集，它继承了nginx的优良血统，是能够支持超大并发量的应用服务器
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/gods" target="_blank" title="[英文] Go Data Structures 文档手册">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/gods/uploads/201901/157c2ee892e23866.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/gods" target="_blank"><h4>[英文] Go Data Structures 文档手册</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 21</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 22</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-22 21:20:58</span>
-                            </div>
-                            <div class="help-block book-description">
-                                Implementation of various data structures and algorithms in Go.
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/TypeScriptDeepDiveZH" target="_blank" title="深入理解 TypeScript">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/TypeScriptDeepDiveZH/uploads/201901/157c2e0036144823.jpeg/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/TypeScriptDeepDiveZH" target="_blank"><h4>深入理解 TypeScript</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 69</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 22</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-22 21:05:13</span>
-                            </div>
-                            <div class="help-block book-description">
-                                此书是 《TypeScript Deep Dive》 的中文翻译版，从基础到深入，很全面的阐述了 TypeScript 的各种魔法，不管你是新手，还是老鸟，它都将适应你
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/PM2Plus" target="_blank" title="PM2 Plus教程">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/PM2Plus/uploads/201901/157be45d371c854d.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/PM2Plus" target="_blank"><h4>PM2 Plus教程</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 19</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 22</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-21 22:42:38</span>
-                            </div>
-                            <div class="help-block book-description">
-                                PM2是node进程管理工具，可以利用它来简化很多node应用管理的繁琐任务，如性能监控、自动重启、负载均衡等，而且使用非常简单.
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/pm2-runtime" target="_blank" title="PM2教程">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/pm2-runtime/uploads/201901/157be40d0c89b6b4.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/pm2-runtime" target="_blank"><h4>PM2教程</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 25</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 14</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-19 09:52:02</span>
-                            </div>
-                            <div class="help-block book-description">
-                                PM2是node进程管理工具，可以利用它来简化很多node应用管理的繁琐任务，如性能监控、自动重启、负载均衡等，而且使用非常简单
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/notes-python" target="_blank" title="中文 Python 笔记">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/notes-python/uploads/201901/157aa3c50a2e3f2d.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/notes-python" target="_blank"><h4>中文 Python 笔记</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 154</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 77</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-17 20:16:14</span>
-                            </div>
-                            <div class="help-block book-description">
-                                大部分内容来自网络。默认安装了 Python 2.7，以及相关的第三方包 ipython， numpy， scipy，pandas。
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/Okam" target="_blank" title="OKAM 小程序开发框架">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/Okam/uploads/201901/157a567085264517.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/Okam" target="_blank"><h4>OKAM 小程序开发框架</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 54</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 37</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-16 20:59:58</span>
-                            </div>
-                            <div class="help-block book-description">
-                                OKAM(奥卡姆)，一个面向小程序开发的开发框架，提供类 Vue 的开发体验。
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/wide-user-guide" target="_blank" title="Wide 用户指南">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/wide-user-guide/uploads/201901/157a54dffca8e206.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/wide-user-guide" target="_blank"><h4>Wide 用户指南</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 16</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 18</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-16 20:42:23</span>
-                            </div>
-                            <div class="help-block book-description">
-                                Wide 是一个基于 Web 的 Go 语言团队 IDE。本文档介绍了 Wide 的核心概念与用法。
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="clearfix">
-                        <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3 " style="padding: 0px;">
-                            <a href="/books/Wide-dev-guide" target="_blank" title="Wide 开发指南">
-                                <img onerror="this.src='/static/images/book.png'" src="http://static.bookstack.cn/projects/Wide-dev-guide/uploads/201901/157a5483c7ca424d.png/cover" alt="" class="img-responsive border-cover-img">
-                            </a>
-                        </div>
-                        <div class="col-sm-9 col-md-9 col-lg-10 col-xs-9">
-                            <a href="/books/Wide-dev-guide" target="_blank"><h4>Wide 开发指南</h4></a>
-                            <div class="text-muted book-info hidden-xs">
-                                <span title="" class="tooltips" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> 17</span>
-                                <span title="" class="tooltips" data-original-title="阅读人次"><i class="fa fa-eye"></i> 19</span>
-                                <span title="" class="tooltips" data-original-title="收藏人次"><i class="fa fa-heart-o"></i> 0</span>
-                                <span title="" class="tooltips" data-original-title="创建时间"><i class="fa fa-clock-o"></i> 2019-01-16 20:33:25</span>
-                            </div>
-                            <div class="help-block book-description">
-                                Wide 是一个基于 Web 的 Go 语言 IDE。如果您要读 Wide 的源码或者要进行修改、二次开发等，请先仔细阅读该文档。
-                            </div>
-                        </div>
-                    </li>
+                    {{end}}
 
                 </ul>
                 {{end}}
 
 
                 {{if eq $.Tab "doc"}}
+                    <ul class="doc-result">
+                        {{range .Docs}}
+                        <li class="clearfix">
+                            <div class="col-xs-12">
+                                <a href="{{urlfor "DocumentController.Read" ":key" .BookIdentify ":id" .Identify}}?wd={{$.Wd}}" target="_blank"><h4>{{.DocumentName}}</h4></a>
+                                <div class="text-muted book-info">
+                                    <span class="tooltips" title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                    <span class="tooltips" title="发布时间"><i class="fa fa-clock-o"></i> {{dateformat .CreateTime "2006-01-02"}}</span>
+                                    <span><a href="{{urlfor "DocumentController.Index" ":key" .BookIdentify}}" target="_blank" class="tooltips" title="查看书籍"><i class="fa fa-book text-muted"></i>《{{.BookName}}》</a></span>
+                                </div>
+                                <div class="help-block book-description">{{substr .Release 0 180}}</div>
+                            </div>
+                        </li>
+                        {{end}}
 
+                    </ul>
 
                 {{end}}
 

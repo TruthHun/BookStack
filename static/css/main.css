@@ -788,7 +788,7 @@ a{color: #333}
 .search-result .search-form{margin: 10px 0px;}
 .result-list ul,.result-list li.clearfix{list-style: none;padding: 0px;}
 .result-list li.clearfix img{width: 80%;}
-.result-list li.clearfix{margin: 15px 0px;border-bottom: 1px dashed #EFEFEF;
+.result-list li.clearfix{margin: 20px 0px;border-bottom: 1px dashed #EFEFEF;
     line-height: 180%;
 }
 .result-list li.clearfix h4{margin-top: 0px;}
@@ -796,4 +796,12 @@ a{color: #333}
 .result-list .book-info span{margin-right: 5px;}
 .result-list .book-description{
     text-overflow: ellipsis;overflow: hidden;word-break: break-all;height: 75px;
+    margin-bottom: 20px;color: #888888;
+}
+
+.search-result .doc-result li>.col-xs-12{
+    padding-left: 0px;
+}
+.search-result .doc-result .book-description{
+    height: auto;max-height: 75px;
 }
