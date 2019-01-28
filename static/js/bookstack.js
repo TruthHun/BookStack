@@ -20,6 +20,13 @@ function RenderByMarkdown($content) {
     });
 }
 
+function show_copy_btn() {
+    var btn="<button class='btn btn-danger btn-sm btn-copy'><i class='fa fa-copy'></i> 复制代码</button>";
+    if(!$(".article-body pre").hasClass("btn-copy")){
+        $(".article-body pre").prepend(btn);
+    }
+}
+
 function load_doc(url,wd,without_history) {
     NProgress.start();
     $.get(url+"?fr=bookstack",function (res) {
@@ -64,6 +71,7 @@ function load_doc(url,wd,without_history) {
             layer.msg("加载失败");
             NProgress.done();
         }
+        show_copy_btn();
     })
 }
 

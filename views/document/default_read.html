@@ -110,7 +110,7 @@
                             <span><i class="fa fa-user-o"></i> <a href="{{.Model.AuthorURL}}">原作者: {{.Model.Author}}</a></span>
                         {{end}}
 
-                        <span><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 文章二维码</a></span>
+                        <span><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码阅读</a></span>
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享给好友</a></span>
                             {{/*<span><a href="#"><i class="fa fa-check-square-o"></i> 无广告声明</a></span>*/}}
                             <span class="pull-right"><i class="fa fa-clock-o"></i> 更新 <i class="updated-at">{{.UpdatedAt}}</i></span>
@@ -242,6 +242,7 @@
 {{/*<script src="{{cdnjs "/static/editor.md/editormd.min.js"}}" type="text/javascript"></script>*/}}
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
 <script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript" src="/static/js/clipboard.min.js"></script>
 <script type="text/javascript" src="/static/js/bookstack.js"></script>
 <script type="text/javascript" src="/static/js/main.js"></script>
 <script type="text/javascript" src="//cdn.staticfile.org/KaTeX/0.7.1/katex.min.js"></script>
@@ -275,6 +276,9 @@ $(function () {
             location.href=href;
         }
     });
+
+    show_copy_btn();
+
     //数学公式处理
     $.each($(".editormd-tex"),function () {
        console.log($(this).text());
@@ -288,6 +292,23 @@ $(function () {
     });
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);
+
+    var clipboard = new ClipboardJS('.btn-copy',{
+        // 通过target指定要复印的节点
+        target: function(trigger) {
+            return trigger.nextElementSibling;
+        }
+    });
+
+    clipboard.on('success', function(e) {
+        console.info('Copy Content：', e.text);
+        alertTips("success","代码复制成功",3000,"");
+    });
+
+    clipboard.on('error', function(e) {
+        console.log("Copy Error：",e);
+    });
+
 });
 </script>
 </body>

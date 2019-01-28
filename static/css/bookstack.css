@@ -1283,4 +1283,8 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     padding: 8px;
 }
 
+.article-content pre{position: relative;}
+.article-content pre .btn-copy{position: absolute;right: 15px;display: none;}
+.article-content pre:hover .btn-copy{display: block;}
+
 /*.article-menu a:hover{color: #008cff;}*/
