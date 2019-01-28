@@ -22,11 +22,46 @@
 - [ ] 直接编辑文档的时候，跳转到指定的编辑文档
 
 ## V1.6 升级日志
-- [x] `puppeteer` 支持
+
+TODO: 删除项目时，索引没跟着删除
+
+- [x] `puppeteer` 支持（超过30秒，自动把进程杀掉）
 - [x] 根据邮箱找回密码
 - [x] `<bookstack-split></bookstack-split>`，文档拆分功能
-- [ ] 文档采集，增加元素排除功能
+- [x] 文章二维码，扫一扫，手机阅读
+- [ ] 文档采集功能优化
+    - [ ] 增加HTML标签排除功能：`<exclude></exclude>`，如要排除标签`h5`以及class为`hello`、id为"book"的HTML内容，写法是`<exclude>h5,.hello,#book</exclude>`
+    - [ ] 文档图片采集优化，base64的图片采集优化，base64的图片，不要补全链接地址
+- [ ] 增加全书指定字符替换功能
+- [ ] 使用 elasticsearch 实现全文搜索（在`管理后台`->`配置管理`进行设置）
+    - [ ] 增加相关书籍推荐功能（开启了全文搜索才会生效）
+    - [ ] 搜索功能，支持搜索书籍和全站文档
+    - [ ] 实时索引功能
+    - [ ] elasticsearch 只返回搜索结果的id，不返回大量的数据
+    - [ ] 文章、搜索结果页关键字高亮
+    - [ ] elasticsearch分词
+    - [ ] 实时索引
+        - [ ] 搜索经度优化
+        - [ ] 删除文档，同时删除索引
+        - [ ] 书籍公有和私有之间转换，同步更新索引中书籍的公有和私有状态
+        - [ ] 发布文档，实时更新对应的书籍的全量索引
+        - [ ] 删除书籍，同步删除概述及的所有相关文档
+        - [ ] 管理后台控制默认搜索的是文档还是书籍
+    - [ ] 文档内的搜索，使用elasticsearch
+- [ ] 标签管理和搜索关键字管理
+- [x] 在书籍编辑页面可以克隆或者是上传markdown
+- [x] 文章内容页顶部显示 作者、发布时间、更新时间、浏览量、分享人
+- [x] 新建和编辑项目，支持添加原作者和原作者链接 
+- [ ] 书籍发布队列
+- [x] 文档文章内容，顶部标题下显示信息
+- [ ] 本地化和内网的完整支持（增加offline配置项，用于内网部署，即无法访问外网的情况下）
+- [ ] 如果配置了第三方登录信息，则显示第三方登录
+- [x] HTML table 渲染问题（把`editormd.js`中的`breaks`设置为false）
 
+```
+sudo docker run -it -p 9300:9300 -p 9200:9200 --restart always -v /Users/TruthHun/elasticsearch/data:/usr/share/elasticsearch/data -v /Users/TruthHun/elasticsearch/config:/usr/share/elasticsearch/config --name bookstack-search truthhun/elasticsearch:6.2.4.ik
+sudo docker run -it -p 9300:9300 -p 9200:9200 -v /Users/TruthHun/elasticsearch/data:/usr/share/elasticsearch/data --name bookstack-search truthhun/elasticsearch:6.2.4.ik
+```
 
 ## V1.5 升级日志
 - [x] 修复：文档项目删除时间过长进而导致删除失败的Bug（启用了MySQL的事务，但事务中SQL语句有select字句查询造成的问题）
