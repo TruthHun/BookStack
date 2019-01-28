@@ -149,7 +149,7 @@ func (this *BookController) Setting() {
 	}
 
 	book, err := models.NewBookResult().FindByIdentify(key, this.Member.MemberId)
-	if err != nil {
+	if err != nil && err != orm.ErrNoRows {
 		beego.Error(err.Error())
 
 		if err == orm.ErrNoRows {
@@ -281,8 +281,9 @@ func (this *BookController) PrivatelyOwned() {
 		if state == 1 {
 			public = false
 		}
-		if errSet := models.NewElasticSearchClient().SetBookPublic(bookResult.BookId, public); errSet != nil {
-			beego.Error(err.Error())
+		client := models.NewElasticSearchClient()
+		if errSet := client.SetBookPublic(bookResult.BookId, public); errSet != nil && client.On {
+			beego.Error(errSet.Error())
 		}
 	}()
 	this.JsonResult(0, "ok")
@@ -647,6 +648,13 @@ func (this *BookController) Delete() {
 		logs.Error("删除项目 => ", err)
 		this.JsonResult(6003, "删除失败")
 	}
+
+	go func() {
+		client := models.NewElasticSearchClient()
+		if errDel := client.DeleteIndex(bookResult.BookId, true); errDel != nil && client.On {
+			beego.Error(errDel.Error())
+		}
+	}()
 
 	this.JsonResult(0, "ok")
 }

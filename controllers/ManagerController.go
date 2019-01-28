@@ -393,6 +393,14 @@ func (this *ManagerController) DeleteBook() {
 		logs.Error("DeleteBook => ", err)
 		this.JsonResult(6003, "删除失败")
 	}
+
+	go func() {
+		client := models.NewElasticSearchClient()
+		if errDel := client.DeleteIndex(bookId, true); errDel != nil && client.On {
+			beego.Error(errDel.Error())
+		}
+	}()
+
 	this.JsonResult(0, "ok")
 }
 
@@ -569,8 +577,9 @@ func (this *ManagerController) PrivatelyOwned() {
 		if state == 1 {
 			public = false
 		}
-		if errSet := models.NewElasticSearchClient().SetBookPublic(book.BookId, public); errSet != nil {
-			beego.Error(err.Error())
+		client := models.NewElasticSearchClient()
+		if errSet := client.SetBookPublic(book.BookId, public); errSet != nil && client.On {
+			beego.Error(errSet.Error())
 		}
 	}()
 

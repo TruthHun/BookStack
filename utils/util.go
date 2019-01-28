@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"strconv"
@@ -14,6 +16,7 @@ import (
 	"github.com/TruthHun/html2article"
 	"github.com/alexcesaro/mail/mailer"
 
+	"net/http"
 	"net/mail"
 
 	"path/filepath"
@@ -508,4 +511,16 @@ func GitClone(url, folder string) error {
 type SplitMD struct {
 	Identify string
 	Cont     string
+}
+
+// 处理http响应成败
+func HandleResponse(resp *http.Response, err error) error {
+	if err == nil {
+		defer resp.Body.Close()
+		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
+			b, _ := ioutil.ReadAll(resp.Body)
+			err = errors.New(resp.Status + "；" + string(b))
+		}
+	}
+	return err
 }

@@ -811,6 +811,15 @@ func (this *DocumentController) Delete() {
 
 	//重置文档数量统计
 	models.NewBook().ResetDocumentNumber(doc.BookId)
+
+	go func() {
+		// 删除文档的索引
+		client := models.NewElasticSearchClient()
+		if errDel := client.DeleteIndex(docId, false); errDel != nil && client.On {
+			beego.Error(errDel.Error())
+		}
+	}()
+
 	this.JsonResult(0, "ok")
 }
 

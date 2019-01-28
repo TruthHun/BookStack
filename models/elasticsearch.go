@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/BookStack/utils"
+
 	"github.com/PuerkitoBio/goquery"
 
 	"net/http"
@@ -388,29 +390,23 @@ func (this *ElasticSearchClient) SetBookPublic(bookId int, public bool) (err err
 	if bookId <= 0 {
 		return
 	}
-	var resp *http.Response
+
 	private := 1
 	if public {
 		private = 0
 	}
-	bodyDoc := fmt.Sprintf(`{"query":{"term":{"book_id":%v}},"script":{"inline":"ctx._source.private = %v"}}`, bookId, private)
+
 	apiDoc := this.Host + this.Index + "/" + this.Type + "/_update_by_query"
-	if resp, err = this.post(apiDoc).Body(bodyDoc).Response(); err == nil {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			b, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New("更新失败：" + resp.Status + "；" + string(b))
-			return
-		}
+	bodyDoc := fmt.Sprintf(`{"query":{"term":{"book_id":%v}},"script":{"inline":"ctx._source.private = %v"}}`, bookId, private)
+
+	err = utils.HandleResponse(this.post(apiDoc).Body(bodyDoc).Response())
+	if err != nil {
+		return
 	}
 
 	apiBook := this.Host + this.Index + "/" + this.Type + "/book_" + strconv.Itoa(bookId) + "/_update"
 	bodyBook := fmt.Sprintf(`{"script" : "ctx._source.private=%v"}`, private)
-	if resp, err = this.post(apiBook).Body(bodyBook).Response(); err == nil {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			b, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New("更新失败：" + resp.Status + "；" + string(b))
-		}
-	}
+	err = utils.HandleResponse(this.post(apiBook).Body(bodyBook).Response())
 	return
 }
 
@@ -504,26 +500,24 @@ func (this *ElasticSearchClient) Count() (count int, err error) {
 
 // TODO:删除索引
 func (this *ElasticSearchClient) DeleteIndex(id int, isBook bool) (err error) {
-	idStr := strconv.Itoa(id)
-	identify := "doc_" + idStr
+	_id := strconv.Itoa(id)
+	idStr := "doc_" + _id
 	if isBook {
-		identify = "book_" + idStr
-	} else {
-
+		idStr = "book_" + _id
 	}
 
-	fmt.Println(identify)
-
+	// 不管是书籍id还是文档id，常规删除操作API如下：
 	api := this.Host + this.Index + "/" + this.Type + "/" + idStr
-
-	if resp, errResp := this.delete(api).Response(); errResp != nil {
-		err = errResp
-	} else {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			b, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New("删除索引失败：" + resp.Status + "；" + string(b))
-		}
+	if err = utils.HandleResponse(this.delete(api).Response()); err != nil {
+		return
 	}
+
+	if isBook { //如果是删除书籍的索引，则接下来删除书籍所对应的文档的索引。使用条件查询的方式进行删除操作
+		api = this.Host + this.Index + "/" + this.Type + "/_query"
+		body := fmt.Sprintf(`{"query":{"term":{ "book_id":%v}}}`, id)
+		err = utils.HandleResponse(this.delete(api).Body(body).Response())
+	}
+
 	return
 }
 
