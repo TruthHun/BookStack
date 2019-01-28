@@ -383,6 +383,37 @@ func (this *ElasticSearchClient) BuildIndexByBuck(data []ElasticSearchData) (err
 	return
 }
 
+// 设置书籍的公有和私有，需要根据文档同时更新文档的公有和私有
+func (this *ElasticSearchClient) SetBookPublic(bookId int, public bool) (err error) {
+	if bookId <= 0 {
+		return
+	}
+	var resp *http.Response
+	private := 1
+	if public {
+		private = 0
+	}
+	bodyDoc := fmt.Sprintf(`{"query":{"term":{"book_id":%v}},"script":{"inline":"ctx._source.private = %v"}}`, bookId, private)
+	apiDoc := this.Host + this.Index + "/" + this.Type + "/_update_by_query"
+	if resp, err = this.post(apiDoc).Body(bodyDoc).Response(); err == nil {
+		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
+			b, _ := ioutil.ReadAll(resp.Body)
+			err = errors.New("更新失败：" + resp.Status + "；" + string(b))
+			return
+		}
+	}
+
+	apiBook := this.Host + this.Index + "/" + this.Type + "/book_" + strconv.Itoa(bookId) + "/_update"
+	bodyBook := fmt.Sprintf(`{"script" : "ctx._source.private=%v"}`, private)
+	if resp, err = this.post(apiBook).Body(bodyBook).Response(); err == nil {
+		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
+			b, _ := ioutil.ReadAll(resp.Body)
+			err = errors.New("更新失败：" + resp.Status + "；" + string(b))
+		}
+	}
+	return
+}
+
 //创建索引
 func (this *ElasticSearchClient) BuildIndex(es ElasticSearchData) (err error) {
 	var (
@@ -471,11 +502,20 @@ func (this *ElasticSearchClient) Count() (count int, err error) {
 	return
 }
 
-//删除索引
-//@param            id          索引id
-//@return           err         错误
-func (this *ElasticSearchClient) DeleteIndex(id int) (err error) {
-	api := this.Host + this.Index + "/" + this.Type + "/" + strconv.Itoa(id)
+// TODO:删除索引
+func (this *ElasticSearchClient) DeleteIndex(id int, isBook bool) (err error) {
+	idStr := strconv.Itoa(id)
+	identify := "doc_" + idStr
+	if isBook {
+		identify = "book_" + idStr
+	} else {
+
+	}
+
+	fmt.Println(identify)
+
+	api := this.Host + this.Index + "/" + this.Type + "/" + idStr
+
 	if resp, errResp := this.delete(api).Response(); errResp != nil {
 		err = errResp
 	} else {

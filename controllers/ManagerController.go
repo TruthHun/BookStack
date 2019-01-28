@@ -563,6 +563,17 @@ func (this *ManagerController) PrivatelyOwned() {
 		beego.Error("PrivatelyOwned => ", err)
 		this.JsonResult(6004, "保存失败")
 	}
+
+	go func() {
+		public := true
+		if state == 1 {
+			public = false
+		}
+		if errSet := models.NewElasticSearchClient().SetBookPublic(book.BookId, public); errSet != nil {
+			beego.Error(err.Error())
+		}
+	}()
+
 	this.JsonResult(0, "ok")
 }
 
