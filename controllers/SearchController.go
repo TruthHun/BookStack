@@ -42,7 +42,7 @@ func (this *SearchController) Result() {
 
 	now := time.Now()
 
-	tab := this.GetString("tab", "book")
+	tab := this.GetString("tab", models.GetOptionValue("DEFAULT_SEARCH", "book"))
 	isSearchDoc := false
 	if tab == "doc" {
 		isSearchDoc = true

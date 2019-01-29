@@ -201,5 +201,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DEFAULT_SEARCH").Exist() {
+		option := NewOption()
+		option.OptionValue = "book"
+		option.OptionName = "DEFAULT_SEARCH"
+		option.OptionTitle = "默认搜索"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
