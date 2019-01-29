@@ -594,7 +594,7 @@ func (n *Book) SearchBook(wd string, page, size int) (books []Book, cnt int, err
 	err = o.Raw(sqlCount, wd, wd, wd).QueryRow(&count)
 	if count.Cnt > 0 {
 		cnt = count.Cnt
-		_, err = o.Raw(sql, wd, wd, wd).QueryRows(&books)
+		_, err = o.Raw(sql+" limit ? offset ?", wd, wd, wd, size, (page-1)*size).QueryRows(&books)
 	}
 
 	return

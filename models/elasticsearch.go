@@ -178,14 +178,7 @@ func (this *ElasticSearchClient) Init() (err error) {
 					beego.Debug(" ==== ElasticSearch初始化mapping ==== ")
 				}
 				api := this.Host + this.Index + "/" + this.Type + "/_mapping"
-				req := this.post(api)
-				if resp, errResp := req.Header("Content-Type", "application/json").Body(js).Response(); errResp != nil {
-					err = errResp
-				} else {
-					if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-						err = errors.New(resp.Status)
-					}
-				}
+				err = utils.HandleResponse(this.post(api).Body(js).Response())
 			}
 		}
 	}
@@ -278,7 +271,7 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 		IsRebuildAllIndex = true
 	}
 
-	pageSize := 1000
+	pageSize := 100
 	maxPage := int(1e7)
 
 	privateMap := make(map[int]int) //map[book_id]private
@@ -298,6 +291,7 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 
 		if len(books) > 0 {
 			var data []ElasticSearchData
+			var bookId []int
 			for _, item := range books {
 				data = append(data, ElasticSearchData{
 					Id:       item.BookId,
@@ -309,17 +303,21 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 					Vcnt:     item.Vcnt,
 				})
 				privateMap[item.BookId] = item.PrivatelyOwned
+				bookId = append(bookId, item.BookId)
 			}
 			if err := this.BuildIndexByBuck(data); err != nil {
 				beego.Error(err.Error())
+				beego.Error("书籍索引创建失败，书籍ID:", bookId)
+			} else {
+				beego.Info("书籍索引创建成功，书籍ID:", bookId)
 			}
 		} else {
 			page = maxPage
 		}
 	}
 
-	// 文档内容可能比较大，每次更新20个文档
-	pageSize = 20
+	// 文档内容可能比较大，每次更新10个文档
+	pageSize = 10
 	doc := NewDocument()
 	for page := 1; page < maxPage; page++ {
 		var docs []Document
@@ -332,13 +330,13 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 		}
 		if len(docs) > 0 {
 			var data []ElasticSearchData
-
+			var docId []int
 			for _, item := range docs {
 				private := 1
 				if v, ok := privateMap[item.BookId]; ok {
 					private = v
 				}
-
+				docId = append(docId, item.DocumentId)
 				d := ElasticSearchData{
 					Id:       item.DocumentId,
 					Title:    item.DocumentName,
@@ -356,6 +354,9 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 			}
 			if err := this.BuildIndexByBuck(data); err != nil {
 				beego.Error(err.Error())
+				beego.Error("文档索引创建失败，文档ID:", docId)
+			} else {
+				beego.Info("文档索引创建成功，文档ID:", docId)
 			}
 		} else {
 			page = maxPage
@@ -385,18 +386,12 @@ func (this *ElasticSearchClient) BuildIndexByBuck(data []ElasticSearchData) (err
 			beego.Info("批量更新索引请求体")
 			beego.Info(body)
 		}
-		if resp, errResp := this.post(api).Body(body).Response(); errResp != nil {
-			err = errResp
-		} else {
-			if resp.StatusCode >= http.StatusMultipleChoices || resp.StatusCode < http.StatusOK {
-				b, _ := ioutil.ReadAll(resp.Body)
-				err = errors.New(resp.Status + "；" + string(b))
-			}
-		}
+		err = utils.HandleResponse(this.post(api).Body(body).Response())
 	}
 	d := time.Since(now)
 	if d > time.Duration(this.Timeout) {
 		// 生成索引时长过长，休眠一小段时间
+		beego.Info("sleep second", (time.Duration(this.Timeout/2) * time.Second).Seconds())
 		time.Sleep(time.Duration(this.Timeout/2) * time.Second)
 	}
 	return
@@ -430,8 +425,7 @@ func (this *ElasticSearchClient) SetBookPublic(bookId int, public bool) (err err
 //创建索引
 func (this *ElasticSearchClient) BuildIndex(es ElasticSearchData) (err error) {
 	var (
-		js   []byte
-		resp *http.Response
+		js []byte
 	)
 	if !this.On {
 		return
@@ -453,12 +447,7 @@ func (this *ElasticSearchClient) BuildIndex(es ElasticSearchData) (err error) {
 	}
 	api := this.Host + this.Index + "/" + this.Type + "/" + _id
 	if js, err = json.Marshal(es); err == nil {
-		if resp, err = this.post(api).Body(js).Response(); err == nil {
-			if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-				b, _ := ioutil.ReadAll(resp.Body)
-				err = errors.New("生成索引失败：" + resp.Status + "；" + string(b))
-			}
-		}
+		err = utils.HandleResponse(this.post(api).Body(js).Response())
 	}
 	return
 }
@@ -501,6 +490,7 @@ func (this *ElasticSearchClient) Count() (count int, err error) {
 	if resp, errResp := this.get(api).Response(); errResp != nil {
 		err = errResp
 	} else {
+		defer resp.Body.Close()
 		b, _ := ioutil.ReadAll(resp.Body)
 		body := string(b)
 		if resp.StatusCode >= http.StatusMultipleChoices || resp.StatusCode < http.StatusOK {
@@ -546,42 +536,22 @@ func (this *ElasticSearchClient) DeleteIndex(id int, isBook bool) (err error) {
 
 //检验es服务能否连通
 func (this *ElasticSearchClient) ping() error {
-	if resp, err := this.get(this.Host).Response(); err != nil {
-		return err
-	} else {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			body, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New(resp.Status + "；" + string(body))
-		}
-	}
-	return nil
+	return utils.HandleResponse(this.get(this.Host).Response())
 }
 
 //查询索引是否存在
 //@return			err				nil表示索引存在，否则表示不存在
 func (this *ElasticSearchClient) existIndex() (err error) {
-	var resp *http.Response
 	api := this.Host + this.Index
-	if resp, err = this.get(api).Response(); err == nil {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			b, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New(resp.Status + "：" + string(b))
-		}
-	}
+	err = utils.HandleResponse(this.get(api).Response())
 	return
 }
 
 //创建索引
 //@return           err             创建索引
 func (this *ElasticSearchClient) createIndex() (err error) {
-	var resp *http.Response
 	api := this.Host + this.Index
-	if resp, err = this.put(api).Response(); err == nil {
-		if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-			b, _ := ioutil.ReadAll(resp.Body)
-			err = errors.New(resp.Status + "：" + string(b))
-		}
-	}
+	err = utils.HandleResponse(this.put(api).Response())
 	return
 }
 
