@@ -126,6 +126,10 @@ func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, 
 
 // 根据id查询搜索结果
 func (m *DocumentSearchResult) GetDocsById(id []int, withoutCont ...bool) (docs []DocResult, err error) {
+	if len(id) == 0 {
+		return
+	}
+
 	var idArr []string
 	for _, i := range id {
 		idArr = append(idArr, fmt.Sprint(i))

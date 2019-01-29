@@ -441,7 +441,7 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 	}
 	pages_len := len(pages)
 	if currentPage > 1 {
-		htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=1">1..</a></li><li><a class="num" href="`+path+`?page=%d%v">«</a></li>`, currentPage-1, urlSuffix)
+		htmlPage += fmt.Sprintf(`<li><a class="num" href="`+path+`?page=1%v">1..</a></li><li><a class="num" href="`+path+`?page=%d%v">«</a></li>`, urlSuffix, currentPage-1, urlSuffix)
 	}
 	if pages_len <= rollPage {
 		for _, v := range pages {
