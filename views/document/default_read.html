@@ -25,7 +25,7 @@
     <link href="{{$.StaticDomain}}/static/highlight/styles/zenburn.css" rel="stylesheet">
     {{end}}
     <link href="{{$.StaticDomain}}/static/css/toast.css" rel="stylesheet">
-    <link href="/static/css/bookstack.css" rel="stylesheet">
+    <link href="/static/css/bookstack.css?version={{$.Version}}"rel="stylesheet">
     <link rel="stylesheet" href="//cdn.staticfile.org/KaTeX/0.7.1/katex.min.css">
 {{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
     <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
@@ -243,8 +243,8 @@
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
 <script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
 <script type="text/javascript" src="/static/js/clipboard.min.js"></script>
-<script type="text/javascript" src="/static/js/bookstack.js"></script>
-<script type="text/javascript" src="/static/js/main.js"></script>
+<script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
+<script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="//cdn.staticfile.org/KaTeX/0.7.1/katex.min.js"></script>
 
 <script type="text/javascript">

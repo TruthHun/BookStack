@@ -47,6 +47,7 @@ type CookieRemember struct {
 
 // Prepare 预处理.
 func (this *BaseController) Prepare() {
+	this.Data["Version"] = utils.Version
 	this.Member = models.NewMember() //初始化
 	this.EnableAnonymous = false
 	this.EnableDocumentHistory = 0

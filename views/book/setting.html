@@ -20,7 +20,7 @@
     <link href="{{$.StaticDomain}}/static/bootstrap/plugins/tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
 
 
-    <link href="/static/css/main.css" rel="stylesheet">
+    <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
 {{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
     <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
 {{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
@@ -320,7 +320,7 @@
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/bootstrap/plugins/tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
-<script src="/static/js/main.js" type="text/javascript"></script>
+<script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
         $("#upload-logo-panel").on("hidden.bs.modal",function () {

@@ -38,6 +38,7 @@ import (
 
 //更多存储类型有待扩展
 const (
+	Version           = "1.6 beta"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )
