@@ -32,5 +32,6 @@ func main() {
 		fmt.Println("Create service error => ", err)
 		os.Exit(1)
 	}
+
 	s.Run()
 }

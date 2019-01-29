@@ -515,7 +515,7 @@ func (this *ElasticSearchClient) Count() (count int, err error) {
 	return
 }
 
-// TODO:删除索引
+// 删除书籍索引
 func (this *ElasticSearchClient) DeleteIndex(id int, isBook bool) (err error) {
 	_id := strconv.Itoa(id)
 	idStr := "doc_" + _id
@@ -525,14 +525,20 @@ func (this *ElasticSearchClient) DeleteIndex(id int, isBook bool) (err error) {
 
 	// 不管是书籍id还是文档id，常规删除操作API如下：
 	api := this.Host + this.Index + "/" + this.Type + "/" + idStr
+
 	if err = utils.HandleResponse(this.delete(api).Response()); err != nil {
-		return
+		beego.Info(api)
+		beego.Error(err.Error())
 	}
 
 	if isBook { //如果是删除书籍的索引，则接下来删除书籍所对应的文档的索引。使用条件查询的方式进行删除操作
-		api = this.Host + this.Index + "/" + this.Type + "/_query"
+		api = this.Host + this.Index + "/_delete_by_query"
 		body := fmt.Sprintf(`{"query":{"term":{ "book_id":%v}}}`, id)
-		err = utils.HandleResponse(this.delete(api).Body(body).Response())
+		err = utils.HandleResponse(this.post(api).Body(body).Response())
+		if err != nil {
+			beego.Info(api)
+			beego.Error(err.Error())
+		}
 	}
 
 	return
