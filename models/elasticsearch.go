@@ -261,16 +261,22 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
 //重建索引【全量】
 //采用批量重建索引的方式进行
 //每次操作100条数据
-func (this *ElasticSearchClient) RebuildAllIndex() {
+func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 
-	if IsRebuildAllIndex {
-		return
+	bid := 0
+	if len(bookId) > 0 {
+		bid = bookId[0]
 	}
 
-	defer func() {
-		IsRebuildAllIndex = false
-	}()
-	IsRebuildAllIndex = true
+	if IsRebuildAllIndex && bid <= 0 {
+		return
+	}
+	if bid <= 0 {
+		defer func() {
+			IsRebuildAllIndex = false
+		}()
+		IsRebuildAllIndex = true
+	}
 
 	pageSize := 1000
 	maxPage := int(1e7)
@@ -283,7 +289,13 @@ func (this *ElasticSearchClient) RebuildAllIndex() {
 	for page := 1; page < maxPage; page++ {
 		var books []Book
 		fields := []string{"book_id", "book_name", "label", "description", "privately_owned"}
-		o.QueryTable(book).Limit(pageSize).Offset((page-1)*pageSize).All(&books, fields...)
+		q := o.QueryTable(book).Limit(pageSize).Offset((page - 1) * pageSize)
+		if bid > 0 {
+			q.Filter("book_id", bookId).All(&books, fields...)
+		} else {
+			q.All(&books, fields...)
+		}
+
 		if len(books) > 0 {
 			var data []ElasticSearchData
 			for _, item := range books {
@@ -312,7 +324,12 @@ func (this *ElasticSearchClient) RebuildAllIndex() {
 	for page := 1; page < maxPage; page++ {
 		var docs []Document
 		fields := []string{"document_id", "book_id", "document_name", "release", "vcnt"}
-		o.QueryTable(doc).Limit(pageSize).Offset((page-1)*pageSize).All(&docs, fields...)
+		q := o.QueryTable(doc).Limit(pageSize).Offset((page - 1) * pageSize)
+		if bid > 0 {
+			q.Filter("book_id", bid).All(&docs, fields...)
+		} else {
+			q.All(&docs, fields...)
+		}
 		if len(docs) > 0 {
 			var data []ElasticSearchData
 

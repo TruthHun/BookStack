@@ -360,6 +360,23 @@ func (this *ManagerController) EditBook() {
 		if err := book.Update(); err != nil {
 			this.JsonResult(6006, "保存失败")
 		}
+
+		go func() {
+			es := models.ElasticSearchData{
+				Id:       book.BookId,
+				BookId:   0,
+				Title:    book.BookName,
+				Keywords: book.Label,
+				Content:  book.Description,
+				Vcnt:     book.Vcnt,
+				Private:  book.PrivatelyOwned,
+			}
+			client := models.NewElasticSearchClient()
+			if errSearch := client.BuildIndex(es); errSearch != nil && client.On {
+				beego.Error(err.Error())
+			}
+		}()
+
 		this.JsonResult(0, "ok")
 	}
 	if book.PrivateToken != "" {

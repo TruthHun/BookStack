@@ -217,7 +217,8 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	}); err != nil {
 		beego.Error(err.Error())
 	}
-
+	client := NewElasticSearchClient()
+	client.RebuildAllIndex(bookId)
 }
 
 //离线文档生成

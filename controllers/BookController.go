@@ -242,6 +242,22 @@ func (this *BookController) SaveBook() {
 		new(models.BookCategory).SetBookCates(book.BookId, cids)
 	}
 
+	go func() {
+		es := models.ElasticSearchData{
+			Id:       book.BookId,
+			BookId:   0,
+			Title:    book.BookName,
+			Keywords: book.Label,
+			Content:  book.Description,
+			Vcnt:     book.Vcnt,
+			Private:  book.PrivatelyOwned,
+		}
+		client := models.NewElasticSearchClient()
+		if errSearch := client.BuildIndex(es); errSearch != nil && client.On {
+			beego.Error(err.Error())
+		}
+	}()
+
 	this.JsonResult(0, "ok", bookResult)
 }
 
