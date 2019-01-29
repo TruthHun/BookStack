@@ -60,8 +60,8 @@ type Book struct {
 	Score             int       `orm:"column(score);default(40)" json:"score"` //文档项目评分，默认40，即4.0星
 	CntScore          int       //评分人数
 	CntComment        int       //评论人数
-	Author            string    `orm:"size(50)"`           //原作者
-	AuthorURL         string    `orm:"column(author_url)"` //原作者链接
+	Author            string    `orm:"size(50)"`           //原作者，即来源
+	AuthorURL         string    `orm:"column(author_url)"` //原作者链接，即来源链接
 }
 
 // TableName 获取对应数据库表名.
