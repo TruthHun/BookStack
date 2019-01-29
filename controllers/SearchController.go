@@ -97,6 +97,7 @@ func (this *SearchController) Result() {
 		} else {
 			this.Data["Books"], _ = models.NewBook().GetBooksById(ids)
 		}
+		this.Data["Words"] = client.SegWords(wd)
 	}
 
 	this.Data["TotalRows"] = totalRows

@@ -15,6 +15,9 @@
     <script src="//apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
 {{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
     <script src="//apps.bdimg.com/libs/respond.js/1.4.2/respond.js"></script>
+    <style>
+        .search-highlight{font-style: normal;color: red;font-weight: 400;}
+    </style>
 
 </head>
 <body>
@@ -99,7 +102,8 @@
             {{/*<div class="col-sm-4 hidden-xs result-right"></div>*/}}
         </div>
     </div>
-    {{template "widgets/footer.html" .}}
+        {{template "widgets/footer.html" .}}
+        <script src="/static/js/jquery.highlight.js"></script>
 </div>
 
 <script>
@@ -108,6 +112,17 @@
            var form=$(this).parents("form"),wd=form.find("[name=wd]").val();
            if(wd) form.submit();
         });
+
+        var wds={{.Words}}
+        if (wds){
+            // 关键字高亮
+            var arr = wds.split(",");
+            for (var i = 0; i < arr.length; i++) {
+                $(".result-list").highlight(arr[i]);
+            }
+        }
+
+
     })
 </script>
 
