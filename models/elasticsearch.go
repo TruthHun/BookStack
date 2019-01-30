@@ -271,7 +271,7 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 		IsRebuildAllIndex = true
 	}
 
-	pageSize := 100
+	pageSize := 1000
 	maxPage := int(1e7)
 
 	privateMap := make(map[int]int) //map[book_id]private
@@ -317,47 +317,64 @@ func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
 	}
 
 	// 文档内容可能比较大，每次更新10个文档
-	pageSize = 10
+	pageSize = 1000
+	per := 20
+
 	doc := NewDocument()
 	for page := 1; page < maxPage; page++ {
 		var docs []Document
 		fields := []string{"document_id", "book_id", "document_name", "release", "vcnt"}
-		q := o.QueryTable(doc).Limit(pageSize).Offset((page - 1) * pageSize)
+		q := o.QueryTable(doc).Limit(pageSize).Offset((page - 1) * pageSize).OrderBy("-document_id")
 		if bid > 0 {
 			q.Filter("book_id", bid).All(&docs, fields...)
 		} else {
 			q.All(&docs, fields...)
 		}
-		if len(docs) > 0 {
-			var data []ElasticSearchData
-			var docId []int
-			for _, item := range docs {
-				private := 1
-				if v, ok := privateMap[item.BookId]; ok {
-					private = v
-				}
-				docId = append(docId, item.DocumentId)
-				d := ElasticSearchData{
-					Id:       item.DocumentId,
-					Title:    item.DocumentName,
-					Keywords: "",
-					Content:  this.html2Text(item.Release),
-					//Content: item.Release,
-					BookId:  item.BookId,
-					Private: private,
-					Vcnt:    item.Vcnt,
-				}
-				data = append(data, d)
-				//if err := this.BuildIndex(d); err != nil {
-				//	beego.Error(err.Error())
-				//}
+		if l := len(docs); l > 0 {
+			num := l / per
+			if l%per > 0 {
+				num = num + 1
 			}
-			if err := this.BuildIndexByBuck(data); err != nil {
-				beego.Error(err.Error())
-				beego.Error("文档索引创建失败，文档ID:", docId)
-			} else {
-				beego.Info("文档索引创建成功，文档ID:", docId)
+			for i := 0; i < num; i++ {
+				var data []ElasticSearchData
+				var docId []int
+				var newDocs []Document
+				start := i * per
+				end := start + per
+				if i < num-1 {
+					newDocs = docs[start:end]
+				} else {
+					newDocs = docs[start:]
+				}
+				for _, item := range newDocs {
+					private := 1
+					if v, ok := privateMap[item.BookId]; ok {
+						private = v
+					}
+					docId = append(docId, item.DocumentId)
+					d := ElasticSearchData{
+						Id:       item.DocumentId,
+						Title:    item.DocumentName,
+						Keywords: "",
+						Content:  this.html2Text(item.Release),
+						//Content: item.Release,
+						BookId:  item.BookId,
+						Private: private,
+						Vcnt:    item.Vcnt,
+					}
+					data = append(data, d)
+					//if err := this.BuildIndex(d); err != nil {
+					//	beego.Error(err.Error())
+					//}
+				}
+				if err := this.BuildIndexByBuck(data); err != nil {
+					beego.Error(err.Error())
+					beego.Error("文档索引创建失败，文档ID:", docId)
+				} else {
+					beego.Info("文档索引创建成功，文档ID:", docId)
+				}
 			}
+
 		} else {
 			page = maxPage
 		}
