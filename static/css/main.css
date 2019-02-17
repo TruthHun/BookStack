@@ -223,7 +223,7 @@ textarea{
 .manual-body .page-right .box-body label{
     font-family: "Microsoft Yahei","Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #222222;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .manual-body .page-right .box-body .form-right{
@@ -474,7 +474,7 @@ textarea{
 /**************用户登录界面样式*******************/
 .login .login-body{
     max-width: 400px;
-    padding: 5px 15px 25px 15px;
+    padding: 5px 15px 5px 15px;
     margin: 100px auto;
     background-color: #FFF;
     border: 1px solid #ddd;
@@ -729,7 +729,7 @@ a{color: #333}
 .row-cate-sub a{display: inline-block;text-align: center;}
 .row-cate-sub a img{width: 60px;height: 60px;border-radius: 4px;}
 
-.cate-list{margin-top: 80px;}
+.cate-list{margin-top: 70px;}
 .cate-list .panel-default>.panel-heading{border-color: transparent;}
 .cate-list .panel{box-shadow: none;}
 .cate-list .panel-default{border:0px;margin-bottom: 0px;}

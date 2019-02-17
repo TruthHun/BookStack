@@ -54,6 +54,21 @@ func (this *AccountController) Oauth() {
 		this.Data["CaptchaOn"] = captchaOn
 	}
 
+	oauthLogin := false
+	if v, ok := this.Option["LOGIN_QQ"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginQQ"] = true
+		oauthLogin = true
+	}
+	if v, ok := this.Option["LOGIN_GITHUB"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginGitHub"] = true
+		oauthLogin = true
+	}
+	if v, ok := this.Option["LOGIN_GITEE"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginGitee"] = true
+		oauthLogin = true
+	}
+	this.Data["OauthLogin"] = oauthLogin
+
 	oa := this.GetString(":oauth")
 	code := this.GetString("code")
 	switch oa {
@@ -223,6 +238,21 @@ func (this *AccountController) Login() {
 		captchaOn = true
 		this.Data["CaptchaOn"] = captchaOn
 	}
+
+	oauthLogin := false
+	if v, ok := this.Option["LOGIN_QQ"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginQQ"] = true
+		oauthLogin = true
+	}
+	if v, ok := this.Option["LOGIN_GITHUB"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginGitHub"] = true
+		oauthLogin = true
+	}
+	if v, ok := this.Option["LOGIN_GITEE"]; ok && strings.EqualFold(v, "true") {
+		this.Data["LoginGitee"] = true
+		oauthLogin = true
+	}
+	this.Data["OauthLogin"] = oauthLogin
 
 	//如果Cookie中存在登录信息
 	if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {

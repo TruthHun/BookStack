@@ -211,5 +211,35 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_QQ").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "LOGIN_QQ"
+		option.OptionTitle = "是否允许使用QQ登录"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_GITHUB").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "LOGIN_GITHUB"
+		option.OptionTitle = "是否允许使用Github登录"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_GITEE").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "LOGIN_GITEE"
+		option.OptionTitle = "是否允许使用码云登录"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

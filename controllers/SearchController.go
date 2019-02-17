@@ -60,7 +60,7 @@ func (this *SearchController) Result() {
 	if client.On { // elasticsearch 进行全文搜索
 		result, err := models.NewElasticSearchClient().Search(wd, page, size, isSearchDoc)
 		if err != nil {
-			beego.Error()
+			beego.Error(err.Error())
 		} else { // 搜索结果处理
 			totalRows = result.Hits.Total
 			for _, item := range result.Hits.Hits {

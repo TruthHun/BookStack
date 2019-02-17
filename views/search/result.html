@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>搜索结果 - {{.SITE_NAME}}</title>
+    <title>{{if eq $.Tab "doc"}}[搜文档]{{else}}[搜书籍]{{end}}{{.Wd}} - 搜索结果 - {{.SITE_NAME}}</title>
 
     <link href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">

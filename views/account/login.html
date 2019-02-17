@@ -58,19 +58,28 @@
                                     <span>没有账号？ <a href="{{urlfor "AccountController.Oauth" ":oauth" "email"}}" title="使用邮箱注册" class="tooltips text-primary">邮箱注册</a></span>
                                     <span class="pull-right"> 忘记密码？<a href="{{urlfor "AccountController.FindPassword"}}" title="找回密码" class="tooltips text-primary">找回密码</a></span>
                                 </div>
+                                {{if $.OauthLogin}}
                                 <hr>
                                 <div class="help-block">您还可以使用以下方式一键登录</div>
                                 <div class="login-by-third">
+
+                                    {{if $.LoginQQ}}
                                     <a class="tooltips" href="https://graph.qq.com/oauth2.0/authorize?client_id={{.QQClientId}}&redirect_uri={{.QQCallback}}&response_type=code&state=bookstack.cn{{.RandomStr}}" rel="nofollow" title="使用QQ一键登录">
                                         <img src="/static/images/qq.png" alt="QQ">
                                     </a>
-                                    <a class="tooltips" href="https://github.com/login/oauth/authorize?client_id={{.GithubClientId}}&redirect_uri={{.GithubCallback}}" rel="nofollow" title="使用GitHub一键登录">
-                                        <img src="/static/images/github.png" alt="GitHub">
-                                    </a>
-                                    <a class="tooltips" rel="nofollow" title="使用码云(Gitee)一键登录" href="https://gitee.com/oauth/authorize?client_id={{.GiteeClientId}}&redirect_uri={{.GiteeCallback}}&response_type=code">
-                                        <img src="/static/images/gitee.png" alt="码云(Gitee)">
-                                    </a>
+                                    {{end}}
+                                    {{if $.LoginGitHub}}
+                                        <a class="tooltips" href="https://github.com/login/oauth/authorize?client_id={{.GithubClientId}}&redirect_uri={{.GithubCallback}}" rel="nofollow" title="使用GitHub一键登录">
+                                            <img src="/static/images/github.png" alt="GitHub">
+                                        </a>
+                                    {{end}}
+                                    {{if $.LoginGitee}}
+                                        <a class="tooltips" rel="nofollow" title="使用码云(Gitee)一键登录" href="https://gitee.com/oauth/authorize?client_id={{.GiteeClientId}}&redirect_uri={{.GiteeCallback}}&response_type=code">
+                                            <img src="/static/images/gitee.png" alt="码云(Gitee)">
+                                        </a>
+                                    {{end}}
                                 </div>
+                                {{end}}
                             </div>
                         </form>
                     </div>
