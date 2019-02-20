@@ -30,7 +30,7 @@
 
 TODO: 删除项目时，索引没跟着删除
 
-- [x] `puppeteer` 支持（超过30秒，自动把进程杀掉）
+- [x] 使用`puppeteer`采集的支持（需要安装node以及在当前程序目录下安装node的puppeteer模块）
 - [x] 根据邮箱找回密码
 - [x] `<bookstack-split></bookstack-split>`，文档拆分功能
 - [x] 文章二维码，扫一扫，手机阅读
@@ -56,7 +56,7 @@ TODO: 删除项目时，索引没跟着删除
 - [x] 新建和编辑项目，支持添加原作者和原作者链接 
 - [x] 文档文章内容，顶部标题下显示信息
 - [x] 管理后台控制第三方登录的显示与隐藏
-- [x] HTML table 渲染问题（把`editormd.js`中的`breaks`设置为false）
+- [x] HTML table 渲染问题优化（把`editormd.js`中的`breaks`设置为false）
 
 ```
 sudo docker run -it -p 9300:9300 -p 9200:9200 --restart always -v /Users/TruthHun/elasticsearch/data:/usr/share/elasticsearch/data -v /Users/TruthHun/elasticsearch/config:/usr/share/elasticsearch/config --name bookstack-search truthhun/elasticsearch:6.2.4.ik
