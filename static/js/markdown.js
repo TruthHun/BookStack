@@ -182,9 +182,10 @@ $(function () {
             $("#ModalMulti").modal("show");
        }else if(name=="spider"){//爬虫采集
             $("#ModalSpider").modal("show");
+       }else if(name=="replace"){//全局内容替换
+           $("#ModalReplace").modal("show");
        }else{
            var action = window.editor.toolbarHandlers[name];
-
            if (action !== "undefined") {
                $.proxy(action, window.editor)();
                window.editor.focus();
@@ -375,6 +376,29 @@ $(function () {
                 }
                 $("#btnCrawl").removeClass("disabled");
             });
+        }
+    });
+
+
+    //提交替换
+    $("#btnReplace").click(function (e) {
+        e.preventDefault();
+        if($(this).hasClass("disabled")) return false;
+        var form=$("#ModalReplace form"),action=form.attr("action"),src=form.find("[name=src]").val();
+        if(src==""){
+            form.find("[name=src]").focus();
+            layer.msg("源内容字符串不能为空");
+        }else{
+            $("#btnReplace").addClass("disabled");
+            $.post(action,form.serialize(),function (res) {
+                layer.msg(res.message);
+                if (res.errcode==0){
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                }
+            });
+            $("#btnReplace").removeClass("disabled");
         }
     });
 
