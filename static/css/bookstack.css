@@ -1145,8 +1145,12 @@ table>tbody>tr:hover{
     }
 
     .m-manual.manual-reader.manual-mobile-show-left .manual-left {
+        transition:left 0.5s;
         left: 0;
         z-index: 3001
+    }
+    .m-manual.manual-reader .manual-left{
+        transition: left 0.5s;
     }
 
     .m-manual.manual-reader.manual-mobile-show-left .manual-mask {

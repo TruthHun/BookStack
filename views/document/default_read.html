@@ -113,7 +113,7 @@
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码阅读</a></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享给好友</a></span>
                             {{/*<span><a href="#"><i class="fa fa-check-square-o"></i> 无广告声明</a></span>*/}}
-                            <span class="pull-right"><i class="fa fa-clock-o"></i> 更新 <i class="updated-at">{{.UpdatedAt}}</i></span>
+                            <span class="pull-right hidden-xs"><i class="fa fa-clock-o"></i> 更新 <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
                     <div class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
