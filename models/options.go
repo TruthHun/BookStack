@@ -211,6 +211,16 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "SEARCH_ACCURACY").Exist() {
+		option := NewOption()
+		option.OptionValue = "50"
+		option.OptionName = "SEARCH_ACCURACY"
+		option.OptionTitle = "搜索精度"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_QQ").Exist() {
 		option := NewOption()
 		option.OptionValue = "true"

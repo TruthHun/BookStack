@@ -145,6 +145,11 @@
                             </select>
                         </div>
 
+                        <div class="form-group">
+                            <label>搜索结果精度( <span class="text-muted">可选值：0 ~ 100，值越大，精度越大</span> )</label>
+                            <input type="number" min="0" class="form-control" max="100" name="SEARCH_ACCURACY" value="{{.SEARCH_ACCURACY.OptionValue}}">
+                        </div>
+
                         <div class="form-group hidden">
                             <label>推荐书籍缓存时长( <span class="text-muted">开启了全文搜索才会生效。</span> )</label>
                             <select name="RELATE_BOOK_CACHE" class="form-control">
