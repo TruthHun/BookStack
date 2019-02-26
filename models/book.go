@@ -118,12 +118,12 @@ func (m *Book) Insert() (err error) {
 	return err
 }
 
-func (m *Book) Find(id int) (book *Book, err error) {
+func (m *Book) Find(id int, cols ...string) (book *Book, err error) {
 	if id <= 0 {
 		return
 	}
 	o := orm.NewOrm()
-	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(m)
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", id).One(m, cols...)
 	return m, err
 }
 
