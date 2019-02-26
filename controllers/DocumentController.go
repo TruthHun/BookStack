@@ -265,6 +265,9 @@ func (this *DocumentController) Read() {
 	})
 
 	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)
+
+	doc.Vcnt = doc.Vcnt + 1
+
 	if this.IsAjax() {
 		var data struct {
 			Id        int    `json:"doc_id"`
