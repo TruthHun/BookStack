@@ -31,7 +31,7 @@
                 <div class="col-xs-6 col-sm-3 col-md-2">
                     <dl class="manual-item-standard">
                         <dt>
-                            <a class="clearfix tooltips {{if gt $item.OrderIndex 0}}recommend-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" target="_blank" >
+                            <a class="clearfix tooltips {{if gt $item.OrderIndex 0}}recommend-book{{end}} {{if gt $item.Pin 0}}pin-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="{{$item.BookName}}" target="_blank" >
                                 <img class="img-responsive border-cover-img" onerror="this.src='/static/images/book.png'" src="{{showImg $item.Cover "cover"}}" class="cover" alt="{{$item.BookName}}">
                             </a>
                         </dt>

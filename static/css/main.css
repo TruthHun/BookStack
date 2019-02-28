@@ -805,3 +805,10 @@ a{color: #333}
 .search-result .doc-result .book-description{
     height: auto;max-height: 75px;
 }
+
+.pin-book:after {
+    content: url(../images/pin.png);
+    position: absolute;
+    left: 19px;
+    top: 5px;
+}

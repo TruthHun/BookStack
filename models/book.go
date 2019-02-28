@@ -37,6 +37,7 @@ type Book struct {
 	BookName          string    `orm:"column(book_name);size(500)" json:"book_name"`      // BookName 项目名称.
 	Identify          string    `orm:"column(identify);size(100);unique" json:"identify"` // Identify 项目唯一标识.
 	OrderIndex        int       `orm:"column(order_index);type(int);default(0)" json:"order_index"`
+	Pin               int       `orm:"column(pin);type(int);default(0)" json:"pin"`       // pin值，用于首页固定显示
 	Description       string    `orm:"column(description);size(2000)" json:"description"` // Description 项目描述.
 	Label             string    `orm:"column(label);size(500)" json:"label"`
 	PrivatelyOwned    int       `orm:"column(privately_owned);type(int);default(0)" json:"privately_owned"` // PrivatelyOwned 项目私有： 0 公开/ 1 私有
@@ -316,35 +317,37 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 }
 
 //首页数据
-//TODO:完善根据分类查询数据
+//完善根据分类查询数据
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	if cid > 0 { //针对cid>0
 		return m.homeData(pageIndex, pageSize, orderType, cid, fields...)
 	}
 	o := orm.NewOrm()
-	order := ""   //排序
-	condStr := "" //查询条件
+	order := "pin desc" //排序
+	condStr := ""       //查询条件
 	cond := []string{"privately_owned=0"}
 	if len(fields) == 0 {
-		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index")
+		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index", "pin")
+	} else {
+		fields = append(fields, "pin")
 	}
 	switch orderType {
 	case OrderRecommend: //推荐
 		cond = append(cond, "order_index>0")
-		order = "order_index desc"
+		order = "pin desc,order_index desc"
 	case OrderPopular: //受欢迎
-		order = "star desc,vcnt desc"
+		order = "pin desc,star desc,vcnt desc"
 	case OrderLatest: //最新发布
-		order = "release_time desc"
+		order = "pin desc,release_time desc"
 	case OrderScore: //评分
-		order = "score desc"
+		order = "pin desc,score desc"
 	case OrderComment: //评论
-		order = "cnt_comment desc"
+		order = "pin desc,cnt_comment desc"
 	case OrderStar: //收藏
-		order = "star desc"
+		order = "pin desc,star desc"
 	case OrderView: //收藏
-		order = "vcnt desc"
+		order = "pin desc,vcnt desc"
 	}
 	if len(cond) > 0 {
 		condStr = " where " + strings.Join(cond, " and ")
