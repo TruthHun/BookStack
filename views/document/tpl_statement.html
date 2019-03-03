@@ -20,6 +20,11 @@
     <p>文档内容由网友们编写和整理，书栈(BookStack.CN) 难以确认文档内容知识点是否错漏。如果您在阅读文档获取知识的时候，发现文档内容有不恰当的地方，请向我们反馈，让我们共同携手，将知识准确、高效且有效地传递给每一个人。</p>
     <p>同时，如果您在日常工作、生活和学习中遇到有价值有营养的知识文档，欢迎分享到 书栈(BookStack.CN) ，为知识的传承献上您的一份力量！</p>
     <p>如果当前文档生成时间太久，请到 书栈(BookStack.CN) 获取最新的文档，以跟上知识更新换代的步伐。</p>
+
+    {{if .Model.Author}}
+        <p>内容来源：<a href="{{.Model.AuthorURL}}">{{.Model.Author}}</a> &nbsp;<span style="color: #888;">{{.Model.AuthorURL}}</span></p>
+    {{end}}
+
     <p>文档地址：<a href="http://www.bookstack.cn{{urlfor "DocumentController.Index" ":key" .Model.Identify}}">http://www.bookstack.cn{{urlfor "DocumentController.Index" ":key" .Model.Identify}}</a></p>
     <p>书栈官网：<a href="http://www.bookstack.cn">http://www.bookstack.cn</a></p>
     <p>书栈开源：<a href="https://github.com/TruthHun">https://github.com/TruthHun</a></p>
