@@ -24,7 +24,7 @@ type DocumentSelected struct {
 }
 
 //获取项目的文档树状结构
-func (m *Document) FindDocumentTree(bookId int, isEdit ...bool) ([]*DocumentTree, error) {
+func (m *Document) FindDocumentTree(bookId int, selectedId int, isEdit ...bool) ([]*DocumentTree, error) {
 	o := orm.NewOrm()
 
 	trees := make([]*DocumentTree, 0)
@@ -41,9 +41,16 @@ func (m *Document) FindDocumentTree(bookId int, isEdit ...bool) ([]*DocumentTree
 
 	for index, item := range docs {
 		tree := &DocumentTree{}
-		if index == 0 {
-			tree.State = &DocumentSelected{Selected: true, Opened: true}
+		if selectedId > 0 {
+			if selectedId == item.DocumentId {
+				tree.State = &DocumentSelected{Selected: true, Opened: true}
+			}
+		} else {
+			if index == 0 {
+				tree.State = &DocumentSelected{Selected: true, Opened: true}
+			}
 		}
+
 		tree.DocumentId = item.DocumentId
 		tree.Identify = item.Identify
 		tree.Version = item.Version
@@ -70,7 +77,7 @@ func (m *Document) FindDocumentTree(bookId int, isEdit ...bool) ([]*DocumentTree
 }
 
 func (m *Document) CreateDocumentTreeForHtml(bookId, selectedId int) (string, error) {
-	trees, err := m.FindDocumentTree(bookId)
+	trees, err := m.FindDocumentTree(bookId, selectedId)
 	if err != nil {
 		return "", err
 	}

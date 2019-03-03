@@ -36,6 +36,8 @@ $(function () {
             this.addKeyMap(keyMap);
 
             var $select_node_id = window.treeCatalog.get_selected();
+
+
             if($select_node_id) {
                 var $select_node = window.treeCatalog.get_node($select_node_id[0])
                 if ($select_node) {
@@ -216,6 +218,8 @@ $(function () {
                 pushDocumentCategory(node);
                 window.selectNode = node;
                 pushVueLists(res.data.attach);
+                // 设置 history
+                history.pushState({"id": $node.node.id},res.data.doc_name,window.editURI + res.data.identify);
             }else{
                 layer.msg("文档加载失败");
             }
@@ -514,4 +518,9 @@ $(function () {
         }
         $("#documentTemplateModal").modal('hide');
     });
+
+    window.onpopstate=function(e){
+        history.back();
+    }
+
 });

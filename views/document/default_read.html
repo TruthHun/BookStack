@@ -82,7 +82,7 @@
 
 
                     {{if eq $.Member.MemberId $.Model.MemberId}}
-                        <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}" title="编辑" class="btn btn-link"><i class="fa fa-edit"></i> 编辑文档</a>
+                        <a href="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" .DocId}}" title="编辑" class="btn btn-link btn-edit" data-url="{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}"><i class="fa fa-edit"></i> 编辑文档</a>
                     {{end}}
                 </div>
             </div>

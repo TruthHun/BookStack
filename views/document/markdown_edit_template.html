@@ -14,6 +14,7 @@
         window.selectNode = null;
         window.deleteURL = "{{urlfor "DocumentController.Delete" ":key" .Model.Identify}}";
         window.editURL = "{{urlfor "DocumentController.Content" ":key" .Model.Identify ":id" ""}}";
+        window.editURI = "{{urlfor "DocumentController.Edit" ":key" .Model.Identify ":id" ""}}";
         window.releaseURL = "{{urlfor "BookController.Release" ":key" .Model.Identify}}";
         window.generateURL = "{{urlfor "BookController.Generate" ":key" .Model.Identify}}";//生成书籍文档
         window.sortURL = "{{urlfor "BookController.SaveSort" ":key" .Model.Identify}}";

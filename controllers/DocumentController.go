@@ -340,6 +340,7 @@ func (this *DocumentController) Read() {
 
 //编辑文档.
 func (this *DocumentController) Edit() {
+	docId := 0 // 文档id
 
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
@@ -378,7 +379,18 @@ func (this *DocumentController) Edit() {
 
 	this.Data["Result"] = template.JS("[]")
 
-	trees, err := models.NewDocument().FindDocumentTree(bookResult.BookId, true)
+	// 编辑的文档
+	if id := this.GetString(":id"); id != "" {
+		if num, _ := strconv.Atoi(id); num > 0 {
+			docId = num
+		} else { //字符串
+			var doc = models.NewDocument()
+			orm.NewOrm().QueryTable(doc).Filter("identify", id).Filter("book_id", bookResult.BookId).One(doc, "document_id")
+			docId = doc.DocumentId
+		}
+	}
+
+	trees, err := models.NewDocument().FindDocumentTree(bookResult.BookId, docId, true)
 	if err != nil {
 		beego.Error("FindDocumentTree => ", err)
 	} else {
@@ -391,6 +403,7 @@ func (this *DocumentController) Edit() {
 		}
 	}
 	this.Data["BaiDuMapKey"] = beego.AppConfig.DefaultString("baidumapkey", "")
+
 }
 
 //创建一个文档.

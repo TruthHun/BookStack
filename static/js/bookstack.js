@@ -41,6 +41,7 @@ function load_doc(url,wd,without_history) {
             $("#article-title").text(doc_title);
 
             $(".bookmark-action").attr("data-docid",res.data.doc_id);
+            $(".btn-edit").attr("href",$(".btn-edit").attr("data-url")+res.data.doc_id);
             if (res.data.bookmark){//已添加书签
                 $(".bookmark-action .bookmark-add").addClass("hide");
                 $(".bookmark-action .bookmark-remove").removeClass("hide");
