@@ -69,6 +69,8 @@ $(function () {
         css :"https://cdn.staticfile.org/KaTeX/0.7.1/katex.min.css",
     };
 
+    // window.editor.tocDropdown=true;
+
     /**
      * 实现标题栏操作
      */
@@ -231,7 +233,8 @@ $(function () {
         var index = null;
         var node = window.selectNode;
         var content = window.editor.getMarkdown();
-        var html = window.editor.getPreviewedHTML();
+        // var html = window.editor.getPreviewedHTML();
+        var html = window.editor.getHTML();
         var version = "";
         var cm = window.editor.cm;
 

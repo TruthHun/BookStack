@@ -140,7 +140,7 @@ $(function () {
         }
     });
 
-    $(".manual-mode-view .manual-left a").click(function () {
+    $(".manual-left").on("click","a",function () {
         if($(".manual-mode-view").hasClass("manual-mobile-show-left")){
             $(".manual-mask").trigger("click");
         }

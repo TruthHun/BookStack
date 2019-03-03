@@ -1012,7 +1012,7 @@ table>tbody>tr:hover{
 @media screen and (max-width: 840px) {
 
     .m-manual.manual-reader {
-        font-size:12px;
+        font-size:13px;
         min-width: initial
     }
 
@@ -1047,7 +1047,7 @@ table>tbody>tr:hover{
 
     .m-manual.manual-reader .manual-head .pull-left .slidebar {
         display: inline-block;
-        margin-right: 5px;
+        margin-right: 10px;
         /*position: absolute;*/
         /*left: 0;*/
         /*top: 0;*/

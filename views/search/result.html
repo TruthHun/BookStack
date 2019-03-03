@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <title>{{if eq $.Tab "doc"}}[搜文档]{{else}}[搜书籍]{{end}}{{.Wd}} - 搜索结果 - {{.SITE_NAME}}</title>
 
@@ -118,11 +118,10 @@
             // 关键字高亮
             var arr = wds.split(",");
             for (var i = 0; i < arr.length; i++) {
-                $(".result-list").highlight(arr[i]);
+                $(".result-list h4").highlight(arr[i]);
+                $(".result-list .book-description").highlight(arr[i]);
             }
         }
-
-
     })
 </script>
 
