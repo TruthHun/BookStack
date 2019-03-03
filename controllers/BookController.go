@@ -67,7 +67,7 @@ func (this *BookController) Index() {
 	books, totalCount, err := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
 	if err != nil {
 		logs.Error("BookController.Index => ", err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 	if totalCount > 0 {
 		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
@@ -131,9 +131,9 @@ func (this *BookController) Dashboard() {
 	if err != nil {
 		beego.Error(err)
 		if err == models.ErrPermissionDenied {
-			this.Abort("403")
+			this.Abort("404")
 		}
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	this.Data["Model"] = *book
@@ -157,14 +157,14 @@ func (this *BookController) Setting() {
 		}
 
 		if err == models.ErrPermissionDenied {
-			this.Abort("403")
+			this.Abort("404")
 		}
 		this.Abort("404")
 	}
 
 	//如果不是创始人也不是管理员则不能操作
 	if book.RoleId != conf.BookFounder && book.RoleId != conf.BookAdmin {
-		this.Abort("403")
+		this.Abort("404")
 	}
 
 	if book.PrivateToken != "" {
@@ -473,9 +473,9 @@ func (this *BookController) Users() {
 	book, err := models.NewBookResult().FindByIdentify(key, this.Member.MemberId)
 	if err != nil {
 		if err == models.ErrPermissionDenied {
-			this.Abort("403")
+			this.Abort("404")
 		}
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	this.Data["Model"] = *book
@@ -756,7 +756,7 @@ func (this *BookController) SaveSort() {
 		bookResult, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 		if err != nil {
 			beego.Error("DocumentController.Edit => ", err)
-			this.Abort("403")
+			this.Abort("404")
 		}
 
 		if bookResult.RoleId == conf.BookObserver {

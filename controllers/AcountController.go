@@ -596,7 +596,7 @@ func (this *AccountController) Captcha() {
 
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	captchaImage.DrawNoise(gocaptcha.CaptchaComplexLower)

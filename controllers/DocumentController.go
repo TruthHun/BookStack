@@ -84,10 +84,10 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 			if token != "" && strings.EqualFold(token, book.PrivateToken) {
 				this.SetSession(identify, token)
 			} else if token, ok := this.GetSession(identify).(string); !ok || !strings.EqualFold(token, book.PrivateToken) {
-				this.Abort("403")
+				this.Abort("404")
 			}
 		} else if !isOk {
-			this.Abort("403")
+			this.Abort("404")
 		}
 	}
 
@@ -183,19 +183,19 @@ func (this *DocumentController) Read() {
 		doc, err = doc.Find(docId) //文档id
 		if err != nil {
 			beego.Error(err)
-			this.Abort("500")
+			this.Abort("404")
 		}
 	} else {
 		//此处的id是字符串，标识文档标识，根据文档标识和文档所属的书的id作为key去查询
 		doc, err = doc.FindByBookIdAndDocIdentify(bookResult.BookId, id) //文档标识
 		if err != nil {
 			beego.Error(err, docId, id, bookResult)
-			this.Abort("500")
+			this.Abort("404")
 		}
 	}
 
 	if doc.BookId != bookResult.BookId {
-		this.Abort("403")
+		this.Abort("404")
 	}
 
 	// 文档对应的书籍发布时间，用于作为304缓存优化
@@ -294,7 +294,7 @@ func (this *DocumentController) Read() {
 
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	// 查询用户哪些文档阅读了
@@ -356,7 +356,7 @@ func (this *DocumentController) Edit() {
 		bookResult, err = models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 		if err != nil {
 			beego.Error("DocumentController.Edit => ", err)
-			this.Abort("403")
+			this.Abort("404")
 		}
 
 		if bookResult.RoleId == conf.BookObserver {
@@ -711,7 +711,7 @@ func (this *DocumentController) DownloadAttachment() {
 		if this.Member == nil || this.Member.Role != conf.MemberSuperRole {
 			//如果项目是私有的，并且token不正确
 			if (book.PrivatelyOwned == 1 && token == "") || (book.PrivatelyOwned == 1 && book.PrivateToken != token) {
-				this.Abort("403")
+				this.Abort("404")
 			}
 		}
 
@@ -727,7 +727,7 @@ func (this *DocumentController) DownloadAttachment() {
 		if err == orm.ErrNoRows {
 			this.Abort("404")
 		} else {
-			this.Abort("500")
+			this.Abort("404")
 		}
 	}
 	if attachment.BookId != bookId {
@@ -1096,13 +1096,13 @@ func (this *DocumentController) QrCode() {
 	code, err := qr.Encode(uri, qr.L, qr.Unicode)
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 	code, err = barcode.Scale(code, 150, 150)
 
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 	this.Ctx.ResponseWriter.Header().Set("Content-Type", "image/png")
 
@@ -1111,7 +1111,7 @@ func (this *DocumentController) QrCode() {
 	err = png.Encode(this.Ctx.ResponseWriter, code)
 	if err != nil {
 		beego.Error(err)
-		this.Abort("500")
+		this.Abort("404")
 	}
 }
 
@@ -1354,7 +1354,7 @@ func (this *DocumentController) Compare() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
 		if err != nil {
 			beego.Error("DocumentController.Compare => ", err)
-			this.Abort("403")
+			this.Abort("404")
 			return
 		}
 		bookId = book.BookId
@@ -1364,7 +1364,7 @@ func (this *DocumentController) Compare() {
 
 		if err != nil || bookResult.RoleId == conf.BookObserver {
 			beego.Error("FindByIdentify => ", err)
-			this.Abort("403")
+			this.Abort("404")
 			return
 		}
 		bookId = bookResult.BookId
@@ -1405,14 +1405,14 @@ func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, 
 
 			if err != nil {
 				beego.Error(err)
-				this.Abort("500")
+				this.Abort("404")
 			}
 
 			html, err := this.ExecuteViewPathTemplate("document/export.html", map[string]interface{}{"Model": book, "Lists": item, "BaseUrl": this.BaseUrl()})
 			if err != nil {
 				f.Close()
 				beego.Error(err)
-				this.Abort("500")
+				this.Abort("404")
 			}
 
 			buf := bytes.NewReader([]byte(html))
@@ -1427,7 +1427,7 @@ func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, 
 			if err != nil {
 				f.Close()
 				beego.Error(err)
-				this.Abort("500")
+				this.Abort("404")
 			}
 			//html = strings.Replace(html, "<img src=\"/uploads", "<img src=\""+this.BaseUrl()+"/uploads", -1)
 

@@ -32,7 +32,7 @@ type ManagerController struct {
 func (this *ManagerController) Prepare() {
 	this.BaseController.Prepare()
 	if !this.Member.IsAdministrator() {
-		this.Abort("403")
+		this.Abort("404")
 	}
 }
 
@@ -298,7 +298,7 @@ func (this *ManagerController) Books() {
 
 	books, totalCount, err := models.NewBookResult().FindToPager(pageIndex, conf.PageSize, private)
 	if err != nil {
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	if totalCount > 0 {
@@ -328,7 +328,7 @@ func (this *ManagerController) EditBook() {
 
 	book, err := models.NewBook().FindByFieldFirst("identify", identify)
 	if err != nil {
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	if this.Ctx.Input.IsPost() {
@@ -459,7 +459,7 @@ func (this *ManagerController) Setting() {
 
 	options, err := models.NewOption().All()
 	if err != nil {
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	if this.Ctx.Input.IsPost() {
@@ -502,7 +502,7 @@ func (this *ManagerController) Transfer() {
 	}
 
 	if !this.Member.IsAdministrator() {
-		this.Abort("403")
+		this.Abort("404")
 	}
 
 	identify := this.GetString("identify")
@@ -532,7 +532,7 @@ func (this *ManagerController) Transfer() {
 
 func (this *ManagerController) Comments() {
 	if !this.Member.IsAdministrator() {
-		this.Abort("403")
+		this.Abort("404")
 	}
 	this.TplName = "manager/comments.html"
 }
@@ -574,7 +574,7 @@ func (this *ManagerController) PrivatelyOwned() {
 	}
 
 	if !this.Member.IsAdministrator() {
-		this.Abort("403")
+		this.Abort("404")
 	}
 
 	book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -612,7 +612,7 @@ func (this *ManagerController) AttachList() {
 
 	attachList, totalCount, err := models.NewAttachment().FindToPager(pageIndex, conf.PageSize)
 	if err != nil {
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	if totalCount > 0 {
@@ -646,7 +646,7 @@ func (this *ManagerController) AttachDetailed() {
 		if err == orm.ErrNoRows {
 			this.Abort("404")
 		}
-		this.Abort("500")
+		this.Abort("404")
 	}
 
 	attach.FilePath = filepath.Join(commands.WorkingDirectory, attach.FilePath)
