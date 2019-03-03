@@ -8,45 +8,34 @@
     <meta name="renderer" content="webkit" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>页面不存在 - {{.SITE_NAME}}</title>
-    <link href="/static/fonts/lato-100.css" rel="stylesheet" type="text/css">
-    <style type="text/css">
-        html, body {
-            height: 100%;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            color: #B0BEC5;
-            display: table;
-            font-weight: 100;
-            font-family: 'Lato',"Microsoft Yahei","Helvetica Neue",Helvetica,Arial,sans-serif;
-        }
-
-        .container {
+    <style>
+        .container{
+            width: 600px;
+            max-width: 80%;
             text-align: center;
-            display: table-cell;
-            vertical-align: middle;
+            margin:150px auto;
         }
-
-        .content {
-            text-align: center;
-            display: inline-block;
+        .err404{
+            font-size: 100px;margin-bottom: 15px;
         }
-
-        .title {
-            font-size: 72px;
-            margin-bottom: 40px;
+        a{color: #0e8c8c !important;text-decoration: none;}
+        .footer{
+            position: fixed;z-index: 99;bottom: 50px;width: 100%;left: 0px;text-align: center;
+            color: #888;
         }
+        .button{font-size: 1.2em;}
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="content">
-        <a href="/" title="返回首页">返回首页</a>
-        <div class="title">HTTP 404 : 页面不存在.</div>
+    <div class="container">
+        <div class="header">
+            <h3>Page Not Foud</h3>
+        </div>
+        <div class="body">
+            <div class="err404">404</div>
+            <a href="/" title="返回首页" class="button">返回首页</a><br />
+            <div class="footer">Powered by <a href="https://github.com/TruthHun/BookStack" target="_blank">BookStack</a></div>
+        </div>
     </div>
-</div>
 </body>
 </html>
