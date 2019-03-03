@@ -41,7 +41,7 @@
                         <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 阅读</a>
                     {{end}}
                     {{end}}
-                        <a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i> 打赏</a>
+                        {{/*<a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i> 打赏</a>*/}}
                         <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
                             {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
                                 <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
@@ -63,7 +63,7 @@
                 <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i>阅读</a>
             {{end}}
             {{end}}
-                <a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i>打赏</a>
+                {{/*<a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i>打赏</a>*/}}
                 <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
                 {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
                     <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
