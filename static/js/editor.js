@@ -24,8 +24,6 @@ function jstree_save(node, parent) {
         shade: [0.1, '#fff'] //0.1透明度的白色背景
     });
 
-    console.log(JSON.stringify(nodeData));
-
     $.ajax({
         url : window.sortURL,
         type :"post",
