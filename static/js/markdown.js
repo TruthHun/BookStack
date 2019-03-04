@@ -19,6 +19,7 @@ $(function () {
         lineNumbers : true,
         tocStartLevel : 1,
         tocm : true,
+        // watch: true,
         saveHTMLToTextarea : true,
         onload : function() {
             this.hideToolbar();
@@ -237,8 +238,8 @@ $(function () {
         var index = null;
         var node = window.selectNode;
         var content = window.editor.getMarkdown();
-        // var html = window.editor.getPreviewedHTML();
-        var html = window.editor.getHTML();
+        var html = window.editor.getPreviewedHTML();
+        // var html = window.editor.getHTML();
         var version = "";
         var cm = window.editor.cm;
 
