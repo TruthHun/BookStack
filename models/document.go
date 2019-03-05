@@ -562,7 +562,7 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 	seg = fmt.Sprintf("${%v}$", strings.Count(seg, "#"))
 	for i := 7; i > 0; i-- {
 		slice := make([]string, i+1)
-		k := strings.Join(slice, "#")
+		k := "\n" + strings.Join(slice, "#")
 		markdown = strings.Replace(markdown, k, fmt.Sprintf("${%v}$", i), -1)
 	}
 	contSlice := strings.Split(markdown, seg)
@@ -590,6 +590,10 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 		doc.DocumentName = utils.ParseTitleFromMdHtml(mdtil.Md2html(val))
 		doc.Version = time.Now().Unix()
 		doc.MemberId = m.MemberId
+
+		if !strings.Contains(doc.Markdown, "[TOC]") {
+			doc.Markdown = "[TOC]\r\n" + doc.Markdown
+		}
 
 		if docId, err := doc.InsertOrUpdate(); err != nil {
 			beego.Error("InsertOrUpdate => ", err)

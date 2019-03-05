@@ -166,6 +166,9 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 
 	//记录已经存在了的图片，避免重复图片出现重复采集的情况
 	var existImage bool
+
+	from := "\r\n<!-- 原文：" + urlstr + " -->"
+
 	imageMap := make(map[string]string)
 
 	if strings.Contains(urlstr, "bookstack.cn") {
@@ -292,13 +295,10 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 			}
 			switch contType {
 			case 1: //=>html
-				//cont = article.Html + "\n原文：\n> " + urlstr
 				cont = article.Html
 			case 2: //=>text
-				//cont = article.Content + fmt.Sprintf("\n原文：\n> %v", urlstr)
 				cont = article.Content
 			default: //0 && other=>markdown
-				//cont = html2md.Convert(article.Html) + fmt.Sprintf("\n\r\n\r原文:\n> %v", urlstr)
 				cont = html2md.Convert(article.Html)
 			}
 		} else if intelligence == 2 && diySelector != "" { //自定义提取
@@ -307,13 +307,10 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 			} else {
 				switch contType {
 				case 1: //=>html
-					//cont = htmlstr + "\n\r\n\r> 原文： " + urlstr
 					cont = htmlstr
 				case 2: //=>text
-					//cont = doc.Find(diySelector).Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 					cont = doc.Find(diySelector).Text()
 				default: //0 && other=>markdown
-					//cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 					cont = html2md.Convert(htmlstr)
 				}
 			}
@@ -322,18 +319,17 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 			switch contType {
 			case 1: //=>html
 				htmlstr, _ := doc.Find("body").Html()
-				//cont = htmlstr + "\n\n\n> 原文：" + urlstr
 				cont = htmlstr
 			case 2: //=>text
-				//cont = doc.Find("body").Text() + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 				cont = doc.Find("body").Text()
 			default: //0 && other=>markdown
 				htmlstr, _ := doc.Find("body").Html()
-				//cont = html2md.Convert(htmlstr) + fmt.Sprintf("\n\r\n\r> 原文: %v", urlstr)
 				cont = html2md.Convert(htmlstr)
 			}
 		}
 	}
+
+	cont = cont + from
 
 	return
 }
