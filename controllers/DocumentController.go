@@ -198,7 +198,7 @@ func (this *DocumentController) Read() {
 		this.Abort("404")
 	}
 
-	cache := true
+	bodyText := ""
 	if doc.Release != "" {
 		query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(doc.Release))
 		if err != nil {
@@ -219,20 +219,7 @@ func (this *DocumentController) Read() {
 				doc.Release = html
 			}
 		}
-		if strings.TrimSpace(query.Find("body").Text()) == "" {
-			cache = false
-		}
-	}
-
-	if cache { // 文档对应的书籍发布时间，用于作为304缓存优化
-		book, _ := models.NewBook().Find(doc.BookId, "release_time")
-		releaseTime := book.ReleaseTime.Format(http.TimeFormat)
-		since := this.Ctx.Request.Header.Get("If-Modified-Since")
-		if since == releaseTime {
-			this.Ctx.ResponseWriter.WriteHeader(http.StatusNotModified)
-			return
-		}
-		this.Ctx.ResponseWriter.Header().Add("Last-Modified", releaseTime)
+		bodyText = query.Find(".markdown-toc").Text()
 	}
 
 	attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
@@ -265,7 +252,7 @@ func (this *DocumentController) Read() {
 	this.GetSeoByPage("book_read", map[string]string{
 		"title":       doc.DocumentName + " - 《" + bookResult.BookName + "》",
 		"keywords":    bookResult.Label,
-		"description": bookResult.Description,
+		"description": beego.Substr(bodyText+" "+bookResult.Description, 0, 200),
 	})
 
 	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)

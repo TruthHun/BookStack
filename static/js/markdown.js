@@ -220,7 +220,8 @@ $(function () {
                 window.selectNode = node;
                 pushVueLists(res.data.attach);
                 // 设置 history
-                history.pushState({"id": $node.node.id},res.data.doc_name,window.editURI + res.data.identify);
+                if(!window.onpop) history.pushState(node,res.data.doc_name,window.editURI + res.data.identify);
+                window.onpop=false;
             }else{
                 layer.msg("文档加载失败");
             }
@@ -520,8 +521,26 @@ $(function () {
         $("#documentTemplateModal").modal('hide');
     });
 
+    /*
+    *   选中节点，id表示文档的id或者identify
+    * */
+    function selectedNodeById(id){
+        $.each(window.documentCategory,function () {
+            if(id == this.id || id==this.identify) {
+                window.treeCatalog.deselect_all();
+                window.treeCatalog.select_node(this);
+                return false;
+            }
+        });
+    }
+    function selectedNode(node){
+        window.treeCatalog.deselect_all();
+        window.treeCatalog.select_node(node);
+    }
+
     window.onpopstate=function(e){
-        history.back();
+        window.onpop = true;
+        selectedNode(e.state)
     }
 
 });
