@@ -563,7 +563,7 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 	for i := 7; i > 0; i-- {
 		slice := make([]string, i+1)
 		k := "\n" + strings.Join(slice, "#")
-		markdown = strings.Replace(markdown, k, fmt.Sprintf("${%v}$", i), -1)
+		markdown = strings.Replace(markdown, k, fmt.Sprintf("\n${%v}$", i), -1)
 	}
 	contSlice := strings.Split(markdown, seg)
 
