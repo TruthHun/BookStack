@@ -16,6 +16,7 @@
                     <li>
                         <a href="{{urlfor "SearchController.Search"}}" class="visible-xs visible-sm" title="搜索"><i class="fa fa-search"></i> 搜索</a>
                     </li>
+                    {{/*<li><a href="https://www.bookstack.cn/books/adv" title="软文投稿" target="_blank"><i class="fa fa-check"></i> 软文投稿</a></li>*/}}
                     <li><a href="https://gitee.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
                 {{if gt .Member.MemberId 0}}
                     <li>
@@ -66,6 +67,7 @@
                     <li class="{{if .IsSearch}}active{{end}}">
                         <a href="{{urlfor "SearchController.Search" }}" title="搜索"><i class="fa fa-search"></i> 搜索</a>
                     </li>
+                    {{/*<li><a href="https://www.bookstack.cn/books/adv" title="软文投稿"><i class="fa fa-check-square-o"></i> 软文投稿</a></li>*/}}
                     <li><a href="https://gitee.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
                 </ul>
                 {{/*<div class="searchbar pull-left visible-lg-inline-block visible-md-inline-block">*/}}
