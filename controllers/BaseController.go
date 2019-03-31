@@ -481,6 +481,9 @@ func (this *BaseController) ProjectsFile() {
 			this.Abort("404")
 		}
 		this.Ctx.ResponseWriter.Header().Set("Last-Modified", date)
+		if strings.HasSuffix(object,".svg"){
+			this.Ctx.ResponseWriter.Header().Set("Content-Type","image/svg+xml")
+		}
 		this.Ctx.ResponseWriter.Write(b)
 	} else { //local
 		this.Abort("404")
