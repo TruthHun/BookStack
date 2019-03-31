@@ -554,6 +554,9 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 		}
 		defer resp.Body.Close()
 		if tmp := strings.TrimPrefix(strings.ToLower(resp.Header.Get("Content-Type")), "image/"); tmp != "" {
+			if strings.HasPrefix(strings.ToLower(tmp),"svg"){
+				tmp="svg"
+			}
 			ext = "." + tmp
 		} else {
 			ext = strings.ToLower(filepath.Ext(srcLower))
