@@ -7,6 +7,15 @@
 <div class="manual-reader manual-container">
 {{template "widgets/header.html" .}}
     <div class="container manual-body cate-list">
+        <div class="row visible-xs" style="margin:15px 0px 30px 0px;">
+            <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
+                <div class="input-group input-group-lg">
+                    <input type="text" name="wd" placeholder="Search..." class="form-control">
+                    <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
+                </div>
+            </form>
+        </div>
+
         {{range $idx,$cate:=.Cates}}
             {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
         <div class="panel panel-default">

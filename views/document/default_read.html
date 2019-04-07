@@ -150,7 +150,9 @@
                                 <span class="bookmark-remove {{if $.Bookmark}}{{else}}hide{{end}}"> <img src="/static/images/icon-bookmark-remove.png" alt="移除书签"></span>
                                 </a>
                             </li>
-
+                            <li class="book-menu">
+                                <a href="javascript:void(0);" title="菜单"><i class="fa fa-align-justify"></i></a>
+                            </li>
                             <li class="visible-xs visible-sm bars-menu-toggle">
                                 <a href="#" title="更多功能"><i class="fa fa-plus-circle"></i><i class="fa fa-minus-circle hide"></i></a>
                             </li>
@@ -303,6 +305,10 @@ $(function () {
     clipboard.on('error', function(e) {
         console.log("Copy Error：",e);
     });
+
+    $(".book-menu").click(function () {
+        $(".slidebar").trigger("click");
+    })
 
 });
 </script>

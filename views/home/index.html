@@ -6,7 +6,17 @@
 <body>
 <div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
+
+
     <div class="container manual-body">
+        <div class="row visible-xs" style="margin:30px 0px 15px 0px;">
+            <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
+                <div class="input-group input-group-lg">
+                    <input type="text" name="wd" placeholder="Search..." class="form-control">
+                    <span class="input-group-addon"><i class="fa fa-search"></i><span class="hidden-xs"> 搜索</span></span>
+                </div>
+            </form>
+        </div>
         <div class="row">
             <div class="col-xs-12 mgt-15px">
                 {{if gt $.Cid 0}}
