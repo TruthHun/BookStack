@@ -1146,7 +1146,7 @@ func (this *DocumentController) Search() {
 		for _, item := range result.Hits.Hits {
 			ids = append(ids, item.Source.Id)
 		}
-		docs, err := models.NewDocumentSearchResult().GetDocsById(ids)
+		docs, err := models.NewDocumentSearchResult().GetDocsById(ids,true)
 		if err != nil {
 			beego.Error(err)
 		}
