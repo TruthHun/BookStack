@@ -1,6 +1,9 @@
 $(function () {
     window.addDocumentModalFormHtml = $(this).find("form").html();
     window.editor = editormd("docEditor", {
+        atLink    : false,    // disable @link
+        emailLink : false,    // disable email address auto link
+        emoji : false,       // Support Github emoji, Twitter Emoji(Twemoji), fontAwesome, Editor.md logo emojis.
         width : "100%",
         height : "100%",
         path : "/static/editor.md/lib/",
