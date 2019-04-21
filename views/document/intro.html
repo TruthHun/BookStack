@@ -2,6 +2,10 @@
 <html lang="zh-CN">
 <head>
     {{template "widgets/head.html" .}}
+        <style>
+            .relate-bookname{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+            h4{font-weight: normal;font-size: 16px;color: #333;}
+        </style>
 </head>
 <body id="bookstack-intro">
 {{template "widgets/header.html" .}}
@@ -158,6 +162,26 @@
                 </ul>
             </div>
         </div>
+    </div>
+
+    <div class="row mgt-15px">
+        <div class="col-xs-12 mgt-15px">
+            <h4 class="help-block"><i class="fa fa-th color-gray"></i> 相关书籍</h4>
+        </div>
+        {{range .RelateBooks}}
+            <div class="col-xs-6 col-sm-3 col-md-2 mgt-15px">
+                <dl class="manual-item-standard">
+                    <dt>
+                        <a class="clearfix tooltips" href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="{{.BookName}}" target="_blank">
+                            <img class="img-responsive border-cover-img" onerror="this.src='/static/images/book.png'" src="{{.Cover}}" alt="{{.BookName}}">
+                        </a>
+                    </dt>
+                    <dd class="mgt-15px">
+                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" class="name tooltips relate-bookname" title="{{.BookName}}" target="_blank" data-original-title="{{.BookName}}">{{.BookName}}{{.BookName}}{{.BookName}}</a>
+                    </dd>
+                </dl>
+            </div>
+        {{end}}
     </div>
 
 </div>

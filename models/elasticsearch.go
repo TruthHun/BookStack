@@ -28,11 +28,12 @@ var IsRebuildAllIndex = false
 
 //全文搜索客户端
 type ElasticSearchClient struct {
-	Host    string        //host
-	Index   string        //索引
-	Type    string        //type
-	On      bool          //是否启用全文搜索
-	Timeout time.Duration //超时时间
+	Host           string        //host
+	Index          string        //索引
+	Type           string        //type
+	On             bool          //是否启用全文搜索
+	Timeout        time.Duration //超时时间
+	IsRelateSearch bool
 }
 
 //全文搜索
@@ -282,6 +283,9 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
 	//}
 
 	percent := GetOptionValue("SEARCH_ACCURACY", "50")
+	if this.IsRelateSearch {
+		percent = "50"
+	}
 	queryBody = fmt.Sprintf(queryBody, wd, percent+"%", (p-1)*listRows, listRows)
 	api := this.Host + this.Index + "/" + this.Type + "/_search"
 	if orm.Debug {

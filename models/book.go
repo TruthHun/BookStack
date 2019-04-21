@@ -567,7 +567,7 @@ func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error
 		idArr = append(idArr, i)
 	}
 
-	rows, err = orm.NewOrm().QueryTable(m).Filter("book_id__in", idArr...).All(&bs, fields...)
+	rows, err = orm.NewOrm().QueryTable(m).Filter("book_id__in", idArr...).Filter("privately_owned", 0).All(&bs, fields...)
 	if rows > 0 {
 		bookMap := make(map[interface{}]Book)
 		for _, book := range bs {

@@ -191,16 +191,6 @@ func (m *Option) Init() error {
 		}
 	}
 
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "RELATE_BOOK_CACHE").Exist() {
-		option := NewOption()
-		option.OptionValue = "0"
-		option.OptionName = "RELATE_BOOK_CACHE"
-		option.OptionTitle = "推荐书籍缓存时长"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DEFAULT_SEARCH").Exist() {
 		option := NewOption()
 		option.OptionValue = "book"
@@ -246,6 +236,27 @@ func (m *Option) Init() error {
 		option.OptionValue = "true"
 		option.OptionName = "LOGIN_GITEE"
 		option.OptionTitle = "是否允许使用码云登录"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	// 书籍公开发布，是否需要执行审核
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CHECK_BOOK").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "CHECK_BOOK"
+		option.OptionTitle = "是否开启书籍审核"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "RELATE_BOOK").Exist() {
+		option := NewOption()
+		option.OptionValue = "0"
+		option.OptionName = "RELATE_BOOK"
+		option.OptionTitle = "是否开始关联书籍"
 		if _, err := o.Insert(option); err != nil {
 			return err
 		}

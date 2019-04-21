@@ -121,6 +121,18 @@
                         </div>
 
                         <div class="form-group">
+                            <label>是否开启书籍审核( <span class="text-muted"> 非管理员发布公开的书籍项目，是否需要进行审核</span> )</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .CHECK_BOOK.OptionValue "true"}}checked{{end}} name="CHECK_BOOK" value="true">是<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .CHECK_BOOK.OptionValue "false"}}checked{{end}} name="CHECK_BOOK" value="false">否<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label>是否开启全文搜索( <span class="text-muted">每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果 </span> )</label>
                             <div class="radio">
                                 <label class="radio-inline">
@@ -150,17 +162,9 @@
                             <input type="number" min="0" class="form-control" max="100" name="SEARCH_ACCURACY" value="{{.SEARCH_ACCURACY.OptionValue}}">
                         </div>
 
-                        <div class="form-group hidden">
-                            <label>推荐书籍缓存时长( <span class="text-muted">开启了全文搜索才会生效。</span> )</label>
-                            <select name="RELATE_BOOK_CACHE" class="form-control">
-                                <option value="0">关闭</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "86400"}}selected{{end}} value="86400">一天</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "172800"}}selected{{end}} value="172800">两天</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "432000"}}selected{{end}} value="432000">五天</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "604800"}}selected{{end}} value="604800">一周</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "1296000"}}selected{{end}} value="1296000">半个月</option>
-                                <option {{if eq .RELATE_BOOK_CACHE.OptionValue "2592000"}}selected{{end}} value="2592000">一个月</option>
-                            </select>
+                        <div class="form-group">
+                            <label>是否开启关联书籍功能( <span class="text-muted">数值，大于0表示开启并把关联结果缓存xx天，其他值表示不开启。<strong class="text-danger">需开启全文搜索!!!</strong></span> )</label>
+                            <input type="number" min="0" max="365" class="form-control" name="RELATE_BOOK" value="{{.RELATE_BOOK.OptionValue}}">
                         </div>
 
                         <div class="form-group">

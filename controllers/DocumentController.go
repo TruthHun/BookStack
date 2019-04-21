@@ -154,6 +154,7 @@ func (this *DocumentController) Index() {
 		"keywords":    bookResult.Label,
 		"description": bookResult.Description,
 	})
+	this.Data["RelateBooks"] = models.NewRelateBook().Lists(bookResult.BookId)
 }
 
 //阅读文档.
@@ -322,7 +323,6 @@ func (this *DocumentController) Read() {
 	this.Data["Content"] = template.HTML(doc.Release)
 	this.Data["View"] = doc.Vcnt
 	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
-
 }
 
 //编辑文档.
