@@ -402,7 +402,17 @@ func (this *ManagerController) DeleteBook() {
 		this.JsonResult(6001, "参数错误")
 	}
 
+	//用户密码
+	pwd := this.GetString("password")
+	if m, err := models.NewMember().Login(this.Member.Account, pwd); err != nil || m.MemberId == 0 {
+		this.JsonResult(1, "项目删除失败，您的登录密码不正确")
+	}
+
 	book := models.NewBook()
+	b, _ := book.Find(bookId)
+	if b.Identify != this.GetString("identify") {
+		this.JsonResult(1, "项目删除失败，您输入的文档标识不正确")
+	}
 	err := book.ThoroughDeleteBook(bookId)
 
 	if err == orm.ErrNoRows {
@@ -420,7 +430,7 @@ func (this *ManagerController) DeleteBook() {
 		}
 	}()
 
-	this.JsonResult(0, "ok")
+	this.JsonResult(0, "项目删除成功")
 }
 
 // CreateToken 创建访问来令牌.

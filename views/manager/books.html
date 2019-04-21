@@ -43,8 +43,7 @@
                                         <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="查看文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看文档</a>
                                         <a href="{{urlfor "DocumentController.Edit" ":key" $item.Identify ":id" ""}}" title="编辑文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-edit" aria-hidden="true"></i> 编辑文档</a>
                                         <a href="{{urlfor "ManagerController.EditBook" ":key" $item.Identify}}" title="项目设置" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs" aria-hidden="true"></i> 项目设置</a>
-                                        <a href="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除项目" class="btn btn-danger ajax-get confirm" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除项目</a>
-
+                                        <a href="javascript:void(0);" data-identify="{{$item.Identify}}" data-book="{{$item.BookName}}" data-action="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除项目" class="btn btn-danger btn-del-book" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除项目</a>
                                     </div>
 
                                     <div class="clearfix"></div>
@@ -85,6 +84,40 @@
     </div>
 </div>
 
+
+
+<!-- Delete Book Modal -->
+<div class="modal fade" id="deleteBookModal" tabindex="-1" role="dialog" aria-labelledby="deleteBookModalLabel">
+    <div class="modal-dialog" role="document">
+        <form method="post" id="deleteBookForm" class="ajax-form" action="">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">删除项目</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="help-block">当前文档项目名称为<span class="text-danger book-name"></span>，标识为 <span class="text-danger book-identify"></span> ；删除项目后将无法找回。</div>
+                    <div class="help-block">如确定删除，请输入当前文档标识和您的登录密码。</div>
+                    <div class="input-group">
+                        <span class="input-group-addon">文档标识</span>
+                        <input type="text" name="identify" autocomplete="off" class="form-control">
+                    </div>
+                    <br>
+                    <div class="input-group form-group">
+                        <span class="input-group-addon">登录密码</span>
+                        <input type="password" name="password" autocomplete="off" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span id="form-error-message2" class="error-message"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" id="btnDeleteBook" class="btn btn-danger" data-loading-text="删除中...">确定删除</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
 <script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 {{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
@@ -94,6 +127,15 @@
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
 <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
-
+<script>
+    $(".btn-del-book").click(function () {
+       var _this=$(this),bookName=_this.attr("data-book"),identify=_this.attr("data-identify"),
+               action=_this.attr("data-action"),$modal=$("#deleteBookModal");
+        $modal.find(".book-identify").text(identify);
+        $modal.find(".book-name").text(bookName);
+        $modal.find("form").attr("action",action);
+        $modal.modal("show");
+    });
+</script>
 </body>
 </html>
