@@ -563,6 +563,10 @@ func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error
 	var rows int64
 	var idArr []interface{}
 
+	if len(id) == 0 {
+		return
+	}
+
 	for _, i := range id {
 		idArr = append(idArr, i)
 	}

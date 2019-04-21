@@ -284,7 +284,7 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
 
 	percent := GetOptionValue("SEARCH_ACCURACY", "50")
 	if this.IsRelateSearch {
-		percent = "50"
+		percent = "10"
 	}
 	queryBody = fmt.Sprintf(queryBody, wd, percent+"%", (p-1)*listRows, listRows)
 	api := this.Host + this.Index + "/" + this.Type + "/_search"

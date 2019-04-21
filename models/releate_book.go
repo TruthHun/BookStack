@@ -70,7 +70,11 @@ func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
 	client := NewElasticSearchClient()
 	client.IsRelateSearch = true
 	client.Timeout = 1 * time.Second
-	res, err := client.Search(book.BookName+", "+book.Label, 1, 12, false)
+	wd := book.Label
+	if len(wd) == 0 {
+		wd = book.BookName
+	}
+	res, err := client.Search(wd, 1, 12, false)
 	if err != nil {
 		beego.Error(err.Error())
 		return

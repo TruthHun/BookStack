@@ -39,7 +39,7 @@ import (
 
 //更多存储类型有待扩展
 const (
-	Version           = "1.7 beta"
+	Version           = "1.7 beta2"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )
@@ -554,8 +554,8 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 		}
 		defer resp.Body.Close()
 		if tmp := strings.TrimPrefix(strings.ToLower(resp.Header.Get("Content-Type")), "image/"); tmp != "" {
-			if strings.HasPrefix(strings.ToLower(tmp),"svg"){
-				tmp="svg"
+			if strings.HasPrefix(strings.ToLower(tmp), "svg") {
+				tmp = "svg"
 			}
 			ext = "." + tmp
 		} else {
