@@ -24,12 +24,13 @@
     $(function() {
         editormd.markdownToHTML("bookstack-render-data", {
            htmlDecode      : "style,script,iframe",  // you can filter tags decode
-            atLink    : false,    // disable @link
+           atLink    : false,    // disable @link
            emailLink : false,    // disable email address auto link
            emoji : false,       // Support Github emoji, Twitter Emoji(Twemoji), fontAwesome, Editor.md logo emojis.
-           tex             : false,  // 默认不解析
-           flowChart       : false,  // 默认不解析
-           sequenceDiagram : false,  // 默认不解析
+            taskList : true,
+            tex  : true,
+            flowChart : true,
+            sequenceDiagram: true,
            markdown:$("#bookstack-data").val(),
         });
         $.post(location.href,{content:$("#bookstack-render-data").html()},function (res) {

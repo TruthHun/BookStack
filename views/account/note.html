@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="//cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="{{$.StaticDomain}}/static/jstree/3.3.4/themes/default/style.min.css" rel="stylesheet">
     <link href="{{$.StaticDomain}}/static/editor.md/css/editormd.css" rel="stylesheet">
     <link href="{{$.StaticDomain}}/static/highlight/styles/zenburn.css" rel="stylesheet">
@@ -53,7 +53,7 @@
             sequenceDiagram : true,       // 开启时序/序列图支持，默认关闭,
             imageUpload : true,
             imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-            imageUploadURL : "./php/upload.php",
+            // imageUploadURL : "./php/upload.php",
             onload : function() {
 //                console.log('onload', this);
             }

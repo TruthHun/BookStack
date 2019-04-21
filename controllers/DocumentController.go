@@ -1053,35 +1053,31 @@ func (this *DocumentController) Export() {
 	if identify == "" {
 		this.JsonResult(1, "下载失败，无法识别您要下载的文档")
 	}
-	if book, err := new(models.Book).FindByIdentify(identify); err == nil {
-		if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
-			this.JsonResult(1, "私有文档，禁止导出")
-		} else {
-			//查询文档是否存在
-			obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
-			switch utils.StoreType {
-			case utils.StoreOss:
-				if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
-					beego.Error(err, obj)
-					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
-				} else {
-					this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": this.OssDomain + "/" + obj})
-				}
-			case utils.StoreLocal:
-				obj = "uploads/" + obj
-				if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
-					beego.Error(err, obj)
-					this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
-				} else {
-					this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": "/" + obj})
-				}
-			}
-
-		}
-	} else {
+	book, err := new(models.Book).FindByIdentify(identify)
+	if err != nil {
 		beego.Error(err.Error())
 	}
-
+	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
+		this.JsonResult(1, "私有文档，只有文档创建人可导出")
+	}
+	//查询文档是否存在
+	obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
+	switch utils.StoreType {
+	case utils.StoreOss:
+		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+		}
+		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": this.OssDomain + "/" + obj})
+	case utils.StoreLocal:
+		obj = "uploads/" + obj
+		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+		}
+		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": "/" + obj})
+	}
+	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 }
 
 //生成项目访问的二维码.
@@ -1146,7 +1142,7 @@ func (this *DocumentController) Search() {
 		for _, item := range result.Hits.Hits {
 			ids = append(ids, item.Source.Id)
 		}
-		docs, err := models.NewDocumentSearchResult().GetDocsById(ids,true)
+		docs, err := models.NewDocumentSearchResult().GetDocsById(ids, true)
 		if err != nil {
 			beego.Error(err)
 		}

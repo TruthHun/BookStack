@@ -7,7 +7,6 @@ $(function () {
         width : "100%",
         height : "100%",
         path : "/static/editor.md/lib/",
-        tex  : true,
         toolbar : true,
         placeholder: "本编辑器支持Markdown编辑，左边编写，右边预览",
         imageUpload: true,
@@ -17,7 +16,9 @@ $(function () {
         fileUpload: true,
         fileUploadURL : window.fileUploadURL,
         taskList : true,
+        tex  : true,
         flowChart : true,
+        sequenceDiagram: true,
         htmlDecode : "style,script,iframe,title,onmouseover,onmouseout,style",
         lineNumbers : true,
         tocStartLevel : 1,
@@ -67,13 +68,12 @@ $(function () {
         },
         onchange : function () {
             resetEditorChanged(true);
-        },
+        }
     });
 
-    window.editor.katexURL={
-        js  : "https://cdn.staticfile.org/KaTeX/0.7.1/katex.min.js",
-        css :"https://cdn.staticfile.org/KaTeX/0.7.1/katex.min.css",
-    };
+
+
+
 
     // window.editor.tocDropdown=true;
 
