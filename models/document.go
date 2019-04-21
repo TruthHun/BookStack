@@ -100,6 +100,7 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
 	id = int64(m.DocumentId)
 	m.ModifyTime = time.Now()
+	m.DocumentName = strings.TrimSpace(m.DocumentName)
 	if m.DocumentId > 0 { //文档id存在，则更新
 		_, err = o.Update(m, cols...)
 		return

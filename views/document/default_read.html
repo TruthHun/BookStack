@@ -188,6 +188,7 @@
     </article>
     <div class="manual-mask"></div>
 </div>
+<span class="article-toggle tooltips" title="收起/展开"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
 <div id="menu-hidden" style="display: none;">
     <!--站点统计代码-->
     {{str2html $.TONGJI}}
@@ -223,6 +224,7 @@
 <script type="text/javascript" src="/static/katex/katex.min.js"></script>
 
 <script type="text/javascript">
+    'use strict';
 $(function () {
 
     var keywords="{{.Keywords}}";
@@ -254,17 +256,8 @@ $(function () {
 
     show_copy_btn();
 
-    //数学公式处理
-    // $.each($(".editormd-tex"),function () {
-    //    console.log($(this).text());
-    //    var text=$(this).text();
-    //    try{
-    //        katex.render(text, this);
-    //    }catch (err){
-    //        console.log(err);
-    //        $(this).text(text);
-    //    }
-    // });
+
+
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);
 
@@ -286,8 +279,15 @@ $(function () {
 
     $(".book-menu").click(function () {
         $(".slidebar").trigger("click");
-    })
+    });
 
+    $(".article-toggle").click(function () {
+        if($("body").hasClass("article-menu-hide")){
+            $("body").removeClass("article-menu-hide");
+        }else{
+            $("body").addClass("article-menu-hide");
+        }
+    });
 });
 </script>
 </body>

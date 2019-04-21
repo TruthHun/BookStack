@@ -17,7 +17,7 @@ body {
     line-height: 1em;
 }
 h1,h2,h3,h4,h5,h6,strong,input,select,textarea,button,body,code {
-    font-family:Microsoft Yahei,Helvetica Neue,Arial,Helvetica,sans-serif;
+    font-family: Helvetica Neue,NotoSansHans-Regular,AvenirNext-Regular,arial,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,Arial,Helvetica,sans-serif;
 }
 h1 {
     font-size: 2.25em;
@@ -1233,7 +1233,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .article-menu{overflow:auto;padding:10px 0px 15px 13px;position: absolute;top:60px;bottom: 33px;width: 278px;}
 .article-menu ul,.article-menu li{list-style: none;padding: 0px;margin: 0px;}
 .article-menu li{padding-left: 1em;}
-.article-menu a{display: block;white-space: nowrap;line-height: 250%;color: #666666;}
+.article-menu a{display: block;white-space: nowrap;line-height: 234%;color: #666666;}
 .article-menu a:hover{color: #008cff;}
 .article-menu a.jstree-clicked,.article-menu a.active{color:#008cff !important;}
 .article-menu .readed>a:first-child{color: #999999;}
@@ -1290,5 +1290,66 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .article-content pre{position: relative;}
 .article-content pre .btn-copy{position: absolute;right: 15px;display: none;}
 .article-content pre:hover .btn-copy{display: block;}
+
+
+/*.markdown-toc-fixed{*/
+    /**/
+/*}*/
+
+
+@media screen and (min-width: 840px) {
+    .markdown-toc{
+        position: fixed;background-color: #fff;
+        right: 15px;z-index: 99;
+        top: 115px;transition: width 0.5s;
+        width: 230px;max-height: 360px;overflow-y: auto;
+        border:1px solid #EEEEEE;border-radius: 3px;border-top-left-radius: 0px;
+    }
+    .article-menu-hide .markdown-toc{
+        width: 0px;overflow: hidden;border: 0px;
+    }
+    .article-menu-hide .markdown-toc::before{
+        border-bottom: 0px;
+    }
+    .markdown-toc-list{
+        white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+        width: 200px;
+    }
+    .markdown-toc::before{
+        content: "本章目录";color: #aaaaaa;position: fixed;background-color: #fff;
+        width: 100%;padding-left: 2.5em;line-height: 200%;border-bottom: 1px solid #EEEEEE;
+    }
+
+    .article-toggle{position: relative;z-index: 999}
+
+    .markdown-toc ul{
+        list-style: none;padding-left: 1em;margin-top: 45px;
+    }
+    .markdown-toc a{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;color: #999999;
+        font-size: 15px;
+    }
+    .markdown-toc a.active,.markdown-toc a:hover{color: #008cff;}
+    .article-toggle{
+        position: fixed;right: 212px;top:115px;cursor: pointer;transition: right 0.5s;
+        border: 1px solid #efefef;background-color: #fff;
+        padding:5px 5px;
+    }
+    .article-menu-hide .article-toggle{
+        right: 15px;border: 1px solid #EFEFEF;border-radius: 3px;
+    }
+    .article-toggle img{height: 21px;}
+
+    .m-manual .manual-right .manual-article{
+        transition: margin-right 0.5s;margin-right: 240px;
+    }
+
+    .article-menu-hide .m-manual .manual-right .manual-article{
+        margin-right: 0px;
+    }
+}
+
+
+
+
 
 /*.article-menu a:hover{color: #008cff;}*/

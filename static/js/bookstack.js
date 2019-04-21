@@ -139,6 +139,18 @@ $(function () {
         }else{
             $(".view-backtop").removeClass("active");
         }
+
+        var links = $(".reference-link"),l = links.length,find=false;
+        for (var i = 0; i < l && find==false; i++) {
+            if($(links[i]).offset().top>0){
+                $(".markdown-toc a").removeClass("active");
+                $(".markdown-toc a[href='#"+$(links[i]).attr("name")+"']").addClass("active");
+                find=true;
+            }
+        }
+
+
+
     });
 
     $(".manual-left").on("click","a",function () {
