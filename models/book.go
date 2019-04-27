@@ -322,7 +322,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
 func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	if cid > 0 { //针对cid>0
-		return m.homeData(pageIndex, pageSize, orderType, cid, fields...)
+		return m.homeData(pageIndex, pageSize, orderType, lang, cid, fields...)
 	}
 	o := orm.NewOrm()
 	order := "pin desc" //排序
@@ -378,7 +378,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 }
 
 //针对cid大于0
-func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
+func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	o := orm.NewOrm()
 	order := ""   //排序
 	condStr := "" //查询条件
@@ -408,6 +408,15 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, cid int, f
 	}
 	if len(cond) > 0 {
 		condStr = " where " + strings.Join(cond, " and ")
+	}
+	lang = strings.ToLower(lang)
+	switch lang {
+	case "zh", "en", "other":
+	default:
+		lang = ""
+	}
+	if strings.TrimSpace(lang) != "" {
+		condStr = condStr + " and `lang` = '" + lang + "'"
 	}
 	sqlFmt := "select %v from md_books b left join md_book_category c on b.book_id=c.book_id" + condStr
 	fieldStr := "b." + strings.Join(fields, ",b.")

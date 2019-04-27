@@ -63,6 +63,7 @@ func (this *HomeController) Index() {
 		if cid > 0 {
 			urlSuffix = urlSuffix + "&cid=" + strconv.Itoa(cid)
 		}
+		urlSuffix = urlSuffix + "&lang=" + lang
 		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, pageIndex, urlPrefix, urlSuffix)
 		this.Data["PageHtml"] = html
 	} else {
