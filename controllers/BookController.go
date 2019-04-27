@@ -228,6 +228,7 @@ func (this *BookController) SaveBook() {
 	book.Editor = editor
 	book.Author = this.GetString("author")
 	book.AuthorURL = this.GetString("author_url")
+	book.Lang = this.GetString("lang")
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")
@@ -254,7 +255,7 @@ func (this *BookController) SaveBook() {
 		}
 		client := models.NewElasticSearchClient()
 		if errSearch := client.BuildIndex(es); errSearch != nil && client.On {
-			beego.Error(err.Error())
+			beego.Error(errSearch.Error())
 		}
 	}()
 

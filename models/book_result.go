@@ -46,6 +46,7 @@ type BookResult struct {
 	IsDisplayComment bool   `json:"is_display_comment"`
 	Author           string `json:"author"`
 	AuthorURL        string `json:"author_url"`
+	Lang             string `json:"lang"`
 }
 
 func NewBookResult() *BookResult {

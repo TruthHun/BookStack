@@ -812,3 +812,7 @@ a{color: #333}
     left: 19px;
     top: 5px;
 }
+
+.lang-explore .text-muted{color: #999;}
+.lang-explore a{margin-left: 5px;margin-right: 3px;}
+.lang-explore a.active{color: #06f}

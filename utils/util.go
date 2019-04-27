@@ -140,6 +140,7 @@ func CrawlByChrome(urlStr string) (b []byte, err error) {
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	if ok, _ := beego.AppConfig.Bool("puppeteer"); ok {
 		name = "node"
+		// 读取截屏信息
 		args = []string{"crawl.js", "--url", urlStr}
 	} else { // chrome
 		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
@@ -569,4 +570,9 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 		err = ioutil.WriteFile(filename, b, os.ModePerm)
 	}
 	return
+}
+
+// 截取md5前8个字符
+func MD5Sub16(str string) string {
+	return cryptil.Md5Crypt(str)[0:16]
 }

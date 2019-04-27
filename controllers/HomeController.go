@@ -24,6 +24,7 @@ func (this *HomeController) Index() {
 		cid       int //分类，如果只是一级分类，则忽略，二级分类，则根据二级分类查找内容
 		urlPrefix = beego.URLFor("HomeController.Index")
 		cate      models.Category
+		lang      = this.GetString("lang")
 		tabName   = map[string]string{"recommend": "站长推荐", "latest": "最新发布", "popular": "热门书籍"}
 	)
 
@@ -52,7 +53,7 @@ func (this *HomeController) Index() {
 	pageIndex, _ := this.GetInt("page", 1)
 	//每页显示24个，为了兼容Pad、mobile、PC
 	pageSize := 24
-	books, totalCount, err := models.NewBook().HomeData(pageIndex, pageSize, models.BookOrder(tab), cid)
+	books, totalCount, err := models.NewBook().HomeData(pageIndex, pageSize, models.BookOrder(tab), lang, cid)
 	if err != nil {
 		beego.Error(err)
 		this.Abort("404")
@@ -71,6 +72,7 @@ func (this *HomeController) Index() {
 	this.Data["TotalPages"] = int(math.Ceil(float64(totalCount) / float64(pageSize)))
 	this.Data["Lists"] = books
 	this.Data["Tab"] = tab
+	this.Data["Lang"] = lang
 	title := this.Sitename
 
 	if cid > 0 {

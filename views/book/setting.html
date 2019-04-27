@@ -100,6 +100,14 @@
                                 <input type="text" class="form-control" value="{{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" placeholder="项目唯一标识" disabled>
                             </div>
                             <div class="form-group">
+                                <label>语种</label>
+                                <select name="lang" class="form-control">
+                                    <option {{if eq .Model.Lang "zh"}}selected{{end}} value="zh">中文</option>
+                                    <option {{if eq .Model.Lang "en"}}selected{{end}} value="en">英文</option>
+                                    <option {{if eq .Model.Lang "other"}}selected{{end}} value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>来源</label>
                                 <div class="input-group">
                                     <span class="input-group-btn">

@@ -15,7 +15,6 @@
                 </div>
             </form>
         </div>
-
         {{range $idx,$cate:=.Cates}}
             {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
         <div class="panel panel-default">

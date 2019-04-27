@@ -63,6 +63,7 @@ type Book struct {
 	CntComment        int       //评论人数
 	Author            string    `orm:"size(50)"`           //原作者，即来源
 	AuthorURL         string    `orm:"column(author_url)"` //原作者链接，即来源链接
+	Lang              string    `orm:"size(10);index;default(zh)"`
 }
 
 // TableName 获取对应数据库表名.
@@ -319,7 +320,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 //首页数据
 //完善根据分类查询数据
 //orderType:排序条件，可选值：recommend(推荐)、latest（）
-func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, fields ...string) (books []Book, totalCount int, err error) {
+func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang string, cid int, fields ...string) (books []Book, totalCount int, err error) {
 	if cid > 0 { //针对cid>0
 		return m.homeData(pageIndex, pageSize, orderType, cid, fields...)
 	}
@@ -351,6 +352,16 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, cid int, f
 	}
 	if len(cond) > 0 {
 		condStr = " where " + strings.Join(cond, " and ")
+	}
+
+	lang = strings.ToLower(lang)
+	switch lang {
+	case "zh", "en", "other":
+	default:
+		lang = ""
+	}
+	if strings.TrimSpace(lang) != "" {
+		condStr = condStr + " and `lang` = '" + lang + "'"
 	}
 	sqlFmt := "select %v from md_books " + condStr
 	fieldStr := strings.Join(fields, ",")
@@ -516,6 +527,7 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.CntComment = book.CntComment
 	m.Author = book.Author
 	m.AuthorURL = book.AuthorURL
+	m.Lang = book.Lang
 
 	if book.Theme == "" {
 		m.Theme = "default"
