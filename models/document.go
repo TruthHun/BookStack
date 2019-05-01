@@ -470,6 +470,11 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 			return
 		}
 
+		// 截屏选择器
+		if screenshot := strings.TrimSpace(gq.Find("screenshot").Text()); screenshot != "" {
+			utils.ScreenShotProjects.Store(project, screenshot)
+		}
+
 		//排除的选择器
 		var exclude []string
 		if excludeStr := strings.TrimSpace(gq.Find("exclude").Text()); excludeStr != "" {

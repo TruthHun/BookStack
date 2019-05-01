@@ -2,12 +2,16 @@ package utils
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"image"
 	"io/ioutil"
 	"os"
 	"path"
 	"sync"
+
+	"github.com/disintegration/imaging"
 
 	"strconv"
 	"strings"
@@ -50,8 +54,8 @@ const (
 //分词器
 var (
 	Segmenter   sego.Segmenter
-	BasePath, _        = filepath.Abs(filepath.Dir(os.Args[0]))
-	StoreType   string = beego.AppConfig.String("store_type") //存储类型
+	BasePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
+	StoreType   = beego.AppConfig.String("store_type") //存储类型
 	langs       sync.Map
 )
 
@@ -146,29 +150,126 @@ func RenderDocumentById(id int) {
 }
 
 //使用chrome采集网页HTML
-func CrawlByChrome(urlStr string) (b []byte, err error) {
-	if strings.Contains(urlStr, "bookstack") {
+func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) {
+	if strings.Contains(strings.ToLower(urlStr), "bookstack") {
 		return
 	}
-	var args []string
+	var (
+		args   []string
+		b      []byte
+		folder string
+	)
+
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
-	if ok, _ := beego.AppConfig.Bool("puppeteer"); ok {
-		name = "node"
-		// 读取截屏信息
+	ok, _ := beego.AppConfig.Bool("puppeteer")
+	selector, isScreenshot := ScreenShotProjects.Load(bookIdentify)
+	if ok || isScreenshot {
+		name = "node" // 读取截屏信息
 		args = []string{"crawl.js", "--url", urlStr}
+		if isScreenshot {
+			folder = fmt.Sprintf("cache/screenshots/" + bookIdentify + "/" + MD5Sub16(urlStr))
+			os.MkdirAll(folder, os.ModePerm)
+			args = append(args, "--folder", folder, "--selector", selector.(string))
+		}
 	} else { // chrome
 		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
 	}
 	cmd := exec.Command(name, args...)
 
-	// 超过10秒，杀掉进程，避免长期占用
-	time.AfterFunc(30*time.Second, func() {
+	expire := 30
+	if isScreenshot {
+		expire = 180
+	}
+	time.AfterFunc(time.Duration(expire)*time.Second, func() {
 		if cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
 	})
 
-	return cmd.Output()
+	b, err = cmd.Output()
+	cont = string(b)
+	pngFile := filepath.Join(folder, "screenshot.png")
+	jsonFile := filepath.Join(folder, "screenshot.json")
+	imagesMap := cropScreenshot(selector.(string), jsonFile, pngFile)
+	if len(imagesMap) > 0 {
+		doc, errDoc := goquery.NewDocumentFromReader(strings.NewReader(cont))
+		if errDoc != nil {
+			beego.Error(errDoc)
+		} else {
+			for ele, images := range imagesMap {
+				doc.Find(ele).Each(func(i int, selection *goquery.Selection) {
+					if img, ok := images[i]; ok {
+						htmlStr := fmt.Sprintf(`<div><img src="$%v"/></div>`, img)
+						selection.AfterHtml(htmlStr)
+						selection.Remove()
+					}
+				})
+			}
+			cont, err = doc.Find("body").Html()
+		}
+	}
+
+	return
+}
+
+func cropScreenshot(selector, jsonFile, pngFile string) (images map[string]map[int]string) {
+	ele := strings.Split(selector, ",")
+	images = make(map[string]map[int]string)
+	b, err := ioutil.ReadFile(jsonFile)
+	if err != nil {
+		beego.Error(err.Error())
+		return
+	}
+	info := &ScreenShotInfo{}
+	if err = json.Unmarshal(b, info); err != nil {
+		beego.Error(err.Error())
+		return
+	}
+
+	if len(ele) != len(info.Data) {
+		return
+	}
+
+	img, err := imaging.Open(pngFile)
+	if err != nil {
+		beego.Error(err.Error())
+		return
+	}
+
+	for idx, item := range info.Data {
+		ele[idx] = strings.TrimSpace(ele[idx])
+		images[ele[idx]] = make(map[int]string)
+		for idx2, item2 := range item {
+			imgItem := imaging.Crop(img, image.Rect(int(item2.X), int(item2.Y), int(item2.X+item2.Width), int(item2.Y+item2.Height)))
+			saveName := fmt.Sprintf(pngFile+"-%v.png", idx2)
+			imaging.Save(imgItem, saveName)
+			images[ele[idx]][idx2] = saveName
+		}
+	}
+	return
+}
+
+// 图片缩放居中裁剪
+//图片缩放居中裁剪
+//@param        file        图片文件
+//@param        width       图片宽度
+//@param        height      图片高度
+//@return       err         错误
+func CropImage(file string, width, height int) (err error) {
+	var img image.Image
+	img, err = imaging.Open(file)
+	if err != nil {
+		return
+	}
+	ext := strings.ToLower(filepath.Ext(file))
+	switch ext {
+	case ".jpeg", ".jpg", ".png", ".gif":
+		img = imaging.Fill(img, width, height, imaging.Center, imaging.CatmullRom)
+	default:
+		err = errors.New("unsupported image format")
+		return
+	}
+	return imaging.Save(img, file)
 }
 
 //采集HTML并把相对链接和相对图片
@@ -190,21 +291,29 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		return
 	}
 
+	// 默认记录到数据库中的图片路径
+	//save := src
+	project := ""
+	for _, header := range headers {
+		if val, ok := header["project"]; ok {
+			project = val
+		}
+	}
+
 	if force { //强力模式
-		var b []byte
-		b, err = CrawlByChrome(urlstr)
-		cont = string(b)
+		cont, err = CrawlByChrome(urlstr, project)
 	} else {
 		req := util.BuildRequest("get", urlstr, "", "", "", true, false, headers...)
 		req.SetTimeout(10*time.Second, 10*time.Second)
 		cont, err = req.String()
 	}
 
+	cont = strings.Replace(cont, "¶", "", -1)
+
 	if err != nil {
 		return
 	}
 
-	//http://www.bookstack.cn/login.html
 	slice := strings.Split(strings.TrimSpace(urlstr), "/")
 	if sliceLen := len(slice); sliceLen > 2 {
 		var doc *goquery.Document
@@ -235,7 +344,8 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 				srcLower := strings.ToLower(src)
 				if !strings.HasPrefix(srcLower, "http://") &&
 					!strings.HasPrefix(srcLower, "https://") &&
-					!strings.HasPrefix(srcLower, "data:image/") { //非base64的任意
+					!strings.HasPrefix(srcLower, "data:image/") && //非base64的任意
+					!strings.HasPrefix(srcLower, "$") {
 					if strings.HasPrefix(src, "/") { //以斜杠开头
 						src = strings.Join(slice[0:3], "/") + src
 					} else {
@@ -245,14 +355,6 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 					}
 				}
 
-				// 默认记录到数据库中的图片路径
-				//save := src
-				project := ""
-				for _, header := range headers {
-					if val, ok := header["project"]; ok {
-						project = val
-					}
-				}
 				if project != "" {
 					var exist string
 					if exist, existImage = imageMap[srcLower]; !existImage {
@@ -551,6 +653,12 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 	file := cryptil.Md5Crypt(src)
 	filename = "cache/" + file
 	srcLower := strings.ToLower(src)
+	if strings.HasPrefix(srcLower, "$") {
+		//_, err = CopyFile(filename, strings.TrimPrefix(srcLower, "$"))
+		err = os.Rename(strings.TrimPrefix(srcLower, "$"), filename)
+		return
+	}
+
 	if strings.HasPrefix(srcLower, "data:image/") && strings.Contains(srcLower, ";base64,") { //base64的图片
 		slice := strings.Split(src, ";base64,")
 		if len(slice) >= 2 {
@@ -562,27 +670,29 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 			}
 			err = ioutil.WriteFile(filename, b, os.ModePerm)
 		}
-	} else { //url链接图片
-		resp, err = util.BuildRequest("get", src, src, "", "", true, false, headers...).Response()
-		if err != nil {
-			return
-		}
-		defer resp.Body.Close()
-		if tmp := strings.TrimPrefix(strings.ToLower(resp.Header.Get("Content-Type")), "image/"); tmp != "" {
-			if strings.HasPrefix(strings.ToLower(tmp), "svg") {
-				tmp = "svg"
-			}
-			ext = "." + tmp
-		} else {
-			ext = strings.ToLower(filepath.Ext(srcLower))
-		}
-		filename = filename + ext
-		b, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return
-		}
-		err = ioutil.WriteFile(filename, b, os.ModePerm)
+		return
 	}
+
+	//url链接图片
+	resp, err = util.BuildRequest("get", src, src, "", "", true, false, headers...).Response()
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	if tmp := strings.TrimPrefix(strings.ToLower(resp.Header.Get("Content-Type")), "image/"); tmp != "" {
+		if strings.HasPrefix(strings.ToLower(tmp), "svg") {
+			tmp = "svg"
+		}
+		ext = "." + tmp
+	} else {
+		ext = strings.ToLower(filepath.Ext(srcLower))
+	}
+	filename = filename + ext
+	b, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(filename, b, os.ModePerm)
 	return
 }
 
