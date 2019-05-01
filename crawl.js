@@ -34,8 +34,9 @@ async function screenshot(winH) {
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,co;q=0.7,fr;q=0.6,zh-HK;q=0.5,zh-TW;q=0.4",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3766.2 Safari/537.36"
     });
-    // await page.goto(url, {"waitUntil" : "networkidle0"});
-    await page.goto(url, {"waitUntil" : "load","timeout":120000});
+    await page.goto(url, {"waitUntil" : "networkidle0", "timeout":120000});
+    // 下面这种方式不行！！！
+    // await page.goto(url, {"waitUntil" : "load","timeout":120000});
     let res;
     if(folder && selector){
         if (folder.substr(folder.length-1,1)!="/"){
