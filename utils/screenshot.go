@@ -1,6 +1,9 @@
 package utils
 
-import "sync"
+import (
+	"os"
+	"sync"
+)
 
 // 截图信息
 type ScreenShotInfo struct {
@@ -14,3 +17,7 @@ type ScreenShotInfo struct {
 }
 
 var ScreenShotProjects sync.Map // map[bookIdentify]selector，书籍标识和书籍元素选择器
+
+func DeleteScreenShot(bookIdentify string) {
+	os.RemoveAll("cache/screenshots/" + bookIdentify)
+}

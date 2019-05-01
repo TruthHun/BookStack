@@ -473,6 +473,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 		// 截屏选择器
 		if screenshot := strings.TrimSpace(gq.Find("screenshot").Text()); screenshot != "" {
 			utils.ScreenShotProjects.Store(project, screenshot)
+			defer utils.DeleteScreenShot(project)
 		}
 
 		//排除的选择器
