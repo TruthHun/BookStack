@@ -38,6 +38,7 @@
                 <li><span>章节数量：</span>{{.Book.DocCount}}</li>
                 <li><span>阅读人次：</span>{{.Book.Vcnt}}</li>
                 <li><span>收藏数量：</span>{{.Book.Star}}</li>
+                <li><span>文档语言：</span> <span style="color: red">{{.Book.Lang}}</span> </li>
                 <li class="hidden-xs">
                     <div class="btn btn-group">
                     {{range $index,$val:=.Menu}}
@@ -55,12 +56,11 @@
                         </a>
                         <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载</a>
                         <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-info"><i class="fa fa-share-alt"></i> &nbsp;分享</a>
-
                     </div>
                 </li>
             </ul>
         </div>
-        <div class="visible-xs text-center">
+        <div class="col-xs-12 text-center visible-xs">
             <div class="btn btn-group">
             {{range $index,$val:=.Menu}}
             {{if eq $index 0}}
@@ -186,7 +186,7 @@
         </div>
     {{end}}
 </div>
-{{template "widgets/support.html" .}}
+{{/*{{template "widgets/support.html" .}}*/}}
 {{template "widgets/share.html" .}}
 {{template "widgets/download.html" .}}
 {{template "widgets/footer.html" .}}

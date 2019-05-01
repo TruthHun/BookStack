@@ -135,6 +135,7 @@ func (this *DocumentController) Index() {
 	}
 
 	this.TplName = "document/intro.html"
+	bookResult.Lang = utils.GetLang(bookResult.Lang)
 	this.Data["Book"] = bookResult
 
 	switch tab {

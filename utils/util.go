@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 
 	"strconv"
 	"strings"
@@ -49,6 +50,7 @@ var (
 	Segmenter   sego.Segmenter
 	BasePath, _        = filepath.Abs(filepath.Dir(os.Args[0]))
 	StoreType   string = beego.AppConfig.String("store_type") //存储类型
+	langs       sync.Map
 )
 
 func init() {
@@ -56,6 +58,16 @@ func init() {
 	go func() {
 		Segmenter.LoadDictionary(BasePath + "/dictionary/dictionary.txt")
 	}()
+	langs.Store("zh", "中文")
+	langs.Store("en", "英文")
+	langs.Store("other", "其他")
+}
+
+func GetLang(lang string) string {
+	if val, ok := langs.Load(lang); ok {
+		return val.(string)
+	}
+	return "中文"
 }
 
 //分词
