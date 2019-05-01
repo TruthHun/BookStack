@@ -258,7 +258,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	if err != nil {
 		beego.Error(err)
 	}
-	idx := 0
+	idx := 1
 	if debug {
 		beego.Info("根据summary文件进行排序")
 	}
@@ -307,6 +307,9 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 
 	}
 
+	// 重置所有之前的文档排序
+	qs.Update(orm.Params{"order_sort": 100000})
+
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 		docName := selection.Text()
 		pid := 0
@@ -345,6 +348,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 		}
 		idx++
 	})
+
 	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
 		this.replaceLinks(bookIdentify, htmlStr, true)
 	}
@@ -413,6 +417,7 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 			}
 		}
 	}
+
 	return docHtml
 }
 
@@ -481,8 +486,8 @@ func (this *BaseController) ProjectsFile() {
 			this.Abort("404")
 		}
 		this.Ctx.ResponseWriter.Header().Set("Last-Modified", date)
-		if strings.HasSuffix(object,".svg"){
-			this.Ctx.ResponseWriter.Header().Set("Content-Type","image/svg+xml")
+		if strings.HasSuffix(object, ".svg") {
+			this.Ctx.ResponseWriter.Header().Set("Content-Type", "image/svg+xml")
 		}
 		this.Ctx.ResponseWriter.Write(b)
 	} else { //local

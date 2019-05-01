@@ -16,8 +16,6 @@ import (
 
 	"crypto/tls"
 
-	"strconv"
-
 	"errors"
 
 	"github.com/PuerkitoBio/goquery"
@@ -493,13 +491,25 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 		})
 
 		replaceMD := func(mdCont string, links map[string]string) string {
-			for link, identify := range links {
+			length := len(links)
+			hashCount := 0
+			for link, _ := range links {
 				if strings.Contains(link, "#") {
-					slice := strings.Split(link, "#")
-					identify = identify + "#" + slice[1]
-					link = slice[0]
+					hashCount++
 				}
-				mdCont = strings.Replace(mdCont, "("+link+")", "($"+identify+")", -1)
+			}
+			isHashLink := hashCount > length/2
+			for link, identify := range links {
+				if isHashLink {
+					mdCont = strings.Replace(mdCont, "("+link+")", "($"+identify+")", -1)
+				} else {
+					if strings.Contains(link, "#") {
+						slice := strings.Split(link, "#")
+						identify = identify + "#" + slice[1]
+						link = slice[0]
+					}
+					mdCont = strings.Replace(mdCont, "("+link+")", "($"+identify+")", -1)
+				}
 			}
 			return mdCont
 		}
@@ -512,7 +522,8 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 					//采集文章内容成功，创建文档，填充内容，替换链接为标识
 					if retMD, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, exclude, map[string]string{"project": project}); err == nil {
 						var doc Document
-						identify := strconv.Itoa(i) + ".md"
+						//identify := strconv.Itoa(i) + ".md"
+						identify := utils.MD5Sub16(href) + ".md"
 						doc.Identify = identify
 						doc.BookId = bookId
 						doc.Version = time.Now().Unix()

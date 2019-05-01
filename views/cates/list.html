@@ -32,7 +32,7 @@
                         {{range $idx,$item:=.Recommends}}
                             <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" target="_blank" title="{{$item.BookName}}" class="col-xs-3 col-sm-2 col-md-1 {{if gt $idx 7}}hidden-xs{{end}}">
                                 {{/*<img src="http://localhost:8181/static/images/book.png" class="img-responsive" alt="{{$item.BookName}}">*/}}
-                                <img class="img-responsive border-cover-img" onerror="this.src='/static/images/book.png'" src="{{showImg $item.Cover "cover"}}" class="cover" alt="{{$item.BookName}}">
+                                <img class="img-responsive" onerror="this.src='/static/images/book.png'" src="{{showImg $item.Cover "cover"}}" class="cover" alt="{{$item.BookName}}">
                                 <div class="help-block">{{$item.BookName}}</div>
                             </a>
                         {{end}}

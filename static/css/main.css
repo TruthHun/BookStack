@@ -736,7 +736,7 @@ a{color: #333}
     font-size: 12px;word-break: break-all;height: 35px;overflow: hidden;
     margin-bottom: 0px;text-overflow: ellipsis;
 }
-.cate-list .panel-recommend .panel-body img{width: auto;height: auto}
+.cate-list .panel-recommend .panel-body img{width: auto;height: auto;border-radius: 3px;}
 .cate-list .panel-recommend .panel-body .col-md-1{padding: 5px;}
 .cate-list .panel-default>.panel-heading{border-color: transparent;}
 .cate-list .panel{box-shadow: none;}

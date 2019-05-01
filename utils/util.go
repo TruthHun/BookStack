@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"sync"
 
 	"strconv"
@@ -20,6 +21,7 @@ import (
 
 	"net/http"
 	"net/mail"
+	"net/url"
 
 	"path/filepath"
 
@@ -40,7 +42,7 @@ import (
 
 //更多存储类型有待扩展
 const (
-	Version           = "1.7 beta3"
+	Version           = "1.7 beta4"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )
@@ -587,4 +589,20 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 // 截取md5前8个字符
 func MD5Sub16(str string) string {
 	return cryptil.Md5Crypt(str)[0:16]
+}
+
+func JoinURL(rawurl string, urlPath string) string {
+	rawurl = strings.TrimSpace(rawurl)
+	if !strings.HasSuffix(rawurl, "/") {
+		slice := strings.Split(rawurl, "/")
+		if l := len(slice); l > 0 {
+			rawurl = strings.Join(slice[:l-1], "/")
+		}
+	}
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return rawurl
+	}
+	u.Path = path.Join(u.Path, urlPath)
+	return u.String()
 }
