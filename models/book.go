@@ -22,13 +22,14 @@ import (
 type BookOrder string
 
 const (
-	OrderRecommend BookOrder = "recommend"
-	OrderPopular   BookOrder = "popular"
-	OrderLatest    BookOrder = "latest"
-	OrderScore     BookOrder = "score"   //评分排序
-	OrderComment   BookOrder = "comment" //评论排序
-	OrderStar      BookOrder = "star"    //收藏排序
-	OrderView      BookOrder = "vcnt"    //浏览排序
+	OrderRecommend       BookOrder = "recommend"
+	OrderPopular         BookOrder = "popular"
+	OrderLatest          BookOrder = "latest"
+	OrderScore           BookOrder = "score"            //评分排序
+	OrderComment         BookOrder = "comment"          //评论排序
+	OrderStar            BookOrder = "star"             //收藏排序
+	OrderView            BookOrder = "vcnt"             //浏览排序
+	OrderLatestRecommend BookOrder = "latest-recommend" //最新推荐
 )
 
 // Book struct .
@@ -337,6 +338,9 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	case OrderRecommend: //推荐
 		cond = append(cond, "order_index>0")
 		order = "pin desc,order_index desc"
+	case OrderLatestRecommend: //最新推荐
+		cond = append(cond, "order_index>0")
+		order = "book_id desc"
 	case OrderPopular: //受欢迎
 		order = "pin desc,star desc,vcnt desc"
 	case OrderLatest: //最新发布
