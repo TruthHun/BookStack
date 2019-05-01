@@ -46,7 +46,7 @@ import (
 
 //更多存储类型有待扩展
 const (
-	Version           = "1.7 beta4"
+	Version           = "1.7 beta5"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )
@@ -188,24 +188,27 @@ func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) 
 
 	b, err = cmd.Output()
 	cont = string(b)
-	pngFile := filepath.Join(folder, "screenshot.png")
-	jsonFile := filepath.Join(folder, "screenshot.json")
-	imagesMap := cropScreenshot(selector.(string), jsonFile, pngFile)
-	if len(imagesMap) > 0 {
-		doc, errDoc := goquery.NewDocumentFromReader(strings.NewReader(cont))
-		if errDoc != nil {
-			beego.Error(errDoc)
-		} else {
-			for ele, images := range imagesMap {
-				doc.Find(ele).Each(func(i int, selection *goquery.Selection) {
-					if img, ok := images[i]; ok {
-						htmlStr := fmt.Sprintf(`<div><img src="$%v"/></div>`, img)
-						selection.AfterHtml(htmlStr)
-						selection.Remove()
-					}
-				})
+
+	if isScreenshot {
+		pngFile := filepath.Join(folder, "screenshot.png")
+		jsonFile := filepath.Join(folder, "screenshot.json")
+		imagesMap := cropScreenshot(selector.(string), jsonFile, pngFile)
+		if len(imagesMap) > 0 {
+			doc, errDoc := goquery.NewDocumentFromReader(strings.NewReader(cont))
+			if errDoc != nil {
+				beego.Error(errDoc)
+			} else {
+				for ele, images := range imagesMap {
+					doc.Find(ele).Each(func(i int, selection *goquery.Selection) {
+						if img, ok := images[i]; ok {
+							htmlStr := fmt.Sprintf(`<div><img src="$%v"/></div>`, img)
+							selection.AfterHtml(htmlStr)
+							selection.Remove()
+						}
+					})
+				}
+				cont, err = doc.Find("body").Html()
 			}
-			cont, err = doc.Find("body").Html()
 		}
 	}
 

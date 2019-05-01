@@ -5,7 +5,7 @@ const fs = require("fs");
 let args = process.argv.splice(2);
 let l=args.length;
 let url, folder, selector;
-let winH=20480;
+let winH=768;
 
 for(var i=0;i<l;i++){
     switch (args[i]){
@@ -29,6 +29,10 @@ for(var i=0;i<l;i++){
 async function screenshot(winH) {
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: true});
     const page = await browser.newPage();
+    if(folder && selector){
+        winH = 20480
+    }
+
     page.setViewport({width: 1280, height: winH});
     page.setExtraHTTPHeaders({
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,co;q=0.7,fr;q=0.6,zh-HK;q=0.5,zh-TW;q=0.4",
