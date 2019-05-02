@@ -658,7 +658,8 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 	srcLower := strings.ToLower(src)
 	if strings.HasPrefix(srcLower, "$") {
 		//_, err = CopyFile(filename, strings.TrimPrefix(srcLower, "$"))
-		err = os.Rename(strings.TrimPrefix(srcLower, "$"), filename)
+		filename = filename + ext
+		err = os.Rename(strings.TrimPrefix(src, "$"), filename)
 		return
 	}
 
