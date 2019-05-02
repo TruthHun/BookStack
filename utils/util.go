@@ -281,7 +281,7 @@ func CropImage(file string, width, height int) (err error) {
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
 //diySelecter:自定义选择器
 //注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
-func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, headers ...map[string]string) (cont string, err error) {
+func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, links map[string]string, headers ...map[string]string) (cont string, err error) {
 
 	//记录已经存在了的图片，避免重复图片出现重复采集的情况
 	var existImage bool
@@ -330,12 +330,23 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 			//存在href，且不以http://和https://开头
 			if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://") && !strings.HasPrefix(strings.ToLower(href), "#")) {
 				if strings.HasPrefix(href, "/") {
-					selection.SetAttr("href", strings.Join(slice[0:3], "/")+href)
+					href = strings.Join(slice[0:3], "/") + href
 				} else {
-					l := strings.Count(href, "../")
-					//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-					selection.SetAttr("href", strings.Join(slice[0:sliceLen-l-1], "/")+"/"+strings.TrimLeft(href, "./"))
+					l := strings.Count(href, "../") //需要多减1，因为"http://"或"https://"后面多带一个斜杠
+					href = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(href, "./")
 				}
+
+				if link, ok := links[href]; ok {
+					href = "$" + link
+				} else {
+					slice := strings.Split(href, "#")
+					if len(slice) > 1 {
+						if link, ok = links[slice[0]]; ok {
+							href = "$" + link + "#" + strings.Join(slice[1:], "#")
+						}
+					}
+				}
+				selection.SetAttr("href", href)
 			}
 		})
 
