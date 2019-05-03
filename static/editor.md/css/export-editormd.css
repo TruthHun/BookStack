@@ -4471,3 +4471,6 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
   margin: 8px 0;
   padding: 8px 16px;
 }
+.editormd-preview-container pre code{
+  display: inline-block !important;
+}

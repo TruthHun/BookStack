@@ -1181,6 +1181,10 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     display: block;
     white-space: pre;
 }
+.editormd-preview-container pre code{
+    display: inline-block !important;
+}
+
 .hung-read-link{margin: 30px 0px 180px;line-height: 200%;}
 .hung-read-link .col-xs-12{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 0px;}
 .hung-read-link .col-xs-12 a{margin-left: 5px;}
