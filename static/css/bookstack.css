@@ -1321,7 +1321,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     }
     .markdown-toc::before{
         content: "本章目录";color: #aaaaaa;position: fixed;background-color: #fff;
-        width: 100%;padding-left: 2.5em;line-height: 200%;border-bottom: 1px solid #EEEEEE;
+        width: 228px;padding-left: 2.5em;line-height: 200%;border-bottom: 1px solid #EEEEEE;
     }
 
     .article-toggle{position: relative;z-index: 999}

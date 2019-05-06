@@ -244,7 +244,7 @@ func cropScreenshot(selector, jsonFile, pngFile string) (images map[string]map[i
 		images[ele[idx]] = make(map[int]string)
 		for idx2, item2 := range item {
 			imgItem := imaging.Crop(img, image.Rect(int(item2.X), int(item2.Y), int(item2.X+item2.Width), int(item2.Y+item2.Height)))
-			saveName := fmt.Sprintf(pngFile+"-%v.png", idx2)
+			saveName := fmt.Sprintf(pngFile+"-%v-%v.png", idx, idx2)
 			imaging.Save(imgItem, saveName)
 			images[ele[idx]][idx2] = saveName
 		}
