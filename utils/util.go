@@ -317,146 +317,128 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		return
 	}
 
-	slice := strings.Split(strings.TrimSpace(urlstr), "/")
-	if sliceLen := len(slice); sliceLen > 2 {
-		var doc *goquery.Document
-		doc, err = goquery.NewDocumentFromReader(strings.NewReader(cont))
-		if err != nil {
-			return
-		}
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(strings.NewReader(cont))
+	if err != nil {
+		return
+	}
 
-		//遍历a标签替换相对链接
-		doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-			//存在href，且不以http://和https://开头
-			if href, ok := selection.Attr("href"); ok && (!strings.HasPrefix(strings.ToLower(href), "http://") && !strings.HasPrefix(strings.ToLower(href), "https://") && !strings.HasPrefix(strings.ToLower(href), "#")) {
-				if strings.HasPrefix(href, "/") {
-					href = strings.Join(slice[0:3], "/") + href
-				} else {
-					l := strings.Count(href, "../") //需要多减1，因为"http://"或"https://"后面多带一个斜杠
-					href = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(href, "./")
-				}
+	//遍历a标签替换相对链接
+	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
+		//存在href，且不以http://和https://开头
+		if href, ok := selection.Attr("href"); ok {
+			href = JoinURL(urlstr, href)
 
-				if link, ok := links[href]; ok {
-					href = "$" + link
-				} else {
-					slice := strings.Split(href, "#")
-					if len(slice) > 1 {
-						if link, ok = links[slice[0]]; ok {
-							href = "$" + link + "#" + strings.Join(slice[1:], "#")
-						}
-					}
-				}
-				selection.SetAttr("href", href)
-			}
-		})
-
-		//遍历替换图片相对链接
-		doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-			//存在src，且不以http://和https://开头
-			if src, ok := selection.Attr("src"); ok {
-				//链接补全
-				srcLower := strings.ToLower(src)
-				if !strings.HasPrefix(srcLower, "http://") &&
-					!strings.HasPrefix(srcLower, "https://") &&
-					!strings.HasPrefix(srcLower, "data:image/") && //非base64的任意
-					!strings.HasPrefix(srcLower, "$") {
-					if strings.HasPrefix(src, "/") { //以斜杠开头
-						src = strings.Join(slice[0:3], "/") + src
-					} else {
-						l := strings.Count(src, "../")
-						//需要多减1，因为"http://"或"https://"后面多带一个斜杠
-						src = strings.Join(slice[0:sliceLen-l-1], "/") + "/" + strings.TrimLeft(src, "./")
-					}
-				}
-
-				if project != "" {
-					var exist string
-					if exist, existImage = imageMap[srcLower]; !existImage {
-						tmpFile, err := DownImage(src, headers...)
-						if err == nil {
-							defer os.Remove(tmpFile) //删除文件
-							switch StoreType {
-							case StoreLocal:
-								src = "/uploads/projects/" + project + "/" + filepath.Base(tmpFile)
-								store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(src, "/"))
-							case StoreOss:
-								src = "projects/" + project + "/" + filepath.Base(tmpFile)
-								store.ModelStoreOss.MoveToOss(tmpFile, src, true)
-								src = "/" + src
-							}
-							imageMap[srcLower] = src
-						} else {
-							beego.Error(err.Error())
-						}
-					} else {
-						src = exist
-					}
-				}
-				selection.SetAttr("src", src)
-			}
-		})
-
-		//h1-h6标题中不要存在链接或者图片，所以提取文本
-		Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
-		for _, tag := range Hs {
-			doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
-				//存在href，且不以http://和https://开头
-				selection.SetText(selection.Text())
-			})
-		}
-
-		//排除标签
-		excludeSelector = append(excludeSelector, "script", "style")
-		for _, sel := range excludeSelector {
-			doc.Find(sel).Remove()
-		}
-
-		diySelector = strings.TrimSpace(diySelector)
-
-		cont, err = doc.Html()
-
-		if intelligence == 1 { //智能提取
-			ext, err := html2article.NewFromHtml(cont)
-			if err != nil {
-				return cont, err
-			}
-			article, err := ext.ToArticle()
-			if err != nil {
-				return cont, err
-			}
-			switch contType {
-			case 1: //=>html
-				cont = article.Html
-			case 2: //=>text
-				cont = article.Content
-			default: //0 && other=>markdown
-				cont = html2md.Convert(article.Html)
-			}
-		} else if intelligence == 2 && diySelector != "" { //自定义提取
-			if htmlstr, err := doc.Find(diySelector).Html(); err != nil {
-				return "", err
+			if link, ok := links[href]; ok {
+				href = "$" + link
 			} else {
-				switch contType {
-				case 1: //=>html
-					cont = htmlstr
-				case 2: //=>text
-					cont = doc.Find(diySelector).Text()
-				default: //0 && other=>markdown
-					cont = html2md.Convert(htmlstr)
+				slice := strings.Split(href, "#")
+				if len(slice) > 1 {
+					if link, ok = links[slice[0]]; ok {
+						href = "$" + link + "#" + strings.Join(slice[1:], "#")
+					}
 				}
 			}
-		} else { //全文
+			selection.SetAttr("href", href)
+		}
+	})
 
+	//遍历替换图片相对链接
+	doc.Find("img").Each(func(i int, selection *goquery.Selection) {
+		//存在src，且不以http://和https://开头
+		if src, ok := selection.Attr("src"); ok {
+			//链接补全
+			srcLower := strings.ToLower(src)
+			if !strings.HasPrefix(srcLower, "data:image/") && !strings.HasPrefix(srcLower, "$") {
+				src = JoinURL(urlstr, src)
+			}
+			if project != "" {
+				var exist string
+				if exist, existImage = imageMap[srcLower]; !existImage {
+					tmpFile, err := DownImage(src, headers...)
+					if err == nil {
+						defer os.Remove(tmpFile) //删除文件
+						switch StoreType {
+						case StoreLocal:
+							src = "/uploads/projects/" + project + "/" + filepath.Base(tmpFile)
+							store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(src, "/"))
+						case StoreOss:
+							src = "projects/" + project + "/" + filepath.Base(tmpFile)
+							store.ModelStoreOss.MoveToOss(tmpFile, src, true)
+							src = "/" + src
+						}
+						imageMap[srcLower] = src
+					} else {
+						beego.Error(err.Error())
+					}
+				} else {
+					src = exist
+				}
+			}
+			selection.SetAttr("src", src)
+		}
+	})
+
+	//h1-h6标题中不要存在链接或者图片，所以提取文本
+	Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
+	for _, tag := range Hs {
+		doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
+			//存在href，且不以http://和https://开头
+			selection.SetText(selection.Text())
+		})
+	}
+
+	//排除标签
+	excludeSelector = append(excludeSelector, "script", "style")
+	for _, sel := range excludeSelector {
+		doc.Find(sel).Remove()
+	}
+
+	diySelector = strings.TrimSpace(diySelector)
+
+	cont, err = doc.Html()
+
+	if intelligence == 1 { //智能提取
+		ext, err := html2article.NewFromHtml(cont)
+		if err != nil {
+			return cont, err
+		}
+		article, err := ext.ToArticle()
+		if err != nil {
+			return cont, err
+		}
+		switch contType {
+		case 1: //=>html
+			cont = article.Html
+		case 2: //=>text
+			cont = article.Content
+		default: //0 && other=>markdown
+			cont = html2md.Convert(article.Html)
+		}
+	} else if intelligence == 2 && diySelector != "" { //自定义提取
+		if htmlstr, err := doc.Find(diySelector).Html(); err != nil {
+			return "", err
+		} else {
 			switch contType {
 			case 1: //=>html
-				htmlstr, _ := doc.Find("body").Html()
 				cont = htmlstr
 			case 2: //=>text
-				cont = doc.Find("body").Text()
+				cont = doc.Find(diySelector).Text()
 			default: //0 && other=>markdown
-				htmlstr, _ := doc.Find("body").Html()
 				cont = html2md.Convert(htmlstr)
 			}
+		}
+	} else { //全文
+
+		switch contType {
+		case 1: //=>html
+			htmlstr, _ := doc.Find("body").Html()
+			cont = htmlstr
+		case 2: //=>text
+			cont = doc.Find("body").Text()
+		default: //0 && other=>markdown
+			htmlstr, _ := doc.Find("body").Html()
+			cont = html2md.Convert(htmlstr)
 		}
 	}
 
@@ -716,18 +698,29 @@ func MD5Sub16(str string) string {
 	return cryptil.Md5Crypt(str)[0:16]
 }
 
-func JoinURL(rawurl string, urlPath string) string {
-	rawurl = strings.TrimSpace(rawurl)
-	if !strings.HasSuffix(rawurl, "/") {
-		slice := strings.Split(rawurl, "/")
+func JoinURL(rawURL string, urlPath string) string {
+	rawURL = strings.TrimSpace(rawURL)
+
+	lowerURLPath := strings.ToLower(urlPath)
+	if strings.HasPrefix(lowerURLPath, "http://") || strings.HasPrefix(lowerURLPath, "https://") {
+		return urlPath
+	}
+
+	if !strings.HasSuffix(rawURL, "/") {
+		slice := strings.Split(rawURL, "/")
 		if l := len(slice); l > 0 {
-			rawurl = strings.Join(slice[:l-1], "/")
+			rawURL = strings.Join(slice[:l-1], "/")
 		}
 	}
-	u, err := url.Parse(rawurl)
+	u, err := url.Parse(rawURL)
 	if err != nil {
-		return rawurl
+		return rawURL
+	}
+
+	if strings.HasPrefix(urlPath, "/") {
+		return u.Scheme + "://" + u.Host + urlPath
 	}
 	u.Path = path.Join(u.Path, urlPath)
-	return u.String()
+	// return u.String() // 会对中文进行编码
+	return u.Scheme + "://" + u.Host + u.Path
 }
