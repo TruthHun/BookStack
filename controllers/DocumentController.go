@@ -213,6 +213,9 @@ func (this *DocumentController) Read() {
 						contentSelection.SetAttr("src", src)
 					}
 				}
+				if alt, _ := contentSelection.Attr("alt"); alt == "" {
+					contentSelection.SetAttr("alt", doc.DocumentName+"-图"+fmt.Sprint(i+1))
+				}
 			})
 			html, err := query.Html()
 			if err != nil {

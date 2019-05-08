@@ -46,7 +46,7 @@ import (
 
 //更多存储类型有待扩展
 const (
-	Version           = "1.7 beta5"
+	Version           = "1.7 beta6"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )

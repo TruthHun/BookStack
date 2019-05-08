@@ -1305,7 +1305,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     .markdown-toc{
         position: fixed;background-color: #fff;
         right: 15px;z-index: 99;
-        top: 115px;transition: width 0.5s;
+        top: 70px;transition: width 0.5s;
         width: 230px;max-height: 360px;overflow-y: auto;
         border:1px solid #EEEEEE;border-radius: 3px;border-top-left-radius: 0px;
     }
@@ -1334,9 +1334,8 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     }
     .markdown-toc a.active,.markdown-toc a:hover{color: #008cff;}
     .article-toggle{
-        position: fixed;right: 212px;top:115px;cursor: pointer;transition: right 0.5s;
-        border: 1px solid #efefef;background-color: #fff;
-        padding:5px 5px;
+        position: fixed;right: 212px;top:71px;cursor: pointer;transition: right 0.5s;
+        border: 0px;background-color: #fff; padding:5px 5px;
     }
     .article-menu-hide .article-toggle{
         right: 15px;border: 1px solid #EFEFEF;border-radius: 3px;

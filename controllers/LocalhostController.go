@@ -3,6 +3,8 @@ package controllers
 import (
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
+
 	"time"
 
 	"github.com/TruthHun/BookStack/models"
@@ -30,6 +32,13 @@ func (this *LocalhostController) RenderMarkdown() {
 				var book models.Book
 				o.QueryTable("md_books").Filter("book_id", doc.BookId).One(&book, "identify")
 				content := this.GetString("content")
+				doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
+				if err == nil {
+					doc.Find("blockquote br").Each(func(i int, selection *goquery.Selection) {
+						selection.Remove()
+					})
+					content, _ = doc.Find("body").Html()
+				}
 				content = this.replaceLinks(book.Identify, content)
 				qs.Update(orm.Params{
 					"release":     content,
