@@ -68,7 +68,7 @@
             </div>
         </div>
     </header>
-    <article class="container-fluid manual-body">
+    <div class="container-fluid manual-body">
 
         <div class="manual-right">
             <div class="manual-article">
@@ -92,9 +92,9 @@
                         {{/*<span><a href="https://www.bookstack.cn/read/adv/4db.md" target="_blank"><i class="fa fa-check-square-o"></i> 广而告之</a></span>*/}}
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
-                    <div class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
+                    <article class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
-                    </div>
+                    </article>
 
                     <div class="row hung-read-link">
                         <div class="col-xs-12 hung-pre">
@@ -185,7 +185,7 @@
         </div>
 
         <div class="manual-progress"><b class="progress-bar"></b></div>
-    </article>
+    </div>
     <div class="manual-mask"></div>
 </div>
 <span class="article-toggle tooltips" title="展开/收起文章目录"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
