@@ -460,8 +460,13 @@ func (m *Member) GetQrcodeByUid(uid interface{}) (qrcode map[string]string) {
 	return qrcode
 }
 
-//根据用户名获取用户信息
+// 获取用户信息，根据用户名或邮箱
 func (this *Member) GetByUsername(username string) (member Member, err error) {
-	err = orm.NewOrm().QueryTable("md_members").Filter("account", username).One(&member)
+	q := orm.NewOrm().QueryTable("md_members")
+	if strings.Contains(username, "@") { //存在 @ 符号的表示邮箱，因为用户名只有数字和字母
+		err = q.Filter("email", username).One(&member)
+	} else {
+		err = q.Filter("account", username).One(&member)
+	}
 	return
 }

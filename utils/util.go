@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"reflect"
 	"sync"
 
 	"github.com/disintegration/imaging"
@@ -723,4 +724,35 @@ func JoinURL(rawURL string, urlPath string) string {
 	u.Path = path.Join(u.Path, urlPath)
 	// return u.String() // 会对中文进行编码
 	return u.Scheme + "://" + u.Host + u.Path
+}
+
+type ReflectVal struct {
+	T reflect.Type
+	V reflect.Value
+}
+
+func CopyObject(src, dst interface{}) {
+	var srcMap = make(map[string]ReflectVal)
+
+	vs := reflect.ValueOf(src)
+	ts := reflect.TypeOf(src)
+	vd := reflect.ValueOf(dst)
+	td := reflect.TypeOf(dst)
+
+	ls := vs.Elem().NumField()
+	for i := 0; i < ls; i++ {
+		srcMap[ts.Elem().Field(i).Name] = ReflectVal{
+			T: vs.Elem().Field(i).Type(),
+			V: vs.Elem().Field(i),
+		}
+	}
+
+	ld := vd.Elem().NumField()
+	for i := 0; i < ld; i++ {
+		n := td.Elem().Field(i).Name
+		t := vd.Elem().Field(i).Type()
+		if v, ok := srcMap[n]; ok && v.T == t && vd.Elem().Field(i).CanSet() {
+			vd.Elem().Field(i).Set(v.V)
+		}
+	}
 }
