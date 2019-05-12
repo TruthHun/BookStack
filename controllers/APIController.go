@@ -3,6 +3,9 @@ package controllers
 import (
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/astaxie/beego/orm"
 
 	"github.com/TruthHun/BookStack/utils"
 
@@ -27,7 +30,7 @@ type APIUser struct {
 	Email       string `json:"email"`
 	Phone       string `json:"phone"`
 	Avatar      string `json:"avatar"`
-	Description string `json:"description"`
+	Description string `json:"intro"`
 }
 
 //###################################//
@@ -35,6 +38,7 @@ type APIUser struct {
 const (
 	messageInternalServerError     = "服务内部错误，请联系管理员"
 	messageUsernameOrPasswordError = "用户名或密码不正确"
+	messageLoginSuccess            = "登录成功"
 )
 
 //###################################//
@@ -49,14 +53,18 @@ func (a *APIController) Response(httpStatus int, message string, data ...interfa
 
 	// support gzip
 	if strings.ToLower(a.Ctx.Request.Header.Get("content-encoding")) == "gzip" {
-
+		// TODO
 	}
+	a.Data["json"] = resp
+	a.ServeJSON()
 	a.StopRun()
 }
 
 // 验证access token
 func (a *APIController) Prepare() {
-
+	if beego.AppConfig.String("runmode") == "dev" {
+		time.Sleep(1 * time.Second)
+	}
 }
 
 func (a *APIController) isLogin() {
@@ -72,6 +80,9 @@ func (a *APIController) Login() {
 	password := a.GetString("password")
 	member, err := models.NewMember().GetByUsername(username)
 	if err != nil {
+		if err == orm.ErrNoRows {
+			a.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+		}
 		beego.Error(err)
 		a.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
@@ -85,8 +96,8 @@ func (a *APIController) Login() {
 	}
 
 	var user APIUser
-	utils.CopyObject(member, user)
-
+	utils.CopyObject(&member, &user)
+	a.Response(http.StatusOK, messageLoginSuccess, user)
 }
 
 func (a *APIController) Logout() {

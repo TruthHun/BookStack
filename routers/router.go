@@ -6,6 +6,8 @@ import (
 )
 
 func init() {
+	bookChatRouters()
+
 	beego.Router("/", &controllers.CateController{}, "get:Index")
 	beego.Router("/cate", &controllers.CateController{}, "get:List")
 	//beego.Router("/", &controllers.HomeController{}, "*:Index")
