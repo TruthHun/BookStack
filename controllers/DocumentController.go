@@ -217,7 +217,7 @@ func (this *DocumentController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
-			html, err := query.Html()
+			html, err := query.Find("body").Html()
 			if err != nil {
 				beego.Error(err)
 			} else {
