@@ -43,3 +43,4 @@ version_control
 *.sh
 build-linux.sh
 node_modules
+dist
