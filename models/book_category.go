@@ -3,9 +3,6 @@ package models
 import (
 	"strconv"
 
-	"fmt"
-	"strings"
-
 	"github.com/astaxie/beego/orm"
 )
 
@@ -33,37 +30,42 @@ func (this *BookCategory) GetByBookId(book_id int) (cates []Category, rows int64
 
 //处理书籍分类
 func (this *BookCategory) SetBookCates(bookId int, cids []string) {
-	var (
-		cates []Category
-		bc    []BookCategory
 
-		oldCids           []string
+	if len(cids) == 0 {
+		return
+	}
+
+	var (
+		cates             []Category
 		tableCategory     = "md_category"
 		tableBookCategory = "md_book_category"
 	)
+
 	o := orm.NewOrm()
-	//1、查找当前分类的父级分类
 	o.QueryTable(tableCategory).Filter("id__in", cids).All(&cates, "id", "pid")
+
+	cidMap := make(map[string]bool)
 	for _, cate := range cates {
-		cids = append(cids, strconv.Itoa(cate.Pid))
+		cidMap[strconv.Itoa(cate.Pid)] = true
+		cidMap[strconv.Itoa(cate.Id)] = true
 	}
-	//2、删除原有的分类关系，并减少计数
-	qs := o.QueryTable(tableBookCategory).Filter("book_id", bookId)
-	qs.All(&bc) //查询
-	qs.Delete() //删除
-	//减少计数
-	for _, c := range bc {
-		oldCids = append(oldCids, strconv.Itoa(c.CategoryId))
+	cids = []string{}
+	for cid, _ := range cidMap {
+		cids = append(cids, cid)
 	}
-	SetIncreAndDecre(tableCategory, "cnt", fmt.Sprintf("id in(%v)", strings.Join(oldCids, ",")), false)
-	//3、新增现在的分类关系，并增加计数
-	SetIncreAndDecre(tableCategory, "cnt", fmt.Sprintf("id in(%v)", strings.Join(cids, ",")), true) //计算增加
-	for _, cid := range cids {                                                                      //这里逐条添加记录，不是批量添加，因为设置了唯一键，批量添加可能会导致全部都添加失败
+
+	o.QueryTable(tableBookCategory).Filter("book_id", bookId).Delete()
+	var bcs []BookCategory
+	for _, cid := range cids {
 		cidNum, _ := strconv.Atoi(cid)
-		var bookCate = BookCategory{
+		bookCate := BookCategory{
 			CategoryId: cidNum,
 			BookId:     bookId,
 		}
-		o.Insert(&bookCate)
+		bcs = append(bcs, bookCate)
 	}
+	if l := len(bcs); l > 0 {
+		o.InsertMulti(l, &bcs)
+	}
+	go CountCategory()
 }

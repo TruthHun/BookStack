@@ -602,6 +602,7 @@ func (this *ManagerController) PrivatelyOwned() {
 	}
 
 	go func() {
+		models.CountCategory()
 		public := true
 		if state == 1 {
 			public = false
