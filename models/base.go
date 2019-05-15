@@ -16,6 +16,10 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+func Init() {
+	initAPI()
+}
+
 //设置增减
 //@param            table           需要处理的数据表
 //@param            field           字段

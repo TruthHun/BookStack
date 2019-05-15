@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/TruthHun/BookStack/models"
+
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/controllers"
 	"github.com/astaxie/beego"
@@ -47,6 +49,8 @@ func (d *Daemon) Run() {
 	commands.RegisterFunction()
 
 	beego.ErrorController(&controllers.ErrorController{})
+
+	models.Init()
 
 	beego.Run()
 }

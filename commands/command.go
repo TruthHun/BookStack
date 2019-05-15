@@ -88,6 +88,7 @@ func RegisterModel() {
 		new(models.ReadRecord),
 		new(models.Bookmark),
 		models.NewRelateBook(),
+		models.NewAuth(),
 	)
 	migrate.RegisterMigration()
 }
@@ -258,6 +259,7 @@ func ResolveCommand(args []string) {
 	RegisterDataBase()
 	RegisterModel()
 	RegisterLogger(LogFile)
+
 }
 
 func init() {

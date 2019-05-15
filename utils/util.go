@@ -714,6 +714,7 @@ func JoinURL(rawURL string, urlPath string) string {
 		}
 	}
 	u, err := url.Parse(rawURL)
+
 	if err != nil {
 		return rawURL
 	}
