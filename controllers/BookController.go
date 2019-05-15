@@ -294,6 +294,8 @@ func (this *BookController) PrivatelyOwned() {
 		this.JsonResult(6004, "保存失败")
 	}
 	go func() {
+		models.CountCategory()
+
 		public := true
 		if state == 1 {
 			public = false
