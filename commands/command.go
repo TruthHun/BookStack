@@ -89,6 +89,7 @@ func RegisterModel() {
 		new(models.Bookmark),
 		models.NewRelateBook(),
 		models.NewAuth(),
+		models.NewBanner(),
 	)
 	migrate.RegisterMigration()
 }

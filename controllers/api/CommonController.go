@@ -208,6 +208,7 @@ func (this *BaseController) Bookmarks() {
 
 }
 
-func (this *BaseController) Banner() {
-
+func (this *BaseController) Banners() {
+	banners, _ := models.NewBanner().Lists("wechat")
+	this.Response(http.StatusOK, messageSuccess, banners)
 }
