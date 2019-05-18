@@ -31,6 +31,25 @@ type APIUser struct {
 	Description string `json:"intro"`
 }
 
+type APIBookList struct {
+	BookId      int       `json:"book_id"`
+	BookName    string    `json:"book_name"`
+	Identify    string    `json:"identify"`
+	OrderIndex  string    `json:"sort"`
+	Description string    `json:"description"`
+	Label       string    `json:"tags"`
+	DocCount    int       `json:"doc_count"` // 章节数量
+	Vcnt        int       `json:"view"`      // 阅读
+	Star        int       `json:"star"`      // 收藏
+	Lang        string    `json:"lang"`
+	Cover       string    `json:"cover"`
+	Score       int       `json:"score"`       // 文档项目评分，默认40，即4.0星
+	CntScore    int       `json:"cnt_score"`   // 评分个数
+	CntComment  int       `json:"cnt_comment"` // 评论人数
+	ModifyTime  time.Time `json:"updated_at"`  // 更新时间
+	CreateTime  time.Time `json:"created_at"`  // 新建时间
+}
+
 //###################################//
 
 const (
@@ -39,7 +58,7 @@ const (
 	messageLoginSuccess            = "登录成功"
 	messageRequiredLogin           = "您未登录或者您的登录已过期，请重新登录"
 	messageLogoutSuccess           = "退出登录成功"
-	messageSuccess           = "操作成功"
+	messageSuccess                 = "操作成功"
 )
 
 //###################################//

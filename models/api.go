@@ -68,10 +68,6 @@ func (m *Auth) GetByToken(token string) (auth Auth) {
 	if ok {
 		return val.(Auth)
 	}
-	//orm.NewOrm().QueryTable(m).Filter("token", token).One(&auth)
-	//if auth.Id > 0 {
-	//	authCache.Store(auth.Token, auth)
-	//}
 	return
 }
 

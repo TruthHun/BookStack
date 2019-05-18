@@ -127,8 +127,48 @@ func (this *BaseController) BookMenu() {
 
 }
 
-func (this *BaseController) BookLists() {
+func (this *CommonController) BookLists() {
+	sort := this.GetString("sort", "new") // new、recommend、hot、pin
+	page, _ := this.GetInt("page", 1)
+	cid, _ := this.GetInt("cid")
+	lang := this.GetString("lang")
+	pageSize, _ := this.GetInt("size", 10)
 
+	if page <= 0 {
+		page = 1
+	}
+
+	if page <= 0 {
+		page = 10
+	}
+
+	if pageSize > 20 {
+		pageSize = 20
+	}
+
+	model := models.NewBook()
+
+	fields := []string{"book_id", "book_name", "identify", "order_index", "description", "label", "doc_count",
+		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time",
+	}
+
+	books, total, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
+	data := map[string]interface{}{"total": total}
+	if len(books) > 0 {
+		var lists []APIBookList
+		var list APIBookList
+
+		for _, book := range books {
+			book.Cover = utils.JoinURL(models.GetAPIStaticDomain(), book.Cover)
+			if book.Lang == "" {
+				book.Lang = ""
+			}
+			utils.CopyObject(&book, &list)
+			lists = append(lists, list)
+		}
+		data["books"] = lists
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
 }
 
 func (this *BaseController) ReadProcess() {

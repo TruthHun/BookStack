@@ -23,8 +23,9 @@ type BookOrder string
 
 const (
 	OrderRecommend       BookOrder = "recommend"
-	OrderPopular         BookOrder = "popular"
-	OrderLatest          BookOrder = "latest"
+	OrderPopular         BookOrder = "popular"          //热门
+	OrderLatest          BookOrder = "latest"           //最新
+	OrderNew             BookOrder = "new"              //最新
 	OrderScore           BookOrder = "score"            //评分排序
 	OrderComment         BookOrder = "comment"          //评论排序
 	OrderStar            BookOrder = "star"             //收藏排序
@@ -343,7 +344,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 		order = "book_id desc"
 	case OrderPopular: //受欢迎
 		order = "pin desc,star desc,vcnt desc"
-	case OrderLatest: //最新发布
+	case OrderLatest, OrderNew: //最新发布
 		order = "pin desc,release_time desc"
 	case OrderScore: //评分
 		order = "pin desc,score desc"
@@ -377,7 +378,9 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 			totalCount, _ = strconv.Atoi(params[0]["cnt"].(string))
 		}
 	}
-	_, err = o.Raw(sql).QueryRows(&books)
+	if totalCount > 0 {
+		_, err = o.Raw(sql).QueryRows(&books)
+	}
 	return
 }
 
@@ -396,7 +399,7 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 		order = "b.order_index desc"
 	case OrderPopular: //受欢迎
 		order = "b.star desc,b.vcnt desc"
-	case OrderLatest: //最新发布
+	case OrderLatest, OrderNew: //最新发布
 		order = "b.release_time desc"
 	case OrderScore: //评分
 		order = "b.score desc"
