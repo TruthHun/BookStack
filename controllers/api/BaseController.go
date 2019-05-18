@@ -39,6 +39,7 @@ const (
 	messageLoginSuccess            = "登录成功"
 	messageRequiredLogin           = "您未登录或者您的登录已过期，请重新登录"
 	messageLogoutSuccess           = "退出登录成功"
+	messageSuccess           = "操作成功"
 )
 
 //###################################//

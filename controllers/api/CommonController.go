@@ -19,7 +19,7 @@ type CommonController struct {
 }
 
 // [OK]
-func (this *BaseController) Login() {
+func (this *CommonController) Login() {
 	username := this.GetString("username") //username or email
 	password := this.GetString("password")
 	member, err := models.NewMember().GetByUsername(username)
@@ -83,6 +83,9 @@ func (this *BaseController) UserFollow() {
 func (this *BaseController) UserReleaseBook() {
 
 }
+func (this *CommonController) TODO() {
+
+}
 
 func (this *BaseController) FindPassword() {
 
@@ -92,8 +95,24 @@ func (this *BaseController) Search() {
 
 }
 
-func (this *BaseController) Categories() {
+func (this *CommonController) Categories() {
 
+	model := models.NewCategory()
+
+	pid, err := this.GetInt("pid")
+	if err != nil {
+		pid = -1
+	}
+
+	categories, _ := model.GetCates(pid, 1)
+	for idx, category := range categories {
+		if category.Icon != "" {
+			category.Icon = utils.JoinURL(models.GetAPIStaticDomain(), category.Icon)
+			categories[idx] = category
+		}
+	}
+
+	this.Response(http.StatusOK, messageSuccess, categories)
 }
 
 func (this *BaseController) BookInfo() {
