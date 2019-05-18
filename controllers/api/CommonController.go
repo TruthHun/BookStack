@@ -143,7 +143,7 @@ func (this *BaseController) BookInfo() {
 	utils.CopyObject(book, &apiBook)
 
 	apiBook.Cover = utils.JoinURL(models.GetAPIStaticDomain(), apiBook.Cover)
-	apiBook.Sharer = models.NewMember().GetNicknameByUid(book.MemberId)
+	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
 
 	this.Response(http.StatusOK, messageSuccess, apiBook)
 }
