@@ -43,11 +43,14 @@ type APIBookList struct {
 	Star        int       `json:"star"`      // 收藏
 	Lang        string    `json:"lang"`
 	Cover       string    `json:"cover"`
-	Score       int       `json:"score"`       // 文档项目评分，默认40，即4.0星
-	CntScore    int       `json:"cnt_score"`   // 评分个数
-	CntComment  int       `json:"cnt_comment"` // 评论人数
-	ModifyTime  time.Time `json:"updated_at"`  // 更新时间
-	CreateTime  time.Time `json:"created_at"`  // 新建时间
+	Score       int       `json:"score"`                // 文档项目评分，默认40，即4.0星
+	CntScore    int       `json:"cnt_score"`            // 评分个数
+	CntComment  int       `json:"cnt_comment"`          // 评论人数
+	ModifyTime  time.Time `json:"updated_at"`           // 更新时间
+	CreateTime  time.Time `json:"created_at"`           // 新建时间
+	Sharer      string    `json:"sharer,omitempty"`     // 分享人
+	Author      string    `json:"author,omitempty"`     // 原作者
+	AuthorURL   string    `json:"author_url,omitempty"` // 原作者连接地址
 }
 
 //###################################//
@@ -59,6 +62,7 @@ const (
 	messageRequiredLogin           = "您未登录或者您的登录已过期，请重新登录"
 	messageLogoutSuccess           = "退出登录成功"
 	messageSuccess                 = "操作成功"
+	messageNotFound                = "资源不存在"
 )
 
 //###################################//

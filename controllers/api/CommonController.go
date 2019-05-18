@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/TruthHun/BookStack/models"
@@ -116,7 +117,35 @@ func (this *CommonController) Categories() {
 }
 
 func (this *BaseController) BookInfo() {
+	var (
+		book    *models.Book
+		err     error
+		apiBook APIBookList
+	)
 
+	identify := this.GetString("identify")
+	model := models.NewBook()
+	id, _ := strconv.Atoi(identify)
+
+	if id > 0 {
+		book, err = model.Find(id)
+	} else {
+		book, err = model.FindByIdentify(identify)
+	}
+	if err != nil {
+		beego.Error(err.Error())
+	}
+
+	if book.BookId == 0 {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	utils.CopyObject(book, &apiBook)
+
+	apiBook.Cover = utils.JoinURL(models.GetAPIStaticDomain(), apiBook.Cover)
+	apiBook.Sharer = models.NewMember().GetNicknameByUid(book.MemberId)
+
+	this.Response(http.StatusOK, messageSuccess, apiBook)
 }
 
 func (this *BaseController) BookContent() {
