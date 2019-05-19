@@ -62,6 +62,20 @@ type APIRegister struct {
 	Email      string `form:"email"`
 }
 
+type APIDoc struct {
+	DocumentId   int       `json:"id"`
+	ParentId     int       `json:"pid"`
+	DocumentName string    `json:"title"`
+	Identify     string    `json:"identify"`
+	BookId       int       `json:"book_id"`
+	OrderSort    int       `json:"sort"`
+	Release      string    `json:"content,omitempty"`
+	CreateTime   time.Time `json:"created_at"`
+	MemberId     int       `json:"uid"`
+	ModifyTime   time.Time `json:"updated_at"`
+	Vcnt         int       `json:"vcnt"`
+}
+
 //###################################//
 
 const (
@@ -106,8 +120,8 @@ func (this *BaseController) Prepare() {
 	}
 }
 
-func (this *BaseController) isLogin() {
-
+func (this *BaseController) isLogin() (uid int) {
+	return models.NewAuth().GetByToken(this.Token).Uid
 }
 
 func (this *BaseController) completeImage() {

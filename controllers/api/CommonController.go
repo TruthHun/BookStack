@@ -46,6 +46,7 @@ func (this *CommonController) Login() {
 	this.login(member)
 }
 
+// 【OK】
 func (this *CommonController) login(member models.Member) {
 	var user APIUser
 	utils.CopyObject(&member, &user)
@@ -60,6 +61,7 @@ func (this *CommonController) login(member models.Member) {
 	this.Response(http.StatusOK, messageSuccess, user)
 }
 
+// 【OK】
 func (this *CommonController) Register() {
 	var register APIRegister
 	err := this.ParseForm(&register)
@@ -170,7 +172,7 @@ func (this *BaseController) BookInfo() {
 		beego.Error(err.Error())
 	}
 
-	if book.BookId == 0 {
+	if book.BookId == 0 || (book.PrivatelyOwned == 1 && this.isLogin() != book.MemberId) {
 		this.Response(http.StatusNotFound, messageNotFound)
 	}
 
@@ -186,8 +188,42 @@ func (this *BaseController) BookContent() {
 
 }
 
+// TODO: 根据用户登录情况，判断书籍是私有还是公有，并再决定是否显示
 func (this *BaseController) BookMenu() {
+	var (
+		book models.Book
+		o    = orm.NewOrm()
+	)
+	identify := this.GetString("identify")
+	q := o.QueryTable(book)
+	cols := []string{"book_id", "privately_owned", "member_id"}
+	if id, _ := strconv.Atoi(identify); id > 0 {
+		q.Filter("book_id", id).One(&book, cols...)
+	} else {
+		q.Filter("identify", identify).One(&book, cols...)
+	}
 
+	if book.BookId == 0 || (book.PrivatelyOwned == 1 && this.isLogin() != book.MemberId) {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	docsOri, err := models.NewDocument().FindListByBookId(book.BookId, true)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	var (
+		docs []APIDoc
+		doc  APIDoc
+	)
+
+	for _, item := range docsOri {
+		utils.CopyObject(item, &doc)
+		docs = append(docs, doc)
+	}
+
+	this.Response(http.StatusOK, messageSuccess, docs)
 }
 
 // 【OK】

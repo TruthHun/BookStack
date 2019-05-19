@@ -406,10 +406,16 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 }
 
-//根据项目ID查询文档列表.
-func (m *Document) FindListByBookId(bookId int) (docs []*Document, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort").All(&docs)
+//根据项目ID查询文档列表(含文档内容).
+func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []*Document, err error) {
+	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort")
+	if len(withoutContent) > 0 && withoutContent[0] {
+		cols := []string{"document_id", "identify", "document_name", "book_id", "vcnt", "version",
+			"modify_time", "member_id", "create_time", "order_sort", "parent_id"}
+		_, err = q.All(&docs, cols...)
+	} else {
+		_, err = q.All(&docs)
+	}
 	return
 }
 
