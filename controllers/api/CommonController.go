@@ -2,14 +2,16 @@ package api
 
 import (
 	"fmt"
+	"github.com/TruthHun/BookStack/conf"
+	"github.com/TruthHun/gotil/cryptil"
+	"github.com/TruthHun/gotil/util"
+	"github.com/unknwon/com"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
-	"github.com/TruthHun/gotil/cryptil"
-	"github.com/TruthHun/gotil/util"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
@@ -41,24 +43,55 @@ func (this *CommonController) Login() {
 		this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
 	}
 
+	this.login(member)
+}
+
+func (this *CommonController) login(member models.Member) {
 	var user APIUser
-
 	utils.CopyObject(&member, &user)
-
 	user.Uid = member.MemberId
-
 	user.Token = cryptil.Md5Crypt(fmt.Sprintf("%v-%v", time.Now().Unix(), util.InterfaceToJson(user)))
-	err = models.NewAuth().Insert(user.Token, user.Uid)
+	err := models.NewAuth().Insert(user.Token, user.Uid)
 	if err != nil {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
 	user.Avatar = utils.JoinURL(models.GetAPIStaticDomain(), user.Avatar)
-	this.Response(http.StatusOK, messageLoginSuccess, user)
+	this.Response(http.StatusOK, messageSuccess, user)
 }
 
-func (this *BaseController) Register() {
+func (this *CommonController) Register() {
+	var register APIRegister
+	err := this.ParseForm(&register)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
 
+	if !com.IsEmail(register.Email) {
+		this.Response(http.StatusBadRequest, messageEmailError)
+	}
+
+	if register.Account == "" || register.Nickname == "" || register.Password == "" || register.RePassword == "" {
+		this.Response(http.StatusBadRequest, messageRequiredInput)
+	}
+
+	if register.Password != register.RePassword {
+		this.Response(http.StatusBadRequest, messageNotEqualTwicePassword)
+	}
+	var member models.Member
+
+	utils.CopyObject(&register, &member)
+
+	member.Role = conf.MemberGeneralRole
+	member.Avatar = conf.GetDefaultAvatar()
+	member.CreateAt = int(time.Now().Unix())
+	member.Status = 0
+	if err = member.Add(); err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+
+	this.login(member)
 }
 
 func (this *BaseController) About() {
@@ -116,6 +149,7 @@ func (this *CommonController) Categories() {
 	this.Response(http.StatusOK, messageSuccess, categories)
 }
 
+// 【OK】
 func (this *BaseController) BookInfo() {
 	var (
 		book    *models.Book
@@ -156,6 +190,7 @@ func (this *BaseController) BookMenu() {
 
 }
 
+// 【OK】
 func (this *CommonController) BookLists() {
 	sort := this.GetString("sort", "new") // new、recommend、hot、pin
 	page, _ := this.GetInt("page", 1)
@@ -208,7 +243,9 @@ func (this *BaseController) Bookmarks() {
 
 }
 
-func (this *BaseController) Banners() {
-	banners, _ := models.NewBanner().Lists("wechat")
+// 【OK】
+func (this *CommonController) Banners() {
+	t := this.GetString("type", "wechat")
+	banners, _ := models.NewBanner().Lists(t)
 	this.Response(http.StatusOK, messageSuccess, banners)
 }

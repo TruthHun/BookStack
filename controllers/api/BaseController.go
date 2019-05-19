@@ -54,6 +54,14 @@ type APIBookList struct {
 	AuthorURL   string    `json:"author_url,omitempty"` // 原作者连接地址
 }
 
+type APIRegister struct {
+	Nickname   string `form:"nickname"`
+	Account    string `form:"username"`
+	Password   string `form:"password"`
+	RePassword string `form:"re_password"`
+	Email      string `form:"email"`
+}
+
 //###################################//
 
 const (
@@ -63,7 +71,11 @@ const (
 	messageRequiredLogin           = "您未登录或者您的登录已过期，请重新登录"
 	messageLogoutSuccess           = "退出登录成功"
 	messageSuccess                 = "操作成功"
+	messageBadRequest              = "请求参数不正确"
 	messageNotFound                = "资源不存在"
+	messageEmailError              = "邮箱格式不正确"
+	messageRequiredInput           = "请输入必填项"
+	messageNotEqualTwicePassword   = "两次输入密码不一致"
 )
 
 //###################################//
