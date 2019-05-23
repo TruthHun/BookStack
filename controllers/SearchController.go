@@ -89,7 +89,6 @@ func (this *SearchController) Result() {
 				}
 			}
 		}
-
 	}
 	if len(ids) > 0 {
 		if isSearchDoc {

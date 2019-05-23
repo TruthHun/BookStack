@@ -521,6 +521,9 @@ func (this *ElasticSearchClient) BuildIndex(es ElasticSearchData) (err error) {
 
 // 查询分词
 func (this *ElasticSearchClient) SegWords(keyword string) string {
+	if !this.On {
+		return keyword
+	}
 	api := this.Host + this.Index + "/_analyze"
 	req := this.post(api)
 	keyword = strings.Replace(keyword, "\\", " ", -1)

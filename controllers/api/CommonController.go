@@ -57,7 +57,7 @@ func (this *CommonController) login(member models.Member) {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
-	user.Avatar = utils.JoinURL(models.GetAPIStaticDomain(), user.Avatar)
+	user.Avatar = this.completeImage(user.Avatar)
 	this.Response(http.StatusOK, messageSuccess, user)
 }
 
@@ -127,8 +127,121 @@ func (this *BaseController) FindPassword() {
 
 }
 
-func (this *BaseController) Search() {
+// [OK]
+func (this *BaseController) SearchBook() {
+	wd := this.GetString("wd")
+	if wd == "" {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
 
+	var (
+		page, _  = this.GetInt("page", 1)
+		size     = 10
+		ids      []int
+		total    int
+		apiBooks []APIBookList
+		book     APIBookList
+	)
+	client := models.NewElasticSearchClient()
+
+	if client.On { // elasticsearch 进行全文搜索
+		result, err := models.NewElasticSearchClient().Search(wd, page, size, false)
+		if err != nil {
+			beego.Error(err.Error())
+			this.Response(http.StatusInternalServerError, messageInternalServerError)
+		}
+
+		total = result.Hits.Total
+		for _, item := range result.Hits.Hits {
+			ids = append(ids, item.Source.Id)
+		}
+
+	} else { //MySQL like 查询
+		books, count, err := models.NewBook().SearchBook(wd, page, size)
+		if err != nil {
+			beego.Error(err.Error())
+			this.Response(http.StatusInternalServerError, messageInternalServerError)
+		}
+		total = count
+		for _, book := range books {
+			ids = append(ids, book.BookId)
+		}
+	}
+
+	data := map[string]interface{}{"total": total}
+
+	if len(ids) > 0 {
+		books, _ := models.NewBook().GetBooksById(ids)
+		for _, item := range books {
+			utils.CopyObject(&item, &book)
+			book.Cover = this.completeImage(book.Cover)
+			apiBooks = append(apiBooks, book)
+		}
+		data["result"] = apiBooks
+	}
+
+	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+// [OK]
+func (this *BaseController) SearchDoc() {
+	wd := this.GetString("wd")
+	if wd == "" {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	var (
+		page, _   = this.GetInt("page", 1)
+		size      = 10
+		ids       []int
+		total     int
+		docs      []APIDoc
+		doc       APIDoc
+		bookId, _ = this.GetInt("book_id")
+	)
+
+	if bookId > 0 {
+		page = 1
+		size = 1000
+	}
+
+	client := models.NewElasticSearchClient()
+
+	if client.On { // elasticsearch 进行全文搜索
+		result, err := models.NewElasticSearchClient().Search(wd, page, size, true, bookId)
+		if err != nil {
+			beego.Error(err.Error())
+			this.Response(http.StatusInternalServerError, messageInternalServerError)
+		}
+
+		total = result.Hits.Total
+		for _, item := range result.Hits.Hits {
+			ids = append(ids, item.Source.Id)
+		}
+
+	} else { //MySQL like 查询
+		result, count, err := models.NewDocumentSearchResult().SearchDocument(wd, bookId, page, size)
+		if err != nil {
+			beego.Error(err.Error())
+			this.Response(http.StatusInternalServerError, messageInternalServerError)
+		}
+		total = count
+		for _, book := range result {
+			ids = append(ids, book.BookId)
+		}
+	}
+
+	data := map[string]interface{}{"total": total}
+
+	if len(ids) > 0 {
+		result, _ := models.NewDocumentSearchResult().GetDocsById(ids)
+		for _, item := range result {
+			utils.CopyObject(&item, &doc)
+			docs = append(docs, doc)
+		}
+		data["result"] = docs
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
 }
 
 func (this *CommonController) Categories() {
@@ -143,7 +256,7 @@ func (this *CommonController) Categories() {
 	categories, _ := model.GetCates(pid, 1)
 	for idx, category := range categories {
 		if category.Icon != "" {
-			category.Icon = utils.JoinURL(models.GetAPIStaticDomain(), category.Icon)
+			category.Icon = this.completeImage(category.Icon)
 			categories[idx] = category
 		}
 	}
@@ -178,7 +291,7 @@ func (this *BaseController) BookInfo() {
 
 	utils.CopyObject(book, &apiBook)
 
-	apiBook.Cover = utils.JoinURL(models.GetAPIStaticDomain(), apiBook.Cover)
+	apiBook.Cover = this.completeImage(apiBook.Cover)
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
 
 	this.Response(http.StatusOK, messageSuccess, apiBook)
@@ -259,7 +372,7 @@ func (this *CommonController) BookLists() {
 		var list APIBookList
 
 		for _, book := range books {
-			book.Cover = utils.JoinURL(models.GetAPIStaticDomain(), book.Cover)
+			book.Cover = this.completeImage(book.Cover)
 			if book.Lang == "" {
 				book.Lang = ""
 			}

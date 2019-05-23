@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/TruthHun/BookStack/utils"
 	"strings"
 	"time"
 
@@ -124,6 +125,6 @@ func (this *BaseController) isLogin() (uid int) {
 	return models.NewAuth().GetByToken(this.Token).Uid
 }
 
-func (this *BaseController) completeImage() {
-
+func (this *BaseController) completeImage(path string) string {
+	return utils.JoinURL(models.GetAPIStaticDomain(), path)
 }

@@ -16,8 +16,10 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/book/categories", &api.CommonController{}, "get:Categories")
 	beego.Router(prefix+"/api/v1/book/lists", &api.CommonController{}, "get:BookLists")
 	beego.Router(prefix+"/api/v1/book/info", &api.CommonController{}, "get:BookInfo")
-
 	beego.Router(prefix+"/api/v1/book/menu", &api.CommonController{}, "get:BookMenu")
+
+	beego.Router(prefix+"/api/v1/search/book", &api.CommonController{}, "get:SearchBook")
+	beego.Router(prefix+"/api/v1/search/doc", &api.CommonController{}, "get:SearchDoc")
 
 	// developing
 	beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
@@ -29,7 +31,6 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/share", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/book/search", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/read", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "post:TODO")
