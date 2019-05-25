@@ -234,9 +234,17 @@ func (this *BaseController) SearchDoc() {
 	data := map[string]interface{}{"total": total}
 
 	if len(ids) > 0 {
-		result, _ := models.NewDocumentSearchResult().GetDocsById(ids)
+		var result []models.DocResult
+		if bookId > 0 {
+			result, _ = models.NewDocumentSearchResult().GetDocsById(ids, true)
+		} else {
+			result, _ = models.NewDocumentSearchResult().GetDocsById(ids)
+		}
 		for _, item := range result {
 			utils.CopyObject(&item, &doc)
+			if len(doc.Release) > 0 {
+				doc.Release = beego.Substr(utils.GetTextFromHtml(doc.Release), 0, 150) + "..."
+			}
 			docs = append(docs, doc)
 		}
 		data["result"] = docs
