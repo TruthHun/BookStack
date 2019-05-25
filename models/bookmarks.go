@@ -39,6 +39,10 @@ func (m *Bookmark) TableUnique() [][]string {
 	}
 }
 
+func NewBookmark() *Bookmark {
+	return &Bookmark{}
+}
+
 //添加或移除书签（如果书签不存在，则添加书签，如果书签存在，则移除书签）
 func (m *Bookmark) InsertOrDelete(uid, docId int) (insert bool, err error) {
 	if uid*docId == 0 {
