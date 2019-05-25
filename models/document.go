@@ -204,6 +204,46 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			content.WriteString("</ul></div>")
 			item.Release += content.String()
 		}
+
+		// crawl image
+		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
+			images := gq.Find("img")
+			if images.Length() > 0 {
+				md := ModelStore.GetFiledById(item.DocumentId, "markdown")
+				images.Each(func(i int, selection *goquery.Selection) {
+					if src, ok := selection.Attr("src"); ok {
+						lowerSrc := strings.ToLower(src)
+						if strings.HasPrefix(lowerSrc, "https://") || strings.HasPrefix(lowerSrc, "http://") {
+							tmpFile, err := utils.DownImage(src)
+							if err == nil {
+								defer os.Remove(tmpFile)
+								var newSrc string
+								switch utils.StoreType {
+								case utils.StoreLocal:
+									newSrc = "/uploads/projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+									err = store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(newSrc, "/"))
+								case utils.StoreOss:
+									newSrc = "projects/" + book.Identify + "/" + filepath.Base(tmpFile)
+									err = store.ModelStoreOss.MoveToOss(tmpFile, newSrc, true)
+									newSrc = "/" + newSrc
+								}
+								if err != nil {
+									beego.Error(err.Error())
+								}
+								selection.SetAttr("src", newSrc)
+								md = strings.Replace(md, src, newSrc, -1)
+
+							} else {
+								beego.Error(err.Error())
+							}
+						}
+					}
+				})
+				ModelStore.InsertOrUpdate(DocumentStore{DocumentId: item.DocumentId, Markdown: md}, "markdown")
+			}
+			item.Release, _ = gq.Find("body").Html()
+		}
+
 		_, err = o.Update(item, "release")
 		if err != nil {
 			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
