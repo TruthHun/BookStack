@@ -117,7 +117,6 @@ func (this *BaseController) Prepare() {
 	this.Token = this.Ctx.Request.Header.Get("Authorization")
 	if beego.AppConfig.String("runmode") == "dev" {
 		beego.Debug("auth data: ", fmt.Sprintf("%+v", models.NewAuth().AllFromCache()))
-		time.Sleep(1 * time.Second)
 	}
 }
 

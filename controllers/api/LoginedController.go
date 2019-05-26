@@ -29,8 +29,15 @@ func (this *LoginedController) Logout() {
 
 func (this *LoginedController) GetBookmarks() {
 	bookId, _ := this.GetInt("book_id")
+	if bookId <= 0 {
+		this.Response(http.StatusOK, messageSuccess, []string{})
+	}
+
 	lists, _, _ := models.NewBookmark().List(this.isLogin(), bookId)
-	this.Response(http.StatusOK, messageSuccess, lists)
+	if len(lists) > 0 {
+		this.Response(http.StatusOK, messageSuccess, lists)
+	}
+	this.Response(http.StatusOK, messageSuccess, []string{})
 }
 
 func (this *LoginedController) SetBookmarks() {

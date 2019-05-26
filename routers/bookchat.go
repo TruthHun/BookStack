@@ -21,7 +21,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/search/doc", &api.CommonController{}, "get:SearchDoc")
 
 	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "get:GetBookmarks")
-	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "put:SetBookmarks")
+	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "Put:SetBookmarks")
 	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "delete:DeleteBookmarks")
 
 	// developing
