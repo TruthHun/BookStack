@@ -163,10 +163,10 @@ func (m *Book) FindByFieldFirst(field string, value interface{}) (book *Book, er
 	return m, err
 }
 
-func (m *Book) FindByIdentify(identify string) (book *Book, err error) {
+func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err error) {
 	o := orm.NewOrm()
 	book = &Book{}
-	err = o.QueryTable(m.TableNameWithPrefix()).Filter("identify", identify).One(book)
+	err = o.QueryTable(m.TableNameWithPrefix()).Filter("identify", identify).One(book, cols...)
 	return
 }
 

@@ -1,13 +1,16 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/gotil/cryptil"
 	"github.com/TruthHun/gotil/util"
 	"github.com/unknwon/com"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/TruthHun/BookStack/models"
@@ -392,7 +395,100 @@ func (this *CommonController) BookLists() {
 	this.Response(http.StatusOK, messageSuccess, data)
 }
 
-func (this *BaseController) ReadProcess() {
+func (this *CommonController) Read() {
+	identify := this.GetString("identify")
+	slice := strings.Split(identify, "/")
+	if len(slice) != 2 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	bookIdentify, docIdentify := slice[0], slice[1]
+	if bookIdentify == "" || docIdentify == "" {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	// 1. 如果书籍是私有的，则必须是作者本人才能阅读，否则无法阅读
+	book := models.NewBook()
+	bookId, _ := strconv.Atoi(bookIdentify)
+	cols := []string{"book_id", "privately_owned", "member_id"}
+	if bookId > 0 {
+		book, _ = book.Find(bookId, cols...)
+	} else {
+		book, _ = book.FindByIdentify(bookIdentify, cols...)
+	}
+
+	if book.PrivatelyOwned == 1 && this.isLogin() != book.MemberId {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	doc := models.NewDocument()
+	docId, _ := strconv.Atoi(docIdentify)
+	if docId > 0 {
+		doc, _ = doc.Find(docId)
+	} else {
+		doc, _ = doc.FindByBookIdAndDocIdentify(book.BookId, docIdentify)
+	}
+
+	if doc.DocumentId == 0 {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	var err error
+
+	// 文档阅读人次+1
+	if err = models.SetIncreAndDecre("md_documents", "vcnt",
+		fmt.Sprintf("document_id=%v", doc.DocumentId),
+		true, 1,
+	); err != nil {
+		beego.Error(err.Error())
+	}
+
+	//项目阅读人次+1
+	if err = models.SetIncreAndDecre("md_books", "vcnt",
+		fmt.Sprintf("book_id=%v", doc.BookId),
+		true, 1,
+	); err != nil {
+		beego.Error(err.Error())
+	}
+
+	// 增加用户阅读记录
+	if this.isLogin() > 0 {
+		if err = new(models.ReadRecord).Add(doc.DocumentId, this.isLogin()); err != nil {
+			beego.Error(err.Error())
+		}
+	}
+
+	// 图片链接地址补全
+	if doc.Release != "" {
+		query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(doc.Release))
+		if err != nil {
+			beego.Error(err)
+		} else {
+			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
+				if src, ok := contentSelection.Attr("src"); ok {
+					contentSelection.SetAttr("src", this.completeLink(src))
+				}
+				if alt, _ := contentSelection.Attr("alt"); alt == "" {
+					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
+				}
+			})
+			html, err := query.Find("body").Html()
+			if err != nil {
+				beego.Error(err)
+			} else {
+				doc.Release = html
+			}
+		}
+	}
+
+	// TODO: 可能还需要对内容中一些无用的HTML标签或属性进行移除处理，如提出 alt、title 等标签属性
+	var apiDoc APIDoc
+
+	utils.CopyObject(doc, &apiDoc)
+
+	this.Response(http.StatusOK, messageSuccess, apiDoc)
+}
+
+func (this *BaseController) Progress() {
 
 }
 
