@@ -57,7 +57,7 @@ func (this *CommonController) login(member models.Member) {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
-	user.Avatar = this.completeImage(user.Avatar)
+	user.Avatar = this.completeLink(user.Avatar)
 	this.Response(http.StatusOK, messageSuccess, user)
 }
 
@@ -174,7 +174,7 @@ func (this *BaseController) SearchBook() {
 		books, _ := models.NewBook().GetBooksById(ids)
 		for _, item := range books {
 			utils.CopyObject(&item, &book)
-			book.Cover = this.completeImage(book.Cover)
+			book.Cover = this.completeLink(book.Cover)
 			apiBooks = append(apiBooks, book)
 		}
 		data["result"] = apiBooks
@@ -264,7 +264,7 @@ func (this *CommonController) Categories() {
 	categories, _ := model.GetCates(pid, 1)
 	for idx, category := range categories {
 		if category.Icon != "" {
-			category.Icon = this.completeImage(category.Icon)
+			category.Icon = this.completeLink(category.Icon)
 			categories[idx] = category
 		}
 	}
@@ -299,7 +299,7 @@ func (this *BaseController) BookInfo() {
 
 	utils.CopyObject(book, &apiBook)
 
-	apiBook.Cover = this.completeImage(apiBook.Cover)
+	apiBook.Cover = this.completeLink(apiBook.Cover)
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
 
 	this.Response(http.StatusOK, messageSuccess, apiBook)
@@ -380,7 +380,7 @@ func (this *CommonController) BookLists() {
 		var list APIBookList
 
 		for _, book := range books {
-			book.Cover = this.completeImage(book.Cover)
+			book.Cover = this.completeLink(book.Cover)
 			if book.Lang == "" {
 				book.Lang = ""
 			}
@@ -405,4 +405,39 @@ func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
 	banners, _ := models.NewBanner().Lists(t)
 	this.Response(http.StatusOK, messageSuccess, banners)
+}
+
+func (this *CommonController) Download() {
+	identify := this.GetString("identify")
+	if identify == "" {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	id, _ := strconv.Atoi(identify)
+
+	book := models.NewBook()
+	q := orm.NewOrm().QueryTable(book)
+	if id > 0 {
+		q.Filter("book_id", id).One(book)
+	} else {
+		q.Filter("identify", identify).One(book)
+	}
+
+	if book.BookId == 0 || book.GenerateTime.Unix() < book.ReleaseTime.Unix() {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	if book.PrivatelyOwned == 1 && this.isLogin() != book.MemberId {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+
+	format := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
+
+	data := map[string]string{
+		"pdf":  this.completeLink(format + ".pdf"),
+		"mobi": this.completeLink(format + ".mobi"),
+		"epub": this.completeLink(format + ".epub"),
+	}
+
+	this.Response(http.StatusOK, messageSuccess, data)
 }

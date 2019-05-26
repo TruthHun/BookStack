@@ -124,6 +124,6 @@ func (this *BaseController) isLogin() (uid int) {
 	return models.NewAuth().GetByToken(this.Token).Uid
 }
 
-func (this *BaseController) completeImage(path string) string {
+func (this *BaseController) completeLink(path string) string {
 	return utils.JoinURL(models.GetAPIStaticDomain(), path)
 }
