@@ -2,12 +2,9 @@ package commands
 
 import (
 	"encoding/gob"
-	"fmt"
-	"net/url"
-	"os"
-	"time"
-
 	"flag"
+	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -37,23 +34,15 @@ func RegisterDataBase() {
 	database := beego.AppConfig.String("db_database")
 	username := beego.AppConfig.String("db_username")
 	password := beego.AppConfig.String("db_password")
-	timezone := beego.AppConfig.String("timezone")
 
 	port := beego.AppConfig.String("db_port")
 
-	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=%s", username, password, host, port, database, url.QueryEscape(timezone))
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local", username, password, host, port, database)
 
 	orm.RegisterDataBase("default", "mysql", dataSource)
 
 	if beego.AppConfig.String("runmode") == "dev" {
 		orm.Debug = true
-	}
-
-	location, err := time.LoadLocation(timezone)
-	if err == nil {
-		orm.DefaultTimeLoc = location
-	} else {
-		log.Fatalln(err)
 	}
 
 }
