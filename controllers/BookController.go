@@ -1192,8 +1192,8 @@ func (this *BookController) Comment() {
 		this.JsonResult(1, "请先登录在评论")
 	}
 	content := this.GetString("content")
-	if l := len(content); l < 5 || l > 512 {
-		this.JsonResult(1, "评论内容先5-512个字符")
+	if l := len(content); l < 5 || l > 256 {
+		this.JsonResult(1, "评论内容限 5 - 256 个字符")
 	}
 	bookId, _ := this.GetInt(":id")
 	if bookId > 0 {

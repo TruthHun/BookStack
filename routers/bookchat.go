@@ -12,6 +12,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/register", &api.CommonController{}, "post:Register")
 	beego.Router(prefix+"/api/v1/login", &api.CommonController{}, "post:Login")
 	beego.Router(prefix+"/api/v1/logout", &api.LoginedController{}, "get:Logout")
+
 	beego.Router(prefix+"/api/v1/banners", &api.CommonController{}, "get:Banners")
 	beego.Router(prefix+"/api/v1/book/categories", &api.CommonController{}, "get:Categories")
 	beego.Router(prefix+"/api/v1/book/lists", &api.CommonController{}, "get:BookLists")
@@ -27,19 +28,18 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/release", &api.CommonController{}, "get:UserReleaseBook")
 	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:UserFans")
 	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:UserFollow")
-
 	beego.Router(prefix+"/api/v1/user/bookshelf", &api.CommonController{}, "get:Bookshelf")
 
 	// developing
+	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:GetComments")
+	beego.Router(prefix+"/api/v1/book/comment", &api.LoginedController{}, "post:PostComment")
 
 	beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/change-password", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/change-avatar", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "post:TODO")
-	beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
 
+	// beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
+	// beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
 	// beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:TODO")
 	// beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
 }

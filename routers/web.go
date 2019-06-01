@@ -5,7 +5,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-func webRouter()  {
+func webRouter() {
 	beego.Router("/", &controllers.CateController{}, "get:Index")
 	beego.Router("/cate", &controllers.CateController{}, "get:List")
 	//beego.Router("/", &controllers.HomeController{}, "*:Index")
@@ -58,9 +58,9 @@ func webRouter()  {
 	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
 
 	beego.Router("/book", &controllers.BookController{}, "*:Index")
-	beego.Router("/book/star/:id", &controllers.BookController{}, "*:Star")          //收藏
-	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")        //收藏
-	beego.Router("/book/comment/:id", &controllers.BookController{}, "post:Comment") //收藏
+	beego.Router("/book/star/:id", &controllers.BookController{}, "*:Star")          // 收藏
+	beego.Router("/book/score/:id", &controllers.BookController{}, "*:Score")        // 评分
+	beego.Router("/book/comment/:id", &controllers.BookController{}, "post:Comment") // 点评
 	beego.Router("/book/uploadProject", &controllers.BookController{}, "post:UploadProject")
 	beego.Router("/book/downloadProject", &controllers.BookController{}, "post:DownloadProject")
 	beego.Router("/book/git-pull", &controllers.BookController{}, "post:GitPull")

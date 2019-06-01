@@ -681,3 +681,44 @@ func (this *CommonController) Bookshelf() {
 
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"books": books, "total": total, "readed": read})
 }
+
+// 查询书籍评论
+func (this *CommonController) GetComments() {
+	page, _ := this.GetInt("page", 1)
+	if page <= 0 {
+		page = 1
+	}
+	size, _ := this.GetInt("size", 10)
+	if size <= 0 {
+		size = 10
+	}
+
+	if size > maxPageSize {
+		size = maxPageSize
+	}
+
+	bookId, _ := this.GetInt("book_id")
+	if bookId <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	uid := this.isLogin()
+	myScore := 0
+	if uid > 0 {
+		myScore = new(models.Score).BookScoreByUid(uid, bookId) / 10
+	}
+	comments, err := new(models.Comments).BookComments(page, size, bookId)
+	if err != nil {
+		beego.Error(err.Error())
+	}
+	data := map[string]interface{}{
+		"my_score": myScore,
+		"comments": []string{},
+	}
+
+	if len(comments) > 0 {
+		data["comments"] = comments
+	}
+
+	this.Response(http.StatusOK, messageSuccess, data)
+}

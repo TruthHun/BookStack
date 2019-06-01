@@ -1,9 +1,8 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/TruthHun/BookStack/models"
+	"net/http"
 )
 
 // 登录之后才能调用的接口放这里
@@ -61,5 +60,30 @@ func (this *LoginedController) DeleteBookmarks() {
 	if bm.Exist(this.isLogin(), docId) {
 		bm.InsertOrDelete(this.isLogin(), docId)
 	}
+	this.Response(http.StatusOK, messageSuccess)
+}
+
+func (this *LoginedController) PostComment() {
+	content := this.GetString("content")
+	if l := len(content); l < 5 || l > 256 {
+		this.Response(http.StatusBadRequest, "点评内容限定 5 - 256 个字符")
+	}
+	bookId, _ := this.GetInt("book_id")
+
+	if bookId <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	err := new(models.Comments).AddComments(this.isLogin(), bookId, content)
+	if err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+
+	// 点评成功之后，再写入评分。如果之前的评分已存在，则不会再重新写入
+	score, _ := this.GetInt("score")
+	if score > 0 && score <= 5 {
+		new(models.Score).AddScore(this.isLogin(), bookId, score)
+	}
+
 	this.Response(http.StatusOK, messageSuccess)
 }

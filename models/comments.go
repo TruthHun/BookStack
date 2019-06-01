@@ -18,6 +18,7 @@ type Comments struct {
 	BookId     int       `orm:"index"` //文档项目id
 	Content    string    //评论内容
 	TimeCreate time.Time //评论时间
+	//Status     bool      // 审核状态
 }
 
 //评分表
@@ -43,14 +44,14 @@ type BookCommentsResult struct {
 	Avatar     string    `json:"avatar"`
 	Nickname   string    `json:"nickname"`
 	Content    string    `json:"content"`
-	TimeCreate time.Time `json:"time_create"` //评论时间
+	TimeCreate time.Time `json:"created_at"` //评论时间
 }
 
 //获取评论内容
-func (this *Comments) BookComments(p, listRows, bookid int) (comments []BookCommentsResult, err error) {
+func (this *Comments) BookComments(p, listRows, bookId int) (comments []BookCommentsResult, err error) {
 	sql := `select c.content,s.score,c.uid,c.time_create,m.avatar,m.nickname from md_comments c left join md_members m on m.member_id=c.uid left join md_score s on s.uid=c.uid and s.book_id=c.book_id where c.book_id=? order by c.id desc limit %v offset %v`
 	sql = fmt.Sprintf(sql, listRows, (p-1)*listRows)
-	_, err = orm.NewOrm().Raw(sql, bookid).QueryRows(&comments)
+	_, err = orm.NewOrm().Raw(sql, bookId).QueryRows(&comments)
 	return
 }
 
@@ -80,7 +81,7 @@ func (this *Score) BookScoreByUid(uid, bookId interface{}) int {
 //添加评论内容
 
 //添加评分
-//score的值只能是1-5，然后需要对scorex10，50则表示5.0分
+//score的值只能是1-5，然后需要对score x 10，50则表示5.0分
 func (this *Score) AddScore(uid, bookId, score int) (err error) {
 	//查询评分是否已存在
 	o := orm.NewOrm()
@@ -91,7 +92,7 @@ func (this *Score) AddScore(uid, bookId, score int) (err error) {
 		return
 	}
 
-	//评分不存在，添加评分记录
+	// 评分不存在，添加评分记录
 	score = score * 10
 	scoreObj.Score = score
 	scoreObj.TimeCreate = time.Now()
@@ -121,19 +122,19 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 	var comment Comments
 
 	//查询该用户现有的评论
-	second := beego.AppConfig.DefaultInt("CommentInterval", 10)
+	second := beego.AppConfig.DefaultInt("CommentInterval", 60)
+	now := time.Now()
 	o := orm.NewOrm()
-	o.QueryTable("md_comments").Filter("uid", uid).Filter("TimeCreate__gt", time.Now().Add(-time.Duration(second)*time.Second)).OrderBy("-Id").One(&comment, "Id")
+	o.QueryTable("md_comments").Filter("uid", uid).Filter("TimeCreate__gt", now.Add(-time.Duration(second)*time.Second)).OrderBy("-Id").One(&comment, "Id")
 	if comment.Id > 0 {
-		return errors.New(fmt.Sprintf("您距离上次发表评论时间小于 %v 秒，请歇会儿再发。", second))
+		return fmt.Errorf("您距离上次发表评论时间小于 %v 秒，请歇会儿再发。", second)
 	}
 
-	//项目被评论是量+1
 	var comments = Comments{
 		Uid:        uid,
 		BookId:     bookId,
 		Content:    content,
-		TimeCreate: time.Now(),
+		TimeCreate: now,
 	}
 
 	if _, err = o.Insert(&comments); err != nil {
@@ -141,7 +142,7 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 		err = errors.New("发表评论失败")
 		return
 	}
-
+	// 项目被评论数量量+1
 	SetIncreAndDecre("md_books", "cnt_comment", fmt.Sprintf("book_id=%v", bookId), true)
 	return
 }
