@@ -99,27 +99,15 @@ func (this *CommonController) Register() {
 	this.login(member)
 }
 
-func (this *BaseController) About() {
-
-}
-
-func (this *BaseController) UserInfo() {
-
-}
-
-func (this *BaseController) UserStar() {
-
-}
-
-func (this *BaseController) UserFollow() {
+func (this *CommonController) UserFollow() {
 	this.getFansOrFollow(false)
 }
 
-func (this *BaseController) UserFans() {
+func (this *CommonController) UserFans() {
 	this.getFansOrFollow(true)
 }
 
-func (this *BaseController) getFansOrFollow(isGetFans bool) {
+func (this *CommonController) getFansOrFollow(isGetFans bool) {
 	page, _ := this.GetInt("page", 1)
 	size, _ := this.GetInt("size", 10)
 	if page <= 0 {
@@ -172,7 +160,7 @@ func (this *BaseController) getFansOrFollow(isGetFans bool) {
 }
 
 // 如果不传用户id，则表示查询当前登录的用户发布的书籍
-func (this *BaseController) UserReleaseBook() {
+func (this *CommonController) UserReleaseBook() {
 	uid, _ := this.GetInt("uid")
 	if uid <= 0 {
 		if login := this.isLogin(); login > 0 {
@@ -218,7 +206,7 @@ func (this *BaseController) FindPassword() {
 }
 
 // [OK]
-func (this *BaseController) SearchBook() {
+func (this *CommonController) SearchBook() {
 	wd := this.GetString("wd")
 	if wd == "" {
 		this.Response(http.StatusBadRequest, messageBadRequest)
@@ -283,7 +271,7 @@ func (this *BaseController) SearchBook() {
 }
 
 // [OK]
-func (this *BaseController) SearchDoc() {
+func (this *CommonController) SearchDoc() {
 	wd := this.GetString("wd")
 	if wd == "" {
 		this.Response(http.StatusBadRequest, messageBadRequest)
@@ -372,7 +360,7 @@ func (this *CommonController) Categories() {
 }
 
 // 【OK】
-func (this *BaseController) BookInfo() {
+func (this *CommonController) BookInfo() {
 	var (
 		book    *models.Book
 		err     error
@@ -404,13 +392,9 @@ func (this *BaseController) BookInfo() {
 	this.Response(http.StatusOK, messageSuccess, apiBook)
 }
 
-func (this *BaseController) BookContent() {
-
-}
-
 // TODO: 根据用户登录情况，判断书籍是私有还是公有，并再决定是否显示
 // 返回用户对该章节是否已读
-func (this *BaseController) BookMenu() {
+func (this *CommonController) BookMenu() {
 	var (
 		book models.Book
 		o    = orm.NewOrm()
@@ -597,14 +581,6 @@ func (this *CommonController) Read() {
 	this.Response(http.StatusOK, messageSuccess, apiDoc)
 }
 
-func (this *BaseController) Progress() {
-
-}
-
-func (this *BaseController) Bookmarks() {
-
-}
-
 // 【OK】
 func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
@@ -717,8 +693,31 @@ func (this *CommonController) GetComments() {
 	}
 
 	if len(comments) > 0 {
+		for idx, _ := range comments {
+			comments[idx].Avatar = this.completeLink(comments[idx].Avatar)
+		}
 		data["comments"] = comments
 	}
 
+	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+func (this *CommonController) RelatedBook() {
+	bookId, _ := this.GetInt("book_id")
+	if bookId <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	res := models.NewRelateBook().Lists(bookId)
+	var books []APIBook
+	for _, item := range res {
+		book := APIBook{}
+		utils.CopyObject(&item, &book)
+		book.Cover = this.completeLink(book.Cover)
+		books = append(books, book)
+	}
+	data := map[string]interface{}{"books": []string{}}
+	if len(books) > 0 {
+		data["books"] = books
+	}
 	this.Response(http.StatusOK, messageSuccess, data)
 }
