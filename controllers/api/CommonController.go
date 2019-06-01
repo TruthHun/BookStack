@@ -111,18 +111,75 @@ func (this *BaseController) UserStar() {
 
 }
 
-func (this *BaseController) UserFans() {
-
-}
-
 func (this *BaseController) UserFollow() {
-
+	this.getFansOrFollow(false)
 }
 
+func (this *BaseController) UserFans() {
+	this.getFansOrFollow(true)
+}
+
+func (this *BaseController) getFansOrFollow(isGetFans bool) {
+	page, _ := this.GetInt("page", 1)
+	size, _ := this.GetInt("size", 10)
+	if page <= 0 {
+		page = 1
+	}
+	if size <= 0 {
+		size = 10
+	}
+	if size > maxPageSize {
+		size = maxPageSize
+	}
+
+	uid, _ := this.GetInt("uid")
+	if uid <= 0 {
+		uid = this.isLogin()
+	}
+	if uid <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	var (
+		fans       []models.FansResult
+		totalCount int64
+		err        error
+		model      = new(models.Fans)
+	)
+
+	if isGetFans {
+		fans, totalCount, err = model.GetFansList(uid, page, size)
+	} else {
+		fans, totalCount, err = model.GetFollowList(uid, page, size)
+	}
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	var users []APIUser
+	for _, item := range fans {
+		user := &APIUser{}
+		utils.CopyObject(&item, user)
+		user.Avatar = this.completeLink(user.Avatar)
+		users = append(users, *user)
+	}
+
+	data := map[string]interface{}{"total": totalCount}
+	if len(users) > 0 {
+		data["fans"] = users
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+// 如果不传用户id，则表示查询当前登录的用户发布的书籍
 func (this *BaseController) UserReleaseBook() {
 	uid, _ := this.GetInt("uid")
 	if uid <= 0 {
-		this.Response(http.StatusBadRequest, messageBadRequest)
+		if login := this.isLogin(); login > 0 {
+			uid = login
+		} else {
+			this.Response(http.StatusBadRequest, messageBadRequest)
+		}
 	}
 
 	page, _ := this.GetInt("page")
@@ -140,6 +197,7 @@ func (this *BaseController) UserReleaseBook() {
 	for _, item := range res {
 		book := &APIBook{}
 		utils.CopyObject(item, book)
+		book.Cover = this.completeLink(book.Cover)
 		books = append(books, *book)
 	}
 	data := map[string]interface{}{"total": totalCount}
@@ -150,6 +208,7 @@ func (this *BaseController) UserReleaseBook() {
 
 	this.Response(http.StatusOK, messageSuccess, data)
 }
+
 func (this *CommonController) TODO() {
 	this.Response(http.StatusOK, "TODO")
 }
@@ -167,12 +226,21 @@ func (this *BaseController) SearchBook() {
 
 	var (
 		page, _  = this.GetInt("page", 1)
-		size     = 10
+		size, _  = this.GetInt("size", 10)
 		ids      []int
 		total    int
 		apiBooks []APIBook
 		book     APIBook
 	)
+
+	if size <= 0 {
+		size = 10
+	}
+
+	if size > maxPageSize {
+		size = maxPageSize
+	}
+
 	client := models.NewElasticSearchClient()
 
 	if client.On { // elasticsearch 进行全文搜索

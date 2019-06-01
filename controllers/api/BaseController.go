@@ -23,13 +23,13 @@ type APIResponse struct {
 
 type APIUser struct {
 	Uid         int    `json:"uid"`
-	Token       string `json:"token"`
+	Token       string `json:"token,omitempty"`
 	Account     string `json:"username"` //对应 member.account
 	Nickname    string `json:"nickname"`
-	Email       string `json:"email"`
-	Phone       string `json:"phone"`
+	Email       string `json:"email,omitempty"`
+	Phone       string `json:"phone,omitempty"`
 	Avatar      string `json:"avatar"`
-	Description string `json:"intro"`
+	Description string `json:"intro,omitempty"`
 }
 
 type APIBook struct {
@@ -92,6 +92,7 @@ const (
 	messageEmailError              = "邮箱格式不正确"
 	messageRequiredInput           = "请输入必填项"
 	messageNotEqualTwicePassword   = "两次输入密码不一致"
+	maxPageSize                    = 30
 )
 
 //###################################//

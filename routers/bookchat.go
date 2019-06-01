@@ -24,8 +24,9 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "delete:DeleteBookmarks")
 	beego.Router(prefix+"/api/v1/book/download", &api.CommonController{}, "get:Download")
 	beego.Router(prefix+"/api/v1/book/read", &api.CommonController{}, "get:Read")
-
 	beego.Router(prefix+"/api/v1/user/release", &api.CommonController{}, "get:UserReleaseBook")
+	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:UserFans")
+	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:UserFollow")
 
 	// developing
 	beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
@@ -34,8 +35,6 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/change-avatar", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/star", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "post:TODO")
 	beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
