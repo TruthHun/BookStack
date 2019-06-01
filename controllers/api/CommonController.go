@@ -120,10 +120,38 @@ func (this *BaseController) UserFollow() {
 }
 
 func (this *BaseController) UserReleaseBook() {
+	uid, _ := this.GetInt("uid")
+	if uid <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
 
+	page, _ := this.GetInt("page")
+	if page <= 0 {
+		page = 1
+	}
+	size := 10
+
+	res, totalCount, err := models.NewBook().FindToPager(page, size, uid, 0)
+	if err != nil {
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	var books []APIBook
+	for _, item := range res {
+		book := &APIBook{}
+		utils.CopyObject(item, book)
+		books = append(books, *book)
+	}
+	data := map[string]interface{}{"total": totalCount}
+
+	if len(books) > 0 {
+		data["books"] = books
+	}
+
+	this.Response(http.StatusOK, messageSuccess, data)
 }
 func (this *CommonController) TODO() {
-
+	this.Response(http.StatusOK, "TODO")
 }
 
 func (this *BaseController) FindPassword() {
@@ -142,8 +170,8 @@ func (this *BaseController) SearchBook() {
 		size     = 10
 		ids      []int
 		total    int
-		apiBooks []APIBookList
-		book     APIBookList
+		apiBooks []APIBook
+		book     APIBook
 	)
 	client := models.NewElasticSearchClient()
 
@@ -280,7 +308,7 @@ func (this *BaseController) BookInfo() {
 	var (
 		book    *models.Book
 		err     error
-		apiBook APIBookList
+		apiBook APIBook
 	)
 
 	identify := this.GetString("identify")
@@ -379,8 +407,8 @@ func (this *CommonController) BookLists() {
 	books, total, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
 	data := map[string]interface{}{"total": total}
 	if len(books) > 0 {
-		var lists []APIBookList
-		var list APIBookList
+		var lists []APIBook
+		var list APIBook
 
 		for _, book := range books {
 			book.Cover = this.completeLink(book.Cover)

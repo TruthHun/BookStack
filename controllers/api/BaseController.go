@@ -32,7 +32,7 @@ type APIUser struct {
 	Description string `json:"intro"`
 }
 
-type APIBookList struct {
+type APIBook struct {
 	BookId      int       `json:"book_id"`
 	BookName    string    `json:"book_name"`
 	Identify    string    `json:"identify"`
@@ -53,6 +53,7 @@ type APIBookList struct {
 	User        string    `json:"user,omitempty"`       // 分享人
 	Author      string    `json:"author,omitempty"`     // 原作者
 	AuthorURL   string    `json:"author_url,omitempty"` // 原作者连接地址
+	//PrivatelyOwned int       `json:"private"`
 }
 
 type APIRegister struct {
