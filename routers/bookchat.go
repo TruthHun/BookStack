@@ -28,15 +28,18 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:UserFans")
 	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:UserFollow")
 
+	beego.Router(prefix+"/api/v1/user/bookshelf", &api.CommonController{}, "get:Bookshelf")
+
 	// developing
-	beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
+
 	beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/change-password", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/user/change-avatar", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:TODO")
-	beego.Router(prefix+"/api/v1/user/star", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "post:TODO")
 	beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
 	beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
+
+	// beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:TODO")
+	// beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
 }

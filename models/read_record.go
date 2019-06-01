@@ -170,6 +170,23 @@ func (this *ReadRecord) Progress(uid, bookId int) (rp ReadProgress, err error) {
 	return
 }
 
+//查询阅读进度
+func (this *ReadRecord) BooksProgress(uid int, bookId ...int) (read map[int]int) {
+	read = make(map[int]int)
+	var count []ReadCount
+	orm.NewOrm().QueryTable(new(ReadCount)).Filter("uid", uid).Filter("book_id__in", bookId).All(&count)
+	for _, item := range count {
+		read[item.BookId] = item.Cnt
+	}
+
+	for _, id := range bookId {
+		if _, ok := read[id]; !ok {
+			read[id] = 0
+		}
+	}
+	return
+}
+
 //删除单条阅读记录
 func (this *ReadRecord) Delete(uid, docId int) (err error) {
 	if uid*docId == 0 {

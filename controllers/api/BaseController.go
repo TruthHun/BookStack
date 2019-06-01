@@ -76,6 +76,7 @@ type APIDoc struct {
 	MemberId     int       `json:"uid"`
 	ModifyTime   time.Time `json:"updated_at"`
 	Vcnt         int       `json:"vcnt"`
+	Readed       bool      `json:"readed"`
 }
 
 //###################################//

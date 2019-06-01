@@ -409,6 +409,7 @@ func (this *BaseController) BookContent() {
 }
 
 // TODO: 根据用户登录情况，判断书籍是私有还是公有，并再决定是否显示
+// 返回用户对该章节是否已读
 func (this *BaseController) BookMenu() {
 	var (
 		book models.Book
@@ -438,8 +439,20 @@ func (this *BaseController) BookMenu() {
 		doc  APIDoc
 	)
 
+	uid := this.isLogin()
+	readed := make(map[int]bool)
+	if uid > 0 {
+		lists, _, _ := new(models.ReadRecord).List(uid, book.BookId)
+		for _, item := range lists {
+			readed[item.DocId] = true
+		}
+	}
+
 	for _, item := range docsOri {
 		utils.CopyObject(item, &doc)
+		if _, ok := readed[doc.DocumentId]; ok {
+			doc.Readed = true
+		}
 		docs = append(docs, doc)
 	}
 
@@ -632,4 +645,39 @@ func (this *CommonController) Download() {
 	}
 
 	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+func (this *CommonController) Bookshelf() {
+	uid, _ := this.GetInt("uid")
+	if uid <= 0 {
+		uid = this.isLogin()
+	}
+
+	if uid <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	size := 1000
+
+	total, res, err := new(models.Star).List(uid, 1, size)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	var (
+		books   []APIBook
+		booksId []int
+	)
+	for _, item := range res {
+		book := &APIBook{}
+		utils.CopyObject(&item, book)
+		booksId = append(booksId, book.BookId)
+		book.Cover = this.completeLink(book.Cover)
+		books = append(books, *book)
+	}
+
+	read := new(models.ReadRecord).BooksProgress(uid, booksId...)
+
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"books": books, "total": total, "readed": read})
 }
