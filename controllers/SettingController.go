@@ -225,7 +225,7 @@ func (this *SettingController) Upload() {
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("200601"), fileName+ext)
+	filePath := filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("2006/01"), fileName+ext)
 
 	path := filepath.Dir(filePath)
 

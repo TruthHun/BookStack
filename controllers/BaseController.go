@@ -56,7 +56,8 @@ func (this *BaseController) Prepare() {
 	this.Data["StaticDomain"] = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
 	//从session中获取用户信息
 	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
-		this.Member = &member
+		m, _ := models.NewMember().Find(member.MemberId)
+		this.Member = m
 	} else {
 		//如果Cookie中存在登录信息，从cookie中获取用户信息
 		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
@@ -106,7 +107,9 @@ func (this *BaseController) SetMember(member models.Member) {
 		this.DelSession("uid")
 		this.DestroySession()
 	} else {
-		this.SetSession(conf.LoginSessionName, member)
+		// this.SetSession(conf.LoginSessionName, member)
+		// 为了兼容，并节省资源，并且用户资料能实时同步显示，每次都从数据库中查询用户资料，而不再从session中查询
+		this.SetSession(conf.LoginSessionName, member.MemberId)
 		this.SetSession("uid", member.MemberId)
 	}
 }

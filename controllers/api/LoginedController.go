@@ -1,8 +1,19 @@
 package api
 
 import (
-	"github.com/TruthHun/BookStack/models"
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/TruthHun/BookStack/models/store"
+	"github.com/TruthHun/BookStack/utils"
+
+	"github.com/astaxie/beego"
+
+	"github.com/TruthHun/BookStack/models"
 )
 
 // 登录之后才能调用的接口放这里
@@ -15,10 +26,6 @@ func (this *LoginedController) Prepare() {
 	if models.NewAuth().GetByToken(this.Token).Uid == 0 {
 		this.Response(http.StatusUnauthorized, messageRequiredLogin)
 	}
-}
-
-func (this *LoginedController) UserInfo() {
-
 }
 
 func (this *LoginedController) Logout() {
@@ -61,6 +68,63 @@ func (this *LoginedController) DeleteBookmarks() {
 		bm.InsertOrDelete(this.isLogin(), docId)
 	}
 	this.Response(http.StatusOK, messageSuccess)
+}
+
+// 更换头像
+func (this *LoginedController) ChangeAvatar() {
+	_, fh, err := this.GetFile("avatar")
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	ext := strings.ToLower(filepath.Ext(fh.Filename))
+	extMap := map[string]bool{".jpg": true, ".png": true, ".gif": true, ".jpeg": true}
+	if _, ok := extMap[ext]; !ok {
+		this.Response(http.StatusBadRequest, "图片格式不正确")
+	}
+	uid := this.isLogin()
+	now := time.Now()
+	tmp := fmt.Sprintf("uploads/%v-%v%v", now.Format("2006/01"), now.Unix(), ext)
+	os.MkdirAll(filepath.Dir(tmp), os.ModePerm)
+	defer os.Remove(tmp)
+	save := fmt.Sprintf("uploads/%v/%v-%v%v", now.Format("2006/01"), uid, now.Unix(), ext)
+	os.MkdirAll(filepath.Dir(save), os.ModePerm)
+	err = this.SaveToFile("avatar", tmp)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	member, err := models.NewMember().Find(uid)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	avatar := strings.TrimLeft(member.Avatar, "./")
+	member.Avatar = "/" + save
+
+	switch utils.StoreType {
+	case utils.StoreOss: //oss存储
+		err = store.ModelStoreOss.MoveToOss(tmp, strings.TrimLeft(save, "./"), true, false)
+		if err != nil {
+			beego.Error(err.Error())
+		} else {
+			store.ModelStoreOss.DelFromOss(avatar)
+		}
+	case utils.StoreLocal: //本地存储
+		err = store.ModelStoreLocal.MoveToStore(tmp, save)
+		if err != nil {
+			beego.Error(err.Error())
+		} else {
+			os.Remove(avatar)
+		}
+	}
+
+	if err = member.Update(); err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	this.Response(http.StatusOK, messageSuccess, map[string]string{"avatar": this.completeLink(save)})
 }
 
 func (this *LoginedController) PostComment() {
