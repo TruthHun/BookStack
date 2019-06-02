@@ -151,3 +151,49 @@ func (this *LoginedController) PostComment() {
 
 	this.Response(http.StatusOK, messageSuccess)
 }
+
+func (this *LoginedController) ChangePassword() {
+	old := this.GetString("old")
+	newPwd := this.GetString("new")
+	repeatPwd := this.GetString("repeat")
+
+	if old == "" || newPwd == "" || repeatPwd == "" {
+		this.Response(http.StatusBadRequest, "原密码、新密码和确认密码均不能为空")
+	}
+
+	if count := strings.Count(newPwd, ""); count < 6 || count > 18 {
+		this.Response(http.StatusBadRequest, "密码必须在 6 - 18 字符之间")
+	}
+
+	if newPwd != repeatPwd {
+		this.Response(http.StatusBadRequest, "新密码和确认密码不一致")
+	}
+
+	if old == newPwd {
+		this.Response(http.StatusBadRequest, "新密码和原密码不能相同")
+	}
+
+	member, err := models.NewMember().Find(this.isLogin())
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	if ok, _ := utils.PasswordVerify(member.Password, old); !ok {
+		this.Response(http.StatusBadRequest, "原密码不正确")
+	}
+
+	pwd, err := utils.PasswordHash(newPwd)
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+
+	member.Password = pwd
+	member.Update()
+	if err != nil {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	this.Response(http.StatusOK, messageSuccess)
+}
