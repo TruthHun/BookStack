@@ -353,7 +353,7 @@ func (this *CommonController) Categories() {
 		}
 	}
 
-	this.Response(http.StatusOK, messageSuccess, categories)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"categories": categories})
 }
 
 // 【OK】
@@ -581,7 +581,7 @@ func (this *CommonController) Read() {
 func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
 	banners, _ := models.NewBanner().Lists(t)
-	this.Response(http.StatusOK, messageSuccess, banners)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners})
 }
 
 func (this *CommonController) Download() {

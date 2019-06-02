@@ -30,7 +30,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/bookshelf", &api.CommonController{}, "get:Bookshelf")
 	beego.Router(prefix+"/api/v1/book/comment", &api.CommonController{}, "get:GetComments")
 	beego.Router(prefix+"/api/v1/book/comment", &api.LoginedController{}, "post:PostComment")
-	beego.Router(prefix+"/api/v1/book/related", &api.CommonController{}, "get:RelatedBook") // 关联书籍
+	beego.Router(prefix+"/api/v1/book/related", &api.CommonController{}, "get:RelatedBook")
 	beego.Router(prefix+"/api/v1/user/change-avatar", &api.LoginedController{}, "post:ChangeAvatar")
 	beego.Router(prefix+"/api/v1/user/change-password", &api.LoginedController{}, "post:ChangePassword")
 

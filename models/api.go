@@ -16,7 +16,8 @@ var (
 func initAPI() {
 	beego.Info(" ===  init api data ===  ")
 	authCache = NewAuth().AllFromDatabase()
-	staticDomain = "http://localhost:8181/" //TODO: 从数据库中查询并初始化为全局变量
+	//TODO: 从数据库中查询并初始化为全局变量
+	staticDomain = beego.AppConfig.DefaultString("static_domain", "https://static.bookstack.cn/")
 }
 
 func GetAPIStaticDomain() string {
