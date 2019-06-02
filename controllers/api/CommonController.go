@@ -348,6 +348,9 @@ func (this *CommonController) Categories() {
 	categories, _ := model.GetCates(pid, 1)
 	for idx, category := range categories {
 		if category.Icon != "" {
+			if category.Icon == "" {
+				category.Icon = "/static/images/cate.png"
+			}
 			category.Icon = this.completeLink(category.Icon)
 			categories[idx] = category
 		}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/astaxie/beego"
@@ -17,7 +18,7 @@ func initAPI() {
 	beego.Info(" ===  init api data ===  ")
 	authCache = NewAuth().AllFromDatabase()
 	//TODO: 从数据库中查询并初始化为全局变量
-	staticDomain = beego.AppConfig.DefaultString("static_domain", "https://static.bookstack.cn/")
+	staticDomain = strings.TrimRight(beego.AppConfig.DefaultString("static_domain", "https://static.bookstack.cn/"), "/") + "/"
 }
 
 func GetAPIStaticDomain() string {
