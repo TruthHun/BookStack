@@ -35,10 +35,5 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/change-password", &api.LoginedController{}, "post:ChangePassword")
 
 	// developing
-	beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")
-
-	// beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
-	// beego.Router(prefix+"/api/v1/book/progress", &api.CommonController{}, "get:TODO")
-	// beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:TODO")
-	// beego.Router(prefix+"/api/v1/about-us", &api.CommonController{}, "get:TODO")
+	//beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")
 }

@@ -3,15 +3,16 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/gotil/cryptil"
 	"github.com/TruthHun/gotil/util"
 	"github.com/unknwon/com"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
@@ -201,10 +202,6 @@ func (this *CommonController) TODO() {
 	this.Response(http.StatusOK, "TODO")
 }
 
-func (this *BaseController) FindPassword() {
-
-}
-
 // [OK]
 func (this *CommonController) SearchBook() {
 	wd := this.GetString("wd")
@@ -392,7 +389,6 @@ func (this *CommonController) BookInfo() {
 	this.Response(http.StatusOK, messageSuccess, apiBook)
 }
 
-// TODO: 根据用户登录情况，判断书籍是私有还是公有，并再决定是否显示
 // 返回用户对该章节是否已读
 func (this *CommonController) BookMenu() {
 	var (
