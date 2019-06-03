@@ -476,15 +476,66 @@ func (this *CommonController) BookLists() {
 
 		for _, book := range books {
 			book.Cover = this.completeLink(book.Cover)
-			if book.Lang == "" {
-				book.Lang = ""
-			}
 			utils.CopyObject(&book, &list)
 			lists = append(lists, list)
 		}
 		data["books"] = lists
 	}
 	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+func (this *CommonController) BookListsByCids() {
+	sort := this.GetString("sort", "new") // new、recommend、hot、pin
+	page, _ := this.GetInt("page", 1)
+	lang := this.GetString("lang")
+	pageSize, _ := this.GetInt("size", 10)
+	cids := this.GetString("cids")
+
+	var cidArr []int
+	slice := strings.Split(cids, ",")
+	for _, item := range slice {
+		if cid, _ := strconv.Atoi(strings.TrimSpace(item)); cid > 0 {
+			cidArr = append(cidArr, cid)
+		}
+	}
+
+	if len(cidArr) == 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+
+	if page <= 0 {
+		page = 1
+	}
+
+	if page <= 0 {
+		page = 10
+	}
+
+	if pageSize > 20 {
+		pageSize = 20
+	}
+
+	model := models.NewBook()
+
+	fields := []string{"book_id", "book_name", "identify", "order_index", "description", "label", "doc_count",
+		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time",
+	}
+	data := make(map[int]interface{})
+	for _, cid := range cidArr {
+		books, _, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
+		if len(books) > 0 {
+			var lists []APIBook
+			var list APIBook
+			for _, book := range books {
+				book.Cover = this.completeLink(book.Cover)
+				utils.CopyObject(&book, &list)
+				lists = append(lists, list)
+			}
+			data[cid] = lists
+		}
+	}
+
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"books": data})
 }
 
 func (this *CommonController) Read() {

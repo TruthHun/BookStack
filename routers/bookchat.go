@@ -15,6 +15,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/banners", &api.CommonController{}, "get:Banners")
 	beego.Router(prefix+"/api/v1/book/categories", &api.CommonController{}, "get:Categories")
 	beego.Router(prefix+"/api/v1/book/lists", &api.CommonController{}, "get:BookLists")
+	beego.Router(prefix+"/api/v1/book/lists-by-cids", &api.CommonController{}, "get:BookListsByCids")
 	beego.Router(prefix+"/api/v1/book/info", &api.CommonController{}, "get:BookInfo")
 	beego.Router(prefix+"/api/v1/book/menu", &api.CommonController{}, "get:BookMenu")
 	beego.Router(prefix+"/api/v1/search/book", &api.CommonController{}, "get:SearchBook")

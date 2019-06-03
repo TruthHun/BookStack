@@ -2,9 +2,10 @@ package api
 
 import (
 	"fmt"
-	"github.com/TruthHun/BookStack/utils"
 	"strings"
 	"time"
+
+	"github.com/TruthHun/BookStack/utils"
 
 	"github.com/TruthHun/BookStack/models"
 
@@ -99,7 +100,6 @@ const (
 //###################################//
 
 func (this *BaseController) Response(httpStatus int, message string, data ...interface{}) {
-	this.Ctx.ResponseWriter.Header().Set("Powered By", "BookChat")
 	this.Ctx.Output.SetStatus(httpStatus)
 	resp := APIResponse{Message: message}
 	if len(data) > 0 {
@@ -128,5 +128,8 @@ func (this *BaseController) isLogin() (uid int) {
 }
 
 func (this *BaseController) completeLink(path string) string {
+	if path == "" {
+		return ""
+	}
 	return utils.JoinURL(models.GetAPIStaticDomain(), path)
 }
