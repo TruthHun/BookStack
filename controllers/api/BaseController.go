@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/TruthHun/BookStack/utils"
@@ -48,7 +47,7 @@ type APIBook struct {
 	CntScore    int       `json:"cnt_score"`   // 评分个数
 	CntComment  int       `json:"cnt_comment"` // 评论人数
 	DocCount    int       `json:"cnt_doc"`     // 章节数量
-	ModifyTime  time.Time `json:"updated_at"`  // 更新时间
+	ReleaseTime time.Time `json:"updated_at"`  // 更新时间。这里用书籍的release_time 作为最后的更新时间。因为现有的更新时间不准
 	CreateTime  time.Time `json:"created_at"`  // 新建时间
 	MemberId    int       `json:"uid,omitempty"`
 	User        string    `json:"user,omitempty"`       // 分享人
@@ -106,10 +105,6 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 		resp.Data = data[0]
 	}
 
-	// support gzip
-	if strings.ToLower(this.Ctx.Request.Header.Get("content-encoding")) == "gzip" {
-		// TODO
-	}
 	this.Data["json"] = resp
 	this.ServeJSON()
 	this.StopRun()

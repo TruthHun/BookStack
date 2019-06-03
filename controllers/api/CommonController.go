@@ -465,7 +465,7 @@ func (this *CommonController) BookLists() {
 	model := models.NewBook()
 
 	fields := []string{"book_id", "book_name", "identify", "order_index", "description", "label", "doc_count",
-		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time",
+		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time", "release_time",
 	}
 
 	books, total, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
@@ -518,7 +518,7 @@ func (this *CommonController) BookListsByCids() {
 	model := models.NewBook()
 
 	fields := []string{"book_id", "book_name", "identify", "order_index", "description", "label", "doc_count",
-		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time",
+		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time", "release_time",
 	}
 	data := make(map[int]interface{})
 	for _, cid := range cidArr {
