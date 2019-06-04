@@ -389,7 +389,7 @@ func (this *CommonController) BookInfo() {
 	apiBook.Cover = this.completeLink(apiBook.Cover)
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
 
-	this.Response(http.StatusOK, messageSuccess, apiBook)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"book": apiBook})
 }
 
 // 返回用户对该章节是否已读
