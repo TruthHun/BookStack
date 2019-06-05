@@ -34,7 +34,7 @@ func (this *LocalhostController) RenderMarkdown() {
 				content := this.GetString("content")
 				doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 				if err == nil {
-					doc.Find("blockquote br").Each(func(i int, selection *goquery.Selection) {
+					doc.Find("br").Each(func(i int, selection *goquery.Selection) {
 						selection.Remove()
 					})
 					content, _ = doc.Find("body").Html()
