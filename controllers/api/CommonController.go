@@ -61,7 +61,7 @@ func (this *CommonController) login(member models.Member) {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
-	user.Avatar = this.completeLink(user.Avatar)
+	user.Avatar = this.completeLink(utils.ShowImg(user.Avatar, "avatar"))
 	this.Response(http.StatusOK, messageSuccess, user)
 }
 
@@ -149,7 +149,7 @@ func (this *CommonController) getFansOrFollow(isGetFans bool) {
 	for _, item := range fans {
 		user := &APIUser{}
 		utils.CopyObject(&item, user)
-		user.Avatar = this.completeLink(user.Avatar)
+		user.Avatar = this.completeLink(utils.ShowImg(user.Avatar, "avatar"))
 		users = append(users, *user)
 	}
 
@@ -186,7 +186,7 @@ func (this *CommonController) UserReleaseBook() {
 	for _, item := range res {
 		book := &APIBook{}
 		utils.CopyObject(item, book)
-		book.Cover = this.completeLink(book.Cover)
+		book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 		books = append(books, *book)
 	}
 	data := map[string]interface{}{"total": totalCount}
@@ -258,7 +258,7 @@ func (this *CommonController) SearchBook() {
 		books, _ := models.NewBook().GetBooksById(ids)
 		for _, item := range books {
 			utils.CopyObject(&item, &book)
-			book.Cover = this.completeLink(book.Cover)
+			book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 			apiBooks = append(apiBooks, book)
 		}
 		data["result"] = apiBooks
@@ -386,7 +386,7 @@ func (this *CommonController) BookInfo() {
 
 	utils.CopyObject(book, &apiBook)
 
-	apiBook.Cover = this.completeLink(apiBook.Cover)
+	apiBook.Cover = this.completeLink(utils.ShowImg(apiBook.Cover, "cover"))
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
 
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"book": apiBook})
@@ -475,7 +475,7 @@ func (this *CommonController) BookLists() {
 		var list APIBook
 
 		for _, book := range books {
-			book.Cover = this.completeLink(book.Cover)
+			book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 			utils.CopyObject(&book, &list)
 			lists = append(lists, list)
 		}
@@ -527,7 +527,7 @@ func (this *CommonController) BookListsByCids() {
 			var lists []APIBook
 			var list APIBook
 			for _, book := range books {
-				book.Cover = this.completeLink(book.Cover)
+				book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 				utils.CopyObject(&book, &list)
 				lists = append(lists, list)
 			}
@@ -699,7 +699,7 @@ func (this *CommonController) Bookshelf() {
 		book := &APIBook{}
 		utils.CopyObject(&item, book)
 		booksId = append(booksId, book.BookId)
-		book.Cover = this.completeLink(book.Cover)
+		book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 		books = append(books, *book)
 	}
 
@@ -744,7 +744,7 @@ func (this *CommonController) GetComments() {
 
 	if len(comments) > 0 {
 		for idx, _ := range comments {
-			comments[idx].Avatar = this.completeLink(comments[idx].Avatar)
+			comments[idx].Avatar = this.completeLink(utils.ShowImg(comments[idx].Avatar, "avatar"))
 		}
 		data["comments"] = comments
 	}
@@ -762,7 +762,7 @@ func (this *CommonController) RelatedBook() {
 	for _, item := range res {
 		book := APIBook{}
 		utils.CopyObject(&item, &book)
-		book.Cover = this.completeLink(book.Cover)
+		book.Cover = this.completeLink(utils.ShowImg(book.Cover, "cover"))
 		books = append(books, book)
 	}
 	data := map[string]interface{}{"books": []string{}}
