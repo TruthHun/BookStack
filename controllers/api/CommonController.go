@@ -62,7 +62,7 @@ func (this *CommonController) login(member models.Member) {
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
 	user.Avatar = this.completeLink(utils.ShowImg(user.Avatar, "avatar"))
-	this.Response(http.StatusOK, messageSuccess, user)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"user": user})
 }
 
 // 【OK】
