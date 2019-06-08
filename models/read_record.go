@@ -86,6 +86,8 @@ func (this *ReadRecord) Add(docId, uid int) (err error) {
 			CreateAt: int(time.Now().Unix()),
 		}
 
+		go new(Star).SetLastReadTime(uid, doc.BookId)
+
 		o.QueryTable(tableReadRecord).Filter("doc_id", docId).Filter("uid", uid).One(&r, "id")
 		readCnt := 1
 		if r.Id > 0 { //先删再增，以便根据主键id索引的倒序查询列表

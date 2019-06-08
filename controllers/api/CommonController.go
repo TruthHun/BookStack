@@ -155,7 +155,7 @@ func (this *CommonController) getFansOrFollow(isGetFans bool) {
 
 	data := map[string]interface{}{"total": totalCount}
 	if len(users) > 0 {
-		data["fans"] = users
+		data["users"] = users
 	}
 	this.Response(http.StatusOK, messageSuccess, data)
 }
@@ -748,9 +748,14 @@ func (this *CommonController) Bookshelf() {
 		books = append(books, *book)
 	}
 
-	read := new(models.ReadRecord).BooksProgress(uid, booksId...)
+	data := map[string]interface{}{"total": total}
 
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"books": books, "total": total, "readed": read})
+	if len(booksId) > 0 {
+		data["readed"] = new(models.ReadRecord).BooksProgress(uid, booksId...)
+		data["books"] = books
+	}
+
+	this.Response(http.StatusOK, messageSuccess, data)
 }
 
 // 查询书籍评论

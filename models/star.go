@@ -3,14 +3,16 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 )
 
 type Star struct {
-	Id  int
-	Uid int `orm:"index"` //用户id,user id
-	Bid int //书籍id,book id
+	Id       int
+	Uid      int `orm:"index"` //用户id,user id
+	Bid      int //书籍id,book id
+	LastRead int `orm:"index;default(0)"` //最后阅读书剑
 }
 
 // 多字段唯一键
@@ -81,9 +83,13 @@ func (this *Star) List(uid, p, listRows int) (cnt int64, books []StarResult, err
 	filter := o.QueryTable("md_star").Filter("uid", uid)
 	//这里先暂时每次都统计一次用户的收藏数量。合理的做法是在用户表字段中增加一个收藏计数
 	if cnt, _ = filter.Count(); cnt > 0 {
-		sql := `select b.*,m.nickname from md_books b left join md_star s on s.bid=b.book_id left join md_members m on m.member_id=b.member_id where s.uid=? order by id desc limit %v offset %v`
+		sql := `select b.*,m.nickname from md_books b left join md_star s on s.bid=b.book_id left join md_members m on m.member_id=b.member_id where s.uid=? order by last_read desc,id desc limit %v offset %v`
 		sql = fmt.Sprintf(sql, listRows, (p-1)*listRows)
 		_, err = o.Raw(sql, uid).QueryRows(&books)
 	}
 	return
+}
+
+func (this *Star) SetLastReadTime(uid, bid int) {
+	orm.NewOrm().QueryTable(this).Filter("uid", uid).Filter("bid", bid).Update(orm.Params{"last_read": time.Now().Unix()})
 }
