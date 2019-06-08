@@ -716,9 +716,21 @@ func (this *CommonController) Bookshelf() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
-	size := 1000
+	size, _ := this.GetInt("size", 10)
+	if size <= 10 {
+		size = 10
+	}
 
-	total, res, err := new(models.Star).List(uid, 1, size)
+	if size > maxPageSize {
+		size = maxPageSize
+	}
+
+	page, _ := this.GetInt("page", 1)
+	if page <= 0 {
+		page = 1
+	}
+
+	total, res, err := new(models.Star).List(uid, page, size)
 	if err != nil {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
