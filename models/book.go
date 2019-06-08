@@ -182,7 +182,6 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	if len(PrivatelyOwned) > 0 {
 		sql1 = sql1 + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
 	}
-
 	err = o.Raw(sql1, memberId).QueryRow(&totalCount)
 	if err != nil {
 		return
@@ -190,15 +189,13 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 
 	offset := (pageIndex - 1) * pageSize
 	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
-		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ?" +
-		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel1 ON book.book_id=rel1.book_id  AND rel1.role_id=0" +
-		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel1.member_id=m.member_id " +
+		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? AND rel.role_id=0" +
+		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
 
 	if len(PrivatelyOwned) > 0 {
 		sql2 = fmt.Sprintf(sql2, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
 	}
-
 	_, err = o.Raw(sql2, memberId).QueryRows(&books)
 	if err != nil {
 		logs.Error("分页查询项目列表 => ", err)
