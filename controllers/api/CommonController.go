@@ -160,6 +160,33 @@ func (this *CommonController) getFansOrFollow(isGetFans bool) {
 	this.Response(http.StatusOK, messageSuccess, data)
 }
 
+// 查询用户的公开信息
+func (this *CommonController) UserInfo() {
+	uid, _ := this.GetInt("uid")
+	if uid <= 0 {
+		uid = this.isLogin()
+	}
+	if uid <= 0 {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+	member, err := models.NewMember().Find(uid)
+	if err != nil && err != orm.ErrNoRows {
+		beego.Error(err.Error())
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	if member.MemberId == 0 {
+		this.Response(http.StatusNotFound, messageNotFound)
+	}
+	var user APIUser
+	utils.CopyObject(member, &user)
+
+	// 由于是公开信息，不显示用户email
+	user.Email = ""
+	user.Uid = member.MemberId
+	user.Avatar = this.completeLink(utils.ShowImg(user.Avatar, "avatar"))
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"user": user})
+}
+
 // 如果不传用户id，则表示查询当前登录的用户发布的书籍
 func (this *CommonController) UserReleaseBook() {
 	uid, _ := this.GetInt("uid")
@@ -175,7 +202,13 @@ func (this *CommonController) UserReleaseBook() {
 	if page <= 0 {
 		page = 1
 	}
-	size := 10
+	size, _ := this.GetInt("size", 10)
+	if size <= 10 {
+		size = 10
+	}
+	if size > maxPageSize {
+		size = maxPageSize
+	}
 
 	res, totalCount, err := models.NewBook().FindToPager(page, size, uid, 0)
 	if err != nil {

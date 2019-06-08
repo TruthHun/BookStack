@@ -25,6 +25,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/book/bookmark", &api.LoginedController{}, "delete:DeleteBookmarks")
 	beego.Router(prefix+"/api/v1/book/download", &api.CommonController{}, "get:Download")
 	beego.Router(prefix+"/api/v1/book/read", &api.CommonController{}, "get:Read")
+	beego.Router(prefix+"/api/v1/user/info", &api.CommonController{}, "get:UserInfo")
 	beego.Router(prefix+"/api/v1/user/release", &api.CommonController{}, "get:UserReleaseBook")
 	beego.Router(prefix+"/api/v1/user/fans", &api.CommonController{}, "get:UserFans")
 	beego.Router(prefix+"/api/v1/user/follow", &api.CommonController{}, "get:UserFollow")

@@ -24,7 +24,7 @@ type APIResponse struct {
 type APIUser struct {
 	Uid         int    `json:"uid"`
 	Token       string `json:"token,omitempty"`
-	Account     string `json:"username"` //对应 member.account
+	Account     string `json:"username,omitempty"` //对应 member.account
 	Nickname    string `json:"nickname"`
 	Email       string `json:"email,omitempty"`
 	Phone       string `json:"phone,omitempty"`
