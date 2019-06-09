@@ -167,6 +167,9 @@ func (this *CommonController) UserInfo() {
 		uid = this.isLogin()
 	}
 	if uid <= 0 {
+		if this.Token != "" {
+			this.Response(http.StatusUnauthorized, messageRequiredLogin)
+		}
 		this.Response(http.StatusNotFound, messageNotFound)
 	}
 	member, err := models.NewMember().Find(uid)
@@ -713,6 +716,9 @@ func (this *CommonController) Bookshelf() {
 	}
 
 	if uid <= 0 {
+		if this.Token != "" {
+			this.Response(http.StatusUnauthorized, messageRequiredLogin)
+		}
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 

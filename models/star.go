@@ -56,8 +56,8 @@ func (this *Star) Star(uid, bid int) (cancel bool, err error) {
 		cancel = true
 	} else { //添加收藏
 		cancel = false
-		if _, err = o.Insert(&star); err == nil {
-			//收藏计数+1
+		star.LastRead = int(time.Now().Unix())
+		if _, err = o.Insert(&star); err == nil { //收藏计数+1
 			SetIncreAndDecre("md_books", "star", "book_id="+strconv.Itoa(bid), true, 1)
 		}
 	}
