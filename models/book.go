@@ -581,7 +581,7 @@ func (m *Book) Replace(bookId int, src, dst string) {
 	}
 }
 
-// 根据书籍id获取书籍
+// 根据书籍id获取(公开的)书籍
 func (m *Book) GetBooksById(id []int, fields ...string) (books []Book, err error) {
 
 	var bs []Book

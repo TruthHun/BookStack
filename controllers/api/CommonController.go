@@ -354,7 +354,12 @@ func (this *CommonController) SearchDoc() {
 	data := map[string]interface{}{"total": total}
 
 	if len(ids) > 0 {
-		var result []models.DocResult
+		var (
+			result    []models.DocResult
+			bookIds   []int
+			bookIdMap = make(map[int]bool)
+			bookInfo  = make(map[int]string) // bookId:bookName
+		)
 		if bookId > 0 {
 			result, _ = models.NewDocumentSearchResult().GetDocsById(ids, true)
 		} else {
@@ -365,8 +370,26 @@ func (this *CommonController) SearchDoc() {
 			if len(doc.Release) > 0 {
 				doc.Release = beego.Substr(utils.GetTextFromHtml(doc.Release), 0, 150) + "..."
 			}
+			if _, ok := bookIdMap[doc.BookId]; !ok {
+				bookIdMap[doc.BookId] = true
+				bookIds = append(bookIds, doc.BookId)
+			}
 			docs = append(docs, doc)
 		}
+
+		books, _ := models.NewBook().GetBooksById(bookIds, "book_id", "book_name")
+		for _, book := range books {
+			bookInfo[book.BookId] = book.BookName
+		}
+		for idx, doc := range docs {
+			if bookName, ok := bookInfo[doc.BookId]; ok {
+				doc.BookName = bookName
+			} else {
+				doc.BookName = "-"
+			}
+			docs[idx] = doc
+		}
+
 		data["result"] = docs
 	}
 	this.Response(http.StatusOK, messageSuccess, data)

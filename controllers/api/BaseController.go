@@ -69,11 +69,12 @@ type APIDoc struct {
 	DocumentName string    `json:"title"`
 	Identify     string    `json:"identify"`
 	BookId       int       `json:"book_id"`
+	BookName     string    `json:"book_name"`
 	OrderSort    int       `json:"sort"`
 	Release      string    `json:"content,omitempty"`
-	CreateTime   time.Time `json:"created_at"`
+	CreateTime   time.Time `json:"created_at,omitempty"`
 	MemberId     int       `json:"uid"`
-	ModifyTime   time.Time `json:"updated_at"`
+	ModifyTime   time.Time `json:"updated_at,omitempty"`
 	Vcnt         int       `json:"vcnt"`
 	Readed       bool      `json:"readed"`
 }
