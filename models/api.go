@@ -2,7 +2,6 @@ package models
 
 import (
 	"strings"
-	"time"
 
 	"github.com/astaxie/beego"
 
@@ -10,7 +9,8 @@ import (
 )
 
 var (
-	staticDomain string
+	staticDomain     string
+	maxLoginTerminal = 10 //允许最大的登录数（这里暂时写死，后面再设置为可以从数据库中进行配置）
 )
 
 func initAPI() {
@@ -22,10 +22,9 @@ func GetAPIStaticDomain() string {
 }
 
 type Auth struct {
-	Id        int
-	Token     string `orm:"size(32);unique"`
-	Uid       int
-	CreatedAt time.Time
+	Id    int
+	Token string `orm:"size(32);unique"`
+	Uid   int    `orm:"index"`
 }
 
 func NewAuth() *Auth {
@@ -40,7 +39,20 @@ func (m *Auth) Insert(token string, uid int) (err error) {
 		beego.Error(err.Error())
 		return
 	}
+	m.clearMoreThanLimit(uid)
 	return
+}
+
+func (m *Auth) clearMoreThanLimit(uid int) {
+	if maxLoginTerminal <= 0 {
+		return
+	}
+	q := orm.NewOrm().QueryTable(m)
+	var auths []Auth
+	q.Filter("uid", uid).OrderBy("-id").Limit(maxLoginTerminal).All(&auths, "id")
+	if len(auths) == maxLoginTerminal {
+		q.Filter("uid", uid).Filter("id__lt", auths[maxLoginTerminal-1].Id).Delete()
+	}
 }
 
 func (m *Auth) GetByToken(token string) (auth Auth) {
