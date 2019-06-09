@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/TruthHun/BookStack/utils"
@@ -113,9 +112,6 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 // 验证access token
 func (this *BaseController) Prepare() {
 	this.Token = this.Ctx.Request.Header.Get("Authorization")
-	if beego.AppConfig.String("runmode") == "dev" {
-		beego.Debug("auth data: ", fmt.Sprintf("%+v", models.NewAuth().AllFromCache()))
-	}
 }
 
 func (this *BaseController) isLogin() (uid int) {
