@@ -447,7 +447,8 @@ func (this *CommonController) BookInfo() {
 
 	apiBook.Cover = this.completeLink(utils.ShowImg(apiBook.Cover, "cover"))
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
-
+	// 这里的map是一定会有值的
+	apiBook.DocReaded = new(models.ReadRecord).BooksProgress(this.isLogin(), apiBook.BookId)[apiBook.BookId]
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"book": apiBook})
 }
 
@@ -780,7 +781,7 @@ func (this *CommonController) Bookshelf() {
 	data := map[string]interface{}{"total": total}
 
 	if len(booksId) > 0 {
-		data["readed"] = new(models.ReadRecord).BooksProgress(uid, booksId...)
+		//data["readed"] = new(models.ReadRecord).BooksProgress(uid, booksId...)
 		data["books"] = books
 	}
 
