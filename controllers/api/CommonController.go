@@ -479,11 +479,7 @@ func (this *CommonController) BookMenu() {
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
 
-	var (
-		docs []APIDoc
-		doc  APIDoc
-	)
-
+	var docs []APIDoc
 	uid := this.isLogin()
 	readed := make(map[int]bool)
 	if uid > 0 {
@@ -494,14 +490,14 @@ func (this *CommonController) BookMenu() {
 	}
 
 	for _, item := range docsOri {
+		var doc APIDoc
 		utils.CopyObject(item, &doc)
-		if _, ok := readed[doc.DocumentId]; ok {
-			doc.Readed = true
+		if val, ok := readed[doc.DocumentId]; ok {
+			doc.Readed = val
 		}
 		docs = append(docs, doc)
 	}
-
-	this.Response(http.StatusOK, messageSuccess, docs)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"menu": docs})
 }
 
 // 【OK】
