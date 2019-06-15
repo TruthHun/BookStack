@@ -1,7 +1,10 @@
 package api
 
 import (
+	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/orm"
 
 	"github.com/TruthHun/BookStack/utils"
 
@@ -126,4 +129,15 @@ func (this *BaseController) completeLink(path string) string {
 		return ""
 	}
 	return utils.JoinURL(models.GetAPIStaticDomain(), path)
+}
+
+// 根据标识查询书籍id，标识可以是数字也可以是字符串
+func (this *BaseController) getBookIdByIdentify(identify string) (bookId int) {
+	bookId, _ = strconv.Atoi(identify)
+	if bookId > 0 {
+		return
+	}
+	book := models.NewBook()
+	orm.NewOrm().QueryTable(book).Filter("identify", identify).One(book, "book_id")
+	return book.BookId
 }

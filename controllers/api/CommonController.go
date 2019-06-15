@@ -311,13 +311,13 @@ func (this *CommonController) SearchDoc() {
 	}
 
 	var (
-		page, _   = this.GetInt("page", 1)
-		size      = 10
-		ids       []int
-		total     int
-		docs      []APIDoc
-		doc       APIDoc
-		bookId, _ = this.GetInt("book_id")
+		page, _ = this.GetInt("page", 1)
+		size    = 10
+		ids     []int
+		total   int
+		docs    []APIDoc
+		doc     APIDoc
+		bookId  = this.getBookIdByIdentify(this.GetString("identify"))
 	)
 
 	if bookId > 0 {
@@ -801,7 +801,7 @@ func (this *CommonController) GetComments() {
 		size = maxPageSize
 	}
 
-	bookId, _ := this.GetInt("book_id")
+	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -831,7 +831,7 @@ func (this *CommonController) GetComments() {
 }
 
 func (this *CommonController) RelatedBook() {
-	bookId, _ := this.GetInt("book_id")
+	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}

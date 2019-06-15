@@ -34,7 +34,7 @@ func (this *LoginedController) Logout() {
 }
 
 func (this *LoginedController) GetBookmarks() {
-	bookId, _ := this.GetInt("book_id")
+	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
 		this.Response(http.StatusOK, messageSuccess, []string{})
 	}
@@ -48,7 +48,7 @@ func (this *LoginedController) GetBookmarks() {
 
 // 收藏书籍(将书籍加入书架)/移除书籍
 func (this *LoginedController) Star() {
-	bookId, _ := this.GetInt("book_id")
+	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
 		this.Response(http.StatusOK, messageSuccess, []string{})
 	}
@@ -148,7 +148,7 @@ func (this *LoginedController) PostComment() {
 	if l := len(content); l < 5 || l > 256 {
 		this.Response(http.StatusBadRequest, "点评内容限定 5 - 256 个字符")
 	}
-	bookId, _ := this.GetInt("book_id")
+	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 
 	if bookId <= 0 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
