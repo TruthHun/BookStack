@@ -21,13 +21,14 @@ type Bookmark struct {
 
 //书签列表
 type bookmarkList struct {
-	Id       int    `json:"id"`
-	Title    string `json:"title"`
-	Identify string `json:"identify"`
-	BookId   int    `json:"book_id"`
-	Uid      int    `json:"uid"`
-	DocId    int    `json:"doc_id"`
-	CreateAt int    `json:"create_at"`
+	Id           int       `json:"id,omitempty"`
+	Title        string    `json:"title"`
+	Identify     string    `json:"identify"`
+	BookId       int       `json:"book_id"`
+	Uid          int       `json:"uid"`
+	DocId        int       `json:"doc_id"`
+	CreateAt     int       `json:"-"`
+	CreateAtTime time.Time `json:"created_at"`
 }
 
 var tableBookmark = "md_bookmark"

@@ -40,10 +40,14 @@ func (this *LoginedController) GetBookmarks() {
 	}
 
 	lists, _, _ := models.NewBookmark().List(this.isLogin(), bookId)
-	if len(lists) > 0 {
-		this.Response(http.StatusOK, messageSuccess, lists)
+
+	for idx, item := range lists {
+		item.Id = 0
+		item.CreateAtTime = time.Unix(int64(item.CreateAt), 0)
+		lists[idx] = item
 	}
-	this.Response(http.StatusOK, messageSuccess, []string{})
+
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"bookmarks": lists})
 }
 
 // 收藏书籍(将书籍加入书架)/移除书籍
