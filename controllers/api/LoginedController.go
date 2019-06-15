@@ -46,6 +46,22 @@ func (this *LoginedController) GetBookmarks() {
 	this.Response(http.StatusOK, messageSuccess, []string{})
 }
 
+// 收藏书籍(将书籍加入书架)/移除书籍
+func (this *LoginedController) Star() {
+	bookId, _ := this.GetInt("book_id")
+	if bookId <= 0 {
+		this.Response(http.StatusOK, messageSuccess, []string{})
+	}
+
+	cancel, err := new(models.Star).Star(this.isLogin(), bookId)
+	data := map[string]bool{"is_cancel": cancel}
+	if err != nil {
+		beego.Error(err.Error())
+	}
+
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"data": data})
+}
+
 func (this *LoginedController) SetBookmarks() {
 	docId, _ := this.GetInt("doc_id")
 	if docId <= 0 {

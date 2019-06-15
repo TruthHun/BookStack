@@ -447,8 +447,10 @@ func (this *CommonController) BookInfo() {
 
 	apiBook.Cover = this.completeLink(utils.ShowImg(apiBook.Cover, "cover"))
 	apiBook.User = models.NewMember().GetNicknameByUid(book.MemberId)
-	// 这里的map是一定会有值的
-	apiBook.DocReaded = new(models.ReadRecord).BooksProgress(this.isLogin(), apiBook.BookId)[apiBook.BookId]
+	apiBook.DocReaded = new(models.ReadRecord).BooksProgress(this.isLogin(), apiBook.BookId)[apiBook.BookId] // 这里的map是一定会有值，所以这样取值
+	if this.isLogin() > 0 {
+		apiBook.IsStar = new(models.Star).DoesStar(this.isLogin(), apiBook.BookId)
+	}
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"book": apiBook})
 }
 

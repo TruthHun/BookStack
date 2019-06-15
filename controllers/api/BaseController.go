@@ -46,13 +46,14 @@ type APIBook struct {
 	CntScore    int       `json:"cnt_score"`   // 评分个数
 	CntComment  int       `json:"cnt_comment"` // 评论人数
 	DocCount    int       `json:"cnt_doc"`     // 章节数量
-	DocReaded   int       `json:"cnt_readed"`  //已读章节
 	ReleaseTime time.Time `json:"updated_at"`  // 更新时间。这里用书籍的release_time 作为最后的更新时间。因为现有的更新时间不准
 	CreateTime  time.Time `json:"created_at"`  // 新建时间
 	MemberId    int       `json:"uid,omitempty"`
 	User        string    `json:"user,omitempty"`       // 分享人
 	Author      string    `json:"author,omitempty"`     // 原作者
 	AuthorURL   string    `json:"author_url,omitempty"` // 原作者连接地址
+	DocReaded   int       `json:"cnt_readed"`           //已读章节
+	IsStar      bool      `json:"is_star"`              //是否已收藏到书架
 	//PrivatelyOwned int       `json:"private"`
 }
 
