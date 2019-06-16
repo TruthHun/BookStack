@@ -665,7 +665,7 @@ func (this *CommonController) Read() {
 			beego.Error(err)
 		} else {
 			for _, tag := range richTextTags {
-				query.Find(tag).AddClass("-" + tag)
+				query.Find(tag).AddClass("-" + tag).RemoveAttr("id")
 			}
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				if src, ok := contentSelection.Attr("src"); ok {

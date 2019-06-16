@@ -1,7 +1,11 @@
 package api
 
 import (
+	"compress/gzip"
+	"encoding/json"
+	"io"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -102,7 +106,9 @@ const (
 )
 
 // 微信小程序支持的 HTML 标签：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
-var richTextTags = []string{"a", "abbr", "address", "article", "aside", "b", "bdi", "bdo", "big", "blockquote", "br", "caption", "center", "cite", "code", "col", "colgroup", "dd", "del", "div", "dl", "dt", "em", "fieldset", "font", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "i", "img", "ins", "label", "legend", "li", "mark", "nav", "ol", "p", "pre", "q", "rt", "ruby",
+var richTextTags = []string{"a", "abbr", "address", "article", "aside", "b", "bdi", "bdo", "big", "blockquote", "br", "caption", "center",
+	"cite", "code", "col", "colgroup", "dd", "del", "div", "dl", "dt", "em", "fieldset", "font", "footer", "h1", "h2", "h3", "h4",
+	"h5", "h6", "header", "hr", "i", "img", "ins", "label", "legend", "li", "mark", "nav", "ol", "p", "pre", "q", "rt", "ruby",
 	"s", "section", "small", "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th", " thead", "tr", "tt", "u", "ul"}
 
 //###################################//
@@ -113,9 +119,21 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 	if len(data) > 0 {
 		resp.Data = data[0]
 	}
-
-	this.Data["json"] = resp
-	this.ServeJSON()
+	returnJSON, err := json.Marshal(resp)
+	if err != nil {
+		beego.Error(err)
+	}
+	this.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
+	if strings.Contains(strings.ToLower(this.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") {
+		this.Ctx.ResponseWriter.Header().Set("Content-Encoding", "gzip")
+		//gzip压缩
+		w := gzip.NewWriter(this.Ctx.ResponseWriter)
+		defer w.Close()
+		w.Write(returnJSON)
+		w.Flush()
+	} else {
+		io.WriteString(this.Ctx.ResponseWriter, string(returnJSON))
+	}
 	this.StopRun()
 }
 
