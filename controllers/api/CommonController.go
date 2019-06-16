@@ -664,6 +664,9 @@ func (this *CommonController) Read() {
 		if err != nil {
 			beego.Error(err)
 		} else {
+			for _, tag := range richTextTags {
+				query.Find(tag).AddClass("-" + tag)
+			}
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				if src, ok := contentSelection.Attr("src"); ok {
 					contentSelection.SetAttr("src", this.completeLink(src))
@@ -681,12 +684,11 @@ func (this *CommonController) Read() {
 		}
 	}
 
-	// TODO: 可能还需要对内容中一些无用的HTML标签或属性进行移除处理，如提出 alt、title 等标签属性
 	var apiDoc APIDoc
 
 	utils.CopyObject(doc, &apiDoc)
 
-	this.Response(http.StatusOK, messageSuccess, apiDoc)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDoc})
 }
 
 // 【OK】
@@ -728,7 +730,7 @@ func (this *CommonController) Download() {
 		"epub": this.completeLink(format + ".epub"),
 	}
 
-	this.Response(http.StatusOK, messageSuccess, data)
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"files": data})
 }
 
 func (this *CommonController) Bookshelf() {

@@ -36,7 +36,7 @@ func (this *LoginedController) Logout() {
 func (this *LoginedController) GetBookmarks() {
 	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
-		this.Response(http.StatusOK, messageSuccess, []string{})
+		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
 	lists, _, _ := models.NewBookmark().List(this.isLogin(), bookId)
@@ -54,7 +54,7 @@ func (this *LoginedController) GetBookmarks() {
 func (this *LoginedController) Star() {
 	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {
-		this.Response(http.StatusOK, messageSuccess, []string{})
+		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
 	cancel, err := new(models.Star).Star(this.isLogin(), bookId)
