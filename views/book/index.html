@@ -51,7 +51,7 @@
                             </form>
                             <div class="list-item clearfix" v-for="item in lists">
                                 <div class="col-sm-2 col-xs-12" style="padding-left: 0px">
-                                    <a :class="item.order_index ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
+                                    <a :class="item.order_index>0 ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
                                         <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="item.cover" alt="">
                                     </a>
                                 </div>

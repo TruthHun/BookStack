@@ -60,8 +60,8 @@
                             </div>
                             <div class="form-group">
                                 <label>排序/推荐</label>
-                                <input type="number" min="0" class="form-control" value="{{.Model.OrderIndex}}" name="order_index" placeholder="项目排序">
-                                <p class="text">只能是数字，序号越大排序越靠前。(默认为0，大于0表示推荐，值越大推荐权重越高)</p>
+                                <input type="number" class="form-control" value="{{.Model.OrderIndex}}" name="order_index" placeholder="项目排序">
+                                <p class="text">数字，越大排序越靠前。(默认为0，大于0表示推荐，值越大推荐权重越高。小于0，表示将内容沉底处理，即不在列表进行显示，但是可以通过搜索等方式检索到)</p>
                             </div>
                             <div class="form-group">
                                 <label>钉子/Pin</label>
