@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/TruthHun/BookStack/models/store"
 
@@ -271,8 +272,10 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	doc.Find("li>a").Each(func(i int, selection *goquery.Selection) {
 		if href, ok := selection.Attr("href"); ok && strings.HasPrefix(href, "$") {
 			href = strings.TrimLeft(strings.Replace(href, "/", "-", -1), "$")
-			hrefs[href] = selection.Text()
-			hrefSlice = append(hrefSlice, href)
+			if utf8.RuneCountInString(href) <= 100 {
+				hrefs[href] = selection.Text()
+				hrefSlice = append(hrefSlice, href)
+			}
 		}
 	})
 	if debug {
@@ -298,18 +301,20 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 				CreateTime:   time.Now(),
 				ModifyTime:   time.Now(),
 			}
-			if docId, err := doc.InsertOrUpdate(); err == nil {
-				ModelStore.InsertOrUpdate(models.DocumentStore{
-					DocumentId: int(docId),
-					Markdown:   "[TOC]\n\r\n\r",
-				})
+			// 如果文档标识超过了规定长度（100），则进行忽略
+			if utf8.RuneCountInString(identify) <= 100 {
+				if docId, err := doc.InsertOrUpdate(); err == nil {
+					if err = ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(docId), Markdown: "[TOC]\n\r\n\r"}); err != nil {
+						beego.Error(err.Error())
+					}
+				}
 			}
 		}
 
 	}
 
 	// 重置所有之前的文档排序
-	qs.Update(orm.Params{"order_sort": 100000})
+	_, _ = qs.Update(orm.Params{"order_sort": 100000})
 
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 		docName := selection.Text()
