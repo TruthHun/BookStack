@@ -326,7 +326,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	o := orm.NewOrm()
 	order := "pin desc" //排序
 	condStr := ""       //查询条件
-	cond := []string{"privately_owned=0"}
+	cond := []string{"privately_owned=0", "order_index>=0"}
 	if len(fields) == 0 {
 		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index", "pin")
 	} else {
@@ -368,7 +368,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	sqlFmt := "select %v from md_books " + condStr
 	fieldStr := strings.Join(fields, ",")
 	sql := fmt.Sprintf(sqlFmt, fieldStr) + " order by " + order + fmt.Sprintf(" limit %v offset %v", pageSize, (pageIndex-1)*pageSize)
-	sqlCount := fmt.Sprintf(sqlFmt, "count(*) cnt")
+	sqlCount := fmt.Sprintf(sqlFmt, "count(book_id) cnt")
 	var params []orm.Params
 	if _, err := o.Raw(sqlCount).Values(&params); err == nil {
 		if len(params) > 0 {
@@ -386,7 +386,7 @@ func (m *Book) homeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 	o := orm.NewOrm()
 	order := ""   //排序
 	condStr := "" //查询条件
-	cond := []string{"b.privately_owned=0"}
+	cond := []string{"b.privately_owned=0", "b.order_index>=0"}
 	if len(fields) == 0 {
 		fields = append(fields, "book_id", "book_name", "identify", "cover", "order_index")
 	}

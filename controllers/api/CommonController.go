@@ -664,6 +664,8 @@ func (this *CommonController) Read() {
 		if err != nil {
 			beego.Error(err)
 		} else {
+			query.Find(".reference-link").Remove()
+			query.Find(".header-link")
 			for _, tag := range richTextTags {
 				query.Find(tag).AddClass("-" + tag).RemoveAttr("id")
 			}

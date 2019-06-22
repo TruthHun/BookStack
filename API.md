@@ -32,6 +32,7 @@ BookStack 配套微信小程序 BookChat API。
 - [ ] 小程序所有触底请求和下拉刷新，都加上`pending`,以表示数据正在请求，避免不断发送请求
 - [ ] 书架还有问题
 - [ ] 查询书籍信息的时候，顺便一同返回有没有收藏该书籍（即加入到书架）
+- [ ] last-modified 实现 HTTP 缓存
 
 ## 功能
 
@@ -66,3 +67,19 @@ BookStack 配套微信小程序 BookChat API。
     - [ ] 书籍下载 - /bookchat/api/v1/book/download
     - [ ] 添加/删除书签 - /bookchat/api/v1/book/bookmark
     - [ ] 首页横幅
+    
+**后期改造：微信小程序404 页面不允许回退，使用redirect进行跳转。在404页面，增加一个返回首页的按钮**
+    
+## 小程序页面实现
+> Promise.all() 改造
+
+- [ ] 增加api cdn 模式的支持。如 /api/v1/lists/base64(page=1&size=2&sxx).json
+
+- [x] 首页
+- [ ] 书籍介绍页面
+    - [x] 书籍信息获取
+    - [x] 相关书籍获取
+    - [ ] 评论获取
+    - [ ] 书籍点评
+    - [ ] 书籍下载？
+    - [ ] 书籍收藏
