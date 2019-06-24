@@ -50,11 +50,11 @@ type Document struct {
 }
 
 // 多字段唯一键
-func (m *Document) TableUnique() [][]string {
-	return [][]string{
-		[]string{"BookId", "Identify"},
-	}
-}
+//func (m *Document) TableUnique() [][]string {
+//	return [][]string{
+//		[]string{"BookId", "Identify"},
+//	}
+//}
 
 // TableName 获取对应数据库表名.
 func (m *Document) TableName() string {

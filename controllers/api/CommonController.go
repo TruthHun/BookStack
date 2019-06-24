@@ -114,13 +114,7 @@ func (this *CommonController) getFansOrFollow(isGetFans bool) {
 	if page <= 0 {
 		page = 1
 	}
-	if size <= 0 {
-		size = 10
-	}
-	if size > maxPageSize {
-		size = maxPageSize
-	}
-
+	size = utils.RangeNumber(size, 10, maxPageSize)
 	uid, _ := this.GetInt("uid")
 	if uid <= 0 {
 		uid = this.isLogin()
@@ -206,12 +200,7 @@ func (this *CommonController) UserReleaseBook() {
 		page = 1
 	}
 	size, _ := this.GetInt("size", 10)
-	if size <= 10 {
-		size = 10
-	}
-	if size > maxPageSize {
-		size = maxPageSize
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	res, totalCount, err := models.NewBook().FindToPager(page, size, uid, 0)
 	if err != nil {
@@ -254,13 +243,7 @@ func (this *CommonController) SearchBook() {
 		book     APIBook
 	)
 
-	if size <= 0 {
-		size = 10
-	}
-
-	if size > maxPageSize {
-		size = maxPageSize
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	client := models.NewElasticSearchClient()
 
@@ -312,7 +295,7 @@ func (this *CommonController) SearchDoc() {
 
 	var (
 		page, _ = this.GetInt("page", 1)
-		size    = 10
+		size, _ = this.GetInt("size", 10)
 		ids     []int
 		total   int
 		docs    []APIDoc
@@ -320,9 +303,11 @@ func (this *CommonController) SearchDoc() {
 		bookId  = this.getBookIdByIdentify(this.GetString("identify"))
 	)
 
+	size = utils.RangeNumber(size, 10, maxPageSize)
+
 	if bookId > 0 {
 		page = 1
-		size = 1000
+		size = 2000
 	}
 
 	client := models.NewElasticSearchClient()
@@ -506,19 +491,13 @@ func (this *CommonController) BookLists() {
 	page, _ := this.GetInt("page", 1)
 	cid, _ := this.GetInt("cid")
 	lang := this.GetString("lang")
-	pageSize, _ := this.GetInt("size", 10)
+	size, _ := this.GetInt("size", 10)
 
 	if page <= 0 {
 		page = 1
 	}
 
-	if page <= 0 {
-		page = 10
-	}
-
-	if pageSize > 20 {
-		pageSize = 20
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	model := models.NewBook()
 
@@ -526,7 +505,7 @@ func (this *CommonController) BookLists() {
 		"vcnt", "star", "lang", "cover", "score", "cnt_score", "cnt_comment", "modify_time", "create_time", "release_time",
 	}
 
-	books, total, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
+	books, total, _ := model.HomeData(page, size, models.BookOrder(sort), lang, cid, fields...)
 	data := map[string]interface{}{"total": total}
 	if len(books) > 0 {
 		var lists []APIBook
@@ -546,7 +525,7 @@ func (this *CommonController) BookListsByCids() {
 	sort := this.GetString("sort", "new") // new、recommend、hot、pin
 	page, _ := this.GetInt("page", 1)
 	lang := this.GetString("lang")
-	pageSize, _ := this.GetInt("size", 10)
+	size, _ := this.GetInt("size", 10)
 	cids := this.GetString("cids")
 
 	var cidArr []int
@@ -565,13 +544,7 @@ func (this *CommonController) BookListsByCids() {
 		page = 1
 	}
 
-	if page <= 0 {
-		page = 10
-	}
-
-	if pageSize > 20 {
-		pageSize = 20
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	model := models.NewBook()
 
@@ -580,7 +553,7 @@ func (this *CommonController) BookListsByCids() {
 	}
 	data := make(map[int]interface{})
 	for _, cid := range cidArr {
-		books, _, _ := model.HomeData(page, pageSize, models.BookOrder(sort), lang, cid, fields...)
+		books, _, _ := model.HomeData(page, size, models.BookOrder(sort), lang, cid, fields...)
 		if len(books) > 0 {
 			var lists []APIBook
 			var list APIBook
@@ -697,7 +670,8 @@ func (this *CommonController) Read() {
 func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
 	banners, _ := models.NewBanner().Lists(t)
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners})
+	// TODO: 直接在这里返回横幅尺寸，不用在小程序文件中进行配置
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners, "size": beego.AppConfig.DefaultString("bannerSize", "825x315")})
 }
 
 func (this *CommonController) Download() {
@@ -749,13 +723,8 @@ func (this *CommonController) Bookshelf() {
 	}
 
 	size, _ := this.GetInt("size", 10)
-	if size <= 10 {
-		size = 10
-	}
 
-	if size > maxPageSize {
-		size = maxPageSize
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	page, _ := this.GetInt("page", 1)
 	if page <= 0 {
@@ -797,13 +766,7 @@ func (this *CommonController) GetComments() {
 		page = 1
 	}
 	size, _ := this.GetInt("size", 10)
-	if size <= 0 {
-		size = 10
-	}
-
-	if size > maxPageSize {
-		size = maxPageSize
-	}
+	size = utils.RangeNumber(size, 10, maxPageSize)
 
 	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 	if bookId <= 0 {

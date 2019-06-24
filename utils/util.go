@@ -757,3 +757,13 @@ func CopyObject(src, dst interface{}) {
 		}
 	}
 }
+
+func RangeNumber(val, min, max int) int {
+	if val > max {
+		return max
+	}
+	if val < min {
+		return min
+	}
+	return val
+}

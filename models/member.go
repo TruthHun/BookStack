@@ -22,7 +22,7 @@ type Member struct {
 	MemberId      int       `orm:"pk;auto;column(member_id)" json:"member_id"`
 	Account       string    `orm:"size(30);unique;column(account)" json:"account"`
 	Nickname      string    `orm:"size(30);unique;column(nickname)" json:"nickname"` //昵称
-	Password      string    `orm:"column(password)" json:"-"`
+	Password      string    `orm:"column(password);size(512)" json:"-"`
 	AuthMethod    string    `orm:"column(auth_method);default(local);size(50);" json:"auth_method"` //认证方式: local 本地数据库 /ldap LDAP
 	Description   string    `orm:"column(description);size(2000)" json:"description"`
 	Email         string    `orm:"size(100);column(email);unique" json:"email"`
