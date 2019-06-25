@@ -638,11 +638,14 @@ func (this *CommonController) Read() {
 			beego.Error(err)
 		} else {
 			query.Find(".reference-link").Remove()
-			query.Find(".header-link")
+			query.Find(".header-link").Remove()
+			// TODO: 把小程序不支持的标签替换成支持的标签
 			for _, tag := range richTextTags {
 				query.Find(tag).AddClass("-" + tag).RemoveAttr("id")
 			}
+			hasImage := false
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
+				hasImage = true
 				if src, ok := contentSelection.Attr("src"); ok {
 					contentSelection.SetAttr("src", this.completeLink(src))
 				}
@@ -655,6 +658,9 @@ func (this *CommonController) Read() {
 				beego.Error(err)
 			} else {
 				doc.Release = html
+			}
+			if strings.TrimSpace(query.Find("body").Text()) == "" && !hasImage {
+				doc.Release = ""
 			}
 		}
 	}
