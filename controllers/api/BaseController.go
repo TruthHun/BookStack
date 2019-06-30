@@ -115,7 +115,6 @@ var richTextTags = []string{"a", "abbr", "address", "article", "aside", "b", "bd
 //###################################//
 
 func (this *BaseController) Response(httpStatus int, message string, data ...interface{}) {
-	this.Ctx.Output.SetStatus(httpStatus)
 	resp := APIResponse{Message: message}
 	if len(data) > 0 {
 		resp.Data = data[0]
@@ -125,9 +124,9 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 		beego.Error(err)
 	}
 	this.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
-	if strings.Contains(strings.ToLower(this.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") {
+	if strings.Contains(strings.ToLower(this.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") { //gzip压缩
 		this.Ctx.ResponseWriter.Header().Set("Content-Encoding", "gzip")
-		//gzip压缩
+		this.Ctx.ResponseWriter.WriteHeader(httpStatus)
 		w := gzip.NewWriter(this.Ctx.ResponseWriter)
 		defer w.Close()
 		w.Write(returnJSON)
