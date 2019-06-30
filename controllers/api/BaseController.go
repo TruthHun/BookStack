@@ -86,6 +86,7 @@ type APIDoc struct {
 	ModifyTime   time.Time `json:"updated_at,omitempty"`
 	Vcnt         int       `json:"vcnt"`
 	Readed       bool      `json:"readed"`
+	Bookmark     bool      `json:"bookmark"`
 }
 
 //###################################//

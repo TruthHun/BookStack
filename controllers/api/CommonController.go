@@ -669,6 +669,8 @@ func (this *CommonController) Read() {
 
 	utils.CopyObject(doc, &apiDoc)
 
+	apiDoc.Bookmark = models.NewBookmark().Exist(this.isLogin(), apiDoc.DocumentId)
+
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDoc})
 }
 
