@@ -637,10 +637,28 @@ func (this *CommonController) Read() {
 		if err != nil {
 			beego.Error(err)
 		} else {
+			allTags := make(map[string]bool)
+			query.Find("*").Each(func(i int, selection *goquery.Selection) {
+				if len(selection.Nodes) > 0 {
+					allTags[strings.ToLower(selection.Nodes[0].Data)] = true
+				}
+			})
+
+			for tag, _ := range allTags {
+				if _, ok := richTextTags[tag]; !ok {
+					query.Find(tag).Each(func(i int, selection *goquery.Selection) {
+						if ret, err := selection.Html(); err == nil {
+							selection.BeforeHtml(ret)
+							selection.Remove()
+						}
+					})
+				}
+			}
+
 			query.Find(".reference-link").Remove()
 			query.Find(".header-link").Remove()
-			// TODO: 把小程序不支持的标签替换成支持的标签
-			for _, tag := range richTextTags {
+
+			for tag, _ := range richTextTags {
 				query.Find(tag).AddClass("-" + tag).RemoveAttr("id")
 			}
 			hasImage := false
@@ -653,13 +671,13 @@ func (this *CommonController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
-			html, err := query.Find("body").Html()
+			html, err := query.Html()
 			if err != nil {
 				beego.Error(err)
 			} else {
 				doc.Release = html
 			}
-			if strings.TrimSpace(query.Find("body").Text()) == "" && !hasImage {
+			if strings.TrimSpace(query.Text()) == "" && !hasImage {
 				doc.Release = ""
 			}
 		}

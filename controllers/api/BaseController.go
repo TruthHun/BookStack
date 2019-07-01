@@ -107,10 +107,14 @@ const (
 )
 
 // 微信小程序支持的 HTML 标签：https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
-var richTextTags = []string{"a", "abbr", "address", "article", "aside", "b", "bdi", "bdo", "big", "blockquote", "br", "caption", "center",
-	"cite", "code", "col", "colgroup", "dd", "del", "div", "dl", "dt", "em", "fieldset", "font", "footer", "h1", "h2", "h3", "h4",
-	"h5", "h6", "header", "hr", "i", "img", "ins", "label", "legend", "li", "mark", "nav", "ol", "p", "pre", "q", "rt", "ruby",
-	"s", "section", "small", "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th", " thead", "tr", "tt", "u", "ul"}
+var richTextTags = map[string]bool{"a": true, "abbr": true, "address": true, "article": true, "aside": true, "b": true,
+	"bdi": true, "bdo": true, "big": true, "blockquote": true, "br": true, "caption": true, "center": true,
+	"cite": true, "code": true, "col": true, "colgroup": true, "dd": true, "del": true, "div": true, "dl": true, "dt": true, "em": true,
+	"fieldset": true, "font": true, "footer": true, "h1": true, "h2": true, "h3": true, "h4": true, "h5": true, "h6": true,
+	"header": true, "hr": true, "i": true, "img": true, "ins": true, "label": true, "legend": true, "li": true, "mark": true,
+	"nav": true, "ol": true, "p": true, "pre": true, "q": true, "rt": true, "ruby": true,
+	"s": true, "section": true, "small": true, "span": true, "strong": true, "sub": true, "sup": true,
+	"table": true, "tbody": true, "td": true, "tfoot": true, "th": true, " thead": true, "tr": true, "tt": true, "u": true, "ul": true}
 
 //###################################//
 
