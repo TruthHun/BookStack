@@ -156,11 +156,11 @@ func (m *Member) Add() error {
 	if ok, err := regexp.MatchString(conf.RegexpEmail, m.Email); !ok || err != nil || m.Email == "" {
 		return errors.New("邮箱格式不正确")
 	}
-	if m.AuthMethod == "local" {
-		if l := strings.Count(m.Password, ""); l < 6 || l >= 50 {
-			return errors.New("密码不能为空且必须在6-50个字符之间")
-		}
+
+	if l := strings.Count(m.Password, ""); l < 6 || l >= 50 {
+		return errors.New("密码不能为空且必须在6-50个字符之间")
 	}
+
 	cond := orm.NewCondition().Or("email", m.Email).Or("nickname", m.Nickname).Or("account", m.Account)
 	var one Member
 	if o.QueryTable(m.TableNameWithPrefix()).SetCond(cond).One(&one, "member_id", "nickname", "account", "email"); one.MemberId > 0 {
