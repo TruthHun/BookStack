@@ -544,7 +544,7 @@ func (this *CommonController) BookListsByCids() {
 		page = 1
 	}
 
-	size = utils.RangeNumber(size, 10, maxPageSize)
+	size = utils.RangeNumber(size, 5, maxPageSize)
 
 	model := models.NewBook()
 
