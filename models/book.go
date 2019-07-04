@@ -298,7 +298,9 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	//删除oss中项目对应的文件夹
 	switch utils.StoreType {
 	case utils.StoreLocal: //删除本地存储，记得加上uploads
-		os.Remove(strings.TrimLeft(m.Cover, "/ ")) //删除封面
+		if m.Cover != beego.AppConfig.DefaultString("cover", "/static/images/book.png") {
+			os.Remove(strings.TrimLeft(m.Cover, "/ ")) //删除封面
+		}
 		go store.ModelStoreLocal.DelFromFolder("uploads/projects/" + m.Identify)
 	case utils.StoreOss:
 		go store.ModelStoreOss.DelOssFolder("projects/" + m.Identify)

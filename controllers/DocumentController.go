@@ -146,6 +146,11 @@ func (this *DocumentController) Index() {
 	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(bookResult.MemberId)
 	this.Data["MyScore"] = new(models.Score).BookScoreByUid(this.Member.MemberId, bookResult.BookId)
 	this.Data["Tab"] = tab
+	if beego.AppConfig.DefaultBool("showWechatCode", false) {
+		wechatCode := models.NewWechatCode()
+		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
+		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
+	}
 
 	//当前默认展示30条评论
 	this.Data["Comments"], _ = new(models.Comments).BookComments(1, 30, bookResult.BookId)
@@ -313,6 +318,12 @@ func (this *DocumentController) Read() {
 				tree, _ = doc.Find("body").Html()
 			}
 		}
+	}
+
+	if beego.AppConfig.DefaultBool("showWechatCode", false) {
+		wechatCode := models.NewWechatCode()
+		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
+		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
 	}
 
 	if wd := this.GetString("wd"); strings.TrimSpace(wd) != "" {

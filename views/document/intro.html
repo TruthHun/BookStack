@@ -22,12 +22,12 @@
                 {{end}}
             </h1>
         </div>
-        <div class="col-sm-3 col-xs-6">
+        <div class="col-sm-3 col-xs-6 col-md-3">
             <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}}">
                 <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
             </div>
         </div>
-        <div class="col-sm-9 col-xs-6">
+        <div class="{{if $.Wxacode}}col-sm-6 col-md-7{{else}}col-sm-9{{end}} col-xs-6">
             <ul class="none-listyle">
                 <li class="bookstack-score"><span>文档评分：</span>
                     <i class="bookstack-star star-{{.Book.Score}}"></i>
@@ -60,6 +60,13 @@
                 </li>
             </ul>
         </div>
+        {{if $.Wxacode}}
+            <div class="col-sm-3 col-md-2 hidden-xs">
+                <img class="img-responsive" src="{{showImg $.Wxacode}}" alt="{{.Book.BookName}} - BookChat 微信小程序阅读码">
+                <div class="help-block text-center">微信扫一扫，知识掌上学</div>
+            </div>
+        {{end}}
+        <div class=""></div>
         <div class="col-xs-12 text-center visible-xs">
             <div class="btn btn-group">
             {{range $index,$val:=.Menu}}

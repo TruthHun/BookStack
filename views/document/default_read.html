@@ -40,7 +40,13 @@
                 <div class="bookstack-item">
                     {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
                     <a title="首页" href="/" class="btn btn-link"><i class="fa fa-home"></i> 首页</a>
+                    {{if $.Wxacode}}
+                    <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalBookChat" class="btn btn-light">
+                        <img src="/static/images/wxacode.png" style="position: relative;top:-2px;" alt="BookChat 小程序"> <span>小程序</span></a>
+                    {{end}}
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-light"><i class="fa fa-cloud-download"></i> 下载</a>
+
+
                     <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-link showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
                     <span class="dropdown">
                         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -199,6 +205,10 @@
 {{template "widgets/qrcode.html" .}}
 
 {{template "widgets/download.html" .}}
+
+{{if $.Wxacode}}
+{{template "widgets/bookchat.html" .}}
+{{end}}
 
 {{template "widgets/bookmark.html" .}}
 

@@ -50,16 +50,22 @@ func GetAccessToken() (token *WechatToken) {
 // 获取书籍页面小程序码
 func GetBookWXACode(accessToken string, bookId int) (tmpFile string, err error) {
 	api := fmt.Sprintf("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + accessToken)
-	data := map[string]string{"page": "pages/intro/intro", "scene": fmt.Sprint(bookId)}
+	data := map[string]interface{}{"page": "pages/intro/intro", "scene": fmt.Sprint(bookId), "width": 280}
 	req := httplib.Post(api).SetTimeout(10*time.Second, 10*time.Second).SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+
 	var resp *http.Response
-	resp, err = req.Body(data).DoRequest()
+	var b []byte
+
+	b, err = json.Marshal(data)
+	if err != nil {
+		return
+	}
+
+	resp, err = req.Body(b).DoRequest()
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-
-	var b []byte
 	b, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return
