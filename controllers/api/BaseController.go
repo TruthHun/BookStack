@@ -147,7 +147,8 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 func (this *BaseController) Prepare() {
 	//在微信小程序中：网络请求的 referer 是不可以设置的，格式固定为 https://servicewechat.com/{appid}/{version}/page-frame.html，其中 {appid} 为小程序的 appid，{version} 为小程序的版本号，版本号为 0 表示为开发版。
 	appId := strings.ToLower(beego.AppConfig.DefaultString("appid", ""))
-	if appId != "" { // 限定请求的微信小程序的appid
+	limitReferer := beego.AppConfig.DefaultBool("limitReferer", false)
+	if appId != "" && limitReferer { // 限定请求的微信小程序的appid
 		prefix := fmt.Sprintf("https://servicewechat.com/%v/", appId)
 		if !strings.HasPrefix(strings.ToLower(this.Ctx.Request.Referer()), prefix) {
 			this.Response(http.StatusNotFound, "not found")
