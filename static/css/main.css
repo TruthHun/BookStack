@@ -782,10 +782,15 @@ a{color: #333}
 .ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;max-width: 100px;}
 .ucenter .fans-item .thumbnail img{border-radius: 50%;max-width: 100px;}
 
+
 .recommend-book:before{
     content: url("../images/recommend-red.png");
     position: absolute;top:5px;left: 22px;
 }
+.bookstack-info .recommend-book:before{
+    top:22px;
+}
+
 .book-list .recommend-book:before,.ucenter .recommend-book:before{left: 7px;}
 
 .manual-header .nav>li>a:focus, .manual-header .nav>li>a:hover{
