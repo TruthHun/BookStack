@@ -829,3 +829,11 @@ a{color: #333}
 .lang-explore .text-muted{color: #999;}
 .lang-explore a{margin-left: 5px;margin-right: 3px;}
 .lang-explore a.active{color: #06f}
+.submit-book{margin-top: 90px;}
+.submit-book p{margin-bottom: 0;}
+.submit-book form{margin-bottom: 30px;}
+.submit-book .form-group{margin-bottom: 30px;}
+.submit-book h1{margin:0 0 50px;font-size: 30px;}
+.submit-book .right{border-left: 1px solid #EFEFEF;line-height: 180%;}
+.submit-book .right div{text-indent: 2em;}
+.submit-book .right strong,.submit-book .right h4{font-weight: normal;color: #000;}

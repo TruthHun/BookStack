@@ -11,6 +11,9 @@ func webRouter() {
 	//beego.Router("/", &controllers.HomeController{}, "*:Index")
 	beego.Router("/explore", &controllers.HomeController{}, "*:Index")
 
+	beego.Router("/submit", &controllers.SubmitController{}, "get:Index")
+	beego.Router("/submit", &controllers.SubmitController{}, "post:Post")
+
 	beego.Router("/login", &controllers.AccountController{}, "*:Login")
 	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")
 	beego.Router("/logout", &controllers.AccountController{}, "*:Logout")

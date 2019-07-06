@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    {{template "widgets/head.html" .}}
+</head>
+<body>
+<div class="manual-reader manual-container">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body submit-book">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 left">
+                <h1>开源书籍和文档收录</h1>
+                <form role="form" method="post" action="{{urlfor "SubmitController.Post"}}" class="ajax-form">
+                    <div class="form-group">
+                        <label>书籍/文档名称 <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control">
+                        <div class="help-block">书籍或文档的名称，以便书栈网小编视情况优先整理</div>
+                    </div>
+                    <div class="form-group">
+                        <label>书籍/文档地址 <span class="text-danger">*</span></label>
+                        <input type="text" name="url" class="form-control">
+                        <div class="help-block">书籍或文档的URL链接地址</div>
+                    </div>
+                    <div class="form-group">
+                        <label>留言</label>
+                        <textarea name="message" class="form-control" rows="5"></textarea>
+                        <div class="help-block">在这里，您可以简单介绍下书籍/文档的内容，或者是留下您想要个小编捎带的话</div>
+                    </div>
+                    <button type="submit" class="btn btn-default btn-block">提交收录</button>
+                </form>
+            </div>
+            <div class="col-xs-12 col-sm-6 right">
+                <h4>书栈介绍</h4>
+                <div class="help-block">分享知识，共享智慧；知识，因分享，传承久远。书栈网，一个专注于开源书籍和文档知识分享的站点。</div>
+                <h4>收录说明</h4>
+                <div class="help-block">
+                    <div>您在阅读学习一门技术，但是文档排版和阅读体验太差？</div>
+                    <div>你们公司需要分发用户手册或者开发手册，增加外链以便SEO优化？</div>
+                    <div>您写了一本开源书籍或一系列博客，想要把所学所知分享给每一位读者？</div>
+                    <div>您在阅读外文开发文档，网速太慢或网络不稳定打不开？</div>
+                    <div><strong>我们帮您解决！</strong></div>
+                    <div>您只需要提交相关链接，我们来负责整理和排版，给你我以及每一位读者良好的阅读体验。</div>
+                    <div>书栈网内容转载分发，遵循 <strong>CC-BY-NC</strong>（<strong>知识共享-署名-非商用</strong>）协议，在转载分发过程中，注明来源，不作商用，并且保留内容中的打赏二维码和赞助链接。</div>
+                </div>
+                <h4>书栈开源</h4>
+                <div class="help-block">
+                    <strong>书栈网 BookStack</strong>
+                    <p>Gitee: <a href="https://gitee.com/truthhun/bookstack" target="_blank">https://gitee.com/truthhun/bookstack</a></p>
+                    <p>GitHub: <a href="https://github.com/truthhun/bookstack" target="_blank">https://github.com/truthhun/bookstack</a></p>
+                    <div><strong>配套微信小程序 BookChat</strong></div>
+                    <p>Gitee: <a href="https://gitee.com/truthhun/BookChat" target="_blank">https://gitee.com/truthhun/BookChat</a></p>
+                    <p>GitHub: <a href="https://github.com/truthhun/bookchat" target="_blank">https://github.com/truthhun/bookchat</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "widgets/footer.html" .}}
+</body>
+</html>
