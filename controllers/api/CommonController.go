@@ -583,7 +583,7 @@ func (this *CommonController) Read() {
 	// 1. 如果书籍是私有的，则必须是作者本人才能阅读，否则无法阅读
 	book := models.NewBook()
 	bookId, _ := strconv.Atoi(bookIdentify)
-	cols := []string{"book_id", "privately_owned", "member_id"}
+	cols := []string{"book_id", "privately_owned", "member_id", "identify"}
 	if bookId > 0 {
 		book, _ = book.Find(bookId, cols...)
 	} else {
@@ -637,6 +637,9 @@ func (this *CommonController) Read() {
 		if err != nil {
 			beego.Error(err)
 		} else {
+			// 处理svg
+			query = utils.HandleSVG(query, book.Identify)
+
 			allTags := make(map[string]bool)
 			query.Find("*").Each(func(i int, selection *goquery.Selection) {
 				if len(selection.Nodes) > 0 {

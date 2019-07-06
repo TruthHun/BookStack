@@ -380,6 +380,9 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		}
 	})
 
+	// 处理svg
+	doc = HandleSVG(doc, project)
+
 	//h1-h6标题中不要存在链接或者图片，所以提取文本
 	Hs := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
 	for _, tag := range Hs {
@@ -446,6 +449,37 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 	cont = cont + from
 
 	return
+}
+
+func HandleSVG(doc *goquery.Document, project string) *goquery.Document {
+	// svg 图片处理
+	doc.Find("svg").Each(func(i int, selection *goquery.Selection) {
+		ret, _ := selection.Parent().Html()
+		width, height := "", ""
+		if val, ok := selection.Attr("width"); ok {
+			width = fmt.Sprintf(` width="%v"`, val)
+		}
+		if val, ok := selection.Attr("height"); ok {
+			height = fmt.Sprintf(` height="%v"`, val)
+		}
+		ret = fmt.Sprintf(`<svg xmlns="http://www.w3.org/2000/svg"%v%v version="1.1">%v</svg>`, width, height, ret)
+		tmpFile := cryptil.Md5Crypt(ret) + ".svg"
+		src := ""
+		ioutil.WriteFile(tmpFile, []byte(ret), os.ModePerm)
+		switch StoreType {
+		case StoreLocal:
+			src = "/uploads/projects/" + project + "/" + filepath.Base(tmpFile)
+			store.ModelStoreLocal.MoveToStore(tmpFile, strings.TrimPrefix(src, "/"))
+		case StoreOss:
+			src = "projects/" + project + "/" + filepath.Base(tmpFile)
+			store.ModelStoreOss.MoveToOss(tmpFile, src, true)
+			src = "/" + src
+		}
+		selection.AfterHtml(fmt.Sprintf(`<img src="%v"/>`, src))
+		selection.Remove()
+		os.Remove(tmpFile) // 删除临时文件
+	})
+	return doc
 }
 
 //操作图片显示

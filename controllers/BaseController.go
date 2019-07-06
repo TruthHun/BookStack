@@ -221,6 +221,9 @@ func (this *BaseController) StaticFile() {
 	ext := filepath.Ext(splat)
 	if strings.Contains(beego.AppConfig.String("StaticExt"), strings.ToLower(ext)) {
 		if b, err := ioutil.ReadFile(splat); err == nil {
+			//if strings.ToLower(ext) == ".svg" {
+			//	this.Ctx.ResponseWriter.Header().Set("content-type", "image/svg+xml")
+			//}
 			this.Ctx.ResponseWriter.Write(b)
 			return
 		}
