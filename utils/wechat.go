@@ -3,14 +3,13 @@ package utils
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-
-	"golang.org/x/tools/go/ssa/interp/testdata/src/errors"
 
 	"github.com/astaxie/beego/httplib"
 

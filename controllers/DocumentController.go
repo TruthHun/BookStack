@@ -146,7 +146,7 @@ func (this *DocumentController) Index() {
 	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(bookResult.MemberId)
 	this.Data["MyScore"] = new(models.Score).BookScoreByUid(this.Member.MemberId, bookResult.BookId)
 	this.Data["Tab"] = tab
-	if beego.AppConfig.DefaultBool("showWechatCode", false) {
+	if beego.AppConfig.DefaultBool("showWechatCode", false) && bookResult.PrivatelyOwned == 0 {
 		wechatCode := models.NewWechatCode()
 		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
 		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
@@ -320,7 +320,7 @@ func (this *DocumentController) Read() {
 		}
 	}
 
-	if beego.AppConfig.DefaultBool("showWechatCode", false) {
+	if beego.AppConfig.DefaultBool("showWechatCode", false) && bookResult.PrivatelyOwned == 0 {
 		wechatCode := models.NewWechatCode()
 		go wechatCode.CreateWechatCode(bookResult.BookId) //如果已经生成了小程序码，则不会再生成
 		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)

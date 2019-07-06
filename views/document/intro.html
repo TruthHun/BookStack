@@ -23,7 +23,7 @@
             </h1>
         </div>
         <div class="col-sm-3 col-xs-6 col-md-3">
-            <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}}">
+            <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}} mgt-15px">
                 <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
             </div>
         </div>

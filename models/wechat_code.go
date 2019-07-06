@@ -1,11 +1,10 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"golang.org/x/tools/go/ssa/interp/testdata/src/errors"
 
 	"github.com/TruthHun/BookStack/models/store"
 
