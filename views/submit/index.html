@@ -40,12 +40,12 @@
                     <div>您在阅读外文开发文档，网速太慢或网络不稳定打不开？</div>
                     <div><strong>我们帮您解决！</strong></div>
                     <div>您只需要提交相关链接，我们来负责整理和排版，给你我以及每一位读者良好的阅读体验。</div>
-                    <div>书栈网内容转载分发，遵循 <strong>CC-BY-NC</strong>（<strong>知识共享-署名-非商用</strong>）协议，在转载分发过程中，注明来源，不作商用，并且保留内容中的打赏二维码和赞助链接。</div>
+                    <div>书栈网内容转载分发，遵循 <strong>CC-BY-NC</strong>（<strong>知识共享-署名-非商用</strong>）协议，在转载分发过程中，注明来源，不作商用，并且保留内容中的打赏二维码和赞助链接等。</div>
                 </div>
                 <h4>书栈开源</h4>
                 <div class="help-block">
                     <strong>书栈网 BookStack</strong>
-                    <p>Gitee: <a href="https://gitee.com/truthhun/bookstack" target="_blank">https://gitee.com/truthhun/bookstack</a></p>
+                    <p>Gitee: <a href="https://gitee.com/truthhun/BookStack" target="_blank">https://gitee.com/truthhun/BookStack</a></p>
                     <p>GitHub: <a href="https://github.com/truthhun/bookstack" target="_blank">https://github.com/truthhun/bookstack</a></p>
                     <div><strong>配套微信小程序 BookChat</strong></div>
                     <p>Gitee: <a href="https://gitee.com/truthhun/BookChat" target="_blank">https://gitee.com/truthhun/BookChat</a></p>
@@ -56,5 +56,22 @@
     </div>
 </div>
 {{template "widgets/footer.html" .}}
+<script src="{{$.StaticDomain}}/static/layer/layer.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        $(".submit-book [type=submit]").click(function (e) {
+            e.preventDefault()
+            var form = $(this).parents("form"),action=form.attr("action");
+            $.post(action,form.serialize(),function (res) {
+                layer.msg(res.message);
+                if(res.errcode==0){
+                    setTimeout(function () {
+                        location.href="/"
+                    },1500)
+                }
+            })
+        });
+    })
+</script>
 </body>
 </html>
