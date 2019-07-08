@@ -1,20 +1,16 @@
 # 程序名称
 appname = BookStack
 
-//https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
 # 微信小程序 appid
 appId=""
 # 微信小程序appSecret
 appSecret=""
 
-# 是否限制API请求
+# 是否限制API请求，也就是如果不是上述配置的微信小程序的appId请求的接口，则直接拒绝
 limitReferer=false
 
-# 是否显示小程序阅读码
+# 是否显示小程序阅读码（需要配置了appScecret才会生效）
 showWechatCode = false
-
-# 程序版本
-version = v1.1
 
 # 监听端口
 httpport = 8181
