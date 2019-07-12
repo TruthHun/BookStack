@@ -34,6 +34,7 @@
                         <strong class="box-title">项目列表</strong>
                         <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加项目</button>
                     </div>
+                    <div class="help-block text-left" style="margin-top: 15px;"><span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span></div>
                     <ul class="nav nav-tabs" style="margin-top: 15px;">
                         <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有项目</a></li>
                         <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开项目</a></li>

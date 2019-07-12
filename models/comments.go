@@ -18,7 +18,7 @@ type Comments struct {
 	BookId     int       `orm:"index"` //文档项目id
 	Content    string    //评论内容
 	TimeCreate time.Time //评论时间
-	//Status     bool      // 审核状态
+	//Status     bool      // 审核状态，true 表示通过
 }
 
 //评分表

@@ -508,6 +508,11 @@ func (this *BookController) Users() {
 
 // Create 创建项目.
 func (this *BookController) Create() {
+	// TODO: 检查用户是否有权限发布内容
+	inspectDays := beego.AppConfig.DefaultInt("inspectDays", 7)
+	if int(time.Now().Unix())-this.Member.CreateAt < inspectDays*24*3600 {
+		this.JsonResult(10086, fmt.Sprintf("新注册用户，考察期【%v天内】暂时不允许创建项目", inspectDays))
+	}
 
 	bookName := strings.TrimSpace(this.GetString("book_name", ""))
 	identify := strings.TrimSpace(this.GetString("identify", ""))
