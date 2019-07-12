@@ -36,6 +36,21 @@ BookStack 配套微信小程序 BookChat API。
 
 ## 功能
 
+`BookChat` v2.0 微信小程序( https://gitee.com/truthhun/BookChat )已经发布了，需要配套 `BookStack` v2.0 以上版本的接口才能正常使用，
+目前`BookStack`相关API已经开发完成，但是对API等的后台管理功能并未完善，
+快的话也需要大半个月时间这样，所以先放出Beta版本，以方便需要调试和对BookChat进行二次开发的朋友。
+
+## 本次主要升级日志
+
+- [x] `BookStack` 配套微信小程序 `BookChat` API接口实现，累计20+个API接口
+- [x] 修复删除项目时误删默认封面的bug
+- [x] HTML内容处理，以兼容微信小程序`rich-text`组件的内容渲染
+- [x] 增加内容收录提交入口
+- [x] 增加网站小程序码功能，打通PC端与移动端一体化阅读浏览
+- [x] 内容采集增强和优化
+
+> 更多升级内容，请查看源码仓库 commit 记录
+
 
 - [ ] 管理后台
     - [ ] 管理员登录
