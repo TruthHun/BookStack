@@ -2,6 +2,7 @@ package store
 
 import (
 	"os"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 )
@@ -31,7 +32,12 @@ func (this *Local) MoveToStore(tmpfile, save string) (err error) {
 	if strings.ToLower(tmpfile) != strings.ToLower(save) { //不是相同文件路径
 
 		os.MkdirAll(filepath.Dir(save), os.ModePerm)
-		err = os.Rename(tmpfile, save)
+		// 不使用rename，因为在docker中会挂载外部卷，导致错误
+		// 见https://gocn.vip/article/178
+		if b, err := ioutil.ReadFile(tmpfile); err == nil {
+			ioutil.WriteFile(save, b, os.ModePerm)
+		}
+		os.Remove(tmpfile)
 	}
 	return
 }
