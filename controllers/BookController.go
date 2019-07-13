@@ -24,6 +24,7 @@ import (
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/TruthHun/gotil/filetil"
 	"github.com/TruthHun/gotil/mdtil"
+	"github.com/TruthHun/html2md"
 	"github.com/TruthHun/gotil/util"
 	"github.com/TruthHun/gotil/ziptil"
 	"github.com/astaxie/beego"
@@ -980,14 +981,23 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 								beego.Error(err)
 							}
 						}
-					} else if ext == ".md" || ext == ".markdown" { //markdown文档，提取文档内容，录入数据库
+					} else if ext == ".md" || ext == ".markdown" || ext == ".html" { //markdown文档，提取文档内容，录入数据库
 						doc := new(models.Document)
+						var mdcont string 
+						var htmlStr string 
 						if b, err := ioutil.ReadFile(file.Path); err == nil {
-							mdcont := strings.TrimSpace(string(b))
+
+							if ext == ".md" || ext == ".markdown" {
+								mdcont = strings.TrimSpace(string(b))
+								
+								htmlStr = mdtil.Md2html(mdcont)
+							}else {
+								htmlStr = string(b)
+								mdcont =  html2md.Convert(htmlStr)
+							}
 							if !strings.HasPrefix(mdcont, "[TOC]") {
 								mdcont = "[TOC]\r\n\r\n" + mdcont
 							}
-							htmlStr := mdtil.Md2html(mdcont)
 							doc.DocumentName = utils.ParseTitleFromMdHtml(htmlStr)
 							doc.BookId = bookId
 							//文档标识
