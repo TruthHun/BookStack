@@ -2,11 +2,16 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xlstudio/wxbizdatacrypt"
+
+	"github.com/TruthHun/BookStack/oauth"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
@@ -25,8 +30,31 @@ type CommonController struct {
 	BaseController
 }
 
-// [OK]
+// 普通登录
 func (this *CommonController) Login() {
+	username := this.GetString("username") //username or email
+	password := this.GetString("password")
+	member, err := models.NewMember().GetByUsername(username)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+		}
+		beego.Error(err)
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	if err != nil {
+		beego.Error(err)
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	if ok, _ := utils.PasswordVerify(member.Password, password); !ok {
+		beego.Error(err)
+		this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+	}
+	this.login(member)
+}
+
+// 已登录状态，绑定微信
+func (this *CommonController) LoginedBindWechat() {
 	username := this.GetString("username") //username or email
 	password := this.GetString("password")
 	member, err := models.NewMember().GetByUsername(username)
@@ -46,8 +74,77 @@ func (this *CommonController) Login() {
 		beego.Error(err)
 		this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
 	}
+	this.login(member)
+}
+
+//
+func (this *CommonController) LoginBindWechat() {
+	form := &WechatBindForm{}
+	err := this.ParseForm(form)
+	if err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	// TODO: 先判断是绑定新注册账号还是已有账号
+
+	member, err := models.NewMember().GetByUsername(form.Username)
+
+	if err != nil {
+		if err == orm.ErrNoRows {
+			this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+		}
+		beego.Error(err)
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	if err != nil {
+		beego.Error(err)
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	if ok, _ := utils.PasswordVerify(member.Password, form.Password); !ok {
+		beego.Error(err)
+		this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+	}
 
 	this.login(member)
+}
+
+// 微信登录
+func (this *CommonController) LoginByWechat() {
+	form := &WechatForm{}
+	err := this.ParseForm(form)
+	if err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	appId, secret := beego.AppConfig.String("appId"), beego.AppConfig.String("appSecret")
+	if form.Code == "" || form.IV == "" || form.EncryptedData == "" {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	sess, err := oauth.GetWechatSessKey(appId, secret, form.Code)
+	if err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	if sess.ErrMsg != "" {
+		this.Response(http.StatusBadRequest, sess.ErrMsg)
+	}
+	m := models.NewWechat()
+	user, err := m.GetUserByOpenid(sess.OpenId)
+	if user.MemberId > 0 { // 之前已经绑定过注册账号，直接登录成功
+		member, _ := models.NewMember().Find(user.MemberId)
+		this.login(*member)
+	}
+	pc := wxbizdatacrypt.WxBizDataCrypt{AppID: appId, SessionKey: sess.SessionKey}
+	result, err := pc.Decrypt(form.EncryptedData, form.IV, true) //第三个参数解释： 需要返回 JSON 数据类型时 使用 true, 需要返回 map 数据类型时 使用 false
+	if err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	wechatUser := &oauth.WechatUser{}
+	if err = json.Unmarshal([]byte(result.(string)), wechatUser); err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	m = &models.Wechat{Openid: sess.OpenId, AvatarURL: wechatUser.AvatarURL, Nickname: wechatUser.NickName, SessKey: sess.SessionKey, Unionid: sess.UnionId}
+	if err = m.Insert(); err != nil {
+		this.Response(http.StatusBadRequest, err.Error())
+	}
+	this.Response(http.StatusUnauthorized, "未绑定账号，请先绑定账号", map[string]string{"sess": sess.SessionKey})
 }
 
 // 【OK】

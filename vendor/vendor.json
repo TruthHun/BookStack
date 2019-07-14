@@ -9,6 +9,12 @@
 			"revisionTime": "2019-05-10T10:23:35Z"
 		},
 		{
+			"checksumSHA1": "qVj6XWX2yikGGu0veyb0ynP4bAY=",
+			"path": "github.com/xlstudio/wxbizdatacrypt",
+			"revision": "c3e116880c11028814d49584074d92a6ddec40bd",
+			"revisionTime": "2019-04-18T11:14:44Z"
+		},
+		{
 			"path": "google.golang.org/appengine/cloudsql",
 			"revision": ""
 		}

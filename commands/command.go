@@ -81,6 +81,7 @@ func RegisterModel() {
 		models.NewAuth(),
 		models.NewBanner(),
 		models.NewWechatCode(),
+		models.NewWechat(),
 	)
 	migrate.RegisterMigration()
 }

@@ -91,6 +91,21 @@ type APIDoc struct {
 	Bookmark     bool      `json:"bookmark"`
 }
 
+type WechatForm struct {
+	IV            string `form:"iv"`
+	EncryptedData string `form:"encryptedData"`
+	Code          string `form:"code"`
+}
+
+type WechatBindForm struct {
+	Username   string `form:"username"`
+	Password   string `form:"password"`
+	RePassword string `form:"re_password"`
+	Nickname   string `form:"nickname"`
+	Email      string `form:"email"`
+	Sess       string `form:"sess"`
+}
+
 //###################################//
 
 const (
