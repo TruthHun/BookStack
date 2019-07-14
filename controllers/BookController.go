@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -1002,10 +1003,25 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 							doc.BookId = bookId
 							//文档标识
 							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, projectRoot), "/"), "/", "-", -1)
+							doc.Identify = strings.Replace(doc.Identify, ")", "", -1)
+							
 							doc.MemberId = this.Member.MemberId
 							doc.OrderSort = 1
 							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
 								doc.OrderSort = 0
+							}
+							if strings.HasSuffix(strings.ToLower(file.Name), "summary.html") {
+								mdcont += "<bookstack-summary></bookstack-summary>"
+								// 生成带$的文档标识，阅读BaseController.go代码可知，
+								// 要使用summary.md的排序功能，必须在链接中带上符号$
+								mdcont = strings.Replace(mdcont, "](", "]($", -1) 
+
+								// 去掉可能存在的url编码的右括号，否则在url译码后会与markdown语法混淆
+								mdcont = strings.Replace(mdcont, "%29", "", -1)
+								mdcont,_ = url.QueryUnescape(mdcont)
+								
+								doc.OrderSort = 0
+								doc.Identify = "summary.md"
 							}
 							if docId, err := doc.InsertOrUpdate(); err == nil {
 								if err := ModelStore.InsertOrUpdate(models.DocumentStore{
