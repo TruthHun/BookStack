@@ -49,6 +49,11 @@
                             <input type="file" name="zipfile" accept="application/zip">
                             <input type="text" name="identify" value="">
                             </form>
+
+                            <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadEpub">
+                                <input type="file" name="zipfile" accept=".epub">
+                                <input type="text" name="identify" value="">
+                            </form>
                             <div class="list-item clearfix" v-for="item in lists">
                                 <div class="col-sm-2 col-xs-12" style="padding-left: 0px">
                                     <a :class="item.order_index ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
@@ -115,6 +120,11 @@
                                                 <span class="sr-only">Toggle Dropdown</span>
                                             </button>
                                             <ul class="dropdown-menu">
+                                                <li>
+                                                    <a href="javascript:void(0);" class="btn-upload-epub" data-toggle="tooltip" :data-identify="item.identify" title="支持epub格式电子书导入。">
+                                                        <i class="fa fa-cloud-upload"></i> EPUB 上传导入
+                                                    </a>
+                                                </li>
                                                 <li>
                                                     <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">
                                                         <i class="fa fa-cloud-upload"></i> ZIP 上传导入
@@ -304,6 +314,21 @@
             if($(this).val() && confirm("您确定要上传 "+$(this).val()+" 吗？")){
                 $(".btn-upload-zip").addClass("disabled");
                 $("#uploadZip").submit();
+            }
+        });
+
+         //批量上传文档图片[要放在vue执行代码的后面，否则获取不到identify的值]
+         $(".btn-upload-epub").click(function () {
+            var _this=$(this),identify=_this.attr("data-identify"),form=$("form#uploadEpub");
+            form.find("[name=identify]").val(identify);
+            form.find("input[type=file]").trigger("click");
+        });
+
+        //change事件处理
+        $("#uploadEpub input[type=file]").change(function () {
+            if($(this).val() && confirm("您确定要上传 "+$(this).val()+" 吗？")){
+                $(".btn-upload-epub").addClass("disabled");
+                $("#uploadEpub").submit();
             }
         });
 

@@ -915,8 +915,8 @@ func (this *BookController) UploadProject() {
 		this.JsonResult(1, err.Error())
 	}
 	defer f.Close()
-	if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" {
-		this.JsonResult(1, "请上传zip格式文件")
+	if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" && strings.ToLower(filepath.Ext(h.Filename)) != ".epub" {
+		this.JsonResult(1, "请上传指定格式文件")
 	}
 	tmpFile := "store/" + identify + ".zip" //保存的文件名
 	if err := this.SaveToFile("zipfile", tmpFile); err == nil {
@@ -1004,7 +1004,7 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 							//文档标识
 							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, projectRoot), "/"), "/", "-", -1)
 							doc.Identify = strings.Replace(doc.Identify, ")", "", -1)
-							
+
 							doc.MemberId = this.Member.MemberId
 							doc.OrderSort = 1
 							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
