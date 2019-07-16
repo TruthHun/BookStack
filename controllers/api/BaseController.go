@@ -92,9 +92,8 @@ type APIDoc struct {
 }
 
 type WechatForm struct {
-	IV            string `form:"iv"`
-	EncryptedData string `form:"encryptedData"`
-	Code          string `form:"code"`
+	UserInfo string `form:"userInfo"`
+	Code     string `form:"code"`
 }
 
 type WechatBindForm struct {

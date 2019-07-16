@@ -157,7 +157,7 @@ func (m *Member) Add() error {
 		return errors.New("邮箱格式不正确")
 	}
 
-	if l := strings.Count(m.Password, ""); l < 6 || l >= 50 {
+	if l := strings.Count(m.Password, ""); l < 7 || l >= 50 {
 		return errors.New("密码不能为空且必须在6-50个字符之间")
 	}
 
@@ -174,9 +174,9 @@ func (m *Member) Add() error {
 			return errors.New("用户名已存在，请更换用户名")
 		}
 	}
-	//if c, err := o.QueryTable(m.TableNameWithPrefix()).Filter("email", m.Email).Count(); err == nil && c > 0 {
-	//	return errors.New("邮箱已被使用")
-	//}
+
+	// 这里必需设置为普通用户，避免采坑：普通用户注册的时候注册成了管理员...
+	m.Role = conf.MemberGeneralRole
 
 	hash, err := utils.PasswordHash(m.Password)
 
