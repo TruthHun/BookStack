@@ -51,7 +51,7 @@ func (this *CommonController) Login() {
 	this.login(member)
 }
 
-// 已登录状态，绑定微信
+// TODO: 已登录状态，绑定微信
 func (this *CommonController) LoginedBindWechat() {
 	username := this.GetString("username") //username or email
 	password := this.GetString("password")
@@ -109,6 +109,9 @@ func (this *CommonController) LoginBindWechat() {
 		}
 		if form.Nickname == "" || form.Email == "" || form.RePassword == "" {
 			this.Response(http.StatusBadRequest, messageBadRequest)
+		}
+		if we.AvatarURL == "" {
+			we.AvatarURL = conf.GetDefaultAvatar()
 		}
 		member = &models.Member{
 			Account:  form.Username,
@@ -192,6 +195,9 @@ func (this *CommonController) login(member models.Member) {
 
 // 【OK】
 func (this *CommonController) Register() {
+
+	this.Response(http.StatusBadRequest, "请升级到最新版微信小程序")
+
 	var register APIRegister
 	err := this.ParseForm(&register)
 	if err != nil {
