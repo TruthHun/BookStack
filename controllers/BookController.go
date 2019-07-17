@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -24,6 +25,7 @@ import (
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/TruthHun/gotil/filetil"
 	"github.com/TruthHun/gotil/mdtil"
+	"github.com/TruthHun/html2md"
 	"github.com/TruthHun/gotil/util"
 	"github.com/TruthHun/gotil/ziptil"
 	"github.com/astaxie/beego"
@@ -918,8 +920,8 @@ func (this *BookController) UploadProject() {
 		this.JsonResult(1, err.Error())
 	}
 	defer f.Close()
-	if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" {
-		this.JsonResult(1, "请上传zip格式文件")
+	if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" && strings.ToLower(filepath.Ext(h.Filename)) != ".epub" {
+		this.JsonResult(1, "请上传指定格式文件")
 	}
 	tmpFile := "store/" + identify + ".zip" //保存的文件名
 	if err := this.SaveToFile("zipfile", tmpFile); err == nil {
@@ -985,22 +987,46 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 								beego.Error(err)
 							}
 						}
-					} else if ext == ".md" || ext == ".markdown" { //markdown文档，提取文档内容，录入数据库
+					} else if ext == ".md" || ext == ".markdown" || ext == ".html" { //markdown文档，提取文档内容，录入数据库
 						doc := new(models.Document)
+						var mdcont string 
+						var htmlStr string 
 						if b, err := ioutil.ReadFile(file.Path); err == nil {
-							mdcont := strings.TrimSpace(string(b))
+
+							if ext == ".md" || ext == ".markdown" {
+								mdcont = strings.TrimSpace(string(b))
+								
+								htmlStr = mdtil.Md2html(mdcont)
+							}else {
+								htmlStr = string(b)
+								mdcont =  html2md.Convert(htmlStr)
+							}
 							if !strings.HasPrefix(mdcont, "[TOC]") {
 								mdcont = "[TOC]\r\n\r\n" + mdcont
 							}
-							htmlStr := mdtil.Md2html(mdcont)
 							doc.DocumentName = utils.ParseTitleFromMdHtml(htmlStr)
 							doc.BookId = bookId
 							//文档标识
 							doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, projectRoot), "/"), "/", "-", -1)
+							doc.Identify = strings.Replace(doc.Identify, ")", "", -1)
+
 							doc.MemberId = this.Member.MemberId
 							doc.OrderSort = 1
 							if strings.HasSuffix(strings.ToLower(file.Name), "summary.md") {
 								doc.OrderSort = 0
+							}
+							if strings.HasSuffix(strings.ToLower(file.Name), "summary.html") {
+								mdcont += "<bookstack-summary></bookstack-summary>"
+								// 生成带$的文档标识，阅读BaseController.go代码可知，
+								// 要使用summary.md的排序功能，必须在链接中带上符号$
+								mdcont = strings.Replace(mdcont, "](", "]($", -1) 
+
+								// 去掉可能存在的url编码的右括号，否则在url译码后会与markdown语法混淆
+								mdcont = strings.Replace(mdcont, "%29", "", -1)
+								mdcont,_ = url.QueryUnescape(mdcont)
+								
+								doc.OrderSort = 0
+								doc.Identify = "summary.md"
 							}
 							if docId, err := doc.InsertOrUpdate(); err == nil {
 								if err := ModelStore.InsertOrUpdate(models.DocumentStore{
