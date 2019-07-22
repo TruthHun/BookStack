@@ -177,7 +177,7 @@ func (this *ManagerController) ChangeMemberRole() {
 	if memberId <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
-	if role != conf.MemberAdminRole && role != conf.MemberGeneralRole {
+	if role != conf.MemberAdminRole && role != conf.MemberGeneralRole && role != conf.MemberEditorRole {
 		this.JsonResult(6001, "用户权限不正确")
 	}
 	member := models.NewMember()

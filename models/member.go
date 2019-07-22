@@ -175,7 +175,7 @@ func (m *Member) Add() error {
 		}
 	}
 
-	// 这里必需设置为普通用户，避免采坑：普通用户注册的时候注册成了管理员...
+	// 这里必需设置为读者，避免采坑：普通用户注册的时候注册成了管理员...
 	m.Role = conf.MemberGeneralRole
 
 	hash, err := utils.PasswordHash(m.Password)
@@ -221,12 +221,15 @@ func (m *Member) Find(id int) (*Member, error) {
 }
 
 func (m *Member) ResolveRoleName() {
-	if m.Role == conf.MemberSuperRole {
+	switch m.Role {
+	case conf.MemberSuperRole:
 		m.RoleName = "超级管理员"
-	} else if m.Role == conf.MemberAdminRole {
+	case conf.MemberAdminRole:
 		m.RoleName = "管理员"
-	} else if m.Role == conf.MemberGeneralRole {
-		m.RoleName = "普通用户"
+	case conf.MemberGeneralRole:
+		m.RoleName = "读者"
+	case conf.MemberEditorRole:
+		m.RoleName = "作者"
 	}
 }
 
