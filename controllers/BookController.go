@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"os"
 	"net/url"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -25,9 +25,9 @@ import (
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/TruthHun/gotil/filetil"
 	"github.com/TruthHun/gotil/mdtil"
-	"github.com/TruthHun/html2md"
 	"github.com/TruthHun/gotil/util"
 	"github.com/TruthHun/gotil/ziptil"
+	"github.com/TruthHun/html2md"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -510,10 +510,10 @@ func (this *BookController) Users() {
 
 // Create 创建项目.
 func (this *BookController) Create() {
-	// TODO: 检查用户是否有权限发布内容
-	inspectDays := beego.AppConfig.DefaultInt("inspectDays", 7)
-	if int(time.Now().Unix())-this.Member.CreateAt < inspectDays*24*3600 {
-		this.JsonResult(10086, fmt.Sprintf("新注册用户，考察期【%v天内】暂时不允许创建项目", inspectDays))
+	if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建项目
+			this.JsonResult(1, "普通读者无法创建项目，如需创建项目，请向管理员申请成为作者")
+		}
 	}
 
 	bookName := strings.TrimSpace(this.GetString("book_name", ""))
@@ -989,17 +989,17 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 						}
 					} else if ext == ".md" || ext == ".markdown" || ext == ".html" { //markdown文档，提取文档内容，录入数据库
 						doc := new(models.Document)
-						var mdcont string 
-						var htmlStr string 
+						var mdcont string
+						var htmlStr string
 						if b, err := ioutil.ReadFile(file.Path); err == nil {
 
 							if ext == ".md" || ext == ".markdown" {
 								mdcont = strings.TrimSpace(string(b))
-								
+
 								htmlStr = mdtil.Md2html(mdcont)
-							}else {
+							} else {
 								htmlStr = string(b)
-								mdcont =  html2md.Convert(htmlStr)
+								mdcont = html2md.Convert(htmlStr)
 							}
 							if !strings.HasPrefix(mdcont, "[TOC]") {
 								mdcont = "[TOC]\r\n\r\n" + mdcont
@@ -1019,12 +1019,12 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 								mdcont += "<bookstack-summary></bookstack-summary>"
 								// 生成带$的文档标识，阅读BaseController.go代码可知，
 								// 要使用summary.md的排序功能，必须在链接中带上符号$
-								mdcont = strings.Replace(mdcont, "](", "]($", -1) 
+								mdcont = strings.Replace(mdcont, "](", "]($", -1)
 
 								// 去掉可能存在的url编码的右括号，否则在url译码后会与markdown语法混淆
 								mdcont = strings.Replace(mdcont, "%29", "", -1)
-								mdcont,_ = url.QueryUnescape(mdcont)
-								
+								mdcont, _ = url.QueryUnescape(mdcont)
+
 								doc.OrderSort = 0
 								doc.Identify = "summary.md"
 							}

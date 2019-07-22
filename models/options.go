@@ -241,22 +241,21 @@ func (m *Option) Init() error {
 		}
 	}
 
-	// 书籍公开发布，是否需要执行审核
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CHECK_BOOK").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "CHECK_BOOK"
-		option.OptionTitle = "是否开启书籍审核"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
 	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "RELATE_BOOK").Exist() {
 		option := NewOption()
 		option.OptionValue = "0"
 		option.OptionName = "RELATE_BOOK"
 		option.OptionTitle = "是否开始关联书籍"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ALL_CAN_WRITE_BOOK").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "ALL_CAN_WRITE_BOOK"
+		option.OptionTitle = "是否都可以创建项目"
 		if _, err := o.Insert(option); err != nil {
 			return err
 		}
