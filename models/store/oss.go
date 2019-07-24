@@ -194,13 +194,16 @@ func (o *Oss) DelByHtmlPics(htmlStr string) {
 //根据oss文件夹
 func (o *Oss) DelOssFolder(folder string) (err error) {
 	bucket, err := o.GetBucket()
-	folder = strings.Trim(folder, "/")
+	folder = strings.Trim(folder, "/") + "/"
 	if lists, err := bucket.ListObjects(oss.Prefix(folder)); err != nil {
 		return err
 	} else {
 		var objs []string
+		folderLower := strings.ToLower(folder)
 		for _, list := range lists.Objects {
-			objs = append(objs, list.Key)
+			if strings.HasPrefix(strings.ToLower(list.Key), folderLower) {
+				objs = append(objs, list.Key)
+			}
 		}
 		if len(objs) > 0 {
 			o.DelFromOss(objs...)
