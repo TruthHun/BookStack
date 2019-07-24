@@ -1109,7 +1109,8 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 						if err := ModelStore.InsertOrUpdate(models.DocumentStore{
 							DocumentId: int(docId),
 							Markdown:   mdCont,
-						}, "markdown"); err != nil {
+							Content:    "",
+						}, "markdown", "content"); err != nil {
 							beego.Error(err)
 						}
 					} else {

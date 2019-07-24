@@ -756,9 +756,9 @@ func JoinURL(rawURL string, urlPath string) string {
 	if strings.HasPrefix(urlPath, "/") {
 		return u.Scheme + "://" + u.Host + urlPath
 	}
-	u.Path = path.Join(u.Path, urlPath)
+	u.Path = path.Join(strings.TrimRight(u.Path, "/")+"/", urlPath)
 	// return u.String() // 会对中文进行编码
-	return u.Scheme + "://" + u.Host + u.Path
+	return u.Scheme + "://" + u.Host + "/" + strings.Trim(u.Path, "/")
 }
 
 type ReflectVal struct {
