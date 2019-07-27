@@ -41,14 +41,18 @@ func (this *Score) TableUnique() [][]string {
 
 //评论内容
 type BookCommentsResult struct {
-	Uid           int       `json:"uid"`
-	Score         int       `json:"score"`
-	Avatar        string    `json:"avatar"`
-	Nickname      string    `json:"nickname"`
-	Content       string    `json:"content"`
-	TimeCreate    time.Time `json:"created_at"`     //评论时间
-	TimeCreateStr string    `json:"created_at_str"` //评论时间
-
+	Id         int       `json:"id"`
+	Uid        int       `json:"uid"`
+	Score      int       `json:"score"`
+	Avatar     string    `json:"avatar"`
+	Account    string    `json:"account"`
+	Nickname   string    `json:"nickname"`
+	BookId     int       `json:"book_id"`
+	BookName   string    `json:"book_name"`
+	Identify   string    `json:"identify"`
+	Content    string    `json:"content"`
+	Status     int8      `json:"status"`
+	TimeCreate time.Time `json:"created_at"` //评论时间
 }
 
 func NewComments() *Comments {
@@ -57,7 +61,7 @@ func NewComments() *Comments {
 
 // 获取可显示的评论内容
 func (this *Comments) Comments(p, listRows, bookId int, status ...int) (comments []BookCommentsResult, err error) {
-	sql := `select c.content,s.score,c.uid,c.time_create,m.avatar,m.nickname from md_comments c left join md_members m on m.member_id=c.uid left join md_score s on s.uid=c.uid and s.book_id=c.book_id %v order by c.id desc limit %v offset %v`
+	sql := `select c.id,c.content,s.score,c.uid,c.status,c.time_create,m.avatar,m.nickname,m.account,b.book_id,b.book_name,b.identify from md_comments c left join md_members m on m.member_id=c.uid left join md_score s on s.uid=c.uid and s.book_id=c.book_id left join md_books b on b.book_id = c.book_id %v order by c.id desc limit %v offset %v`
 	whereStr := ""
 	whereSlice := []string{"true"}
 	if bookId > 0 {

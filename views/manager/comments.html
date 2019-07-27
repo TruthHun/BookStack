@@ -11,6 +11,7 @@
     <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+{{/*    <style>td a{color: #06f}</style>*/}}
 </head>
 <body>
 <div class="manual-reader">
@@ -37,21 +38,36 @@
                     <table class="table table-hover table-striped">
                         <thead>
                         <tr>
+                            <th>#</th>
                             <th>用户</th>
                             <th>书籍</th>
-                            <th>点评内容</th>
-                            <th>状态</th>
-                            <th>操作 清评、禁言、删评、通过、</th>
+                            <th>内容</th>
+                            <th>状态/时间</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
                             {{range .Comments}}
                                 <tr>
-                                    <td><a href="#">111</a></td>
-                                    <td>书籍</td>
-                                    <td>点评内容</td>
-                                    <td>状态</td>
-                                    <td>操作 清评、禁言、删评、通过、</td>
+                                    <td>{{.Id}}</td>
+                                    <td><a href="{{urlfor "UserController.Index" ":username" .Account}}" target="_blank">{{.Nickname}}</a></td>
+                                    <td><a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank">《{{.BookName}}》</a></td>
+                                    <td>
+                                        <textarea rows="2" class="form-control">{{.Content}}</textarea>
+                                    </td>
+                                    <td>
+                                        <select name="status" class="form-control">
+                                            <option value="1" {{if eq .Status 1}}selected{{end}}>审核通过</option>
+                                            <option value="0" {{if eq .Status 0}}selected{{end}}>待审核</option>
+                                            <option value="-1" {{if eq .Status -1}}selected{{end}}>审核不通过</option>
+                                        </select>
+                                        <div class="help-block">{{date .TimeCreate "Y-m-d H:i:s"}}</div>
+                                    </td>
+                                    <td>
+                                        <a href="#">清评</a><br>
+                                        <a href="#">禁言</a><br>
+                                        <a href="#">删评</a>
+                                    </td>
                                 </tr>
                             {{end}}
                         </tbody>

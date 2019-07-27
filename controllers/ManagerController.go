@@ -544,7 +544,7 @@ func (this *ManagerController) Comments() {
 	status := this.GetString("status")
 	statusNum, _ := strconv.Atoi(status)
 	p, _ := this.GetInt("page", 1)
-	size, _ := this.GetInt("size", 20)
+	size, _ := this.GetInt("size", 10)
 	m := models.NewComments()
 	if status == "" {
 		this.Data["Comments"], _ = m.Comments(p, size, 0)
