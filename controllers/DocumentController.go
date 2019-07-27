@@ -152,8 +152,8 @@ func (this *DocumentController) Index() {
 		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
 	}
 
-	//当前默认展示30条评论
-	this.Data["Comments"], _ = new(models.Comments).BookComments(1, 30, bookResult.BookId)
+	//当前默认展示100条评论
+	this.Data["Comments"], _ = new(models.Comments).Comments(1, 100, bookResult.BookId, 1)
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
 	this.GetSeoByPage("book_info", map[string]string{
 		"title":       "《" + bookResult.BookName + "》",

@@ -541,8 +541,23 @@ func (this *ManagerController) Transfer() {
 }
 
 func (this *ManagerController) Comments() {
-	if !this.Member.IsAdministrator() {
-		this.Abort("404")
+	status := this.GetString("status")
+	statusNum, _ := strconv.Atoi(status)
+	p, _ := this.GetInt("page", 1)
+	size, _ := this.GetInt("size", 20)
+	m := models.NewComments()
+	if status == "" {
+		this.Data["Comments"], _ = m.Comments(p, size, 0)
+	} else {
+		this.Data["Comments"], _ = m.Comments(p, size, 0, statusNum)
+	}
+	this.Data["IsComments"] = true
+	this.Data["Status"] = status
+	count, _ := m.Count(0, statusNum)
+	this.Data["Count"] = count
+	if count > 0 {
+		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, p, size, int(count))
+		this.Data["PageHtml"] = html
 	}
 	this.TplName = "manager/comments.html"
 }

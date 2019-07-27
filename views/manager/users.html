@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     {{template "widgets/head.html" .}}
+    <style>.fix-time{display: block;white-space: nowrap;width: 141px;overflow: hidden;}</style>
 </head>
 <body>
 <div class="manual-reader">
@@ -33,7 +34,7 @@
                                     <th width="80">头像</th>
                                     <th>账号</th>
                                     <th>角色</th>
-                                    <th>类型</th>
+{{/*                                    <th>类型</th>*/}}
                                     <th>状态</th>
                                     <th>注册</th>
                                     <th>操作</th>
@@ -68,9 +69,9 @@
                                             </div>
                                         </template>
                                     </td>
-                                    <td>
-                                        ${item.auth_method}
-                                    </td>
+{{/*                                    <td>*/}}
+{{/*                                        ${item.auth_method}*/}}
+{{/*                                    </td>*/}}
                                     <td>
                                         <template v-if="item.status == 0">
                                             <span class="label label-success">正常</span>
@@ -80,7 +81,7 @@
                                         </template>
                                     </td>
                                     <td>
-                                        ${item.create_time}
+                                        <div class="fix-time">${item.create_time}</div>
                                     </td>
                                     <td>
                                         <template v-if="item.member_id == {{.Member.MemberId}}">
