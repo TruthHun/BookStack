@@ -102,6 +102,7 @@ func (this *Comments) ClearComments(uid int) {
 	o := orm.NewOrm()
 	sql := "select count(id) cnt,id,book_id from md_comments where uid = ? group by book_id"
 	o.Raw(sql, uid).QueryRows(&comments)
+	fmt.Printf("%+v", comments)
 	if len(comments) > 0 {
 		for _, comment := range comments {
 			cid = append(cid, comment.Id)
@@ -122,7 +123,7 @@ func (this *Comments) ClearComments(uid int) {
 		if err != nil {
 			return
 		}
-		sqlUpdate := "update md_books set cnt_comment = cnt_comment - ? where cnt_comment> ? where book_id = ?"
+		sqlUpdate := "update md_books set cnt_comment = cnt_comment - ? where cnt_comment> ? and book_id = ?"
 		for bid, cnt := range bookIdMap {
 			if _, err = o.Raw(sqlUpdate, cnt, cnt-1, bid).Exec(); err != nil {
 				return
