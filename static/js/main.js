@@ -83,7 +83,7 @@ function alertTips(cls,msg,timeout,url) {
 }
 
 $(function () {
-
+    $(".tooltips").tooltip();
 
     //文档项目评分
     if($("body").attr("id")=="bookstack-intro"){
@@ -127,23 +127,24 @@ $(function () {
 
     //针对表单项
     $(".change-update").change(function () {
-        var _this=$(this),_url=_this.attr("data-url"),field=_this.attr("name"),method=_this.attr("data-method");
+        var _this=$(this),_url=_this.attr("data-url"),field=_this.attr("name"),method=_this.attr("data-method"),refresh=_this.attr("refresh")=="true";
+        var urlRefresh=refresh ? "" : window.location.href;
         if(method=="post"){
             $.post(_url,{field:field,value:$(this).val().trim()},function (res) {
                 if(res.errcode==0){
-                    alertTips("success",res.message,3000,"");
+                    alertTips("success",res.message,3000,urlRefresh);
                 }else{
                     $(this).val($(this)[0].defaultValue);//恢复值
-                    alertTips("danger",res.message,3000,"");
+                    alertTips("danger",res.message,3000,urlRefresh);
                 }
             })
         }else{
             $.get(_url,{field:field,value:$(this).val().trim()},function (res) {
                 if(res.errcode==0){
-                    alertTips("success",res.message,3000,"");
+                    alertTips("success",res.message,3000,urlRefresh);
                 }else{
                     $(this).val($(this)[0].defaultValue);//恢复值
-                    alertTips("error",res.message,3000,"");
+                    alertTips("error",res.message,3000,urlRefresh);
                 }
             })
         }

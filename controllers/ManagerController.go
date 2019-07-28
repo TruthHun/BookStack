@@ -541,7 +541,7 @@ func (this *ManagerController) Transfer() {
 }
 
 func (this *ManagerController) Comments() {
-	status := this.GetString("status")
+	status := this.GetString("status", "0")
 	statusNum, _ := strconv.Atoi(status)
 	p, _ := this.GetInt("page", 1)
 	size, _ := this.GetInt("size", 10)
@@ -562,24 +562,32 @@ func (this *ManagerController) Comments() {
 	this.TplName = "manager/comments.html"
 }
 
-//DeleteComment 标记评论为已删除
+func (this *ManagerController) ClearComments() {
+	uid, _ := this.GetInt("uid")
+	if uid > 0 {
+		models.NewComments().ClearComments(uid)
+	}
+	this.JsonResult(0, "清除成功")
+}
+
 func (this *ManagerController) DeleteComment() {
-
-	commentId, _ := this.GetInt("comment_id", 0)
-	if commentId <= 0 {
-		this.JsonResult(6001, "参数错误")
+	id, _ := this.GetInt("id")
+	if id > 0 {
+		models.NewComments().DeleteComment(id)
 	}
+	this.JsonResult(0, "删除成功")
+}
 
-	comment := models.NewComment()
-	if _, err := comment.Find(commentId); err != nil {
-		this.JsonResult(6002, "评论不存在")
+func (this *ManagerController) SetCommentStatus() {
+	id, _ := this.GetInt("id")
+	status, _ := this.GetInt("value")
+	field := this.GetString("field")
+	if id > 0 && field == "status" {
+		if err := models.NewComments().SetCommentStatus(id, status); err != nil {
+			this.JsonResult(1, err.Error())
+		}
 	}
-
-	comment.Approved = 3
-	if err := comment.Update("approved"); err != nil {
-		this.JsonResult(6003, "删除评论失败")
-	}
-	this.JsonResult(0, "ok", comment)
+	this.JsonResult(0, "设置成功")
 }
 
 //设置项目私有状态.

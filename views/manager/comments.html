@@ -11,7 +11,7 @@
     <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
-{{/*    <style>td a{color: #06f}</style>*/}}
+    <link rel="stylesheet" href="/static/css/toast.css">
 </head>
 <body>
 <div class="manual-reader">
@@ -29,7 +29,6 @@
                 </div>
                 <div class="box-body">
                     <ul class="nav nav-tabs">
-                        <li {{if eq .Status ""}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}">全部</a></li>
                         <li {{if eq .Status "0"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=0">待审核</a></li>
                         <li {{if eq .Status "1"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=1">审核通过</a></li>
                         <li {{if eq .Status "-1"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=-1">审核不通过</a></li>
@@ -56,7 +55,7 @@
                                         <textarea rows="2" class="form-control">{{.Content}}</textarea>
                                     </td>
                                     <td>
-                                        <select name="status" class="form-control">
+                                        <select name="status" class="form-control change-update" data-refresh="true" data-url="{{urlfor "ManagerController.SetCommentStatus"}}?id={{.Id}}">
                                             <option value="1" {{if eq .Status 1}}selected{{end}}>审核通过</option>
                                             <option value="0" {{if eq .Status 0}}selected{{end}}>待审核</option>
                                             <option value="-1" {{if eq .Status -1}}selected{{end}}>审核不通过</option>
@@ -64,9 +63,8 @@
                                         <div class="help-block">{{date .TimeCreate "Y-m-d H:i:s"}}</div>
                                     </td>
                                     <td>
-                                        <a href="#">清评</a><br>
-                                        <a href="#">禁言</a><br>
-                                        <a href="#">删评</a>
+                                        <a href="{{urlfor "ManagerController.ClearComments"}}?uid={{.Uid}}" class="tooltips confirm ajax-get" title="清除当前用户的所有评论">清评</a><br>
+                                        <a href="{{urlfor "ManagerController.DeleteComment"}}?id={{.Id}}" class="tooltips confirm ajax-get" title="删除当前评论">删评</a>
                                     </td>
                                 </tr>
                             {{end}}
@@ -80,5 +78,7 @@
 </div>
 <script src="/static/jquery/1.12.4/jquery.min.js"></script>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
 </body>
 </html>

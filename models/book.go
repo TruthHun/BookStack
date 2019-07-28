@@ -58,11 +58,11 @@ type Book struct {
 	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //下载文档生成时间
 	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
-	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    //文档项目被阅读次数
-	Star              int       `orm:"column(star);default(0)" json:"star"`    //文档项目被收藏次数
-	Score             int       `orm:"column(score);default(40)" json:"score"` //文档项目评分，默认40，即4.0星
-	CntScore          int       //评分人数
-	CntComment        int       //评论人数
+	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    // 文档项目被阅读次数
+	Star              int       `orm:"column(star);default(0)" json:"star"`    // 文档项目被收藏次数
+	Score             int       `orm:"column(score);default(40)" json:"score"` // 文档项目评分，默认40，即4.0星
+	CntScore          int       // 评分人数
+	CntComment        int       // 评论人数
 	Author            string    `orm:"size(50)"`           //原作者，即来源
 	AuthorURL         string    `orm:"column(author_url)"` //原作者链接，即来源链接
 	Lang              string    `orm:"size(10);index;default(zh)"`
