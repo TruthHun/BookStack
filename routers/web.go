@@ -56,6 +56,10 @@ func webRouter() {
 	beego.Router("/manager/update_friendlink", &controllers.ManagerController{}, "get:UpdateFriendlink")
 	beego.Router("/manager/rebuild-index", &controllers.ManagerController{}, "get:RebuildAllIndex")
 	beego.Router("/manager/del_friendlink", &controllers.ManagerController{}, "get:DelFriendlink")
+	beego.Router("/manager/banners", &controllers.ManagerController{}, "get:Banners")
+	beego.Router("/manager/banners/upload", &controllers.ManagerController{}, "post:UploadBanner")
+	beego.Router("/manager/banners/delete", &controllers.ManagerController{}, "get:DeleteBanner")
+	beego.Router("/manager/banners/update", &controllers.ManagerController{}, "get:UpdateBanner")
 
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
 	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")

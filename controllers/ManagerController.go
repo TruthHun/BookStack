@@ -894,3 +894,19 @@ func (this *ManagerController) RebuildAllIndex() {
 	go models.NewElasticSearchClient().RebuildAllIndex()
 	this.JsonResult(0, "提交成功，请耐心等待")
 }
+
+func (this *ManagerController) Banners() {
+
+}
+
+func (this *ManagerController) DeleteBanner() {
+
+}
+
+func (this *ManagerController) UpdateBanner() {
+
+}
+
+func (this *ManagerController) UploadBanner() {
+
+}
