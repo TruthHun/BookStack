@@ -196,7 +196,9 @@ func (this *DocumentController) Read() {
 		//此处的id是字符串，标识文档标识，根据文档标识和文档所属的书的id作为key去查询
 		doc, err = doc.FindByBookIdAndDocIdentify(bookResult.BookId, id) //文档标识
 		if err != nil {
-			beego.Error(err, docId, id, bookResult)
+			if err != orm.ErrNoRows {
+				beego.Error(err, docId, id, bookResult)
+			}
 			this.Abort("404")
 		}
 	}

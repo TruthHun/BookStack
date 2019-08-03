@@ -308,7 +308,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		cont, err = CrawlByChrome(urlstr, project)
 	} else {
 		req := util.BuildRequest("get", urlstr, "", "", "", true, false, headers...)
-		req.SetTimeout(10*time.Second, 10*time.Second)
+		req.SetTimeout(30*time.Second, 30*time.Second)
 		cont, err = req.String()
 	}
 
@@ -345,7 +345,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 	})
 
 	//遍历替换图片相对链接
-	doc.Find("img").Each(func(i int, selection *goquery.Selection) {
+	doc.Filter(diySelector).Find("img").Each(func(i int, selection *goquery.Selection) {
 		//存在src，且不以http://和https://开头
 		if src, ok := selection.Attr("src"); ok {
 			//链接补全
@@ -737,6 +737,9 @@ func JoinURL(rawURL string, urlPath string) string {
 	rawURL = strings.TrimSpace(rawURL)
 
 	lowerURLPath := strings.ToLower(urlPath)
+	if strings.HasPrefix(lowerURLPath, "//") {
+		return "http:" + urlPath
+	}
 	if strings.HasPrefix(lowerURLPath, "http://") || strings.HasPrefix(lowerURLPath, "https://") {
 		return urlPath
 	}
@@ -754,7 +757,7 @@ func JoinURL(rawURL string, urlPath string) string {
 	}
 
 	if strings.HasPrefix(urlPath, "/") {
-		return u.Scheme + "://" + u.Host + urlPath
+		return u.Scheme + "://" + u.Host + "/" + strings.TrimLeft(urlPath, "/")
 	}
 	u.Path = path.Join(strings.TrimRight(u.Path, "/")+"/", urlPath)
 	// return u.String() // 会对中文进行编码
