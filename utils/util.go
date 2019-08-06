@@ -345,7 +345,7 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 	})
 
 	//遍历替换图片相对链接
-	doc.Filter(diySelector).Find("img").Each(func(i int, selection *goquery.Selection) {
+	doc.Find(diySelector).Find("img").Each(func(i int, selection *goquery.Selection) {
 		//存在src，且不以http://和https://开头
 		if src, ok := selection.Attr("src"); ok {
 			//链接补全
