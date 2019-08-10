@@ -598,8 +598,12 @@ func (this *CommonController) BookMenu() {
 	var docs []APIDoc
 	uid := this.isLogin()
 	readed := make(map[int]bool)
+	latestReadId := 0
 	if uid > 0 {
 		lists, _, _ := new(models.ReadRecord).List(uid, book.BookId)
+		if len(lists) > 0 {
+			latestReadId = lists[0].DocId
+		}
 		for _, item := range lists {
 			readed[item.DocId] = true
 		}
@@ -613,7 +617,7 @@ func (this *CommonController) BookMenu() {
 		}
 		docs = append(docs, doc)
 	}
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"menu": docs})
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"menu": docs, "latest_read_id": latestReadId})
 }
 
 // 【OK】

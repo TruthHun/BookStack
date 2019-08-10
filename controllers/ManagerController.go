@@ -51,6 +51,11 @@ func (this *ManagerController) Index() {
 func (this *ManagerController) Users() {
 	this.TplName = "manager/users.html"
 	this.Data["IsUsers"] = true
+	wd := this.GetString("wd")
+	role, err := this.GetInt("role")
+	if err != nil {
+		role = -1
+	}
 	pageIndex, _ := this.GetInt("page", 0)
 	this.GetSeoByPage("manage_users", map[string]string{
 		"title":       "用户管理 - " + this.Sitename,
@@ -58,7 +63,7 @@ func (this *ManagerController) Users() {
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 
-	members, totalCount, err := models.NewMember().FindToPager(pageIndex, conf.PageSize)
+	members, totalCount, err := models.NewMember().FindToPager(pageIndex, conf.PageSize, wd, role)
 
 	if err != nil {
 		this.Data["ErrorMessage"] = err.Error()
@@ -78,7 +83,8 @@ func (this *ManagerController) Users() {
 	} else {
 		this.Data["Result"] = template.JS(string(b))
 	}
-
+	this.Data["Role"] = role
+	this.Data["Wd"] = wd
 }
 
 // 添加用户.

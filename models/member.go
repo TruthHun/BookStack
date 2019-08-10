@@ -246,20 +246,33 @@ func (m *Member) FindByAccount(account string) (*Member, error) {
 }
 
 //分页查找用户.
-func (m *Member) FindToPager(pageIndex, pageSize int) ([]*Member, int64, error) {
+func (m *Member) FindToPager(pageIndex, pageSize int, wd string, role ...int) ([]*Member, int64, error) {
 	o := orm.NewOrm()
 
 	var members []*Member
 
 	offset := (pageIndex - 1) * pageSize
+	q := o.QueryTable(m.TableNameWithPrefix())
+	cond := orm.NewCondition()
 
-	totalCount, err := o.QueryTable(m.TableNameWithPrefix()).Count()
+	if len(role) > 0 && role[0] != -1 {
+		cond = cond.And("role", role[0])
+	}
+
+	if wd != "" {
+		cond = cond.AndCond(orm.NewCondition().Or("account__icontains", wd).Or("nickname__icontains", wd).Or("email__icontains", wd))
+	}
+	if !cond.IsEmpty() {
+		q = q.SetCond(cond)
+	}
+
+	totalCount, err := q.Count()
 
 	if err != nil {
 		return members, 0, err
 	}
 
-	_, err = o.QueryTable(m.TableNameWithPrefix()).OrderBy("-member_id").Offset(offset).Limit(pageSize).All(&members)
+	_, err = q.OrderBy("-member_id").Offset(offset).Limit(pageSize).All(&members)
 
 	if err != nil {
 		return members, 0, err

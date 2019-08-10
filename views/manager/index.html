@@ -33,19 +33,16 @@
                             <span class="fa-class">会员数量</span>
                             <span class="fa-class">{{.Model.MemberNumber}}</span>
                     </a>
-                    <!--
-                    {{/*
-                    <div class="dashboard-item">
+                    <a href="{{urlfor "ManagerController.Comments"}}" class="dashboard-item">
                         <span class="fa fa-comments-o" aria-hidden="true"></span>
                         <span class="fa-class">评论数量</span>
                         <span class="fa-class">{{.Model.CommentNumber}}</span>
-                    </div>
-                */}}-->
-                    <a href="{{urlfor "ManagerController.AttachList" }}" class="dashboard-item">
-                        <span class="fa fa-cloud-download" aria-hidden="true"></span>
-                        <span class="fa-class">附件数量</span>
-                        <span class="fa-class">{{.Model.AttachmentNumber}}</span>
                     </a>
+{{/*                    <a href="{{urlfor "ManagerController.AttachList" }}" class="dashboard-item">*/}}
+{{/*                        <span class="fa fa-cloud-download" aria-hidden="true"></span>*/}}
+{{/*                        <span class="fa-class">附件数量</span>*/}}
+{{/*                        <span class="fa-class">{{.Model.AttachmentNumber}}</span>*/}}
+{{/*                    </a>*/}}
                 </div>
             </div>
         </div>
