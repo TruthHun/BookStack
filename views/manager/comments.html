@@ -52,7 +52,9 @@
                                     <td><a href="{{urlfor "UserController.Index" ":username" .Account}}" target="_blank">{{.Nickname}}</a></td>
                                     <td><a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank">《{{.BookName}}》</a></td>
                                     <td>
-                                        <textarea rows="2" class="form-control">{{.Content}}</textarea>
+                                        <div class="help-block">
+                                            {{.Content}}
+                                        </div>
                                     </td>
                                     <td>
                                         <select name="status" class="form-control change-update" data-refresh="true" data-url="{{urlfor "ManagerController.SetCommentStatus"}}?id={{.Id}}">
