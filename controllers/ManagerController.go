@@ -933,5 +933,42 @@ func (this *ManagerController) UpdateBanner() {
 }
 
 func (this *ManagerController) UploadBanner() {
+	f, h, err := this.GetFile("image")
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	ext := strings.ToLower(filepath.Ext(strings.ToLower(h.Filename)))
+	tmpFile := fmt.Sprintf("uploads/tmp/banner-%v-%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+	destFile := fmt.Sprintf("uploads/banners/%v.%v%v", this.Member.MemberId, time.Now().Unix(), ext)
+	defer func() {
+		f.Close()
+		os.Remove(tmpFile)
+		if err != nil {
+			utils.DeleteFile(destFile)
+		}
+	}()
 
+	os.MkdirAll(filepath.Dir(tmpFile), os.ModePerm)
+	err = this.SaveToFile("image", tmpFile)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	err = utils.UploadFile(tmpFile, destFile)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	banner := &models.Banner{
+		Image:     "/" + destFile,
+		Type:      this.GetString("type"),
+		Title:     this.GetString("title"),
+		Link:      this.GetString("link"),
+		Status:    true,
+		CreatedAt: time.Now(),
+	}
+	banner.Sort, _ = this.GetInt("sort")
+	_, err = orm.NewOrm().Insert(banner)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	this.JsonResult(0, "横幅上传成功")
 }

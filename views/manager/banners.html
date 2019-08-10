@@ -107,19 +107,35 @@
 <div class="modal fade" id="FlModal" tabindex="-1" role="dialog" aria-labelledby="FlModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{urlfor "ManagerController.AddFriendlink"}}" class="ajax-form" method="post">
+            <form action="{{urlfor "ManagerController.UploadBanner"}}" enctype="multipart/form-data" class="ajax-form" method="post">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="FlModalLabel">新增友链</h4>
+                    <h4 class="modal-title" id="FlModalLabel">新增横幅</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>名称</label>
-                        <input type="text" class="form-control" name="title">
+                    <div class="input-group">
+                        <span class="input-group-addon">分类</span>
+                        <select name="type" class="form-control">
+                            <option value="wechat">微信小程序横幅</option>
+                            <option value="pc">PC横幅</option>
+                            <option value="mobi">移动端横幅</option>
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label>链接</label>
-                        <input type="text" class="form-control" name="link">
+                    <div class="input-group">
+                        <span class="input-group-addon">名称</span>
+                        <input type="text" class="form-control" name="title" value="">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">链接</span>
+                        <input type="text" class="form-control"name="link" value="">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">排序</span>
+                        <input type="number" class="form-control" name="sort" value="">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">图片</span>
+                        <input type="file" class="form-control" name="image" accept="image/png,image/jpeg,image/jpg,image/gif" value="">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -131,6 +147,7 @@
     </div>
 </div>
 
+<iframe src="javascript:void(0);" class="hidden" name="notarget" id="notarget"></iframe>
 
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
 <script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>

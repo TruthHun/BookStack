@@ -818,3 +818,19 @@ func DeleteFile(file string) {
 		go store.ModelStoreOss.DelOssFolder(file)
 	}
 }
+
+func UploadFile(src, dest string) (err error) {
+	switch StoreType {
+	case StoreOss: //oss存储
+		err = store.ModelStoreOss.MoveToOss(src, strings.TrimLeft(dest, "./"), false, false)
+		if err != nil {
+			beego.Error(err.Error())
+		}
+	case StoreLocal: //本地存储
+		err = store.ModelStoreLocal.MoveToStore(src, dest)
+		if err != nil {
+			beego.Error(err.Error())
+		}
+	}
+	return
+}
