@@ -902,15 +902,34 @@ func (this *ManagerController) RebuildAllIndex() {
 }
 
 func (this *ManagerController) Banners() {
-
+	this.Data["SeoTitle"] = "横幅管理"
+	this.TplName = "manager/banners.html"
+	this.Data["Banners"], _ = models.NewBanner().All()
+	this.Data["IsBanner"] = true
 }
 
 func (this *ManagerController) DeleteBanner() {
-
+	id, _ := this.GetInt("id")
+	if id > 0 {
+		err := models.NewBanner().Delete(id)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+	}
+	this.JsonResult(0, "删除成功")
 }
 
 func (this *ManagerController) UpdateBanner() {
-
+	id, _ := this.GetInt("id")
+	field := this.GetString("field")
+	value := this.GetString("value")
+	if id > 0 {
+		err := models.NewBanner().Update(id, field, value)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+	}
+	this.JsonResult(0, "更新成功")
 }
 
 func (this *ManagerController) UploadBanner() {

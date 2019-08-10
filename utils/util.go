@@ -804,3 +804,17 @@ func RangeNumber(val, min, max int) int {
 	}
 	return val
 }
+
+func DeleteFile(file string) {
+	file = strings.TrimPrefix(file, "./")
+	fileLower := strings.ToLower(file)
+	if strings.HasPrefix(fileLower, "https://") || strings.HasPrefix(fileLower, "http://") {
+		return
+	}
+	switch StoreType {
+	case StoreLocal:
+		go store.ModelStoreLocal.DelFromFolder(file)
+	case StoreOss:
+		go store.ModelStoreOss.DelOssFolder(file)
+	}
+}
