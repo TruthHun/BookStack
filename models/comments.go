@@ -139,8 +139,11 @@ func (this *Comments) DeleteComment(id int) {
 	o.QueryTable(m).Filter("id", id).One(m, "book_id")
 	if m.BookId > 0 {
 		o.QueryTable(m).Filter("id", id).Delete()
-		sql := "update md_books set cnt_comment = cnt_comment - 1 where cnt_comment>0 where book_id = ?"
-		o.Raw(sql, m.BookId).Exec()
+		sql := "update md_books set cnt_comment = cnt_comment - 1 where cnt_comment > 0 and book_id = ?"
+		_, err := o.Raw(sql, m.BookId).Exec()
+		if err != nil {
+			beego.Error(err.Error())
+		}
 	}
 }
 

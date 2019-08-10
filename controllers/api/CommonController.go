@@ -942,7 +942,7 @@ func (this *CommonController) GetComments() {
 	if uid > 0 {
 		myScore = new(models.Score).BookScoreByUid(uid, bookId) / 10
 	}
-	comments, err := new(models.Comments).Comments(page, size, bookId)
+	comments, err := new(models.Comments).Comments(page, size, bookId, 1)
 	if err != nil {
 		beego.Error(err.Error())
 	}

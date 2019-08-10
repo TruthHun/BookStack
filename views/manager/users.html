@@ -25,8 +25,8 @@
                     <div class="form-group">
                         <select name="role" class="form-control">
                             <option value="">全部</option>
-                            <option value="0" {{if eq .Role 0}}selected{{end}}>管理员</option>
-                            <option value="1" {{if eq .Role 1}}selected{{end}}>作者</option>
+                            <option value="1" {{if eq .Role 0}}selected{{end}}>管理员</option>
+                            <option value="3" {{if eq .Role 3}}selected{{end}}>作者</option>
                             <option value="2" {{if eq .Role 2}}selected{{end}}>读者</option>
                         </select>
                     </div>

@@ -12,6 +12,11 @@
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
     <link rel="stylesheet" href="/static/css/toast.css">
+    <style>
+        .content-block{
+            max-width: 300px;word-break: break-all;
+        }
+    </style>
 </head>
 <body>
 <div class="manual-reader">
@@ -52,7 +57,7 @@
                                     <td><a href="{{urlfor "UserController.Index" ":username" .Account}}" target="_blank">{{.Nickname}}</a></td>
                                     <td><a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank">《{{.BookName}}》</a></td>
                                     <td>
-                                        <div class="help-block">
+                                        <div class="help-block content-block">
                                             {{.Content}}
                                         </div>
                                     </td>
