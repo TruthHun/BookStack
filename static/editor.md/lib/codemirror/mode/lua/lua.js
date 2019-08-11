@@ -40,7 +40,7 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
 
     "close","flush","lines","read","seek","setvbuf","write",
 
-    "io.close","io.flush","io.input","io.lines","io.open","io.output","io.popen","io.read","io.stderr","io.stdin",
+    "io.close","io.flush","io.input","io.lines","io.open","io.output","io.popen","read","io.stderr","io.stdin",
     "io.stdout","io.tmpfile","io.type","io.write",
 
     "math.abs","math.acos","math.asin","math.atan","math.atan2","math.ceil","math.cos","math.cosh","math.deg",

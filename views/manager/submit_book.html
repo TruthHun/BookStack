@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <title>收录管理 - {{.SITE_NAME}}</title>
+
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
+{{/*<script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>*/}}
+    <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
+{{/*<script src="/static/respond.js/1.4.2/respond.min.js"></script>*/}}
+    <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+
+    <link rel="stylesheet" href="/static/css/toast.css">
+    <style>.content-block{max-width: 350px;word-break: break-all;}</style>
+</head>
+<body>
+<div class="manual-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="row">
+            <div class="page-left">
+                {{template "manager/menu.html" .}}
+            </div>
+            <div class="page-right">
+                <div class="m-box">
+                    <div class="box-head">
+                        <strong class="box-title">收录管理</strong>
+                    </div>
+                </div>
+                <div class="box-body" id="bookList">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>用户</th>
+                            <th>内容</th>
+                            <th>留言</th>
+                            <th>时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range .Books}}
+                            <tr>
+                                <td>{{.Id}}</td>
+                                <td>
+                                    <a href="{{urlfor "UserController.Index" ":username" .Account}}" target="_blank">{{.Nickname}}</a>
+                                </td>
+                                <td>
+                                    <a href="{{.Url}}" target="_blank">《{{.Title}}》</a>
+                                </td>
+                                <td>
+                                    <div class="help-block conten-block">{{.Message}}</div>
+                                </td>
+                                <td>{{.CreatedAtStr}}</td>
+                                <td>
+                                    {{if .Status}}
+                                        <span class="text-success">已处理</span>
+                                    {{else}}
+                                        <span class="text-danger">待处理</span>
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{if .Status}}
+                                        <a href="{{urlfor "ManagerController.UpdateSubmitBook"}}?id={{.Id}}&field=status&value=0" class="ajax-get">待处理</a>
+                                    {{else}}
+                                        <a href="{{urlfor "ManagerController.UpdateSubmitBook"}}?id={{.Id}}&field=status&value=1" class="ajax-get">已处理</a>
+                                    {{end}}
+                                    <a href="{{urlfor "ManagerController.DeleteSubmitBook"}}?id={{.Id}}" class="text-danger confirm ajax-get">删除</a>
+                                </td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+
+                    {{.PageHtml}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
+<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+{{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
+<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
+</body>
+</html>

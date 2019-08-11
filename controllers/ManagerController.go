@@ -972,3 +972,37 @@ func (this *ManagerController) UploadBanner() {
 	}
 	this.JsonResult(0, "横幅上传成功")
 }
+
+func (this *ManagerController) SubmitBook() {
+	this.TplName = "manager/submit_book.html"
+	m := models.NewSubmitBooks()
+	page, _ := this.GetInt("page", 1)
+	size, _ := this.GetInt("size", 100)
+	books, total, _ := m.Lists(page, size)
+	if total > 0 {
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(total), size, page, beego.URLFor("ManagerController.SubmitBook"), "")
+	} else {
+		this.Data["PageHtml"] = ""
+	}
+	this.Data["Books"] = books
+	this.Data["IsSubmitBook"] = true
+}
+
+func (this *ManagerController) DeleteSubmitBook() {
+	id, _ := this.GetInt("id")
+	orm.NewOrm().QueryTable(models.NewSubmitBooks()).Filter("id", id).Delete()
+	this.JsonResult(0, "删除成功")
+}
+
+func (this *ManagerController) UpdateSubmitBook() {
+	field := this.GetString("field")
+	value := this.GetString("value")
+	id, _ := this.GetInt("id")
+	if id > 0 {
+		_, err := orm.NewOrm().QueryTable(models.NewSubmitBooks()).Filter("id", id).Update(orm.Params{field: value})
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+	}
+	this.JsonResult(0, "更新成功")
+}
