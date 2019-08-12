@@ -176,10 +176,9 @@ func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) 
 		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
 	}
 	cmd := exec.Command(name, args...)
-
-	expire := 30
+	expire := 180
 	if isScreenshot {
-		expire = 180
+		expire = 300
 	}
 	time.AfterFunc(time.Duration(expire)*time.Second, func() {
 		if cmd.Process.Pid != 0 {
