@@ -1,13 +1,12 @@
 
-**BookStack 配套微信小程序**
+**BookStack 配套微信小程序BookChat开源地址**
+
 - Gitee: https://gitee.com/truthhun/BookChat
 - GitHub: https://github.com/TruthHun/BookChat
-- 微信小程序码：
+
+**微信扫描小程序码体验**
 
 ![BookChat](https://www.bookstack.cn/projects/help/96a18d5a8fe8ea518efcbc5d59286e9b.png "BookChat")
-
-
-
 
 
 目录：
@@ -32,13 +31,9 @@
 		- [更美观、简洁的页面布局和更为完善的移动端兼容](#beauty)
     - [TODO](#todo)
     - [安装与使用](#install)
-    - [在开发的开源项目](#opening)
-    - [待开发的开源项目](#to-open)
     - [关于本人](#aboutme)
     - [赞助我](#support)
-		- [支付宝打赏赞助](#alipy)
-		- [微信打赏赞助](#wxpay)
-		- [捐赠列表](#supportlist)
+
     
 <a name="intro"></a>
 # BookStack 简介
@@ -72,36 +67,30 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，为�
 
 > QQ交流群：457803862(猿军团)
 
-同时要说明的是，这个是学习交流群，如果是程序相关问题，请看这里->[BookStack 相关问题最快获得解答帮助的方法](http://askq.cc/thread-41-1-1.html)：http://askq.cc/thread-41-1-1.html
+同时要说明的是，该群是一个学习交流群，如果是程序相关问题，请直接提交issues，不接受邮件求助、微信求助和QQ私信求助
+
+BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www.bookstack.cn/books/help)
+
 
 <a name="site"></a>
 ## 站点
 
 <a name="demo"></a>
 ### 演示站点
-[http://demo.bookstack.cn](http://demo.bookstack.cn)
 
-有些功能，只有拥有管理员权限的用户才能使用，所以放出演示站点，欢迎大家随便玩。
-管理员账号和密码如下（请大家不要更改密码，以方便大家体验，谢谢）：
-```
-账号：bookstack
-密码：bookstack.cn
-```
-Tips:
-- 如果管理员账号密码被修改，请在演示站点上注册一个账号，并把账号通过邮件发送给我，让我把你的账号设置成管理员。我的联系邮箱：TruthHun@QQ.COM
-- 演示站点的第三方登录并未配置，注册账号时，请直接邮箱注册即可。
+> 服务器资源有限，不再提供演示站点
 
 <a name="normal"></a>
 ### 正式站点
-[http://www.bookstack.cn](http://www.bookstack.cn)
 
-因为演示站点上的内容，大家在测试的时候，肯定是各种乱七八糟的什么内容都有，所以放出正式站点，给大家看下真正的效果。
-还望大家不要在这个站点发一些乱七八糟的内容，毕竟这是正式站点，谢谢。
+**书栈网**：[https://www.bookstack.cn](https://www.bookstack.cn)
+
+
 
 <a name="upgrade"></a>
 ## 更新、维护和升级
-- 更新和升级日志，以后都写在这里==>[更新和升级日志](change.md)
-- 本人会坚持平均每天抽出一小时用于开源程序的开发，您的支持、认可与鼓励比什么都重要
+
+- 程序下载与升级日志，看这里--> [Release](/truthhun/BookStack/releases)
 
 <a name="func"></a>
 ## 功能与亮点
@@ -194,9 +183,6 @@ Tips:
 ### SEO
 后台管理，个性化定制你的SEO关键字；并且在SEO管理这里，可以更新站点sitemap（暂时没做程序定时自动更新sitemap）
 
-<a name="qrcode"></a>
-### 赞助二维码
-用户闲的蛋疼才会来你这里进行文档写作并给你生产内容...所以，要给用户画个饼——你来我这里进行文档写作，不但可以展示你的才华，还可以收到别人的打赏，而且，别人给你的打赏全都是直达你那里，没有`中奸商`赚差价。。。
 
 <a name="version-control"></a>
 ### 版本控制
@@ -257,6 +243,7 @@ Tips:
 
 
 为了方便，安装和使用教程，请移步到这里：http://www.bookstack.cn/read/help/Ubuntu.md
+
 > 目前只写了Ubuntu下的安装教程，Windows下的安装和使用教程，暂时没时间
 
 有两个模板文件，需要手动修改下：
@@ -270,17 +257,6 @@ Tips:
 关于二次开发，请看这个issue [README.md中能否添源码编译说明](https://github.com/TruthHun/BookStack/issues/3)
 
 
-<a name="opening"></a>
-## 在开发的开源项目
-- wenku.it IT文库，地址：http://wenku.it （半成品）
-- ApiServ.me API服务，地址：http://apiserv.me (半成品)
-- BookStack 无库版(不需要数据库)，地址：https://github.com/BookStackCN/BookStack （半成品）
-
-<a name="to-open"></a>
-## 待开发的开源项目
-- NetDisk.ME 网盘项目，"抄袭"百度网盘和腾讯微云
-- OneHourADay.CN 每天一小时（微信小程序）
-
 <a name="aboutme"></a>
 ## 关于本人
 2014年7月本科"毕业"踏入IT行业；Web全栈工程师；什么都懂一点，什么都不精通。
@@ -291,7 +267,6 @@ Tips:
 如果我的努力值得你的肯定，请赞助我，让我在开源的路上，做更好，走更远。
 赞助我的方式包括：`支付宝打赏`、`微信打赏`、`给BookStack一个star`、`向我反馈意见和建议`
 
-> 对我进行打赏赞助的朋友，麻烦在赞助的时候留一下你的姓名或者昵称，感谢。
 
 <a name="alipay"></a>
 ### 支付宝打赏赞助
@@ -302,10 +277,3 @@ Tips:
 ![微信打赏赞助](static/openstatic/wxpay.jpg)
 
 
-<a name="supportlist"></a>
-### 捐赠列表
- 
-为了方便对捐赠的公示，已创建了专门的仓库，地址：
-
-- Gitee: https://gitee.com/truthhun/PlanAndSupport
-- GitHub:https://github.com/truthhun/PlanAndSupport
