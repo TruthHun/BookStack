@@ -53,7 +53,7 @@ func initialization() {
 
 		member.Account = "admin"
 		member.Avatar = beego.AppConfig.String("avatar")
-		member.Password = "admin"
+		member.Password = "admin888"
 		member.AuthMethod = "local"
 		member.Nickname = "管理员"
 		member.Role = 0
