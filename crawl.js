@@ -1,13 +1,13 @@
+'use strict';
+
 const puppeteer = require('puppeteer');
 const fs = require("fs");
-
 
 let args = process.argv.splice(2);
 let l=args.length;
 let url, folder, selector;
-let winH=768;
 
-for(var i=0;i<l;i++){
+for(let i=0;i<l;i++){
     switch (args[i]){
         case "--url":
             url = args[i+1];
@@ -26,23 +26,31 @@ for(var i=0;i<l;i++){
     i++;
 }
 
-async function screenshot(winH) {
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: true});
+async function screenshot() {
+    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: true, ignoreHTTPSErrors: true});
     const page = await browser.newPage();
+    let shot = false;
     if(folder && selector){
-        winH = 20480
+        shot = true;
+        page.setViewport({width: 1280, height: 20480});
     }
 
-    page.setViewport({width: 1280, height: winH});
     page.setExtraHTTPHeaders({
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,co;q=0.7,fr;q=0.6,zh-HK;q=0.5,zh-TW;q=0.4",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3766.2 Safari/537.36"
     });
-    await page.goto(url, {"waitUntil" : "networkidle0", "timeout":120000});
-    // 下面这种方式不行！！！
-    // await page.goto(url, {"waitUntil" : "load","timeout":120000});
+
+    await page.setRequestInterception(true);
+    page.on("request", request => {
+        if(getHost(request.url()).indexOf("google")>-1){
+            request.abort();
+        }else{
+            request.continue();
+        }
+    });
+    shot ?   await page.goto(url, {"waitUntil" :  'networkidle2', "timeout":120000}) : await page.goto(url, {"waitUntil" : "domcontentloaded", "timeout":3000})
     let res;
-    if(folder && selector){
+    if(shot){
         if (folder.substr(folder.length-1,1)!="/"){
             folder=folder+"/"
         }
@@ -50,9 +58,9 @@ async function screenshot(winH) {
             let bodyHeight = document.querySelector("body").clientHeight
 
             let data = new Array();
-            let eleSlice=ele.split(",")
+            let eleSlice=ele.split(",");
 
-            for (var i = 0; i < eleSlice.length; i++) {
+            for (let i = 0; i < eleSlice.length; i++) {
                 let d = [],item = eleSlice[i];
                 let elements = document.querySelectorAll(item);
                 for (var element of elements){
@@ -69,11 +77,18 @@ async function screenshot(winH) {
             return {height: bodyHeight, data: data};
         }, selector);
         fs.writeFile(folder+'screenshot.json', JSON.stringify(res),function(){});
-        await page.screenshot({path: folder+'screenshot.png'});
+        await page.screenshot({path: folder+'screenshot.png', fullPage: true});
     }
     let content=await page.content();
     console.log(content);
     await browser.close();
 }
 
-if (url) screenshot(winH);
+function getHost(url) {
+    let u = String(url).toLowerCase()
+    if (u.startsWith("https://") || u.startsWith("http://")){
+        return u.split("/")[2]
+    }
+    return ""
+}
+if (url) screenshot();
