@@ -784,12 +784,14 @@ func (this *CommonController) Read() {
 
 			for tag, _ := range allTags {
 				if _, ok := richTextTags[tag]; !ok {
-					query.Find(tag).Each(func(i int, selection *goquery.Selection) {
-						if ret, err := selection.Html(); err == nil {
-							selection.BeforeHtml(ret)
-							selection.Remove()
-						}
-					})
+					for len(query.Find(tag).Nodes) > 0 {
+						query.Find(tag).Each(func(i int, selection *goquery.Selection) {
+							if ret, err := selection.Html(); err == nil {
+								selection.BeforeHtml(ret)
+								selection.Remove()
+							}
+						})
+					}
 				}
 			}
 
