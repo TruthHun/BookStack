@@ -49,7 +49,8 @@ async function screenshot() {
         }
     });
     let timeout =  shot ? 120000 : 30000;
-    await page.goto(url, {"waitUntil" :  'networkidle2', "timeout":timeout});
+    let until = shot ? ['load', 'networkidle0'] : ['networkidle2']
+    await page.goto(url, {"waitUntil" :  until, "timeout":timeout});
     let res;
     if(shot){
         if (folder.substr(folder.length-1,1)!="/"){
