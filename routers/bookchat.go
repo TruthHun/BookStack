@@ -3,10 +3,16 @@ package routers
 import (
 	"github.com/TruthHun/BookStack/controllers/api"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/plugins/cors"
 )
 
 func bookChatRouters() {
 	prefix := "/bookchat"
+
+	beego.InsertFilter("/bookchat/*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"PUT", "POST", "OPTIONS", "GET", "DELETE"},
+	}))
 
 	// finished
 	beego.Router(prefix+"/api/v1/register", &api.CommonController{}, "post:Register") // TODO: 待注释掉，等微信小程序新版本上线
