@@ -176,7 +176,11 @@ func (m *Member) Add() error {
 	}
 
 	// 这里必需设置为读者，避免采坑：普通用户注册的时候注册成了管理员...
-	m.Role = conf.MemberGeneralRole
+	if m.Account == "admin" {
+		m.Role = conf.MemberSuperRole
+	} else {
+		m.Role = conf.MemberGeneralRole
+	}
 
 	hash, err := utils.PasswordHash(m.Password)
 
