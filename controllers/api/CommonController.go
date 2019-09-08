@@ -195,9 +195,6 @@ func (this *CommonController) login(member models.Member) {
 
 // 【OK】
 func (this *CommonController) Register() {
-
-	this.Response(http.StatusBadRequest, "请升级到最新版微信小程序")
-
 	var register APIRegister
 	err := this.ParseForm(&register)
 	if err != nil {

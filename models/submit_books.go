@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"errors"
+
 	"github.com/astaxie/beego"
-	"golang.org/x/tools/go/ssa/interp/testdata/src/errors"
 
 	"github.com/TruthHun/gotil/cryptil"
 	"github.com/astaxie/beego/orm"

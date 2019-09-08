@@ -1,8 +1,8 @@
 package store
 
 import (
-	"os"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 )
