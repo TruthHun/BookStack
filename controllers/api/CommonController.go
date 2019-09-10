@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/BookStack/utils/html2json"
+
 	"github.com/TruthHun/BookStack/oauth"
 
 	"github.com/PuerkitoBio/goquery"
@@ -704,6 +706,7 @@ func (this *CommonController) BookListsByCids() {
 func (this *CommonController) Read() {
 	identify := this.GetString("identify")
 	slice := strings.Split(identify, "/")
+	fromAPP, _ := this.GetBool("from-app") // 是否来自app
 	if len(slice) != 2 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -808,11 +811,16 @@ func (this *CommonController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
-			html, err := query.Html()
+			var htmlStr string
+			if fromAPP {
+				htmlStr, err = html2json.ParseByDom(query)
+			} else {
+				htmlStr, err = query.Html()
+			}
 			if err != nil {
 				beego.Error(err)
 			} else {
-				doc.Release = html
+				doc.Release = htmlStr
 			}
 			if strings.TrimSpace(query.Text()) == "" && !hasImage {
 				doc.Release = ""

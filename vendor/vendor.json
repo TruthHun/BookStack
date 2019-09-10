@@ -3,6 +3,12 @@
 	"ignore": "",
 	"package": [
 		{
+			"checksumSHA1": "PN9/xyf4NSCFaOmlGtxK3Rkvd6Q=",
+			"path": "github.com/PuerkitoBio/goquery",
+			"revision": "3dcf72e6c17f694381a21592651ca1464ded0e10",
+			"revisionTime": "2019-01-09T23:07:04Z"
+		},
+		{
 			"checksumSHA1": "wUqbOMXtTgnqaLAqSGrJZBYi5pU=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "877a9775f06853f611fb2d4e817d92479242d1cd",
