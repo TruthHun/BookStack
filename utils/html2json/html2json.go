@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"golang.org/x/net/html"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -67,26 +69,33 @@ func parse(sel *goquery.Selection) (data []h2j) {
 		}
 		return
 	}
-
-	for _, item := range nodes {
-		var h h2j
-		h.Name = item.Data
-		attr := make(map[string]string)
-		for _, a := range item.Attr {
-			attr[a.Key] = a.Val
-		}
-		if h.Name == "pre" {
-			h.Name = "div"
-			if class, ok := attr["class"]; ok {
-				attr["class"] = "tag-pre " + class
+	sel.Contents().FilterFunction(func(i int, s *goquery.Selection) bool {
+		ns := s.Nodes
+		for _, item := range ns {
+			var h h2j
+			if item.Type != html.TextNode {
+				h.Name = item.Data
+				attr := make(map[string]string)
+				for _, a := range item.Attr {
+					attr[a.Key] = a.Val
+				}
+				if h.Name == "pre" {
+					h.Name = "div"
+					if class, ok := attr["class"]; ok {
+						attr["class"] = "tag-pre " + class
+					} else {
+						attr["class"] = "tag-pre"
+					}
+				}
+				h.Attrs = attr
+				h.Children = parse(goquery.NewDocumentFromNode(item).Selection)
 			} else {
-				attr["class"] = "tag-pre"
+				h.Type = "text"
+				h.Text = goquery.NewDocumentFromNode(item).Selection.Text()
 			}
+			data = append(data, h)
 		}
-
-		h.Children = parse(goquery.NewDocumentFromNode(item).Selection)
-		h.Attrs = attr
-		data = append(data, h)
-	}
+		return true
+	})
 	return
 }
