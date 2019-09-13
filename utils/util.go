@@ -329,12 +329,12 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 		if href, ok := selection.Attr("href"); ok {
 			href = JoinURL(urlstr, href)
 
-			if link, ok := links[href]; ok {
+			if link, ok := links[strings.TrimRight(href, "/")]; ok {
 				href = "$" + link
 			} else {
 				slice := strings.Split(href, "#")
 				if len(slice) > 1 {
-					if link, ok = links[slice[0]]; ok {
+					if link, ok = links[strings.TrimRight(slice[0], "/")]; ok {
 						href = "$" + link + "#" + strings.Join(slice[1:], "#")
 					}
 				}

@@ -536,8 +536,9 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 		gq.Find("a").Each(func(i int, selection *goquery.Selection) {
 			if href, ok := selection.Attr("href"); ok {
 				if !strings.HasPrefix(href, "$") {
-					identify := utils.MD5Sub16(href) + ".md"
-					links[href] = identify
+					hrefTrim := strings.TrimRight(href, "/")
+					identify := utils.MD5Sub16(hrefTrim) + ".md"
+					links[hrefTrim] = identify
 				}
 			}
 		})
@@ -550,7 +551,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 					//采集文章内容成功，创建文档，填充内容，替换链接为标识
 					if retMD, err := utils.CrawlHtml2Markdown(href, 0, CrawlByChrome, 2, selector, exclude, links, map[string]string{"project": project}); err == nil {
 						var doc Document
-						identify := utils.MD5Sub16(href) + ".md"
+						identify := utils.MD5Sub16(strings.TrimRight(href, "/")) + ".md"
 						doc.Identify = identify
 						doc.BookId = bookId
 						doc.Version = time.Now().Unix()
