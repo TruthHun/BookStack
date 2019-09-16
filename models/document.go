@@ -539,6 +539,7 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 					hrefTrim := strings.TrimRight(href, "/")
 					identify := utils.MD5Sub16(hrefTrim) + ".md"
 					links[hrefTrim] = identify
+					links[href] = identify
 				}
 			}
 		})

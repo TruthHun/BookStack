@@ -379,6 +379,7 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 		docs []models.Document
 		o    = orm.NewOrm()
 	)
+
 	o.QueryTable("md_books").Filter("identify", bookIdentify).One(&book, "book_id")
 	if book.BookId > 0 {
 		o.QueryTable("md_documents").Filter("book_id", book.BookId).Limit(5000).All(&docs, "identify", "document_id")
@@ -396,7 +397,6 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 
 			//替换文档内容中的链接
 			if gq, err := goquery.NewDocumentFromReader(strings.NewReader(docHtml)); err == nil {
-
 				gq.Find("a").Each(func(i int, selection *goquery.Selection) {
 					if href, ok := selection.Attr("href"); ok && strings.HasPrefix(href, "$") {
 						if slice := strings.Split(href, "#"); len(slice) > 1 {
