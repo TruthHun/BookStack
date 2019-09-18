@@ -96,6 +96,14 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
+	if v, ok := this.Option["CLOSE_OPEN_SOURCE_LINK"]; ok {
+		this.Data["CloseOpenSourceLink"] = v == "true"
+	}
+
+	if v, ok := this.Option["CLOSE_SUBMIT_ENTER"]; ok {
+		this.Data["CloseSubmitEnter"] = v == "true"
+	}
+
 	this.Data["SiteName"] = this.Sitename
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 }

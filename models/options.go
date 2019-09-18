@@ -261,5 +261,25 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CLOSE_SUBMIT_ENTER").Exist() {
+		option := NewOption()
+		option.OptionValue = "false"
+		option.OptionName = "CLOSE_SUBMIT_ENTER"
+		option.OptionTitle = "是否关闭收录入口"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CLOSE_OPEN_SOURCE_LINK").Exist() {
+		option := NewOption()
+		option.OptionValue = "true"
+		option.OptionName = "CLOSE_OPEN_SOURCE_LINK"
+		option.OptionTitle = "是否关闭开源项目入口"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

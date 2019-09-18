@@ -16,8 +16,10 @@
                     <li>
                         <a href="{{urlfor "SearchController.Search"}}" class="visible-xs visible-sm" title="搜索"><i class="fa fa-search"></i> 搜索</a>
                     </li>
-                    {{/*<li><a href="https://www.bookstack.cn/books/adv" title="软文投稿" target="_blank"><i class="fa fa-check"></i> 软文投稿</a></li>*/}}
-                    <li><a href="https://gitee.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
+
+                    {{if eq .CloseOpenSourceLink false}}
+                        <li><a href="https://gitee.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
+                    {{end}}
                 {{if gt .Member.MemberId 0}}
                     <li>
                         <a href="{{urlfor "SettingController.Index"}}" title="个人中心"><i class="fa fa-user-o" aria-hidden="true"></i> 个人中心</a>
@@ -65,10 +67,15 @@
                     <li class="{{if .IsLabel}}active{{end}}">
                         <a href="{{urlfor "LabelController.List" }}" title="标签"><i class="fa fa-tags"></i> 标签</a>
                     </li>
+                    {{if eq .CloseSubmitEnter false}}
                     <li class="{{if .IsSubmit}}active{{end}}">
                         <a href="{{urlfor "SubmitController.Index" }}" title="收录"><i class="fa fa-check-square-o"></i> 收录</a>
                     </li>
+                    {{end}}
+                    {{if eq .CloseOpenSourceLink false}}
                     <li class="hidden-sm"><a href="https://gitee.com/TruthHun/BookStack" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
+                    {{end}}
+
                     {{if .IsSearch}}
                         <li class="active">
                             <a href="{{urlfor "SearchController.Search" }}" title="搜索"><i class="fa fa-search"></i> 搜索</a>
