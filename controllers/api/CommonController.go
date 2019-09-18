@@ -77,6 +77,11 @@ func (this *CommonController) LoginedBindWechat() {
 	this.login(member)
 }
 
+// 获取验证码
+func (this *CommonController) Captcha() {
+
+}
+
 //
 func (this *CommonController) LoginBindWechat() {
 	form := &WechatBindForm{}

@@ -159,6 +159,18 @@
                                 </label>
                             </div>
                         </div>
+
+
+                        <div class="form-group">
+                            <label>同一IP每小时允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
+                            <input type="number" name="HOUR_REG_NUM" class="form-control" value="{{.HOUR_REG_NUM.OptionValue}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label>同一IP每天允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
+                            <input type="number" name="DAILY_REG_NUM" class="form-control" value="{{.DAILY_REG_NUM.OptionValue}}">
+                        </div>
+
                         <div class="form-group">
                             <label>是否开启全文搜索( <span class="text-muted">每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果 </span> )</label>
                             <div class="radio">

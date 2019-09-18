@@ -281,5 +281,25 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "HOUR_REG_NUM").Exist() {
+		option := NewOption()
+		option.OptionValue = "0"
+		option.OptionName = "HOUR_REG_NUM"
+		option.OptionTitle = "同一IP每小时允许注册人数"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DAILY_REG_NUM").Exist() {
+		option := NewOption()
+		option.OptionValue = "0"
+		option.OptionName = "DAILY_REG_NUM"
+		option.OptionTitle = "同一IP每天允许注册人数"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
