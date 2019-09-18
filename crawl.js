@@ -43,14 +43,14 @@ async function screenshot() {
     await page.setRequestInterception(true);
     page.on("request", request => {
         if(getHost(request.url()).indexOf("google")>-1){
-            request.abort();
-        }else{
-            request.continue();
-        }
-    });
-    let timeout =  shot ? 120000 : 30000;
-    let until = shot ? ['load', 'networkidle0'] : ['networkidle2']
-    await page.goto(url, {"waitUntil" :  until, "timeout":timeout});
+        request.abort();
+    }else{
+        request.continue();
+    }
+});
+    let timeout =  shot ? 120000 : 60000;
+    await page.goto(url, {"waitUntil" :  ['networkidle2', 'domcontentloaded'], "timeout":timeout});
+
     let res;
     if(shot){
         if (folder.substr(folder.length-1,1)!="/"){
