@@ -15,7 +15,7 @@ func bookChatRouters() {
 	}))
 
 	// finished
-	beego.Router(prefix+"/api/v1/register", &api.CommonController{}, "post:Register")
+	beego.Router(prefix+"/api/v1/register", &api.CommonController{}, "get,post:Register")
 	beego.Router(prefix+"/api/v1/login", &api.CommonController{}, "post:Login")
 	beego.Router(prefix+"/api/v1/login-by-wechat", &api.CommonController{}, "post:LoginByWechat")
 	beego.Router(prefix+"/api/v1/login-bind-wechat", &api.CommonController{}, "post:LoginBindWechat")

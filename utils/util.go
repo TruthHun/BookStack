@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/astaxie/beego/context"
+
 	"github.com/disintegration/imaging"
 
 	"strconv"
@@ -830,6 +832,27 @@ func UploadFile(src, dest string) (err error) {
 		if err != nil {
 			beego.Error(err.Error())
 		}
+	}
+	return
+}
+
+// 获取ip地址
+func GetIP(ctx *context.Context) (ip string) {
+	ip = ctx.Request.Header.Get("X-Real-Ip")
+	if ip != "" {
+		return
+	}
+	ip = ctx.Request.Header.Get("X-Forwarded-For")
+	if ip != "" {
+		return
+	}
+	ip = ctx.Request.Header.Get("Remote-Addr")
+	if ip != "" {
+		return
+	}
+	slice := strings.Split(ctx.Request.RemoteAddr, ":")
+	if len(slice) == 2 {
+		return slice[0]
 	}
 	return
 }

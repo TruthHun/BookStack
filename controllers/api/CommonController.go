@@ -77,12 +77,6 @@ func (this *CommonController) LoginedBindWechat() {
 	this.login(member)
 }
 
-// 获取验证码
-func (this *CommonController) Captcha() {
-
-}
-
-//
 func (this *CommonController) LoginBindWechat() {
 	form := &WechatBindForm{}
 	err := this.ParseForm(form)
@@ -202,6 +196,10 @@ func (this *CommonController) login(member models.Member) {
 
 // 【OK】
 func (this *CommonController) Register() {
+	if this.Ctx.Request.Method == http.MethodGet {
+		this.Response(http.StatusOK, "Register", this.Ctx.Request.Header, map[string]string{"IP": utils.GetIP(this.Ctx)})
+	}
+
 	var register APIRegister
 	err := this.ParseForm(&register)
 	if err != nil {
