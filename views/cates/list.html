@@ -78,6 +78,10 @@
     $(function () {
         $(".cate-item").tooltip();
         $(".panel-recommend .panel-body a").tooltip();
+        $(".cate-item").click(function (e) {
+            e.preventDefault()
+            location.href=$(this).find("a").attr("href")
+        });
     })
 </script>
 </body>

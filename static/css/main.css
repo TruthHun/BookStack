@@ -743,7 +743,7 @@ a{color: #333}
 .cate-list .panel-default{border:0px;margin-bottom: 0px;}
 .cate-list .panel-body{padding-left: 7px;padding-right: 7px;padding-top: 0px;}
 .cate-list .panel-body img{width: 50px;height: 50px;border:1px solid #f1f1f1;}
-.cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;border-radius: 3px;}
+.cate-list .panel-body .cate-item{margin-top: 15px;border: 1px solid rgba(0,0,0,.1);padding-left: 0px;padding-right: 15px;padding: 10px;border-radius: 3px;cursor: pointer}
 .cate-list .panel-body .col-xs-12{padding-left: 8px;padding-right: 8px;}
 .cate-list .cate-item>a{display: inline-block;float: left;}
 .cate-list .cate-item>div{display: inline-block;width: 100%;}
