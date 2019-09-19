@@ -259,13 +259,24 @@ func (this *DocumentController) Read() {
 			beego.Error(err.Error())
 		}
 	}
-
-	//SEO
-	this.GetSeoByPage("book_read", map[string]string{
+	parentTitle := doc.GetParentTitle(doc.ParentId)
+	seo := map[string]string{
 		"title":       doc.DocumentName + " - 《" + bookResult.BookName + "》",
 		"keywords":    bookResult.Label,
 		"description": beego.Substr(bodyText+" "+bookResult.Description, 0, 200),
-	})
+	}
+
+	if len(parentTitle) > 0 {
+		parentTitleStr := strings.Join(parentTitle, " - ")
+		parentTitleSub := beego.Substr(parentTitleStr, 0, 50)
+		if len(parentTitleStr) > 50 {
+			parentTitleSub = parentTitleSub + "..."
+		}
+		seo["title"] = doc.DocumentName + " - " + parentTitleSub + " - 《" + bookResult.BookName + "》"
+	}
+
+	//SEO
+	this.GetSeoByPage("book_read", seo)
 
 	existBookmark := new(models.Bookmark).Exist(this.Member.MemberId, doc.DocumentId)
 
