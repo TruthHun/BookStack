@@ -710,6 +710,10 @@ func (this *CommonController) Read() {
 	identify := this.GetString("identify")
 	slice := strings.Split(identify, "/")
 	fromAPP, _ := this.GetBool("from-app") // 是否来自app
+	tagsMap := weixinTagsMap
+	if fromAPP {
+		tagsMap = appTagsMap
+	}
 	if len(slice) != 2 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -786,7 +790,7 @@ func (this *CommonController) Read() {
 			})
 
 			for tag, _ := range allTags {
-				if _, ok := richTextTags[tag]; !ok {
+				if _, ok := tagsMap.Load(tag); !ok {
 					for len(query.Find(tag).Nodes) > 0 {
 						query.Find(tag).Each(func(i int, selection *goquery.Selection) {
 							if ret, err := selection.Html(); err == nil {
@@ -801,9 +805,12 @@ func (this *CommonController) Read() {
 			query.Find(".reference-link").Remove()
 			query.Find(".header-link").Remove()
 
-			for tag, _ := range richTextTags {
-				query.Find(tag).AddClass("-" + tag).RemoveAttr("id")
-			}
+			tagsMap.Range(func(tag, value interface{}) bool {
+				t := tag.(string)
+				query.Find(t).AddClass("-" + t).RemoveAttr("id")
+				return true
+			})
+
 			hasImage := false
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				hasImage = true
@@ -814,7 +821,9 @@ func (this *CommonController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
+
 			var htmlStr string
+
 			if fromAPP {
 				htmlStr, err = html2json.ParseByDom(query)
 			} else {
