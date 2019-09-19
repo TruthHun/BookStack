@@ -53,7 +53,6 @@ func (this *CommonController) Login() {
 	this.login(member)
 }
 
-// TODO: 已登录状态，绑定微信
 func (this *CommonController) LoginedBindWechat() {
 	username := this.GetString("username") //username or email
 	password := this.GetString("password")
@@ -196,8 +195,12 @@ func (this *CommonController) login(member models.Member) {
 
 // 【OK】
 func (this *CommonController) Register() {
+	//hourNum, _ := strconv.Atoi(models.GetOptionValue("HOUR_REG_NUM", ""))
+	//dailyNum, _ := strconv.Atoi(models.GetOptionValue("DAILY_REG_NUM", ""))
+	realIPField := models.GetOptionValue("REAL_IP_FIELD", "")
+
 	if this.Ctx.Request.Method == http.MethodGet {
-		this.Response(http.StatusOK, "Register", this.Ctx.Request.Header, map[string]string{"IP": utils.GetIP(this.Ctx)})
+		this.Response(http.StatusOK, "Register", map[string]interface{}{"IP": utils.GetIP(this.Ctx, realIPField), "Request": this.Ctx.Request.Header})
 	}
 
 	var register APIRegister

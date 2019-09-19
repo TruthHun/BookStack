@@ -162,6 +162,15 @@
 
 
                         <div class="form-group">
+                            <label>获取访客真实IP的request header字段</label>
+                            <input type="number" name="REAL_IP_FIELD" class="form-control" value="{{.REAL_IP_FIELD.OptionValue}}">
+                            <div class="help-block">
+                                常见的字段有：Remote-Host、X-Forwarded-For、X-Real-Ip，如果您的网站使用了CDN，则您的字段可能不一样。
+                                您可以通过GET的方式访问： https://您的域名/bookchat/api/v1/register 的方式来查看获取真实IP的字段。
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label>同一IP每小时允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
                             <input type="number" name="HOUR_REG_NUM" class="form-control" value="{{.HOUR_REG_NUM.OptionValue}}">
                         </div>

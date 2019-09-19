@@ -837,7 +837,11 @@ func UploadFile(src, dest string) (err error) {
 }
 
 // 获取ip地址
-func GetIP(ctx *context.Context) (ip string) {
+func GetIP(ctx *context.Context, field string) (ip string) {
+	ip = ctx.Request.Header.Get(field)
+	if ip != "" {
+		return
+	}
 	ip = ctx.Request.Header.Get("X-Real-Ip")
 	if ip != "" {
 		return
@@ -850,8 +854,9 @@ func GetIP(ctx *context.Context) (ip string) {
 	if ip != "" {
 		return
 	}
+
 	slice := strings.Split(ctx.Request.RemoteAddr, ":")
-	if len(slice) == 2 {
+	if len(slice) == 2 && !strings.Contains(ctx.Request.RemoteAddr, ",") {
 		return slice[0]
 	}
 	return

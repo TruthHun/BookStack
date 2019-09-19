@@ -301,5 +301,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "REAL_IP_FIELD").Exist() {
+		option := NewOption()
+		option.OptionValue = "X-Real-Ip"
+		option.OptionName = "REAL_IP_FIELD"
+		option.OptionTitle = "request中获取访客真实IP的header"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
