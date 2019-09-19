@@ -195,16 +195,23 @@ func (this *CommonController) login(member models.Member) {
 
 // 【OK】
 func (this *CommonController) Register() {
-	//hourNum, _ := strconv.Atoi(models.GetOptionValue("HOUR_REG_NUM", ""))
-	//dailyNum, _ := strconv.Atoi(models.GetOptionValue("DAILY_REG_NUM", ""))
-	realIPField := models.GetOptionValue("REAL_IP_FIELD", "")
-
+	rl := models.NewRegLimit()
+	realIP := utils.GetIP(this.Ctx, rl.RealIPField)
 	if this.Ctx.Request.Method == http.MethodGet {
-		this.Response(http.StatusOK, "Register", map[string]interface{}{"IP": utils.GetIP(this.Ctx, realIPField), "Request": this.Ctx.Request.Header})
+		this.Response(http.StatusOK, "Register", map[string]interface{}{"IP": realIP, "Request": this.Ctx.Request.Header})
+	}
+
+	allowHour, allowDaily := rl.CheckIPIsAllowed(realIP)
+	if !allowHour {
+		this.Response(http.StatusBadRequest, fmt.Sprintf("同一IP，每小时只能注册 %v 个账户", rl.HourRegNum))
+	}
+	if !allowDaily {
+		this.Response(http.StatusBadRequest, fmt.Sprintf("同一IP，每天只能注册 %v 个账户", rl.DailyRegNum))
 	}
 
 	var register APIRegister
 	err := this.ParseForm(&register)
+
 	if err != nil {
 		beego.Error(err.Error())
 		this.Response(http.StatusBadRequest, messageBadRequest)
@@ -232,7 +239,9 @@ func (this *CommonController) Register() {
 	if err = member.Add(); err != nil {
 		this.Response(http.StatusBadRequest, err.Error())
 	}
-
+	if err = rl.Insert(realIP); err != nil {
+		beego.Error(err.Error())
+	}
 	this.login(member)
 }
 

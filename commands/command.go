@@ -82,6 +82,7 @@ func RegisterModel() {
 		models.NewBanner(),
 		models.NewWechatCode(),
 		models.NewWechat(),
+		new(models.RegLimit),
 	)
 	migrate.RegisterMigration()
 }
