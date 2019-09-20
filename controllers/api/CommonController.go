@@ -722,10 +722,6 @@ func (this *CommonController) Read() {
 	identify := this.GetString("identify")
 	slice := strings.Split(identify, "/")
 	fromAPP, _ := this.GetBool("from-app") // 是否来自app
-	tagsMap := weixinTagsMap
-	if fromAPP {
-		tagsMap = appTagsMap
-	}
 	if len(slice) != 2 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -802,7 +798,7 @@ func (this *CommonController) Read() {
 			})
 
 			for tag, _ := range allTags {
-				if _, ok := tagsMap.Load(tag); !ok {
+				if _, ok := weixinTagsMap.Load(tag); !ok {
 					for len(query.Find(tag).Nodes) > 0 {
 						query.Find(tag).Each(func(i int, selection *goquery.Selection) {
 							if ret, err := selection.Html(); err == nil {
@@ -817,7 +813,7 @@ func (this *CommonController) Read() {
 			query.Find(".reference-link").Remove()
 			query.Find(".header-link").Remove()
 
-			tagsMap.Range(func(tag, value interface{}) bool {
+			weixinTagsMap.Range(func(tag, value interface{}) bool {
 				t := tag.(string)
 				query.Find(t).AddClass("-" + t).RemoveAttr("id")
 				return true
@@ -828,9 +824,6 @@ func (this *CommonController) Read() {
 				hasImage = true
 				if src, ok := contentSelection.Attr("src"); ok {
 					contentSelection.SetAttr("src", this.completeLink(src))
-				}
-				if alt, _ := contentSelection.Attr("alt"); alt == "" {
-					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
 

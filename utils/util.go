@@ -49,13 +49,13 @@ import (
 
 //更多存储类型有待扩展
 const (
-	Version           = "2.0"
 	StoreLocal string = "local"
 	StoreOss   string = "oss"
 )
 
 //分词器
 var (
+	Version     = "2.0"
 	Segmenter   sego.Segmenter
 	BasePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	StoreType   = beego.AppConfig.String("store_type") //存储类型
