@@ -10,6 +10,9 @@ appSecret=""
 # 是否限制API请求，也就是如果不是上述配置的微信小程序的appId请求的接口，则直接拒绝
 limitReferer=false
 
+# API 路由前缀，默认为 bookchat
+apiPrefix=bookchat
+
 # 是否显示小程序阅读码（需要配置了appScecret才会生效）
 showWechatCode = false
 

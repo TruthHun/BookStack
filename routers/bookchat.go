@@ -1,15 +1,18 @@
 package routers
 
 import (
+	"strings"
+
 	"github.com/TruthHun/BookStack/controllers/api"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 )
 
 func bookChatRouters() {
-	prefix := "/bookchat"
+	prefix := strings.TrimSpace(beego.AppConfig.DefaultString("apiPrefix", "/bookchat"))
+	prefix = "/" + strings.Trim(prefix, "./")
 
-	beego.InsertFilter("/bookchat/*", beego.BeforeRouter, cors.Allow(&cors.Options{
+	beego.InsertFilter(prefix+"/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"PUT", "POST", "OPTIONS", "GET", "DELETE"},
 	}))
