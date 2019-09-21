@@ -55,7 +55,9 @@ const (
 
 //分词器
 var (
-	Version     = "2.0"
+	Version     string = "unknown"
+	GitHash     string = "unknown"
+	BuildAt     string = time.Now().String()
 	Segmenter   sego.Segmenter
 	BasePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	StoreType   = beego.AppConfig.String("store_type") //存储类型
@@ -70,6 +72,13 @@ func init() {
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
+}
+
+func PrintInfo() {
+	fmt.Println("APP: ", "BookStack")
+	fmt.Println("Version: ", Version)
+	fmt.Println("GitHash: ", GitHash)
+	fmt.Println("BuildAt: ", BuildAt)
 }
 
 func GetLang(lang string) string {

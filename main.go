@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/TruthHun/BookStack/utils"
+
 	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/commands/daemon"
 	_ "github.com/TruthHun/BookStack/routers"
@@ -31,6 +33,6 @@ func main() {
 		fmt.Println("Create service error => ", err)
 		os.Exit(1)
 	}
-
+	utils.PrintInfo()
 	s.Run()
 }
