@@ -25,7 +25,7 @@
                     <a {{if eq $.Lang "other"}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{$.Cid}}&lang=other" title="其他">其他</a>
                 </div>
                 {{if .Cates}}
-                    <div class="help-block lang-explore" style="margin: 10px 0;">
+                    <div class="help-block lang-explore" style="margin: 10px 0 15px;">
                         <span class="text-muted">分类：</span>
                             <a {{if eq $.Cid 0}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&lang={{$.Lang}}" title="不限">不限</a>
                             {{range .Cates}}

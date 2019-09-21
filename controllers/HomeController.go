@@ -40,12 +40,13 @@ func (this *HomeController) Index() {
 	cid, _ = this.GetInt("cid")
 	pid := cid
 	if cid > 0 {
-		for _, cate := range cates {
-			if cate.Id == cid {
-				if cate.Pid > 0 {
-					pid = cate.Pid
+		for _, item := range cates {
+			if item.Id == cid {
+				if item.Pid > 0 {
+					pid = item.Pid
 				}
-				this.Data["Cate"] = cate
+				this.Data["Cate"] = item
+				cate = item
 				break
 			}
 		}
