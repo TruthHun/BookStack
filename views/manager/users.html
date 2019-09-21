@@ -83,9 +83,6 @@
                                             </div>
                                         </template>
                                     </td>
-{{/*                                    <td>*/}}
-{{/*                                        ${item.auth_method}*/}}
-{{/*                                    </td>*/}}
                                     <td>
                                         <template v-if="item.status == 0">
                                             <span class="label label-success">正常</span>
@@ -256,7 +253,28 @@
                 lists : {{.Result}}
             },
             delimiters : ['${','}'],
+            created:function(){
+                var lists = this.lists
+                for (var i = 0; i < lists.length; i++) {
+                    lists[i].create_time=this.formatTime(lists[i].create_time)
+                }
+                this.lists = lists
+            },
             methods : {
+                formatTime:function(time){
+                    date = new Date(time)
+                    const year = date.getFullYear()
+                    const month = date.getMonth() + 1
+                    const day = date.getDate()
+                    const hour = date.getHours()
+                    const minute = date.getMinutes()
+                    const second = date.getSeconds()
+                    return [year, month, day].map(this.formatNumber).join('-') + ' ' + [hour, minute, second].map(this.formatNumber).join(':')
+                },
+                formatNumber:function(n){
+                    n = n.toString()
+                    return n[1] ? n : '0' + n
+                },
                 setMemberStatus : function (id,status,e) {
                     var $this = this;
                     $.ajax({
