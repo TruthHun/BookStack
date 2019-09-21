@@ -35,20 +35,26 @@ func (this *HomeController) Index() {
 		tab = "latest"
 	}
 
-	if cid, _ = this.GetInt("cid"); cid > 0 {
-		ModelCate := new(models.Category)
-		cate = ModelCate.Find(cid)
-		this.Data["Cate"] = cate
+	ModelCate := new(models.Category)
+	cates, _ := ModelCate.GetCates(-1, 1)
+	cid, _ = this.GetInt("cid")
+	pid := cid
+	if cid > 0 {
+		for _, cate := range cates {
+			if cate.Id == cid {
+				if cate.Pid > 0 {
+					pid = cate.Pid
+				}
+				this.Data["Cate"] = cate
+				break
+			}
+		}
 	}
-
+	this.Data["Cates"] = cates
 	this.Data["Cid"] = cid
+	this.Data["Pid"] = pid
 	this.TplName = "home/index.html"
 	this.Data["IsHome"] = true
-
-	//如果没有开启匿名访问，则跳转到登录页面
-	if !this.EnableAnonymous && this.Member == nil {
-		this.Redirect(beego.URLFor("AccountController.Login"), 302)
-	}
 
 	pageIndex, _ := this.GetInt("page", 1)
 	//每页显示24个，为了兼容Pad、mobile、PC
