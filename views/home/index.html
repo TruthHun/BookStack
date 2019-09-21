@@ -16,8 +16,8 @@
             </form>
         </div>
         <div class="row">
-            <div class="col-xs-12 mgt-15px">
-                <div class="help-block lang-explore" style="margin: 15px 0px 0;">
+            <div class="col-xs-12 mgt-15px" style="line-height: 200%;">
+                <div class="help-block lang-explore" style="margin: 10px 0px 0;">
                     <span class="text-muted">语种：</span>
                     <a {{if eq $.Lang ""}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{$.Cid}}" title="不限">不限</a>
                     <a {{if eq $.Lang "zh"}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{$.Cid}}&lang=zh" title="中文">中文</a>
@@ -25,7 +25,7 @@
                     <a {{if eq $.Lang "other"}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{$.Cid}}&lang=other" title="其他">其他</a>
                 </div>
                 {{if .Cates}}
-                    <div class="help-block lang-explore" style="margin: 15px 0px 30px;">
+                    <div class="help-block lang-explore" style="margin: 10px 0;">
                         <span class="text-muted">分类：</span>
                             <a {{if eq $.Cid 0}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&lang={{$.Lang}}" title="不限">不限</a>
                             {{range .Cates}}
@@ -35,7 +35,7 @@
                             {{end}}
 
                         {{if gt $.Cid 0}}
-                            <div class="help-block" style="text-indent: 45px;margin-top: 10px;line-height: 200%;">
+                            <div class="help-block" style="text-indent: 45px;">
                             {{range .Cates}}
                             {{if and (eq .Pid $.Pid) (gt .Cnt 0)}}
                                 <a {{if eq $.Cid .Id}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{.Id}}&lang={{$.Lang}}" title="{{.Title}}">{{.Title}}</a>
