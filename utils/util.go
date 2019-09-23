@@ -49,8 +49,9 @@ import (
 
 //更多存储类型有待扩展
 const (
-	StoreLocal string = "local"
-	StoreOss   string = "oss"
+	StoreLocal  string = "local"
+	StoreOss    string = "oss"
+	VirtualRoot string = "virtualroot"
 )
 
 //分词器
@@ -79,6 +80,10 @@ func PrintInfo() {
 	fmt.Println("Version: ", Version)
 	fmt.Println("BuildAt: ", BuildAt)
 	fmt.Println("GitHash: ", GitHash)
+}
+
+func InitVirtualRoot() {
+	os.MkdirAll(VirtualRoot, os.ModePerm)
 }
 
 func GetLang(lang string) string {

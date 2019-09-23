@@ -3,11 +3,8 @@ package controllers
 import (
 	"bytes"
 	"fmt"
-	"net/http"
 	"strconv"
 	"unicode/utf8"
-
-	"github.com/TruthHun/BookStack/models/store"
 
 	"github.com/TruthHun/BookStack/utils"
 
@@ -16,9 +13,6 @@ import (
 	"strings"
 
 	"compress/gzip"
-
-	"io/ioutil"
-	"path/filepath"
 
 	"time"
 
@@ -221,22 +215,6 @@ func (this *BaseController) Sitemap() {
 	//this.JsonResult(0, "aaa", docs)
 	this.Data["Docs"] = docs
 	this.TplName = "widgets/sitemap.html"
-}
-
-//静态文件，这个加在路由的最后
-func (this *BaseController) StaticFile() {
-	splat := this.GetString(":splat")
-	ext := filepath.Ext(splat)
-	if strings.Contains(beego.AppConfig.String("StaticExt"), strings.ToLower(ext)) {
-		if b, err := ioutil.ReadFile(splat); err == nil {
-			//if strings.ToLower(ext) == ".svg" {
-			//	this.Ctx.ResponseWriter.Header().Set("content-type", "image/svg+xml")
-			//}
-			this.Ctx.ResponseWriter.Write(b)
-			return
-		}
-	}
-	this.Abort("404")
 }
 
 func (this *BaseController) loginByMemberId(memberId int) (err error) {
@@ -475,39 +453,4 @@ func (this *BaseController) SetFollow() {
 		this.JsonResult(0, "您已经成功取消了关注")
 	}
 	this.JsonResult(0, "您已经成功关注了Ta")
-}
-
-// 项目静态文件
-func (this *BaseController) ProjectsFile() {
-	prefix := "projects/"
-	object := prefix + this.GetString(":splat")
-
-	//这里的时间只是起到缓存的作用
-	t, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
-	date := t.Format(http.TimeFormat)
-	since := this.Ctx.Request.Header.Get("If-Modified-Since")
-	if since == date {
-		this.Ctx.ResponseWriter.WriteHeader(http.StatusNotModified)
-		return
-	}
-
-	if utils.StoreType == utils.StoreOss { //oss
-		reader, err := store.NewOss().GetFileReader(object)
-		if err != nil {
-			beego.Error(err.Error())
-			this.Abort("404")
-		}
-		b, err := ioutil.ReadAll(reader)
-		if err != nil {
-			beego.Error(err.Error())
-			this.Abort("404")
-		}
-		this.Ctx.ResponseWriter.Header().Set("Last-Modified", date)
-		if strings.HasSuffix(object, ".svg") {
-			this.Ctx.ResponseWriter.Header().Set("Content-Type", "image/svg+xml")
-		}
-		this.Ctx.ResponseWriter.Write(b)
-	} else { //local
-		this.Abort("404")
-	}
 }

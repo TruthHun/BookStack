@@ -3,6 +3,8 @@ package routers
 import (
 	"encoding/json"
 
+	"github.com/TruthHun/BookStack/utils"
+
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/astaxie/beego"
@@ -37,8 +39,8 @@ func init() {
 
 	var FinishRouter = func(ctx *context.Context) {
 		ctx.ResponseWriter.Header().Add("Application", "BookStack")
-		ctx.ResponseWriter.Header().Add("Version", beego.AppConfig.DefaultString("version", "v1.0.0"))
+		ctx.ResponseWriter.Header().Add("Version", utils.Version)
 	}
-
 	beego.InsertFilter("/*", beego.BeforeRouter, FinishRouter, false)
+	beego.SetStaticPath("/sitemap", "sitemap")
 }

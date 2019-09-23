@@ -42,3 +42,4 @@ version_control
 node_modules
 dist
 output
+virtualroot

@@ -34,5 +34,6 @@ func main() {
 		os.Exit(1)
 	}
 	utils.PrintInfo()
+	utils.InitVirtualRoot()
 	s.Run()
 }
