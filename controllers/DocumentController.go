@@ -267,12 +267,7 @@ func (this *DocumentController) Read() {
 	}
 
 	if len(parentTitle) > 0 {
-		parentTitleStr := strings.Join(parentTitle, " - ")
-		parentTitleSub := beego.Substr(parentTitleStr, 0, 50)
-		if len(parentTitleStr) > 50 {
-			parentTitleSub = parentTitleSub + "..."
-		}
-		seo["title"] = doc.DocumentName + " - " + parentTitleSub + " - 《" + bookResult.BookName + "》"
+		seo["title"] = parentTitle + " - " + doc.DocumentName + " - 《" + bookResult.BookName + "》"
 	}
 
 	//SEO

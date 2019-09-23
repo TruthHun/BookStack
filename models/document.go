@@ -474,18 +474,10 @@ func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	return
 }
 
-func (m *Document) GetParentTitle(pid int) (title []string) {
+func (m *Document) GetParentTitle(pid int) (title string) {
 	var d Document
 	orm.NewOrm().QueryTable(m).Filter("document_id", pid).One(&d, "document_id", "parent_id", "document_name")
-	if d.DocumentId > 0 {
-		title = append(title, d.DocumentName)
-	}
-
-	if d.ParentId > 0 {
-		title = append(title, m.GetParentTitle(d.ParentId)...)
-	}
-
-	return
+	return d.DocumentName
 }
 
 //自动生成下一级的内容
