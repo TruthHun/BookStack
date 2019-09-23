@@ -9,6 +9,10 @@
 			"revisionTime": "2019-01-09T23:07:04Z"
 		},
 		{
+			"path": "github.com/TruthHun/html2json",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "wUqbOMXtTgnqaLAqSGrJZBYi5pU=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "877a9775f06853f611fb2d4e817d92479242d1cd",

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TruthHun/BookStack/utils/html2json"
+	"github.com/TruthHun/html2json/html2json"
 
 	"github.com/TruthHun/BookStack/oauth"
 
@@ -781,77 +781,104 @@ func (this *CommonController) Read() {
 		}
 	}
 
+	var (
+		nodes    interface{}
+		apiDoc   APIDoc
+		apiDocV2 APIDocV2
+		isMark   = models.NewBookmark().Exist(this.isLogin(), doc.DocumentId)
+	)
 	// 图片链接地址补全
 	if doc.Release != "" {
-		query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(doc.Release))
-		if err != nil {
-			beego.Error(err)
+		if fromAPP { // 兼容 app
+			nodes = this.handleReleaseV2(doc.Release, bookIdentify)
 		} else {
-			// 处理svg
-			query = utils.HandleSVG(query, book.Identify)
-
-			allTags := make(map[string]bool)
-			query.Find("*").Each(func(i int, selection *goquery.Selection) {
-				if len(selection.Nodes) > 0 {
-					allTags[strings.ToLower(selection.Nodes[0].Data)] = true
-				}
-			})
-
-			for tag, _ := range allTags {
-				if _, ok := weixinTagsMap.Load(tag); !ok {
-					for len(query.Find(tag).Nodes) > 0 {
-						query.Find(tag).Each(func(i int, selection *goquery.Selection) {
-							if ret, err := selection.Html(); err == nil {
-								selection.BeforeHtml(ret)
-								selection.Remove()
-							}
-						})
-					}
-				}
-			}
-
-			query.Find(".reference-link").Remove()
-			query.Find(".header-link").Remove()
-
-			weixinTagsMap.Range(func(tag, value interface{}) bool {
-				t := tag.(string)
-				query.Find(t).AddClass("-" + t).RemoveAttr("id")
-				return true
-			})
-
-			hasImage := false
-			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
-				hasImage = true
-				if src, ok := contentSelection.Attr("src"); ok {
-					contentSelection.SetAttr("src", this.completeLink(src))
-				}
-			})
-
-			var htmlStr string
-
-			if fromAPP {
-				htmlStr, err = html2json.ParseByDom(query)
-			} else {
-				htmlStr, err = query.Html()
-			}
-			if err != nil {
-				beego.Error(err)
-			} else {
-				doc.Release = htmlStr
-			}
-			if strings.TrimSpace(query.Text()) == "" && !hasImage {
-				doc.Release = ""
-			}
+			// 兼容微信小程序
+			doc.Release = this.handleReleaseV1(doc.Release, bookIdentify)
 		}
 	}
 
-	var apiDoc APIDoc
+	if fromAPP {
+		utils.CopyObject(doc, &apiDocV2)
+		apiDocV2.Release = nodes
+		apiDocV2.Bookmark = isMark
+		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDocV2})
+	} else {
+		utils.CopyObject(doc, &apiDoc)
+		apiDoc.Bookmark = isMark
+		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDoc})
+	}
 
-	utils.CopyObject(doc, &apiDoc)
+}
 
-	apiDoc.Bookmark = models.NewBookmark().Exist(this.isLogin(), apiDoc.DocumentId)
+func (this *CommonController) handleReleaseV1(release string, bookIdentify string) (htmlStr string) {
+	query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(release))
+	if err != nil {
+		beego.Error(err)
+	} else {
+		// 处理svg
+		query = utils.HandleSVG(query, bookIdentify)
+		allTags := make(map[string]bool)
+		query.Find("*").Each(func(i int, selection *goquery.Selection) {
+			if len(selection.Nodes) > 0 {
+				allTags[strings.ToLower(selection.Nodes[0].Data)] = true
+			}
+		})
 
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDoc})
+		for tag, _ := range allTags {
+			if _, ok := weixinTagsMap.Load(tag); !ok {
+				for len(query.Find(tag).Nodes) > 0 {
+					query.Find(tag).Each(func(i int, selection *goquery.Selection) {
+						if ret, err := selection.Html(); err == nil {
+							selection.BeforeHtml(ret)
+							selection.Remove()
+						}
+					})
+				}
+			}
+		}
+
+		query.Find(".reference-link").Remove()
+		query.Find(".header-link").Remove()
+
+		weixinTagsMap.Range(func(tag, value interface{}) bool {
+			t := tag.(string)
+			query.Find(t).AddClass("-" + t).RemoveAttr("id")
+			return true
+		})
+
+		hasImage := false
+		query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
+			hasImage = true
+			if src, ok := contentSelection.Attr("src"); ok {
+				contentSelection.SetAttr("src", this.completeLink(src))
+			}
+		})
+
+		htmlStr, err = query.Html()
+		if err != nil {
+			beego.Error(err)
+		}
+	}
+	return
+}
+
+func (this *CommonController) handleReleaseV2(release, bookIdentify string) interface{} {
+	query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(release))
+	if err != nil {
+		beego.Error(err)
+		return release
+	}
+	// 处理svg
+	utils.HandleSVG(query, bookIdentify)
+	query.Find(".reference-link").Remove()
+	query.Find(".header-link").Remove()
+
+	nodes, err := html2json.NewDefault().Parse(release, models.GetAPIStaticDomain())
+	if err != nil {
+		beego.Error(err)
+		return release
+	}
+	return nodes
 }
 
 // 【OK】
