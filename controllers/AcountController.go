@@ -17,7 +17,7 @@ import (
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/utils/captcha"
-	"github.com/lifei6671/gocaptcha"
+	//"github.com/lifei6671/gocaptcha"
 )
 
 // AccountController 用户登录与注册.
@@ -591,29 +591,29 @@ func (this *AccountController) Logout() {
 }
 
 //验证码.
-func (this *AccountController) Captcha() {
-	captchaImage, err := gocaptcha.NewCaptchaImage(140, 40, gocaptcha.RandLightColor())
-
-	if err != nil {
-		beego.Error(err)
-		this.Abort("404")
-	}
-
-	captchaImage.DrawNoise(gocaptcha.CaptchaComplexLower)
-
-	//captchaImage.DrawTextNoise(gocaptcha.CaptchaComplexHigh)
-	txt := gocaptcha.RandText(4)
-
-	this.SetSession(conf.CaptchaSessionName, txt)
-
-	captchaImage.DrawText(txt)
-	//captchaImage.Drawline(3);
-	captchaImage.DrawBorder(gocaptcha.ColorToRGB(0x17A7A7A))
-	//captchaImage.DrawHollowLine()
-
-	captchaImage.SaveImage(this.Ctx.ResponseWriter, gocaptcha.ImageFormatJpeg)
-	this.StopRun()
-}
+//func (this *AccountController) Captcha() {
+//	captchaImage, err := gocaptcha.NewCaptchaImage(140, 40, gocaptcha.RandLightColor())
+//
+//	if err != nil {
+//		beego.Error(err)
+//		this.Abort("404")
+//	}
+//
+//	captchaImage.DrawNoise(gocaptcha.CaptchaComplexLower)
+//
+//	//captchaImage.DrawTextNoise(gocaptcha.CaptchaComplexHigh)
+//	txt := gocaptcha.RandText(4)
+//
+//	this.SetSession(conf.CaptchaSessionName, txt)
+//
+//	captchaImage.DrawText(txt)
+//	//captchaImage.Drawline(3);
+//	captchaImage.DrawBorder(gocaptcha.ColorToRGB(0x17A7A7A))
+//	//captchaImage.DrawHollowLine()
+//
+//	captchaImage.SaveImage(this.Ctx.ResponseWriter, gocaptcha.ImageFormatJpeg)
+//	this.StopRun()
+//}
 
 //记录笔记
 func (this *AccountController) Note() {

@@ -1162,7 +1162,7 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 			basePathSlice := strings.Split(basePath, "/")
 			l := len(basePathSlice)
 			b, _ := ioutil.ReadFile(file.Path)
-			output := blackfriday.MarkdownCommon(b)
+			output := blackfriday.Run(b)
 			doc, _ := goquery.NewDocumentFromReader(strings.NewReader(string(output)))
 
 			//图片链接处理
