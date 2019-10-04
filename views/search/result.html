@@ -35,7 +35,7 @@
         </div>
         <div class="row">
             <div class="col-sm-8 col-xs-12 result-list">
-                <div class="help-block">本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您搜索到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
+                <div class="help-block"><a style="color: red;" target="_blank" rel="nofollow noreferrer" href="https://www.baidu.com/s?wd={{.SITE_NAME}}">{{.SITE_NAME}}</a> 本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您找到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "book"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=book">搜书籍</a></li>
                     <li {{if eq $.Tab "doc"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a></li>

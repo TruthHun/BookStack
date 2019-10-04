@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>广告管理  - {{.SITE_NAME}}</title>
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
+    <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+    <link rel="stylesheet" href="/static/css/toast.css">
+    <style>
+        .content-block{
+            max-width: 300px;word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+<div class="manual-reader">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="row">
+            <div class="page-left">
+                {{template "manager/menu.html" .}}
+            </div>
+            <div class="page-right">
+                <div class="m-box">
+                    <div class="box-head">
+                        <strong class="box-title">评论管理</strong>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <ul class="nav nav-tabs">
+                        <li {{if eq .Status "0"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=0">待审核</a></li>
+                        <li {{if eq .Status "1"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=1">审核通过</a></li>
+                        <li {{if eq .Status "-1"}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments"}}?status=-1">审核不通过</a></li>
+                    </ul>
+                    <br>
+                    <table class="table table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>用户</th>
+                            <th>书籍</th>
+                            <th>内容</th>
+                            <th>状态/时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {{range .Comments}}
+                                <tr>
+                                    <td>{{.Id}}</td>
+                                    <td><a href="{{urlfor "UserController.Index" ":username" .Account}}" target="_blank">{{.Nickname}}</a></td>
+                                    <td><a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank">《{{.BookName}}》</a></td>
+                                    <td>
+                                        <div class="help-block content-block">
+                                            {{.Content}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select name="status" class="form-control change-update" data-refresh="true" data-url="{{urlfor "ManagerController.SetCommentStatus"}}?id={{.Id}}">
+                                            <option value="1" {{if eq .Status 1}}selected{{end}}>审核通过</option>
+                                            <option value="0" {{if eq .Status 0}}selected{{end}}>待审核</option>
+                                            <option value="-1" {{if eq .Status -1}}selected{{end}}>审核不通过</option>
+                                        </select>
+                                        <div class="help-block">{{date .TimeCreate "Y-m-d H:i:s"}}</div>
+                                    </td>
+                                    <td>
+                                        <a href="{{urlfor "ManagerController.ClearComments"}}?uid={{.Uid}}" class="tooltips confirm ajax-get" title="清除当前用户的所有评论">清评</a><br>
+                                        <a href="{{urlfor "ManagerController.DeleteComment"}}?id={{.Id}}" class="tooltips confirm ajax-get" title="删除当前评论">删评</a>
+                                    </td>
+                                </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                    {{.PageHtml}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/jquery/1.12.4/jquery.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
+<script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
+</body>
+</html>
