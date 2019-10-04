@@ -23,6 +23,9 @@ type Category struct {
 	Cnt    int    `json:"cnt"`                         //分类下的文档项目统计
 	Sort   int    `json:"sort"`                        //排序
 	Status bool   `json:"status"`                      //分类状态，true表示显示，否则表示隐藏
+	//PrintBookCount int    `orm:"default(0)" json:"print_book_count"`
+	//WikiCount      int    `orm:"default(0)" json:"wiki_count"`
+	//ArticleCount   int    `orm:"default(0)" json:"article_count"`
 }
 
 func NewCategory() *Category {

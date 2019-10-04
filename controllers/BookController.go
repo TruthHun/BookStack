@@ -231,6 +231,8 @@ func (this *BookController) SaveBook() {
 	book.Author = this.GetString("author")
 	book.AuthorURL = this.GetString("author_url")
 	book.Lang = this.GetString("lang")
+	book.AdTitle = this.GetString("ad_title")
+	book.AdLink = this.GetString("ad_link")
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")

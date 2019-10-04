@@ -122,6 +122,21 @@
                             </div>
 
                             <div class="form-group">
+                                <label>文字广告</label>
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">广告标题</button>
+                                    </span>
+                                    <input type="text" placeholder="选填" value="{{.Model.AdTitle}}" name="ad_title" id="author" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" style="border-left: 0px;border-right: 0px;border-radius: 0px;" type="button">广告链接</button>
+                                    </span>
+                                    <input type="text" placeholder="选填" value="{{.Model.AdLink}}" name="ad_link" id="author_url" class="form-control">
+                                </div>
+                                <p class="text help-block">文字广告，可以放原作者的打赏和赞助二维码链接，也可以放开源书籍的购买链接以支持作者</p>
+                            </div>
+
+                            <div class="form-group">
                                 <label>分类 (<span class="text-muted">支持选择多个分类</span>)</label>
                                 {{range $idx,$cate:=$.Cates}}
                                     {{if eq $cate.Pid 0}}
@@ -141,12 +156,12 @@
                             <div class="form-group">
                                 <label>描述</label>
                                 <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="项目描述">{{.Model.Description}}</textarea>
-                                <p class="text">描述信息不超过500个字符,支持Markdown语法</p>
+                                <p class="text help-block">描述信息不超过500个字符,支持Markdown语法</p>
                             </div>
                             <div class="form-group">
                                 <label>标签</label>
                                 <input type="text" class="form-control" name="label" placeholder="项目标签" value="{{.Model.Label}}">
-                                <p class="text">最多允许添加10个标签，多个标签请用“,”分割</p>
+                                <p class="text help-block">最多允许添加10个标签，多个标签请用“,”分割</p>
                             </div>
                 {{if eq .Model.PrivatelyOwned 1}}
                 <div class="form-group">

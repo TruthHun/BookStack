@@ -25,6 +25,8 @@
         li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
         .editormd-preview-container pre.prettyprint, .editormd-html-preview pre.prettyprint{border-color: transparent;}
         body{-webkit-overflow-scrolling:touch;}
+        .alink,.alink a{color: #888 !important;}
+        .alink:hover,.alink a:hover{color: red !important;}
     </style>
 </head>
 <body>
@@ -45,7 +47,6 @@
                         <img src="/static/images/wxacode.png" style="position: relative;top:-2px;" alt="BookChat 小程序"> <span>小程序</span></a>
                     {{end}}
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload" class="btn btn-light"><i class="fa fa-cloud-download"></i> 下载</a>
-
 
                     <a href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow" class="btn btn-link showModalHistory"><i class="fa fa-clock-o"></i> 阅读记录</a>
                     <span class="dropdown">
@@ -89,8 +90,12 @@
                 </div>
                 <div class="article-content">
                     <div class="help-block article-info" style="padding-bottom: 20px;">
+                        {{if .Model.AdTitle}}
+                            <span class="alink tooltips" title="{{.Model.AdTitle}}"><i class="fa fa-angle-right"></i> <a target="_blank" rel="nofollow" href="{{.Model.AdLink}}">{{.Model.AdTitle}}</a> <i class="fa fa-angle-left"></i> </span>
+                        {{end}}
+
                         {{if .Model.Author}}
-                            <span><i class="fa fa-user-o"></i> <a target="_blank" title="来源" href="{{.Model.AuthorURL}}">来源: {{.Model.Author}}</a></span>
+                            <span><i class="fa fa-user-o"></i> <a target="_blank" title="来源" href="{{.Model.AuthorURL}}">来源 {{.Model.Author}}</a></span>
                         {{end}}
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>

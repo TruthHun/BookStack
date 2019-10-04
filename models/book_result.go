@@ -46,6 +46,8 @@ type BookResult struct {
 	IsDisplayComment bool   `json:"is_display_comment"`
 	Author           string `json:"author"`
 	AuthorURL        string `json:"author_url"`
+	AdTitle          string `json:"ad_title"`
+	AdLink           string `json:"ad_link"`
 	Lang             string `json:"lang"`
 }
 

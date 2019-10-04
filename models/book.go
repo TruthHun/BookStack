@@ -63,8 +63,10 @@ type Book struct {
 	Score             int       `orm:"column(score);default(40)" json:"score"` // 文档项目评分，默认40，即4.0星
 	CntScore          int       // 评分人数
 	CntComment        int       // 评论人数
-	Author            string    `orm:"size(50)"`           //原作者，即来源
-	AuthorURL         string    `orm:"column(author_url)"` //原作者链接，即来源链接
+	Author            string    `orm:"size(50)"`            //原作者，即来源
+	AuthorURL         string    `orm:"column(author_url)"`  //原作者链接，即来源链接
+	AdTitle           string    `orm:"default()"`           // 文字广告标题
+	AdLink            string    `orm:"default();size(512)"` // 文字广告链接
 	Lang              string    `orm:"size(10);index;default(zh)"`
 }
 
@@ -542,6 +544,8 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.CntComment = book.CntComment
 	m.Author = book.Author
 	m.AuthorURL = book.AuthorURL
+	m.AdTitle = book.AdTitle
+	m.AdLink = book.AdLink
 	m.Lang = book.Lang
 
 	if book.Theme == "" {

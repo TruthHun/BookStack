@@ -21,7 +21,18 @@
 - [ ] 增加电子书下载管控，是否必须登录才能下载电子书
 - [ ] 发布队列
 
-## V2.4 升级日志
+## v2.2 升级日志
+
+- [ ] 书籍信息设置页，支持增加文字广告功能
+- [ ] 申请成为作者的功能（提交自己GitHub、gitee和博客等相关内容）
+- [ ] 增加实体书功能(广告)
+- [ ] 增加网络课程推广功能(广告)
+- [ ] 增加 wiki 功能
+- [ ] 增加博客(文章)系统功能
+- [ ] ElasticSearch支持搜索博客、wiki和实体书
+- [ ] 增加程序员工具箱功能（长期工作）
+
+## V2.1 升级日志
 
 - [x] 解决 2.0 版本，初始化管理员失败（密码长度修改导致）的问题
 - [x] html转json实现，以兼容各种小程序和uni-app的富文本组件`rich-text`对内容的渲染
@@ -167,8 +178,8 @@ sudo docker run -it -p 9300:9300 -p 9200:9200 -v /Users/TruthHun/elasticsearch/d
 ## V1.3 开发升级预告
 - [x] 新增：用户阅读记录和阅读进度
 - [x] 新增：阅读书签功能，以便读者标记阅读位置
-- [x] 新增：书籍详情页和文档内容页增加分享功能（由于百度分享等现有分享代码不支持`https`，所以使用本地化百度分享源码解决方案 https://github.com/hrwhisper/baiduShare ）
-- [x] 新增：使用KaTeX（ https://github.com/Khan/KaTeX ），扩展对数学公式的支持
+- [x] 新增：书籍详情页和文档内容页增加分享功能（由于百度分享等现有分享代码不支持`https`，所以使用本地化百度分享源码解决方案 <https://github.com/hrwhisper/baiduShare> ）
+- [x] 新增：使用KaTeX（ <https://github.com/Khan/KaTeX> ），扩展对数学公式的支持
 - [x] 优化：更新HTML转markdown工具[html2md](https://github.com/TruthHun/html2md)，强化转化效果
 - [x] 修复：文档内URL链接大小写问题优化 [issue#20](https://github.com/TruthHun/BookStack/issues/20)
 - [x] 修复：友链唯一索引问题(默认的字段varchar类型长度(255)过长，导致部分MySQL数据库无法生成唯一索引)
@@ -203,7 +214,7 @@ FIX:
 - [x] 一键拉取项目，支持任何来源的zip压缩的markdown项目的拉取
 - [x] 无刷新加载上下篇阅读文档，优化阅读体验
 - [x] 移除SEO等Go文件中硬编码的"bookstack.cn"的域名(因为BookStack，一开始是打算自用的，所以当时写死了)
-- [x] 登录和注册验证码优化（使用Beego自带的验证码体系：https://github.com/astaxie/beego/tree/master/utils/captcha）
+- [x] 登录和注册验证码优化（使用Beego自带的验证码体系：<https://github.com/astaxie/beego/tree/master/utils/captcha）>
 - [x] 支持本地化存储（改动了很多地方，具体改动，请`git log`查看）。在app.conf中增加了`store_type`配置项，以扩展存储类型，目前扩展的存储类型有本地存储(`local`)和阿里云OSS存储(`oss`)，更多存储类型(`七牛云存储(qiniu)、腾讯云存储(cos)、百度云存储(bos)、又拍云存储(upyun)`)持续开发中.
 - [x] 分页优化
 - [x] 解决角色名称有时不显示的问题
