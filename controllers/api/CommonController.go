@@ -885,8 +885,11 @@ func (this *CommonController) handleReleaseV2(release, bookIdentify string) inte
 func (this *CommonController) Banners() {
 	t := this.GetString("type", "wechat")
 	banners, _ := models.NewBanner().Lists(t)
-	// TODO: 直接在这里返回横幅尺寸，不用在小程序文件中进行配置
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners, "size": beego.AppConfig.DefaultString("bannerSize", "825x315")})
+	bannerSize, _ := strconv.ParseFloat(models.GetOptionValue("MOBILE_BANNER_SIZE", "2.619"), 64)
+	if bannerSize <= 0 {
+		bannerSize = 2.619
+	}
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners, "size": bannerSize})
 }
 
 func (this *CommonController) Download() {

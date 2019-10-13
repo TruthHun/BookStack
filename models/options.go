@@ -341,5 +341,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "MOBILE_BANNER_SIZE").Exist() {
+		option := NewOption()
+		option.OptionValue = ""
+		option.OptionName = "MOBILE_BANNER_SIZE"
+		option.OptionTitle = "手机端横幅宽高比"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

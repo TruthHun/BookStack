@@ -181,6 +181,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label>移动端横幅宽高比( <span class="text-muted">填写横幅宽高比例数字，如长300，宽100，则填3或3.0。【针对 <a href="/manager/banners" target="_blank">横幅管理</a> 中的移动端横幅比例】</span> )</label>
+                            <input type="number" name="MOBILE_BANNER_SIZE" class="form-control" value="{{.MOBILE_BANNER_SIZE.OptionValue}}">
+                        </div>
+
+                        <div class="form-group">
                             <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
                             <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
                         </div>
