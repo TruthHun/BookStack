@@ -1301,7 +1301,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 /*}*/
 
 
-@media screen and (min-width: 840px) {
+@media screen and (min-width: 1450px) {
     .markdown-toc{
         position: fixed;background-color: #fff;
         right: 15px;z-index: 99;
