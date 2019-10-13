@@ -194,7 +194,17 @@
                             <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
                             <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
                         </div>
-
+                        <div class="form-group">
+                            <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "true"}}checked{{end}} name="AUTO_HTTPS" value="true">是<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "false"}}checked{{end}} name="AUTO_HTTPS" value="false">否<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label>是否隐藏导航栏"标签"</label>
                             <div class="radio">

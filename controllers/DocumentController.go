@@ -227,18 +227,25 @@ func (this *DocumentController) Read() {
 	}
 
 	bodyText := ""
+	authHTTPS := strings.ToLower(models.GetOptionValue("AUTO_HTTPS", "false")) == "true"
 	if doc.Release != "" {
 		query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(doc.Release))
 		if err != nil {
 			beego.Error(err)
 		} else {
 			query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
-				if src, ok := contentSelection.Attr("src"); ok {
+				src, ok := contentSelection.Attr("src")
+				if ok {
 					if utils.StoreType == utils.StoreOss && !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
 						src = this.OssDomain + "/" + strings.TrimLeft(src, "./")
-						contentSelection.SetAttr("src", src)
 					}
 				}
+				if authHTTPS {
+					if srcArr := strings.Split(src, "://"); len(srcArr) > 1 {
+						src = "https://" + strings.Join(srcArr[1:], "://")
+					}
+				}
+				contentSelection.SetAttr("src", src)
 				if alt, _ := contentSelection.Attr("alt"); alt == "" {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
