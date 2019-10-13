@@ -1285,7 +1285,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .article-info i{font-style: normal;}
 
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{
-    color: #999 !important;font-style: normal !important;
+    color: #777 !important;font-style: normal !important;
     border-left: 4px solid #D6DBDF;font-size: 14px;
     background: none repeat scroll 0 0 rgba(102,128,153,.05);
     margin: 8px 0;padding: 8px;
