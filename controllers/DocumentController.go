@@ -68,15 +68,14 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 
 	//如果文档是私有的
 	if book.PrivatelyOwned == 1 && !this.Member.IsAdministrator() {
-
 		isOk := false
-
 		if this.Member != nil {
 			_, err := models.NewRelationship().FindForRoleId(book.BookId, this.Member.MemberId)
 			if err == nil {
 				isOk = true
 			}
 		}
+
 		if book.PrivateToken != "" && !isOk {
 			//如果有访问的Token，并且该项目设置了访问Token，并且和用户提供的相匹配，则记录到Session中.
 			//如果用户未提供Token且用户登录了，则判断用户是否参与了该项目.
@@ -84,7 +83,12 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 			if token != "" && strings.EqualFold(token, book.PrivateToken) {
 				this.SetSession(identify, token)
 			} else if token, ok := this.GetSession(identify).(string); !ok || !strings.EqualFold(token, book.PrivateToken) {
-				this.Abort("404")
+				hasErr := ""
+				if this.Ctx.Request.Method == "POST" {
+					hasErr = "true"
+				}
+				this.Redirect(beego.URLFor("DocumentController.Index", ":key", identify)+"?with-password=true&err="+hasErr, 302)
+				this.StopRun()
 			}
 		} else if !isOk {
 			this.Abort("404")
@@ -118,16 +122,15 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 func (this *DocumentController) Index() {
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
+	if len(strings.TrimSpace(this.GetString("with-password"))) > 0 {
+		this.indexWithPassword()
+		return
+	}
 	if identify == "" {
 		this.Abort("404")
 	}
 	tab := strings.ToLower(this.GetString("tab"))
 
-	//如果没有开启匿名访问则跳转到登录
-	if !this.EnableAnonymous && this.Member == nil {
-		this.Redirect(beego.URLFor("AccountController.Login"), 302)
-		return
-	}
 	bookResult := isReadable(identify, token, this)
 	if bookResult.BookId == 0 { //没有阅读权限
 		this.Redirect(beego.URLFor("HomeController.Index"), 302)
@@ -161,6 +164,22 @@ func (this *DocumentController) Index() {
 		"description": bookResult.Description,
 	})
 	this.Data["RelateBooks"] = models.NewRelateBook().Lists(bookResult.BookId)
+}
+
+//文档首页.
+func (this *DocumentController) indexWithPassword() {
+	identify := this.Ctx.Input.Param(":key")
+	if identify == "" {
+		this.Abort("404")
+	}
+	this.TplName = "document/read-with-password.html"
+	this.GetSeoByPage("book_info", map[string]string{
+		"title":       "密码访问",
+		"keywords":    "密码访问",
+		"description": "密码访问",
+	})
+	this.Data["ShowErrTips"] = this.GetString("err") != ""
+	this.Data["Identify"] = identify
 }
 
 //阅读文档.

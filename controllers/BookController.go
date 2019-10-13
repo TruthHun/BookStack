@@ -170,7 +170,9 @@ func (this *BookController) Setting() {
 	}
 
 	if book.PrivateToken != "" {
-		book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
+		//book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
+		tipsFmt := "访问链接：%v  访问密码：%v"
+		book.PrivateToken = fmt.Sprintf(tipsFmt, this.BaseUrl()+beego.URLFor("DocumentController.Index", ":key", book.Identify), book.PrivateToken)
 	}
 
 	//查询当前书籍的分类id
@@ -621,8 +623,6 @@ func (this *BookController) CreateToken() {
 		this.JsonResult(6002, err.Error())
 	}
 
-	fmt.Println(bookResult.BookId)
-
 	book := models.NewBook()
 	if _, err := book.Find(bookResult.BookId); err != nil {
 		this.JsonResult(6001, "项目不存在")
@@ -638,7 +638,10 @@ func (this *BookController) CreateToken() {
 			logs.Error("生成阅读令牌失败 => ", err)
 			this.JsonResult(6003, "生成阅读令牌失败")
 		}
-		this.JsonResult(0, "ok", this.BaseUrl()+beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken))
+		//book.PrivateToken = this.BaseUrl() + beego.URLFor("DocumentController.Index", ":key", book.Identify, "token", book.PrivateToken)
+		tipsFmt := "访问链接：%v  访问密码：%v"
+		privateToken := fmt.Sprintf(tipsFmt, this.BaseUrl()+beego.URLFor("DocumentController.Index", ":key", book.Identify), book.PrivateToken)
+		this.JsonResult(0, "ok", privateToken)
 	}
 
 	book.PrivateToken = ""
