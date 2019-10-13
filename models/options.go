@@ -311,5 +311,25 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "APP_PAGE").Exist() {
+		option := NewOption()
+		option.OptionValue = ""
+		option.OptionName = "APP_PAGE"
+		option.OptionTitle = "手机APP下载单页"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "HIDE_TAG").Exist() {
+		option := NewOption()
+		option.OptionValue = "false"
+		option.OptionName = "HIDE_TAG"
+		option.OptionTitle = "是否隐藏标签在导航栏显示"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

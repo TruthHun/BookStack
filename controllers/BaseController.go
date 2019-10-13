@@ -94,6 +94,10 @@ func (this *BaseController) Prepare() {
 		this.Data["CloseOpenSourceLink"] = v == "true"
 	}
 
+	if v, ok := this.Option["HIDE_TAG"]; ok {
+		this.Data["HideTag"] = v == "true"
+	}
+
 	if v, ok := this.Option["CLOSE_SUBMIT_ENTER"]; ok {
 		this.Data["CloseSubmitEnter"] = v == "true"
 	}

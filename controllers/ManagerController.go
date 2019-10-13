@@ -490,10 +490,15 @@ func (this *ManagerController) Setting() {
 		this.JsonResult(0, "ok")
 	}
 
-	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
 	for _, item := range options {
-		this.Data[item.OptionName] = item
+		if item.OptionName == "APP_PAGE" {
+			this.Data["APP_PAGE"] = item.OptionValue
+			this.Data["M_APP_PAGE"] = item
+		} else {
+			this.Data[item.OptionName] = item
+		}
 	}
+	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
 
 	this.Data["IsSetting"] = true
 	this.Data["SeoTitle"] = "配置管理"
