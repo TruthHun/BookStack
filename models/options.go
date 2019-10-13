@@ -331,5 +331,15 @@ func (m *Option) Init() error {
 		}
 	}
 
+	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DOWNLOAD_LIMIT").Exist() {
+		option := NewOption()
+		option.OptionValue = ""
+		option.OptionName = "DOWNLOAD_LIMIT"
+		option.OptionTitle = "是否需要登录才能下载电子书"
+		if _, err := o.Insert(option); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

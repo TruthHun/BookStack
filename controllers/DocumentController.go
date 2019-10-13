@@ -1064,6 +1064,15 @@ func (this *DocumentController) Content() {
 
 //导出文件
 func (this *DocumentController) Export() {
+	if this.Member == nil || this.Member.MemberId == 0 {
+		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
+			tips = strings.TrimSpace(tips)
+			if len(tips) > 0 {
+				this.JsonResult(1, tips)
+			}
+		}
+	}
+
 	this.TplName = "document/export.html"
 	identify := this.Ctx.Input.Param(":key")
 	ext := strings.ToLower(this.GetString("output"))
