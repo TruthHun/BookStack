@@ -16,8 +16,18 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+var httpCache = 0
+
 func Init() {
 	initAPI()
+	go func() {
+		httpCache, _ = strconv.Atoi(GetOptionValue("HTTP_CACHE", "0"))
+		time.Sleep(60 * time.Second)
+	}()
+}
+
+func GetHTTPCache() int {
+	return httpCache
 }
 
 //设置增减

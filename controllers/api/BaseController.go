@@ -166,6 +166,11 @@ func (this *BaseController) Response(httpStatus int, message string, data ...int
 	if err != nil {
 		beego.Error(err)
 	}
+
+	if this.Ctx.Request.Method == http.MethodGet && models.GetHTTPCache() > 0 {
+		this.Ctx.ResponseWriter.Header().Set("Cache-Control", fmt.Sprintf("max-age=%v", models.GetHTTPCache()))
+	}
+
 	this.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if strings.Contains(strings.ToLower(this.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") { //gzip压缩
 		this.Ctx.ResponseWriter.Header().Set("Content-Encoding", "gzip")

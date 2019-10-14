@@ -194,6 +194,12 @@
                             <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
                             <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
                         </div>
+
+                        <div class="form-group">
+                            <label>HTTP缓存( <span class="text-muted">针对小程序/移动APP的API。0表示不缓存，大于0表示缓存多少秒，默认30，即缓存30秒</span> )</label>
+                            <input type="number" min="0" name="HTTP_CACHE" class="form-control" value="{{.HTTP_CACHE.OptionValue}}">
+                        </div>
+
                         <div class="form-group">
                             <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>
                             <div class="radio">

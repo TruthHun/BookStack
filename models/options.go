@@ -96,268 +96,128 @@ func (p *Option) All() ([]*Option, error) {
 func (m *Option) Init() error {
 
 	o := orm.NewOrm()
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLED_REGISTER").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "ENABLED_REGISTER"
-		option.OptionTitle = "是否启用注册"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLE_DOCUMENT_HISTORY").Exist() {
-		option := NewOption()
-		option.OptionValue = "100"
-		option.OptionName = "ENABLE_DOCUMENT_HISTORY"
-		option.OptionTitle = "版本控制"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLED_CAPTCHA").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "ENABLED_CAPTCHA"
-		option.OptionTitle = "是否启用验证码"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ENABLE_ANONYMOUS").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "ENABLE_ANONYMOUS"
-		option.OptionTitle = "启用匿名访问"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "SITE_NAME").Exist() {
-		option := NewOption()
-		option.OptionValue = "BookStack"
-		option.OptionName = "SITE_NAME"
-		option.OptionTitle = "站点名称"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ICP").Exist() {
-		option := NewOption()
-		option.OptionValue = ""
-		option.OptionName = "ICP"
-		option.OptionTitle = "网站备案"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "TONGJI").Exist() {
-		option := NewOption()
-		option.OptionValue = ""
-		option.OptionName = "TONGJI"
-		option.OptionTitle = "站点统计"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "SPIDER").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "SPIDER"
-		option.OptionTitle = "采集器，是否只对管理员开放"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ELASTICSEARCH_ON").Exist() {
-		option := NewOption()
-		option.OptionValue = "false"
-		option.OptionName = "ELASTICSEARCH_ON"
-		option.OptionTitle = "是否开启全文搜索"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ELASTICSEARCH_HOST").Exist() {
-		option := NewOption()
-		option.OptionValue = "http://localhost:9200/"
-		option.OptionName = "ELASTICSEARCH_HOST"
-		option.OptionTitle = "ElasticSearch Host"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DEFAULT_SEARCH").Exist() {
-		option := NewOption()
-		option.OptionValue = "book"
-		option.OptionName = "DEFAULT_SEARCH"
-		option.OptionTitle = "默认搜索"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "SEARCH_ACCURACY").Exist() {
-		option := NewOption()
-		option.OptionValue = "50"
-		option.OptionName = "SEARCH_ACCURACY"
-		option.OptionTitle = "搜索精度"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_QQ").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "LOGIN_QQ"
-		option.OptionTitle = "是否允许使用QQ登录"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
+	options := []Option{
+		{
+			OptionValue: "true",
+			OptionName:  "ENABLED_REGISTER",
+			OptionTitle: "是否启用注册",
+		},
+		{
+			OptionValue: "100",
+			OptionName:  "ENABLE_DOCUMENT_HISTORY",
+			OptionTitle: "版本控制",
+		}, {
+			OptionValue: "true",
+			OptionName:  "ENABLED_CAPTCHA",
+			OptionTitle: "是否启用验证码",
+		}, {
+			OptionValue: "true",
+			OptionName:  "ENABLE_ANONYMOUS",
+			OptionTitle: "启用匿名访问",
+		}, {
+			OptionValue: "BookStack",
+			OptionName:  "SITE_NAME",
+			OptionTitle: "站点名称",
+		}, {
+			OptionValue: "",
+			OptionName:  "ICP",
+			OptionTitle: "网站备案",
+		}, {
+			OptionValue: "",
+			OptionName:  "TONGJI",
+			OptionTitle: "站点统计",
+		}, {
+			OptionValue: "true",
+			OptionName:  "SPIDER",
+			OptionTitle: "采集器，是否只对管理员开放",
+		}, {
+			OptionValue: "false",
+			OptionName:  "ELASTICSEARCH_ON",
+			OptionTitle: "是否开启全文搜索",
+		}, {
+			OptionValue: "http://localhost:9200/",
+			OptionName:  "ELASTICSEARCH_HOST",
+			OptionTitle: "ElasticSearch Host",
+		}, {
+			OptionValue: "book",
+			OptionName:  "DEFAULT_SEARCH",
+			OptionTitle: "默认搜索",
+		}, {
+			OptionValue: "50",
+			OptionName:  "SEARCH_ACCURACY",
+			OptionTitle: "搜索精度",
+		}, {
+			OptionValue: "true",
+			OptionName:  "LOGIN_QQ",
+			OptionTitle: "是否允许使用QQ登录",
+		}, {
+			OptionValue: "true",
+			OptionName:  "LOGIN_GITHUB",
+			OptionTitle: "是否允许使用Github登录",
+		}, {
+			OptionValue: "true",
+			OptionName:  "LOGIN_GITEE",
+			OptionTitle: "是否允许使用码云登录",
+		}, {
+			OptionValue: "0",
+			OptionName:  "RELATE_BOOK",
+			OptionTitle: "是否开始关联书籍",
+		}, {
+			OptionValue: "true",
+			OptionName:  "ALL_CAN_WRITE_BOOK",
+			OptionTitle: "是否都可以创建项目",
+		}, {
+			OptionValue: "false",
+			OptionName:  "CLOSE_SUBMIT_ENTER",
+			OptionTitle: "是否关闭收录入口",
+		}, {
+			OptionValue: "true",
+			OptionName:  "CLOSE_OPEN_SOURCE_LINK",
+			OptionTitle: "是否关闭开源项目入口",
+		}, {
+			OptionValue: "0",
+			OptionName:  "HOUR_REG_NUM",
+			OptionTitle: "同一IP每小时允许注册人数",
+		}, {
+			OptionValue: "0",
+			OptionName:  "DAILY_REG_NUM",
+			OptionTitle: "同一IP每天允许注册人数",
+		}, {
+			OptionValue: "X-Real-Ip",
+			OptionName:  "REAL_IP_FIELD",
+			OptionTitle: "request中获取访客真实IP的header",
+		}, {
+			OptionValue: "",
+			OptionName:  "APP_PAGE",
+			OptionTitle: "手机APP下载单页",
+		}, {
+			OptionValue: "false",
+			OptionName:  "HIDE_TAG",
+			OptionTitle: "是否隐藏标签在导航栏显示",
+		}, {
+			OptionValue: "",
+			OptionName:  "DOWNLOAD_LIMIT",
+			OptionTitle: "是否需要登录才能下载电子书",
+		}, {
+			OptionValue: "",
+			OptionName:  "MOBILE_BANNER_SIZE",
+			OptionTitle: "手机端横幅宽高比",
+		}, {
+			OptionValue: "false",
+			OptionName:  "AUTO_HTTPS",
+			OptionTitle: "图片链接HTTP转HTTPS",
+		}, {
+			OptionValue: "30",
+			OptionName:  "HTTP_CACHE",
+			OptionTitle: "是否开启API缓存",
+		},
 	}
 
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_GITHUB").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "LOGIN_GITHUB"
-		option.OptionTitle = "是否允许使用Github登录"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "LOGIN_GITEE").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "LOGIN_GITEE"
-		option.OptionTitle = "是否允许使用码云登录"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "RELATE_BOOK").Exist() {
-		option := NewOption()
-		option.OptionValue = "0"
-		option.OptionName = "RELATE_BOOK"
-		option.OptionTitle = "是否开始关联书籍"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "ALL_CAN_WRITE_BOOK").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "ALL_CAN_WRITE_BOOK"
-		option.OptionTitle = "是否都可以创建项目"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CLOSE_SUBMIT_ENTER").Exist() {
-		option := NewOption()
-		option.OptionValue = "false"
-		option.OptionName = "CLOSE_SUBMIT_ENTER"
-		option.OptionTitle = "是否关闭收录入口"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "CLOSE_OPEN_SOURCE_LINK").Exist() {
-		option := NewOption()
-		option.OptionValue = "true"
-		option.OptionName = "CLOSE_OPEN_SOURCE_LINK"
-		option.OptionTitle = "是否关闭开源项目入口"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "HOUR_REG_NUM").Exist() {
-		option := NewOption()
-		option.OptionValue = "0"
-		option.OptionName = "HOUR_REG_NUM"
-		option.OptionTitle = "同一IP每小时允许注册人数"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DAILY_REG_NUM").Exist() {
-		option := NewOption()
-		option.OptionValue = "0"
-		option.OptionName = "DAILY_REG_NUM"
-		option.OptionTitle = "同一IP每天允许注册人数"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "REAL_IP_FIELD").Exist() {
-		option := NewOption()
-		option.OptionValue = "X-Real-Ip"
-		option.OptionName = "REAL_IP_FIELD"
-		option.OptionTitle = "request中获取访客真实IP的header"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "APP_PAGE").Exist() {
-		option := NewOption()
-		option.OptionValue = ""
-		option.OptionName = "APP_PAGE"
-		option.OptionTitle = "手机APP下载单页"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "HIDE_TAG").Exist() {
-		option := NewOption()
-		option.OptionValue = "false"
-		option.OptionName = "HIDE_TAG"
-		option.OptionTitle = "是否隐藏标签在导航栏显示"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "DOWNLOAD_LIMIT").Exist() {
-		option := NewOption()
-		option.OptionValue = ""
-		option.OptionName = "DOWNLOAD_LIMIT"
-		option.OptionTitle = "是否需要登录才能下载电子书"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "MOBILE_BANNER_SIZE").Exist() {
-		option := NewOption()
-		option.OptionValue = ""
-		option.OptionName = "MOBILE_BANNER_SIZE"
-		option.OptionTitle = "手机端横幅宽高比"
-		if _, err := o.Insert(option); err != nil {
-			return err
-		}
-	}
-
-	if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", "AUTO_HTTPS").Exist() {
-		option := NewOption()
-		option.OptionValue = "false"
-		option.OptionName = "AUTO_HTTPS"
-		option.OptionTitle = "图片链接HTTP转HTTPS"
-		if _, err := o.Insert(option); err != nil {
-			return err
+	for _, op := range options {
+		if !o.QueryTable(m.TableNameWithPrefix()).Filter("option_name", op.OptionName).Exist() {
+			if _, err := o.Insert(&op); err != nil {
+				return err
+			}
 		}
 	}
 
