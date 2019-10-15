@@ -1,6 +1,8 @@
 package models
 
-import "github.com/astaxie/beego/orm"
+import (
+	"github.com/astaxie/beego/orm"
+)
 
 var TableDocumentStore = "md_document_store"
 

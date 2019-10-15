@@ -97,65 +97,62 @@
 
                                     <div class="btns">
                                         <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看<span class="hidden-xs">文档</span></a>
-                                        <template v-if="item.role_id != 3">
-                                            <a :href="'/api/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
-                                        </template>
-                                        <a :href="'/book/' + item.identify + '/setting'" title="项目设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">项目</span>设置</a>
-                                        {{if lt $.Member.Role 2}}
-                                        {{/*<a href="javascript:void(0);" class="btn btn-default btn-upload-zip  btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">*/}}
-                                            {{/*<i class="fa fa-cloud-upload"></i> 导入<span class="hidden-xs">项目</span>*/}}
-                                        {{/*</a>*/}}
-                                        {{/*<a href="javascript:void(0);" class="btn btn-default btn-pull-project-by-zip btn-sm" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">*/}}
-                                            {{/*<i class="fa fa-link"></i> 拉取<span class="hidden-xs">项目</span>*/}}
-                                        {{/*</a>*/}}
-
-                                        {{end}}
-                                        <a :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
+                                        <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="项目设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">项目</span>设置</a>
+                                        <a v-if="item.role_id < 2" :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
                                             <i class="fa fa-book"></i> 生成下载文档
                                         </a>
-                                        <!-- Split button -->
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入项目</button>
-                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="caret"></span>
-                                                <span class="sr-only">Toggle Dropdown</span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="javascript:void(0);" class="btn-upload-epub" data-toggle="tooltip" :data-identify="item.identify" title="支持epub格式电子书导入。">
-                                                        <i class="fa fa-cloud-upload"></i> EPUB 上传导入
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">
-                                                        <i class="fa fa-cloud-upload"></i> ZIP 上传导入
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
-                                                        <i class="fa fa-link"></i> ZIP 拉取导入
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown项目">
-                                                        <i class="fa fa-git"></i> Git Clone 导入
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <!-- Split button -->
-                                        <div class="btn-group btn-group-download">
-                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出项目</button>
-                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                <span class="caret"></span>
-                                                <span class="sr-only">Toggle Dropdown</span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
-                                                <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
-                                            </ul>
-                                        </div>
+
+                                        <template v-if="item.role_id != 3">
+                                            <a :href="'/api/' + item.identify + '/edit'" title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm"><i class="fa fa-edit" aria-hidden="true"></i> 编辑<span class="hidden-xs">文档</span></a>
+
+
+                                            <!-- Split button -->
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入项目</button>
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a href="javascript:void(0);" class="btn-upload-epub" data-toggle="tooltip" :data-identify="item.identify" title="支持epub格式电子书导入。">
+                                                            <i class="fa fa-cloud-upload"></i> EPUB 上传导入
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">
+                                                            <i class="fa fa-cloud-upload"></i> ZIP 上传导入
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
+                                                            <i class="fa fa-link"></i> ZIP 拉取导入
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown项目">
+                                                            <i class="fa fa-git"></i> Git Clone 导入
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </template>
+                                        <template v-if="item.role_id == 0">
+                                            <!-- Split button -->
+                                            <div class="btn-group btn-group-download">
+                                                <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出项目</button>
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
+                                                    <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
+                                                    <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
+                                                </ul>
+                                            </div>
+                                        </template>
+
                                     </div>
                                 </div>
 

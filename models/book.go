@@ -191,7 +191,7 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 
 	offset := (pageIndex - 1) * pageSize
 	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
-		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? AND rel.role_id=0" +
+		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? " +
 		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
 
@@ -218,13 +218,13 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 				books[index].LastModifyText = text.Account + " 于 " + text.ModifyTime.Format("2006-01-02 15:04:05")
 			}
 
-			if book.RoleId == 0 {
+			if book.RoleId == conf.BookFounder {
 				book.RoleName = "创始人"
-			} else if book.RoleId == 1 {
+			} else if book.RoleId == conf.BookAdmin {
 				book.RoleName = "管理员"
-			} else if book.RoleId == 2 {
+			} else if book.RoleId == conf.BookEditor {
 				book.RoleName = "编辑者"
-			} else if book.RoleId == 3 {
+			} else if book.RoleId == conf.BookObserver {
 				book.RoleName = "观察者"
 			}
 		}

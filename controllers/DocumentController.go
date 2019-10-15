@@ -99,7 +99,7 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 	if this.Member != nil {
 		rel, err := models.NewRelationship().FindByBookIdAndMemberId(bookResult.BookId, this.Member.MemberId)
 		if err == nil {
-			bookResult.MemberId = rel.MemberId
+			bookResult.MemberId = book.MemberId
 			bookResult.RoleId = rel.RoleId
 			bookResult.RelationshipId = rel.RelationshipId
 		}
@@ -1057,13 +1057,14 @@ func (this *DocumentController) Content() {
 	//如果启用了文档历史，则添加历史文档
 	if this.EnableDocumentHistory > 0 {
 		if len(strings.TrimSpace(ds.Markdown)) > 0 { //空内容不存储版本
+			now := time.Now().Unix()
 			history := models.NewDocumentHistory()
 			history.DocumentId = docId
 			history.DocumentName = doc.DocumentName
-			history.ModifyAt = this.Member.MemberId
-			history.MemberId = doc.MemberId
+			history.ModifyAt = int(now)
+			history.MemberId = this.Member.MemberId
 			history.ParentId = doc.ParentId
-			history.Version = time.Now().Unix()
+			history.Version = now
 			history.Action = "modify"
 			history.ActionName = actionName
 			_, err = history.InsertOrUpdate()
