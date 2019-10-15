@@ -49,9 +49,10 @@ import (
 
 //更多存储类型有待扩展
 const (
-	StoreLocal  string = "local"
-	StoreOss    string = "oss"
-	VirtualRoot string = "virtualroot"
+	StoreLocal  = "local"
+	StoreOss    = "oss"
+	VirtualRoot = "virtualroot"
+	unknown     = "unknown"
 )
 
 //分词器
@@ -77,9 +78,15 @@ func init() {
 
 func PrintInfo() {
 	fmt.Println("Service: ", "BookStack")
-	fmt.Println("Version: ", Version)
-	fmt.Println("BuildAt: ", BuildAt)
-	fmt.Println("GitHash: ", GitHash)
+	if Version != unknown {
+		fmt.Println("Version: ", Version)
+	}
+	if BuildAt != unknown {
+		fmt.Println("BuildAt: ", BuildAt)
+	}
+	if GitHash != unknown {
+		fmt.Println("GitHash: ", GitHash)
+	}
 }
 
 func InitVirtualRoot() {
