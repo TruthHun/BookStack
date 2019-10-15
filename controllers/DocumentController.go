@@ -121,14 +121,16 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 //文档首页.
 func (this *DocumentController) Index() {
 	identify := this.Ctx.Input.Param(":key")
+	if identify == "" {
+		this.Abort("404")
+	}
+
 	token := this.GetString("token")
 	if len(strings.TrimSpace(this.GetString("with-password"))) > 0 {
 		this.indexWithPassword()
 		return
 	}
-	if identify == "" {
-		this.Abort("404")
-	}
+
 	tab := strings.ToLower(this.GetString("tab"))
 
 	bookResult := isReadable(identify, token, this)

@@ -442,6 +442,10 @@ func (this *ManagerController) DeleteBook() {
 // CreateToken 创建访问来令牌.
 func (this *ManagerController) CreateToken() {
 
+	if this.forbidGeneralRole() {
+		this.JsonResult(6001, "您的角色非作者和管理员，无法创建访问令牌")
+	}
+
 	action := this.GetString("action")
 	identify := this.GetString("identify")
 

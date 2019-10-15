@@ -272,6 +272,9 @@ func (this *BookController) SaveBook() {
 func (this *BookController) PrivatelyOwned() {
 
 	status := this.GetString("status")
+	if this.forbidGeneralRole() && status == "open" {
+		this.JsonResult(6001, "您的角色非作者和管理员，无法将项目设置为公开")
+	}
 	if status != "open" && status != "close" {
 		this.JsonResult(6003, "参数错误")
 	}
@@ -605,7 +608,9 @@ func (this *BookController) Create() {
 
 // CreateToken 创建访问来令牌.
 func (this *BookController) CreateToken() {
-
+	if this.forbidGeneralRole() {
+		this.JsonResult(6001, "您的角色非作者和管理员，无法创建访问令牌")
+	}
 	action := this.GetString("action")
 
 	bookResult, err := this.IsPermission()

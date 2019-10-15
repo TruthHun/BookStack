@@ -458,3 +458,11 @@ func (this *BaseController) SetFollow() {
 	}
 	this.JsonResult(0, "您已经成功关注了Ta")
 }
+
+func (this *BaseController) forbidGeneralRole() bool {
+	// 如果只有作者和管理员才能写作的话，那么已创建了项目的普通用户无法将项目转为公开或者是私密分享
+	if this.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
+		return true
+	}
+	return false
+}
