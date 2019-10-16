@@ -1,13 +1,12 @@
 
-**BookStack 配套微信小程序BookChat开源地址**
+**BookStack 配套手机APP `BookChatApp` 开源地址**
 
-- Gitee: https://gitee.com/truthhun/BookChat
-- GitHub: https://github.com/TruthHun/BookChat
+- Gitee: https://gitee.com/truthhun/BookChatApp
+- GitHub: https://github.com/TruthHun/BookChatApp
 
-**微信扫描小程序码体验**
+**BookChatApp下载体验地址**
 
-![BookChat](https://www.bookstack.cn/projects/help/96a18d5a8fe8ea518efcbc5d59286e9b.png "BookChat")
-
+- https://www.bookstack.cn/app
 
 目录：
 - [BookStack简介](#intro)
