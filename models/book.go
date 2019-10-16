@@ -87,6 +87,26 @@ func NewBook() *Book {
 	return &Book{}
 }
 
+// minRole 最小的角色权限
+//conf.BookFounder
+//conf.BookAdmin
+//conf.BookEditor
+//conf.BookObserver
+func (m *Book) HasProjectAccess(identify string, memberId int, minRole int) bool {
+	book := NewBook()
+	rel := NewRelationship()
+	o := orm.NewOrm()
+	o.QueryTable(book).Filter("identify", identify).One(book, "book_id")
+	if book.BookId <= 0 {
+		return false
+	}
+	o.QueryTable(rel).Filter("book_id", book.BookId).Filter("member_id", memberId).One(rel)
+	if rel.RelationshipId <= 0 {
+		return false
+	}
+	return rel.RoleId <= minRole
+}
+
 func (m *Book) Insert() (err error) {
 	o := orm.NewOrm()
 	if _, err = o.Insert(m); err != nil {

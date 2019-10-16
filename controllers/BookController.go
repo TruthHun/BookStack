@@ -739,16 +739,19 @@ func (this *BookController) Release() {
 //加锁，防止用户不停地点击生成下载文档造成服务器资源开销.
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
-	book, err := models.NewBook().FindByIdentify(identify)
 
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookAdmin) {
+		this.JsonResult(1, "您没有操作权限，只有项目创始人和项目管理员才有权限")
+	}
+
+	book, err := models.NewBook().FindByIdentify(identify)
+	if err != nil {
+		beego.Error(err)
+		this.JsonResult(1, "项目不存在")
+	}
 	//书籍正在生成离线文档
 	if isGenerating := utils.BooksGenerate.Exist(book.BookId); isGenerating {
 		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
-	}
-
-	if err != nil || book.MemberId != this.Member.MemberId {
-		beego.Error(err)
-		this.JsonResult(1, "项目不存在；或您不是文档创始人，没有文档生成权限")
 	}
 
 	baseUrl := "http://localhost:" + beego.AppConfig.String("httpport")
@@ -811,6 +814,7 @@ func (this *BookController) SaveSort() {
 	this.JsonResult(0, "ok")
 }
 
+// 判断是否具有管理员或管理员以上权限
 func (this *BookController) IsPermission() (*models.BookResult, error) {
 
 	identify := this.GetString("identify")
@@ -876,16 +880,12 @@ func (this *BookController) GitPull() {
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
 
-	if _, err := this.IsPermission(); err != nil {
-		this.JsonResult(1, err.Error())
-	}
-
-	//普通用户没有权限
-	if this.Member.Role > 1 {
-		this.JsonResult(1, "您没有操作权限")
-	}
-
 	identify := this.GetString("identify")
+
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookEditor) {
+		this.JsonResult(1, "无操作权限")
+	}
+
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 	if book.BookId == 0 {
 		this.JsonResult(1, "导入失败，只有项目创建人才有权限导入项目")
@@ -910,21 +910,18 @@ func (this *BookController) UploadProject() {
 	//1、接受上传上来的zip文件，并存放到store/temp目录下
 	//2、解压zip到当前目录，然后移除非图片文件
 	//3、将文件夹移动到uploads目录下
-	if _, err := this.IsPermission(); err != nil {
-		this.JsonResult(1, err.Error())
-	}
-
-	//普通用户没法上传项目
-	if this.Member.Role > 1 {
-		this.JsonResult(1, "您没有操作权限")
-	}
 
 	identify := this.GetString("identify")
 
+	if !models.NewBook().HasProjectAccess(identify, this.Member.MemberId, conf.BookEditor) {
+		this.JsonResult(1, "无操作权限")
+	}
+
 	book, _ := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 	if book.BookId == 0 {
-		this.JsonResult(1, "导入失败，只有项目创建人才有权限导入项目")
+		this.JsonResult(1, "项目不存在")
 	}
+
 	f, h, err := this.GetFile("zipfile")
 	if err != nil {
 		this.JsonResult(1, err.Error())
