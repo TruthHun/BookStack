@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TruthHun/BookStack/models"
+
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
@@ -14,6 +16,14 @@ import (
 
 type StaticController struct {
 	beego.Controller
+}
+
+func (this *StaticController) APP() {
+	link := strings.TrimSpace(models.GetOptionValue("APP_PAGE", ""))
+	if link != "" {
+		this.Redirect(link, 302)
+	}
+	this.Abort("404")
 }
 
 //静态文件，这个加在路由的最后

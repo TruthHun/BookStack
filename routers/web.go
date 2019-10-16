@@ -7,6 +7,7 @@ import (
 
 func webRouter() {
 	beego.Router("/", &controllers.CateController{}, "get:Index")
+	beego.Router("/app", &controllers.StaticController{}, "get:APP")
 	beego.Router("/cate", &controllers.CateController{}, "get:List")
 	//beego.Router("/", &controllers.HomeController{}, "*:Index")
 	beego.Router("/explore", &controllers.HomeController{}, "*:Index")

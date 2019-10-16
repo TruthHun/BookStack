@@ -21,7 +21,8 @@
                         <li><a href="https://www.bookstack.cn/read/help/opensource.md" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
                     {{end}}
                     {{if .APP_PAGE}}
-                        <li><a href="{{.APP_PAGE}}" title="手机APP下载" target="_blank"><i class="fa fa-paper-plane-o"></i> APP下载</a></li>
+                        {{/*  "/app" 会自动根据后台配置的APP单页地址跳转过去  */}}
+                        <li><a href="/app" title="手机APP下载" target="_blank"><i class="fa fa-paper-plane-o"></i> APP下载</a></li>
                     {{end}}
                 {{if gt .Member.MemberId 0}}
                     <li>
@@ -81,7 +82,8 @@
                     <li class="hidden-sm"><a href="https://www.bookstack.cn/read/help/opensource.md" title="BookStack开源" target="_blank"><i class="fa fa-code"></i> 开源</a></li>
                     {{end}}
                     {{if .APP_PAGE}}
-                        <li><a href="{{.APP_PAGE}}" title="手机APP下载" target="_blank"><i class="fa fa-paper-plane-o"></i> APP下载</a></li>
+                        {{/*  "/app" 会自动根据后台配置的APP单页地址跳转过去  */}}
+                        <li><a href="/app" title="手机APP下载" target="_blank"><i class="fa fa-paper-plane-o"></i> APP下载</a></li>
                     {{end}}
                     {{if .IsSearch}}
                         <li class="active">
