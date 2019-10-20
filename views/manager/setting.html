@@ -191,6 +191,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label>手机APP版本号( <span class="text-muted">应用版本号，必须是整数，用于提示用户升级APP</span> )</label>
+                            <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
+                        </div>
+
+                        <div class="form-group">
                             <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
                             <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
                         </div>

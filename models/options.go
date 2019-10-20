@@ -206,6 +206,10 @@ func (m *Option) Init() error {
 			OptionValue: "false",
 			OptionName:  "AUTO_HTTPS",
 			OptionTitle: "图片链接HTTP转HTTPS",
+		}, {
+			OptionValue: "0",
+			OptionName:  "APP_VERSION",
+			OptionTitle: "Android APP版本号（数字）",
 		},
 	}
 

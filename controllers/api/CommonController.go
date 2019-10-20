@@ -1034,3 +1034,9 @@ func (this *CommonController) RelatedBook() {
 	}
 	this.Response(http.StatusOK, messageSuccess, data)
 }
+
+func (this *CommonController) LatestVersion() {
+	version, _ := strconv.Atoi(models.GetOptionValue("APP_VERSION", "0"))
+	page := models.GetOptionValue("APP_PAGE", "")
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"version": version, "url": page})
+}
