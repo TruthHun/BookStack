@@ -58,11 +58,17 @@ func NewMember() *Member {
 
 // Login 用户登录.
 func (m *Member) Login(account string, password string) (*Member, error) {
+	var err error
 	o := orm.NewOrm()
 
 	member := &Member{}
+	if strings.Contains(account, "@") {
+		err = o.QueryTable(m.TableNameWithPrefix()).Filter("email", account).Filter("status", 0).One(member)
+	}
 
-	err := o.QueryTable(m.TableNameWithPrefix()).Filter("account", account).Filter("status", 0).One(member)
+	if err != nil || member.MemberId == 0 {
+		err = o.QueryTable(m.TableNameWithPrefix()).Filter("account", account).Filter("status", 0).One(member)
+	}
 
 	if err != nil {
 		beego.Error("用户登录 => " + err.Error())
@@ -485,7 +491,8 @@ func (this *Member) GetByUsername(username string) (member Member, err error) {
 	q := orm.NewOrm().QueryTable("md_members")
 	if strings.Contains(username, "@") { //存在 @ 符号的表示邮箱，因为用户名只有数字和字母
 		err = q.Filter("email", username).One(&member)
-	} else {
+	}
+	if err != nil || member.MemberId == 0 {
 		err = q.Filter("account", username).One(&member)
 	}
 	return
