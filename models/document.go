@@ -127,7 +127,11 @@ func (m *Document) FindByFieldFirst(field string, v interface{}) (*Document, err
 
 //根据指定字段查询一条文档.
 func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Document, error) {
-	err := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("BookId", BookId).Filter("Identify", Identify).One(m)
+	q:=orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("BookId", BookId)
+	err := q.Filter("Identify", Identify).One(m)
+	if m.DocumentId==0 && !strings.HasSuffix(fmt.Sprint(Identify),".md"){
+		err=q.Filter("identify",fmt.Sprint(Identify)+".md").One(m)
+	}
 	return m, err
 }
 

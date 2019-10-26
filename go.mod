@@ -8,6 +8,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.0
 	github.com/TruthHun/converter v0.0.0-20180618131031-80268d67d7a8
 	github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45
+	github.com/TruthHun/gpm v0.0.0-20191003082629-92635dfa6f09 // indirect
 	github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b
 	github.com/TruthHun/html2json v0.0.0-20191003085735-6ba0884c8c03
 	github.com/TruthHun/html2md v0.0.0-20190507142218-8352cc68f88e
