@@ -83,6 +83,8 @@ func RegisterModel() {
 		models.NewWechatCode(),
 		models.NewWechat(),
 		new(models.RegLimit),
+		models.NewAdsPosition(),
+		models.NewAdsCont(),
 	)
 	migrate.RegisterMigration()
 }
@@ -202,6 +204,7 @@ func RegisterFunction() {
 	beego.AddFuncMap("showImg", utils.ShowImg)
 	beego.AddFuncMap("IsFollow", new(models.Fans).Relation)
 	beego.AddFuncMap("isubstr", utils.Substr)
+	beego.AddFuncMap("ads", models.NewAdsCont().GetAdsCode)
 }
 
 func ResolveCommand(args []string) {

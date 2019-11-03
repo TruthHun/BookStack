@@ -3,9 +3,8 @@ package commands
 import (
 	"fmt"
 	"os"
-	"time"
-
 	"strings"
+	"time"
 
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
@@ -40,9 +39,8 @@ func Version() {
 
 //初始化数据
 func initialization() {
-
+	models.InitAdsPosition()
 	err := models.NewOption().Init()
-
 	if err != nil {
 		panic(err.Error())
 		os.Exit(1)
@@ -50,7 +48,6 @@ func initialization() {
 
 	member, err := models.NewMember().FindByFieldFirst("account", "admin")
 	if err == orm.ErrNoRows {
-
 		member.Account = "admin"
 		member.Avatar = beego.AppConfig.String("avatar")
 		member.Password = "admin888"
@@ -60,8 +57,7 @@ func initialization() {
 		member.Email = "bookstack@qq.cn"
 
 		if err := member.Add(); err != nil {
-			panic("Member.Add => " + err.Error())
-			os.Exit(0)
+			beego.Error("Member.Add => " + err.Error())
 		}
 
 		book := models.NewBook()
@@ -88,10 +84,8 @@ func initialization() {
 		book.Score = 40
 
 		if err := book.Insert(); err != nil {
-			panic("Book.Insert => " + err.Error())
-			os.Exit(0)
+			beego.Error("Book.Insert => " + err.Error())
 		}
-
 	}
 }
 

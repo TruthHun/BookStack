@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/mssola/user_agent"
 	"image"
 	"io/ioutil"
 	"os"
@@ -881,4 +882,8 @@ func GetIP(ctx *context.Context, field string) (ip string) {
 		return slice[0]
 	}
 	return
+}
+
+func IsMobile(userAgent string) bool {
+	return user_agent.New(userAgent).Mobile()
 }
