@@ -57,19 +57,19 @@
                             {{range $i,$item:=.Lists}}
                                 <tr>
                                     <td>
-                                        <select name="pid" class="form-control">
+                                        <select data-refresh="true" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" name="pid" class="form-control change-update">
                                             {{range $idx,$p:=$.Positions}}
-                                                <option {{if eq $item.Pid $p.Id}}selected{{end}} value="{{$p.Id}}">
+                                                <option  {{if eq $item.Pid $p.Id}}selected{{end}} value="{{$p.Id}}">
                                                     {{if $p.IsMobile}}【移动广告】{{else}}【PC广告】{{end}}{{$p.Title}}
                                                 </option>
                                             {{end}}
                                         </select>
                                     </td>
                                     <td>
-                                        <input type="title" class="form-control" value="{{$item.Title}}">
+                                        <input type="text" name="title" class="form-control change-update" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" value="{{$item.Title}}">
                                     </td>
                                     <td>
-                                        <textarea name="code" class="form-control" rows="3">{{$item.Code}}</textarea>
+                                        <textarea name="code" class="form-control change-update" data-method="post" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" rows="3">{{$item.Code}}</textarea>
                                     </td>
                                     <td>
                                         <span>{{$item.StartTime}}</span>
@@ -84,9 +84,13 @@
                                         {{end}}
                                     </td>
                                     <td>
-                                        <a href="#">关闭</a>
+                                        {{if $item.Status}}
+                                        <a href="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}&field=status&value=0" class="ajax-get">关闭</a>
+                                        {{else}}
+                                        <a href="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}&field=status&value=1" class="ajax-get">启用</a>
+                                        {{end}}
                                         <br>
-                                        <a href="#">删除</a>
+                                        <a href="{{urlfor "ManagerController.DelAds"}}?id={{$item.Id}}" class="ajax-get confirm">删除</a>
                                     </td>
                                 </tr>
                             {{end}}

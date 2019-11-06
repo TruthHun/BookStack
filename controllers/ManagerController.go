@@ -753,6 +753,29 @@ func (this *ManagerController) Seo() {
 	this.TplName = "manager/seo.html"
 }
 
+func (this *ManagerController) UpdateAds() {
+	id, _ := this.GetInt("id")
+	field := this.GetString("field")
+	value := this.GetString("value")
+	if field == "" {
+		this.JsonResult(1, "字段不能为空")
+	}
+	_, err := orm.NewOrm().QueryTable(models.NewAdsCont()).Filter("id", id).Update(orm.Params{field: value})
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	this.JsonResult(0, "操作成功")
+}
+
+func (this *ManagerController) DelAds() {
+	id, _ := this.GetInt("id")
+	_, err := orm.NewOrm().QueryTable(models.NewAdsCont()).Filter("id", id).Delete()
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	this.JsonResult(0, "删除成功")
+}
+
 //广告管理
 func (this *ManagerController) Ads() {
 	if this.Ctx.Request.Method == http.MethodPost {
