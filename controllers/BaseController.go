@@ -32,6 +32,7 @@ type BaseController struct {
 	EnableAnonymous       bool
 	EnableDocumentHistory int
 	Sitename              string
+	IsMobile              bool
 	OssDomain             string
 }
 type CookieRemember struct {
@@ -43,7 +44,8 @@ type CookieRemember struct {
 // Prepare 预处理.
 func (this *BaseController) Prepare() {
 	this.Data["Version"] = utils.Version
-	this.Data["IsMobile"] = utils.IsMobile(this.Ctx.Request.UserAgent())
+	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
+	this.Data["IsMobile"] = this.IsMobile
 	this.Member = models.NewMember() //初始化
 	this.EnableAnonymous = false
 	this.EnableDocumentHistory = 0

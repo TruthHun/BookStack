@@ -16,6 +16,7 @@ require (
 	github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.3+incompatible
 	github.com/andybalholm/cascadia v1.1.0 // indirect
+	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/astaxie/beego v1.12.0
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/boombuler/barcode v1.0.0

@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/araddon/dateparse"
 	"html/template"
+	"net/http"
 	"regexp"
 	"strings"
 
@@ -749,6 +751,47 @@ func (this *ManagerController) Seo() {
 	this.Data["Lists"] = seos
 	this.Data["IsManagerSeo"] = true
 	this.TplName = "manager/seo.html"
+}
+
+//广告管理
+func (this *ManagerController) Ads() {
+	if this.Ctx.Request.Method == http.MethodPost {
+		pid, _ := this.GetInt("pid")
+		if pid <= 0 {
+			this.JsonResult(1, "请选择广告位")
+		}
+		ads := &models.AdsCont{
+			Title:  this.GetString("title"),
+			Code:   this.GetString("code"),
+			Status: true,
+			Pid:    pid,
+		}
+		start, err := dateparse.ParseAny(this.GetString("start"))
+		if err != nil {
+			start = time.Now()
+		}
+		end, err := dateparse.ParseAny(this.GetString("end"))
+		if err != nil {
+			end = time.Now().Add(24 * time.Hour * 730)
+		}
+		ads.Start = int(start.Unix())
+		ads.End = int(end.Unix())
+		_, err = orm.NewOrm().Insert(ads)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		} else {
+			this.JsonResult(0, "新增广告成功")
+		}
+	} else {
+		layout := "2006-01-02"
+		this.Data["Mobile"] = this.GetString("mobile", "0")
+		this.Data["Positions"] = models.NewAdsCont().GetPositions()
+		this.Data["Lists"] = models.NewAdsCont().Lists(this.GetString("mobile", "0") == "1")
+		this.Data["IsAds"] = true
+		this.Data["Now"] = time.Now().Format(layout)
+		this.Data["Next"] = time.Now().Add(time.Hour * 24 * 730).Format(layout)
+		this.TplName = "manager/ads.html"
+	}
 }
 
 //更行书籍项目的排序

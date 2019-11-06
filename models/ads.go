@@ -21,9 +21,9 @@ type AdsCont struct {
 	Title     string
 	Code      string `orm:"size(4096)"`
 	Start     int
-	StartDate string `orm:"-"`
+	StartTime string `orm:"-"`
 	End       int
-	EndDate   string `orm:"-"`
+	EndTime   string `orm:"-"`
 	Status    bool
 }
 
@@ -40,9 +40,13 @@ const (
 	AdsPositionGlobalFooter         = "global-footer"
 	AdsPositionUnderLatestRecommend = "index-under-latest-recommend"
 	AdsPositionSearchRight          = "search-right"
+	AdsPositionSearchTop            = "search-top"
+	AdsPositionSearchBottom         = "search-bottom"
 	AdsPositionBeforeMenu           = "intro-before-menu"
 	AdsPositionBeforeRelatedBooks   = "intro-before-related-books"
 	AdsPositionUnderExploreCate     = "explore-under-cate"
+	AdsPositionContentTop           = "content-top"
+	AdsPositionContentBottom        = "content-bottom"
 )
 
 var adsCache sync.Map // map[positionIdentify][]AdsCont
@@ -56,7 +60,7 @@ func InitAdsPosition() {
 		},
 		{
 			IsMobile: false,
-			Title:    "[全局]友链顶部",
+			Title:    "[友链]顶部",
 			Identify: AdsPositionBeforeFriendLink,
 		},
 		{
@@ -66,8 +70,18 @@ func InitAdsPosition() {
 		},
 		{
 			IsMobile: false,
-			Title:    "[搜索页]右侧",
+			Title:    "[搜索页]搜索结果右侧",
 			Identify: AdsPositionSearchRight,
+		},
+		{
+			IsMobile: false,
+			Title:    "[搜索页]搜索结果上方",
+			Identify: AdsPositionSearchTop,
+		},
+		{
+			IsMobile: false,
+			Title:    "[搜索页]搜索结果下方",
+			Identify: AdsPositionSearchBottom,
 		},
 		{
 			IsMobile: false,
@@ -78,6 +92,16 @@ func InitAdsPosition() {
 			IsMobile: false,
 			Title:    "[书籍介绍页]相关书籍上方",
 			Identify: AdsPositionBeforeRelatedBooks,
+		},
+		{
+			IsMobile: false,
+			Title:    "[内容阅读页]内容上方",
+			Identify: AdsPositionContentTop,
+		},
+		{
+			IsMobile: false,
+			Title:    "[内容阅读页]内容下方",
+			Identify: AdsPositionContentBottom,
 		},
 		{
 			IsMobile: false,
@@ -91,7 +115,7 @@ func InitAdsPosition() {
 		},
 		{
 			IsMobile: true,
-			Title:    "[全局]友链顶部",
+			Title:    "[友链]顶部",
 			Identify: AdsPositionBeforeFriendLink,
 		},
 		{
@@ -101,8 +125,13 @@ func InitAdsPosition() {
 		},
 		{
 			IsMobile: true,
-			Title:    "[搜索页]右侧",
-			Identify: AdsPositionSearchRight,
+			Title:    "[搜索页]搜索结果上方",
+			Identify: AdsPositionSearchTop,
+		},
+		{
+			IsMobile: true,
+			Title:    "[搜索页]搜索结果下方",
+			Identify: AdsPositionSearchBottom,
 		},
 		{
 			IsMobile: true,
@@ -119,15 +148,31 @@ func InitAdsPosition() {
 			Title:    "[发现页]分类下方",
 			Identify: AdsPositionUnderExploreCate,
 		},
+		{
+			IsMobile: true,
+			Title:    "[内容阅读页]内容上方",
+			Identify: AdsPositionContentTop,
+		},
+		{
+			IsMobile: true,
+			Title:    "[内容阅读页]内容下方",
+			Identify: AdsPositionContentBottom,
+		},
 	}
-	table := &AdsPosition{}
 	o := orm.NewOrm()
 	for _, position := range positions {
+		table := &AdsPosition{}
 		o.QueryTable(table).Filter("is_mobile", position.IsMobile).Filter("identify", position.Identify).One(table)
 		if table.Id == 0 {
 			o.Insert(&position)
 		}
 	}
+}
+
+func (m *AdsCont) GetPositions() []AdsPosition {
+	var positions []AdsPosition
+	orm.NewOrm().QueryTable(NewAdsPosition()).OrderBy("is_mobile").All(&positions)
+	return positions
 }
 
 func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
@@ -146,6 +191,13 @@ func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
 	q := o.QueryTable(tableAds).Filter("pid__in", pids...)
 	if len(status) > 0 {
 		q = q.Filter("status", status[0])
+	}
+	q.All(&ads)
+	layout := "2006-01-02"
+	for idx, ad := range ads {
+		ad.StartTime = time.Unix(int64(ad.Start), 0).Format(layout)
+		ad.EndTime = time.Unix(int64(ad.End), 0).Format(layout)
+		ads[idx] = ad
 	}
 	return
 }
