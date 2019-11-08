@@ -764,6 +764,7 @@ func (this *ManagerController) UpdateAds() {
 	if err != nil {
 		this.JsonResult(1, err.Error())
 	}
+	go models.UpdateAdsCache()
 	this.JsonResult(0, "操作成功")
 }
 
@@ -773,6 +774,7 @@ func (this *ManagerController) DelAds() {
 	if err != nil {
 		this.JsonResult(1, err.Error())
 	}
+	go models.UpdateAdsCache()
 	this.JsonResult(0, "删除成功")
 }
 
@@ -802,9 +804,9 @@ func (this *ManagerController) Ads() {
 		_, err = orm.NewOrm().Insert(ads)
 		if err != nil {
 			this.JsonResult(1, err.Error())
-		} else {
-			this.JsonResult(0, "新增广告成功")
 		}
+		go models.UpdateAdsCache()
+		this.JsonResult(0, "新增广告成功")
 	} else {
 		layout := "2006-01-02"
 		this.Data["Mobile"] = this.GetString("mobile", "0")

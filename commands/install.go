@@ -39,7 +39,7 @@ func Version() {
 
 //初始化数据
 func initialization() {
-	models.InitAdsPosition()
+	models.InitAds()
 	err := models.NewOption().Init()
 	if err != nil {
 		panic(err.Error())

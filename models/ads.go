@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"sync"
 	"time"
@@ -49,9 +51,12 @@ const (
 	AdsPositionContentBottom        = "content-bottom"
 )
 
-var adsCache sync.Map // map[positionIdentify][]AdsCont
+var (
+	adsCache      sync.Map // map[pid][]AdsCont
+	positionCache sync.Map // map[positionIdentify-isMobile]=pid
+)
 
-func InitAdsPosition() {
+func InitAds() {
 	positions := []AdsPosition{
 		{
 			IsMobile: false,
@@ -167,6 +172,36 @@ func InitAdsPosition() {
 			o.Insert(&position)
 		}
 	}
+	var pos []AdsPosition
+	o.QueryTable(&AdsPosition{}).All(&pos)
+	for _, item := range pos {
+		positionCache.Store(fmt.Sprintf("%v-%v", item.Identify, item.IsMobile), item.Id)
+	}
+	UpdateAdsCache()
+}
+
+func UpdateAdsCache() {
+	var (
+		ads   []AdsCont
+		cache sync.Map
+		data  = make(map[int][]AdsCont)
+	)
+	now := time.Now().Unix()
+	orm.NewOrm().QueryTable(&AdsCont{}).Filter("status", 1).Filter("start__lt", now).Filter("end__gt", now).All(&ads)
+	for _, item := range ads {
+		data[item.Pid] = append(data[item.Pid], item)
+	}
+	debug := beego.AppConfig.String("runmode") == "dev"
+	if debug {
+		beego.Info(" =============== update ads cache =============== ")
+	}
+	for pid, arr := range data {
+		if debug {
+			beego.Debug("ads cache: ", pid, arr)
+		}
+		cache.Store(pid, arr)
+	}
+	adsCache = cache
 }
 
 func (m *AdsCont) GetPositions() []AdsPosition {
@@ -202,21 +237,30 @@ func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
 	return
 }
 
-func (m *AdsCont) GetAdsCode(positionIdentify string, isMobile bool) (code string) {
-	position := NewAdsPosition()
-	o := orm.NewOrm()
-	o.QueryTable(position).Filter("is_mobile", isMobile).Filter("Identify", positionIdentify).One(&position)
-	if position.Id > 0 {
-		var ads []AdsCont
-		now := int(time.Now().Unix())
-		o.QueryTable(NewAdsCont()).Filter("start__lt", now).Filter("end__gt", now).Filter("pid", position.Id).Filter("status", 1).All(&ads)
-		if l := len(ads); l > 0 {
-			if l == 1 {
-				return ads[0].Code
-			} else {
-				return ads[time.Now().UnixNano()%int64(l)].Code
-			}
+func GetAdsCode(positionIdentify string, isMobile bool) (code string) {
+	pid, ok := positionCache.Load(fmt.Sprintf("%v-%v", positionIdentify, isMobile))
+	if !ok {
+		return
+	}
+	data, ok := adsCache.Load(pid.(int))
+	if !ok {
+		return
+	}
+	var ads []AdsCont
+	nowSec := int(time.Now().Unix())
+	for _, ad := range data.([]AdsCont) {
+		if ad.Start <= nowSec && ad.End >= nowSec {
+			ads = append(ads, ad)
 		}
 	}
-	return
+	lenAds := len(ads)
+	if len(data.([]AdsCont)) != lenAds {
+		adsCache.Store(pid.(int), ads)
+	}
+	if lenAds == 0 {
+		return
+	} else if lenAds == 1 {
+		return ads[0].Code
+	}
+	return ads[time.Now().UnixNano()%int64(lenAds)].Code
 }

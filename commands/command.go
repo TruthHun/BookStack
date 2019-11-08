@@ -44,7 +44,6 @@ func RegisterDataBase() {
 	if beego.AppConfig.String("runmode") == "dev" {
 		orm.Debug = true
 	}
-
 }
 
 // RegisterModel 注册Model
@@ -204,7 +203,7 @@ func RegisterFunction() {
 	beego.AddFuncMap("showImg", utils.ShowImg)
 	beego.AddFuncMap("IsFollow", new(models.Fans).Relation)
 	beego.AddFuncMap("isubstr", utils.Substr)
-	beego.AddFuncMap("ads", models.NewAdsCont().GetAdsCode)
+	beego.AddFuncMap("ads", models.GetAdsCode)
 }
 
 func ResolveCommand(args []string) {
