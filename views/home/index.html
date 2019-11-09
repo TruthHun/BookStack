@@ -17,6 +17,11 @@
         </div>
         <div class="row">
             <div class="col-xs-12 mgt-15px" style="line-height: 200%;">
+                {{if (ads "explore-under-nav" $.IsMobile)}}
+                    <div class="ap ap-explore-under-nav mgb-15px">
+                        {{str2html (ads "explore-under-nav" $.IsMobile)}}
+                    </div>
+                {{end}}
                 <div class="help-block lang-explore" style="margin: 10px 0px 0;">
                     <span class="text-muted">语种：</span>
                     <a {{if eq $.Lang ""}}class="active"{{end}} href="{{urlfor "HomeController.Index"}}?tab={{$.Tab}}&cid={{$.Cid}}" title="不限">不限</a>
@@ -51,6 +56,9 @@
                     <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}&lang={{$.Lang}}" title="站长推荐">站长推荐</a></li>
                 </ul>
             </div>
+
+
+
         </div>
         <div class="row">
             <div class="manual-list">
@@ -79,6 +87,11 @@
                 {{end}}
                 <div class="clearfix"></div>
             </div>
+            {{if (ads "explore-before-pagination" $.IsMobile)}}
+                    <div class="ap ap-explore-before-pagination">
+                        {{str2html (ads "explore-before-pagination" $.IsMobile)}}
+                    </div>
+            {{end}}
             <nav class="pagination-container">
                 {{if gt .TotalPages 1}}
                 {{.PageHtml}}

@@ -38,17 +38,18 @@ func NewAdsCont() *AdsCont {
 }
 
 const (
-	AdsPositionBeforeFriendLink     = "global-before-friend-link"
-	AdsPositionGlobalFooter         = "global-footer"
-	AdsPositionUnderLatestRecommend = "index-under-latest-recommend"
-	AdsPositionSearchRight          = "search-right"
-	AdsPositionSearchTop            = "search-top"
-	AdsPositionSearchBottom         = "search-bottom"
-	AdsPositionBeforeMenu           = "intro-before-menu"
-	AdsPositionBeforeRelatedBooks   = "intro-before-related-books"
-	AdsPositionUnderExploreCate     = "explore-under-cate"
-	AdsPositionContentTop           = "content-top"
-	AdsPositionContentBottom        = "content-bottom"
+	AdsPositionBeforeFriendLink        = "global-before-friend-link"
+	AdsPositionGlobalFooter            = "global-footer"
+	AdsPositionUnderLatestRecommend    = "index-under-latest-recommend"
+	AdsPositionSearchRight             = "search-right"
+	AdsPositionSearchTop               = "search-top"
+	AdsPositionSearchBottom            = "search-bottom"
+	AdsPositionBeforeMenu              = "intro-before-menu"
+	AdsPositionBeforeRelatedBooks      = "intro-before-related-books"
+	AdsPositionUnderExploreNav         = "explore-under-nav"
+	AdsPositionBeforeExplorePagination = "explore-before-pagination"
+	AdsPositionContentTop              = "content-top"
+	AdsPositionContentBottom           = "content-bottom"
 )
 
 var (
@@ -90,7 +91,7 @@ func InstallAdsPosition() {
 		},
 		{
 			IsMobile: false,
-			Title:    "[书籍介绍页]菜单上方",
+			Title:    "[书籍介绍页]文档概述上方",
 			Identify: AdsPositionBeforeMenu,
 		},
 		{
@@ -110,8 +111,13 @@ func InstallAdsPosition() {
 		},
 		{
 			IsMobile: false,
-			Title:    "[发现页]分类下方",
-			Identify: AdsPositionUnderExploreCate,
+			Title:    "[发现页]导航栏下方",
+			Identify: AdsPositionUnderExploreNav,
+		},
+		{
+			IsMobile: false,
+			Title:    "[发现页]分页上方",
+			Identify: AdsPositionBeforeExplorePagination,
 		},
 		{
 			IsMobile: true,
@@ -140,7 +146,7 @@ func InstallAdsPosition() {
 		},
 		{
 			IsMobile: true,
-			Title:    "[书籍介绍页]菜单上方",
+			Title:    "[书籍介绍页]文档概述上方",
 			Identify: AdsPositionBeforeMenu,
 		},
 		{
@@ -150,8 +156,13 @@ func InstallAdsPosition() {
 		},
 		{
 			IsMobile: true,
-			Title:    "[发现页]分类下方",
-			Identify: AdsPositionUnderExploreCate,
+			Title:    "[发现页]导航栏下方",
+			Identify: AdsPositionUnderExploreNav,
+		},
+		{
+			IsMobile: true,
+			Title:    "[发现页]分页上方",
+			Identify: AdsPositionBeforeExplorePagination,
 		},
 		{
 			IsMobile: true,
@@ -243,11 +254,6 @@ func GetAdsCode(positionIdentify string, isMobile bool) (code string) {
 		beego.Debug("getAdsCode", positionIdentify, isMobile)
 	}
 	key := fmt.Sprintf("%v-%v", positionIdentify, isMobile)
-	beego.Info(key)
-	positionCache.Range(func(key, value interface{}) bool {
-		beego.Info(key, value)
-		return true
-	})
 	pid, ok := positionCache.Load(key)
 	if !ok {
 		return

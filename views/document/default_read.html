@@ -100,18 +100,26 @@
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
-                        {{/*<span><a href="https://www.bookstack.cn/read/adv/4db.md" target="_blank"><i class="fa fa-check-square-o"></i> 广而告之</a></span>*/}}
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
+                    {{if (ads "content-top" $.IsMobile)}}
+                        <div class="ap ap-content-top mgb-15px">
+                            {{str2html (ads "content-top" $.IsMobile)}}
+                        </div>
+                    {{end}}
                     <article class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
                     {{.Content}}
                     </article>
-
+                    {{if (ads "content-bottom" $.IsMobile)}}
+                        <div class="ap ap-content-bottom mgt-15px">
+                            {{str2html (ads "content-bottom" $.IsMobile)}}
+                        </div>
+                    {{end}}
                     <div class="row hung-read-link">
-                        <div class="col-xs-12 hung-pre">
+                        <div class="col-xs-12 hung-pre" style="display: none">
                             <span class="text-muted">上一篇:</span><a href="#"></a>
                         </div>
-                        <div class="col-xs-12 hung-next">
+                        <div class="col-xs-12 hung-next" style="display: none">
                             <span class="text-muted">下一篇:</span><a href="#"></a>
                         </div>
                     </div>
