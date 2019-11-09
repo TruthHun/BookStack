@@ -36,6 +36,11 @@
         <div class="row">
             <div class="col-sm-8 col-xs-12 result-list">
                 <div class="help-block"><a style="color: red;" target="_blank" rel="nofollow noreferrer" href="https://www.baidu.com/s?wd={{.SITE_NAME}}">{{.SITE_NAME}}</a> 本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您找到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
+                {{if (ads "search-top" $.IsMobile)}}
+                    <div class="ap ap-search-top mgb-15px">
+                        {{str2html (ads "search-top" $.IsMobile)}}
+                    </div>
+                {{end}}
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "book"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=book">搜书籍</a></li>
                     <li {{if eq $.Tab "doc"}}class="active"{{end}}><a href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a></li>
@@ -65,11 +70,8 @@
                             <div class="help-block">啊哦，没搜到相关书籍，<a style="font-weight: 600;color: #06f;" href="{{urlfor "SearchController.Result"}}?wd={{$.Wd}}&tab=doc">搜文档</a> 试下？</div>
                         </li>
                     {{end}}
-
                 </ul>
                 {{end}}
-
-
                 {{if eq $.Tab "doc"}}
                     <ul class="doc-result">
                         {{range .Docs}}
@@ -91,13 +93,21 @@
                         {{end}}
 
                     </ul>
+                {{end}}
 
+                {{if (ads "search-bottom" $.IsMobile)}}
+                    <div class="ap ap-search-bottom">
+                        {{str2html (ads "search-bottom" $.IsMobile)}}
+                    </div>
                 {{end}}
 
                 {{.PageHtml}}
             </div>
-            {{/*TODO: 右侧显示内容*/}}
-            {{/*<div class="col-sm-4 hidden-xs result-right"></div>*/}}
+            {{if (ads "search-right" $.IsMobile)}}
+                <div class="col-sm-4 hidden-xs result-right ap ap-search-right">
+                    {{str2html (ads "search-right" $.IsMobile)}}
+                </div>
+            {{end}}
         </div>
     </div>
         {{template "widgets/footer.html" .}}

@@ -20,11 +20,9 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"><i class="fa fa-thumbs-o-up"></i> 最新推荐</a>
-
                         <small class="pull-right">
                             <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"> 更多 <i class="fa fa-angle-right"></i><i class="fa fa-angle-right"></i></a>
                         </small>
-
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -37,6 +35,11 @@
                             </a>
                         {{end}}
                     </div>
+                    {{if (ads "index-under-latest-recommend" $.IsMobile)}}
+                        <div class="row">
+                            <div class="ap ap-index-under-latest-recommend col-xs-12">{{str2html (ads "index-under-latest-recommend" $.IsMobile)}}</div>
+                        </div>
+                    {{end}}
                 </div>
             </div>
         {{end}}

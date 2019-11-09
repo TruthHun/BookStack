@@ -1,6 +1,9 @@
 <div class="footer">
     <div class="container">
         <div class="row">
+            {{if (ads "global-before-friend-link" $.IsMobile)}}
+                <div class="ap ap-global-before-friend-link col-xs-12 mgb-15px">{{str2html (ads "global-before-friend-link" $.IsMobile)}}</div>
+            {{end}}
             <div class="col-xs-12 friend-links">
                 <span class="text-muted">友情链接</span>
                 {{range $.Friendlinks}}
@@ -52,3 +55,6 @@
         $(".tooltips").tooltip();
     })
 </script>
+{{if (ads "global-footer" $.IsMobile)}}
+    <div class="ap ap-global-footer">{{str2html (ads "global-footer" $.IsMobile)}}</div>
+{{end}}

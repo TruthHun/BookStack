@@ -18,7 +18,7 @@ import (
 
 func Init() {
 	initAPI()
-	UpdateAdsCache()
+	initAdsCache()
 }
 
 //设置增减

@@ -56,7 +56,7 @@ var (
 	positionCache sync.Map // map[positionIdentify-isMobile]=pid
 )
 
-func InitAds() {
+func InstallAdsPosition() {
 	positions := []AdsPosition{
 		{
 			IsMobile: false,
@@ -172,10 +172,15 @@ func InitAds() {
 			o.Insert(&position)
 		}
 	}
+}
+
+func initAdsCache() {
+	o := orm.NewOrm()
 	var pos []AdsPosition
 	o.QueryTable(&AdsPosition{}).All(&pos)
 	for _, item := range pos {
-		positionCache.Store(fmt.Sprintf("%v-%v", item.Identify, item.IsMobile), item.Id)
+		key := fmt.Sprintf("%v-%v", item.Identify, item.IsMobile)
+		positionCache.Store(key, item.Id)
 	}
 	UpdateAdsCache()
 }
@@ -191,14 +196,10 @@ func UpdateAdsCache() {
 	for _, item := range ads {
 		data[item.Pid] = append(data[item.Pid], item)
 	}
-	debug := beego.AppConfig.String("runmode") == "dev"
-	if debug {
+	if beego.AppConfig.String("runmode") == "dev" {
 		beego.Info(" =============== update ads cache =============== ")
 	}
 	for pid, arr := range data {
-		if debug {
-			beego.Debug("ads cache: ", pid, arr)
-		}
 		cache.Store(pid, arr)
 	}
 	adsCache = cache
@@ -238,7 +239,16 @@ func (m *AdsCont) Lists(isMobile bool, status ...bool) (ads []AdsCont) {
 }
 
 func GetAdsCode(positionIdentify string, isMobile bool) (code string) {
-	pid, ok := positionCache.Load(fmt.Sprintf("%v-%v", positionIdentify, isMobile))
+	if beego.AppConfig.String("runmode") == "dev" {
+		beego.Debug("getAdsCode", positionIdentify, isMobile)
+	}
+	key := fmt.Sprintf("%v-%v", positionIdentify, isMobile)
+	beego.Info(key)
+	positionCache.Range(func(key, value interface{}) bool {
+		beego.Info(key, value)
+		return true
+	})
+	pid, ok := positionCache.Load(key)
 	if !ok {
 		return
 	}
