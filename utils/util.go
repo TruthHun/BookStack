@@ -165,7 +165,7 @@ func RenderDocumentById(id int) {
 	beego.Info("render document by document_id:", cmd.Args)
 	// 超过10秒，杀掉进程，避免长期占用
 	time.AfterFunc(30*time.Second, func() {
-		if cmd.Process.Pid != 0 {
+		if cmd.Process != nil && cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
 	})
@@ -205,7 +205,7 @@ func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) 
 		expire = 300
 	}
 	time.AfterFunc(time.Duration(expire)*time.Second, func() {
-		if cmd.Process.Pid != 0 {
+		if cmd.Process != nil && cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
 	})
