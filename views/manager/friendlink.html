@@ -40,6 +40,7 @@
                         <tr>
                             <th>名称</th>
                             <th>链接</th>
+                            <th>备注</th>
                             <th>排序</th>
                             <th>状态</th>
                             <th>操作</th>
@@ -53,6 +54,9 @@
                                     </td>
                                     <td>
                                         <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="link" value="{{.Link}}">
+                                    </td>
+                                    <td>
+                                        <input type="text" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="remark" value="{{.Remark}}">
                                     </td>
                                     <td>
                                         <input type="number" data-url="{{urlfor "ManagerController.UpdateFriendlink"}}?id={{.Id}}" class="form-control change-update" name="sort" value="{{.Sort}}">

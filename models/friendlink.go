@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	"github.com/astaxie/beego/orm"
 )
 
@@ -12,6 +10,7 @@ type FriendLink struct {
 	Sort   int    //排序
 	Link   string `orm:"unique;size(128)"` //链接地址
 	Title  string //链接名称
+	Remark string `orm:"default()"`  // 备注
 	Status bool   `orm:"default(1)"` //状态
 }
 
@@ -29,8 +28,7 @@ func (this *FriendLink) Add(title, link string) (err error) {
 
 //根据字段更新友链
 func (this *FriendLink) Update(id int, field string, value interface{}) (err error) {
-	sql := fmt.Sprintf("update md_friend_link set %v=? where id=?", field)
-	_, err = orm.NewOrm().Raw(sql, value, id).Exec()
+	_, err = orm.NewOrm().QueryTable(this).Filter("id", id).Update(orm.Params{field: value})
 	return
 }
 
