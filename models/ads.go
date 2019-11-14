@@ -48,6 +48,7 @@ const (
 	AdsPositionBeforeRelatedBooks      = "intro-before-related-books"
 	AdsPositionUnderExploreNav         = "explore-under-nav"
 	AdsPositionBeforeExplorePagination = "explore-before-pagination"
+	AdsPositionUnderExplorePagination  = "explore-under-pagination"
 	AdsPositionContentTop              = "content-top"
 	AdsPositionContentBottom           = "content-bottom"
 )
@@ -120,6 +121,11 @@ func InstallAdsPosition() {
 			Identify: AdsPositionBeforeExplorePagination,
 		},
 		{
+			IsMobile: false,
+			Title:    "[发现页]分页下方",
+			Identify: AdsPositionUnderExplorePagination,
+		},
+		{
 			IsMobile: true,
 			Title:    "[全局]页面底部",
 			Identify: AdsPositionGlobalFooter,
@@ -163,6 +169,11 @@ func InstallAdsPosition() {
 			IsMobile: true,
 			Title:    "[发现页]分页上方",
 			Identify: AdsPositionBeforeExplorePagination,
+		},
+		{
+			IsMobile: true,
+			Title:    "[发现页]分页下方",
+			Identify: AdsPositionUnderExplorePagination,
 		},
 		{
 			IsMobile: true,

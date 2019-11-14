@@ -98,6 +98,11 @@
                 {{end}}
                 <div class="clearfix"></div>
             </nav>
+            {{if (ads "explore-under-pagination" $.IsMobile)}}
+                <div class="ap ap-explore-under-pagination">
+                    {{str2html (ads "explore-under-pagination" $.IsMobile)}}
+                </div>
+            {{end}}
         </div>
     </div>
 </div>
