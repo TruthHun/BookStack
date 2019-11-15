@@ -791,7 +791,7 @@ a{color: #333}
 .bookstack-info .recommend-book:before{
     top:22px;
 }
-
+.bookstack-info .btn{border: 0px;}
 .book-list .recommend-book:before,.ucenter .recommend-book:before{left: 7px;}
 
 .manual-header .nav>li>a:focus, .manual-header .nav>li>a:hover{

@@ -34,10 +34,13 @@
                     {{.Book.ScoreFloat}}
                     （<span class="text-muted">{{.Book.CntScore}} 个有效评分</span>）
                 </li>
-                <li><span>分享达人：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
+                <li><span>分享整理：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
                 <li><span>章节数量：</span>{{.Book.DocCount}}</li>
                 <li><span>阅读人次：</span>{{.Book.Vcnt}}</li>
                 <li><span>收藏数量：</span>{{.Book.Star}}</li>
+                {{if .Book.Author}}
+                <li><span>内容来源：</span><a href="{{.Book.AuthorURL}}" target="_blank" title="内容来源：{{.Book.Author}}">{{.Book.Author}}</a></li>
+                {{end}}
                 <li><span>文档语言：</span> <span style="color: red">{{.Book.Lang}}</span> </li>
                 <li class="hidden-xs">
                     <div class="btn btn-group">
@@ -46,12 +49,11 @@
                         <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 阅读</a>
                     {{end}}
                     {{end}}
-                        {{/*<a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i> 打赏</a>*/}}
-                        <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
+                        <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-warning ajax-star">
                             {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
-                                <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
+                                <i class="fa fa-heart"></i> <span>已收藏</span>
                             {{else}}
-                                <i class="fa fa-heart-o"></i> <span style="color: #333;">收藏</span>
+                                <i class="fa fa-heart-o"></i> <span>收藏</span>
                             {{end}}
                         </a>
                         <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载</a>
@@ -73,12 +75,11 @@
                 <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i>阅读</a>
             {{end}}
             {{end}}
-                {{/*<a href="#" data-target="#ModalSupport" data-toggle="modal" class="btn btn-primary"><i class="fa fa-usd"></i>打赏</a>*/}}
-                <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-default ajax-star">
+                <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-warning ajax-star">
                 {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
-                    <i class="fa fa-heart"></i> <span style="color: #333;">已收藏</span>
+                    <i class="fa fa-heart"></i> <span>已收藏</span>
                 {{else}}
-                    <i class="fa fa-heart-o"></i> <span style="color: #333;">收藏</span>
+                    <i class="fa fa-heart-o"></i> <span>收藏</span>
                 {{end}}
                 </a>
                 <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i>下载</a>
@@ -100,6 +101,7 @@
                     </div>
                 </li>
                 {{end}}
+
                 <li style="border-bottom: 0px;">
                     <span>文档概述</span>
                     <div style="text-indent: 2em;">
