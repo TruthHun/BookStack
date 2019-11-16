@@ -68,7 +68,7 @@ func (o *Oss) IsObjectExist(object string) (err error) {
 	if err != nil {
 		return
 	}
-	_, err = bucket.IsObjectExist(object)
+	_, err = bucket.GetObjectMeta(object)
 	return
 }
 

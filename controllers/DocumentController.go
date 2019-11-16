@@ -1117,6 +1117,7 @@ func (this *DocumentController) Export() {
 	book, err := new(models.Book).FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err.Error())
+		this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 	}
 	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
 		this.JsonResult(1, "私有文档，只有文档创建人可导出")
