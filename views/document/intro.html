@@ -34,14 +34,14 @@
                     {{.Book.ScoreFloat}}
                     （<span class="text-muted">{{.Book.CntScore}} 个有效评分</span>）
                 </li>
-                <li><span>分享整理：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
+                <li><span>文档语言：</span> <span style="color: red">{{.Book.Lang}}</span> </li>
                 <li><span>章节数量：</span>{{.Book.DocCount}}</li>
                 <li><span>阅读人次：</span>{{.Book.Vcnt}}</li>
                 <li><span>收藏数量：</span>{{.Book.Star}}</li>
                 {{if .Book.Author}}
                 <li><span>内容来源：</span><a href="{{.Book.AuthorURL}}" target="_blank" title="内容来源：{{.Book.Author}}">{{.Book.Author}}</a></li>
                 {{end}}
-                <li><span>文档语言：</span> <span style="color: red">{{.Book.Lang}}</span> </li>
+                <li><span>整理分享：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
                 <li class="hidden-xs">
                     <div class="btn btn-group">
                     {{range $index,$val:=.Menu}}
