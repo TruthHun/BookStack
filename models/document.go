@@ -313,7 +313,20 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		defer os.RemoveAll(folder)
 	}
 
-	//生成致谢信内容
+	if beego.AppConfig.DefaultBool("exportCustomCover", false) {
+		// 生成书籍封面
+		if err = utils.RenderCoverByBookIdentify(book.Identify); err != nil {
+			beego.Error(err)
+		}
+		cover := "cover.png"
+		if _, err = os.Stat(folder + cover); err != nil {
+			cover = ""
+		}
+		// 用相对路径
+		ExpCfg.Cover = cover
+	}
+
+	//生成致谢内容
 	statementFile := "ebook/statement.html"
 	_, err = os.Stat("views/" + statementFile)
 	if err != nil {
@@ -407,6 +420,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	} else {
 		beego.Error("css样式不存在", err)
 	}
+
 	cfgFile := folder + "config.json"
 	ioutil.WriteFile(cfgFile, []byte(util.InterfaceToJson(ExpCfg)), os.ModePerm)
 	if Convert, err := converter.NewConverter(cfgFile, debug); err == nil {

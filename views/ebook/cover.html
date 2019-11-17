@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍封面</title>
+    <style>
+        body{padding: 0px;margin: 0px;}
+        .cover{
+            width: 800px;position: relative;
+            height: 1068px;
+            /*border:1px solid red;*/
+        }
+        .min-cover{ position: absolute; top: 360px; left: 30px;}
+        .title{font-size: 50px;padding:90px 45px 45px;font-weight: bold;word-break: break-word;line-height: 150%;height: 100px;overflow: hidden;text-align: center;color: #34495e}
+        .min-cover img{width: 100%;border-radius: 4px;border:1px solid rgba(255,255,255,.12)}
+        .part-top{height: 40%;background-color: #EEEEEE;}
+        .part-bottom{height: 60%;
+            background-color: #34495e;
+        }
+        .intro{
+            color: #eeeeee; line-height: 250%; width: 535px; padding: 25px 30px; float: right; height: 100px; text-indent: 2em; overflow: hidden;word-break: break-all;
+            text-overflow: ellipsis;display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .logo{
+            position: absolute;bottom: 350px;right: 0;
+            text-align: center;color: #fff;padding-right: 10px;background-color: #fff;
+        }
+        .logo img{background-color: #fff;margin-left: 4px;margin-top: 4px;}
+        .app{
+            position: absolute;bottom: 30px;right:30px;
+            text-align: center;color: #fff;line-height: 160%;
+        }
+        .app img{width: 120px;height: 120px;margin-bottom: 5px;}
+    </style>
+</head>
+<body>
+<div class="cover">
+    <div class="min-cover">
+        <img onerror="this.src='/static/images/book.png'" src="{{showImg .Book.Cover "cover"}}" alt="">
+    </div>
+    <div class="part-top">
+        <!-- 这里是书籍名称，不要改动 -->
+        <div class="title">{{.Book.BookName}}</div>
+    </div>
+    <div class="part-bottom">
+        <!-- 这里是书籍内容介绍，不要改动 -->
+        <div class="intro">{{.Book.Description}}</div>
+            <!--<div class="logo">-->
+                <!--这里，可以换成您网站的LOGO小图标-->
+                <!--<img src="/static/images/logo.png" alt="">-->
+            <!--</div>-->
+        <div class="app">
+            <!-- 这里，可以替换成您的手机APP二维码或者是小程序码 -->
+                <img src="/static/images/qrcode-app.png" alt="">
+                <div>下载手机APP</div>
+                <div>畅享精彩阅读</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

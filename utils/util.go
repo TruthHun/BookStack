@@ -154,10 +154,10 @@ func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
 func RenderDocumentById(id int) {
 	//使用chromium-browser
 	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
-	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8080") + "/local-render?id=" + strconv.Itoa(id)
+	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render?id=" + strconv.Itoa(id)
 	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
 	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
-	if ok, _ := beego.AppConfig.Bool("puppeteer"); ok {
+	if ok := beego.AppConfig.DefaultBool("puppeteer", false); ok {
 		name = "node"
 		args = []string{"crawl.js", "--url", link}
 	}
@@ -172,6 +172,81 @@ func RenderDocumentById(id int) {
 	if err := cmd.Run(); err != nil {
 		beego.Error(err)
 	}
+}
+
+const screenshotCoverJS = `'use strict';
+// 说明： 这段js是用来进行书籍封面截屏的，请勿随便删除或改动
+const puppeteer = require('puppeteer');
+const fs = require("fs");
+
+let args = process.argv.splice(2);
+let l=args.length;
+let url, identify,folder;
+
+for(let i=0;i<l;i++){
+    switch (args[i]){
+        case "--url":
+            url = args[i+1];
+            if (url==undefined){
+                url = "";
+            }
+            break;
+        case '--identify':
+            identify = args[i+1];
+            break;
+    }
+    i++;
+}
+
+async function screenshot() {
+    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: true, ignoreHTTPSErrors: true});
+    const page = await browser.newPage();
+    page.setViewport({width: 800, height: 1068}); // A4 宽高
+    folder="cache/books/"+identify+"/"
+    page.setExtraHTTPHeaders({
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,co;q=0.7,fr;q=0.6,zh-HK;q=0.5,zh-TW;q=0.4",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3766.2 Safari/537.36"
+    });
+
+    await page.goto(url, {"waitUntil" :  ['networkidle2', 'domcontentloaded'], "timeout":5000});
+    await page.screenshot({path: folder+'cover.png'});
+    await browser.close();
+}
+if (url && identify) screenshot();`
+
+// 生成
+func RenderCoverByBookIdentify(identify string) (err error) {
+	var args []string
+	shotJS := "cover.js"
+	if _, err = os.Stat(shotJS); err != nil {
+		err = ioutil.WriteFile(shotJS, []byte(screenshotCoverJS), os.ModePerm)
+	}
+	if err != nil {
+		return
+	}
+
+	//使用chromium-browser
+	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
+	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render-cover?id=" + identify
+	name := "node"
+	if ok := beego.AppConfig.DefaultBool("puppeteer", false); ok {
+		args = []string{shotJS, "--identify", identify, "--url", link}
+	} else {
+		err = errors.New("请安装并启用puppeteer")
+		return
+	}
+	cmd := exec.Command(name, args...)
+	beego.Info("render cover by book id:", cmd.Args)
+	// 超过30秒，杀掉进程，避免长期占用
+	time.AfterFunc(30*time.Second, func() {
+		if cmd.Process != nil && cmd.Process.Pid != 0 {
+			cmd.Process.Kill()
+		}
+	})
+	if err = cmd.Run(); err != nil {
+		beego.Error(err)
+	}
+	return
 }
 
 //使用chrome采集网页HTML

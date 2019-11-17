@@ -71,6 +71,8 @@ exportMarginLeft=36
 exportMarginRight=36
 exportMarginTop=36
 exportMarginBottom=36
+# 是否使用自定义的电子书封面，如果使用，则需要安装并启用puppeteer，否则不生效
+exportCustomCover=true
 
 
 ####################MySQL 数据库配置###########################
