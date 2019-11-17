@@ -6,6 +6,5 @@
     {{end}}
         <li {{if .SettingBook}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}" class="item"><i class="fa fa-sitemap" aria-hidden="true"></i> 我的项目</a> </li>
         <li {{if .SettingStar}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}" class="item"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a> </li>
-        <li {{if .SettingQrcode}}class="active"{{end}}><a href="{{urlfor "SettingController.Qrcode"}}" class="item"><i class="fa fa-qrcode" aria-hidden="true"></i> 二维码管理</a> </li>
     </ul>
 </div>
