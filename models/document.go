@@ -314,8 +314,11 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 
 	//生成致谢信内容
-	statementFile := "document/tpl_statement.html"
-	if _, err := os.Stat("views/" + statementFile); err == nil {
+	statementFile := "ebook/statement.html"
+	_, err = os.Stat("views/" + statementFile)
+	if err != nil {
+		beego.Error(err)
+	} else {
 		if htmlStr, err := utils.ExecuteViewPathTemplate(statementFile, map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
 			h1Title := "说明"
 			if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
@@ -423,23 +426,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		beego.Error(err.Error())
 	}
 	orm.NewOrm().Read(book)
-	newBook := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
-
-	exts := []string{".pdf", ".epub", ".mobi"}
-	for _, ext := range exts {
-		switch utils.StoreType {
-		case utils.StoreOss:
-			//不要开启gzip压缩，否则会出现文件损坏的情况
-			if err := store.ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBook+ext, true, false); err != nil {
-				beego.Error(err)
-			} else { //设置下载头
-				store.ModelStoreOss.SetObjectMeta(newBook+ext, book.BookName+ext)
-			}
-		case utils.StoreLocal: //本地存储
-			store.ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBook+ext)
-		}
-
-	}
+	newBookFmt := fmt.Sprintf("projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
 
 	//删除旧文件
 	switch utils.StoreType {
@@ -448,8 +435,25 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 			beego.Error(err)
 		}
 	case utils.StoreLocal: //本地存储
-		if err := store.ModelStoreLocal.DelFiles(oldBook+".pdf", oldBook+".epub", oldBook+".mobi"); err != nil { //删除旧版
-			beego.Error(err)
+		if utils.StoreType == utils.StoreLocal {
+			if err = os.RemoveAll(fmt.Sprintf("uploads/projects/%v/books/", book.Identify)); err != nil {
+				beego.Error(err)
+			}
+		}
+	}
+
+	exts := []string{".pdf", ".epub", ".mobi"}
+	for _, ext := range exts {
+		switch utils.StoreType {
+		case utils.StoreOss:
+			//不要开启gzip压缩，否则会出现文件损坏的情况
+			if err := store.ModelStoreOss.MoveToOss(folder+"output/book"+ext, newBookFmt+ext, true, false); err != nil {
+				beego.Error(err)
+			} else { //设置下载头
+				store.ModelStoreOss.SetObjectMeta(newBookFmt+ext, book.BookName+ext)
+			}
+		case utils.StoreLocal: //本地存储
+			store.ModelStoreLocal.MoveToStore(folder+"output/book"+ext, "uploads/"+newBookFmt+ext)
 		}
 	}
 }
