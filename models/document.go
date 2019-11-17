@@ -127,10 +127,10 @@ func (m *Document) FindByFieldFirst(field string, v interface{}) (*Document, err
 
 //根据指定字段查询一条文档.
 func (m *Document) FindByBookIdAndDocIdentify(BookId, Identify interface{}) (*Document, error) {
-	q:=orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("BookId", BookId)
+	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("BookId", BookId)
 	err := q.Filter("Identify", Identify).One(m)
-	if m.DocumentId==0 && !strings.HasSuffix(fmt.Sprint(Identify),".md"){
-		err=q.Filter("identify",fmt.Sprint(Identify)+".md").One(m)
+	if m.DocumentId == 0 && !strings.HasSuffix(fmt.Sprint(Identify), ".md") {
+		err = q.Filter("identify", fmt.Sprint(Identify)+".md").One(m)
 	}
 	return m, err
 }
@@ -314,21 +314,25 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 
 	//生成致谢信内容
-	if htmlStr, err := utils.ExecuteViewPathTemplate("document/tpl_statement.html", map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
-		h1Title := "说明"
-		if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
-			h1Title = doc.Find("h1").Text()
+	statementFile := "document/tpl_statement.html"
+	if _, err := os.Stat("views/" + statementFile); err == nil {
+		if htmlStr, err := utils.ExecuteViewPathTemplate(statementFile, map[string]interface{}{"Model": book, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+			h1Title := "说明"
+			if doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlStr)); err == nil {
+				h1Title = doc.Find("h1").Text()
+			}
+			toc := converter.Toc{
+				Id:    time.Now().Nanosecond(),
+				Pid:   0,
+				Title: h1Title,
+				Link:  "statement.html",
+			}
+			htmlname := folder + toc.Link
+			ioutil.WriteFile(htmlname, []byte(htmlStr), os.ModePerm)
+			ExpCfg.Toc = append(ExpCfg.Toc, toc)
 		}
-		toc := converter.Toc{
-			Id:    time.Now().Nanosecond(),
-			Pid:   0,
-			Title: h1Title,
-			Link:  "statement.html",
-		}
-		htmlname := folder + toc.Link
-		ioutil.WriteFile(htmlname, []byte(htmlStr), os.ModePerm)
-		ExpCfg.Toc = append(ExpCfg.Toc, toc)
 	}
+
 	ModelStore := new(DocumentStore)
 	for _, doc := range docs {
 		content := strings.TrimSpace(ModelStore.GetFiledById(doc.DocumentId, "content"))
