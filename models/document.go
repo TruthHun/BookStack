@@ -183,21 +183,30 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	qs.One(&book)
 
 	//全部重新发布。查询该书籍的所有文档id
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id")
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id", "identify")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
 	}
+	docMap := make(map[string]bool)
+	for _, item := range docs {
+		docMap[item.Identify] = true
+	}
 
 	ModelStore := new(DocumentStore)
 	for _, item := range docs {
-		content := strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
-		if len(utils.GetTextFromHtml(content)) == 0 {
+		ds, err := ModelStore.GetById(item.DocumentId)
+		if err != nil {
+			beego.Error(err)
+			continue
+		}
+		if len(utils.GetTextFromHtml(ds.Content)) == 0 {
 			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
-			content = strings.TrimSpace(ModelStore.GetFiledById(item.DocumentId, "content"))
+			ds, _ = ModelStore.GetById(item.DocumentId)
 		}
-		item.Release = content
+
+		item.Release = ds.Content
 		attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
 		if err == nil && len(attachList) > 0 {
 			content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
@@ -209,11 +218,10 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			item.Release += content.String()
 		}
 
-		// crawl image
+		// 采集图片与稳定内容连接替换
 		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
 			images := gq.Find("img")
 			if images.Length() > 0 {
-				md := ModelStore.GetFiledById(item.DocumentId, "markdown")
 				images.Each(func(i int, selection *goquery.Selection) {
 					if src, ok := selection.Attr("src"); ok {
 						lowerSrc := strings.ToLower(src)
@@ -235,18 +243,36 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 									beego.Error(err.Error())
 								}
 								selection.SetAttr("src", newSrc)
-								md = strings.Replace(md, src, newSrc, -1)
-
+								ds.Markdown = strings.Replace(ds.Markdown, src, newSrc, -1)
 							} else {
 								beego.Error(err.Error())
 							}
 						}
 					}
 				})
-				ModelStore.InsertOrUpdate(DocumentStore{DocumentId: item.DocumentId, Markdown: md}, "markdown")
+			}
+
+			links := gq.Find("a")
+			if links.Length() > 0 {
+				links.Each(func(i int, selection *goquery.Selection) {
+					if href, ok := selection.Attr("href"); ok {
+						lowerHref := strings.ToLower(href)
+						if strings.HasPrefix(lowerHref, "https://") || strings.HasPrefix(lowerHref, "http://") {
+							identify := utils.MD5Sub16(strings.Trim(href, "/")) + ".md"
+							if _, ok := docMap[identify]; ok {
+								// 替换markdown中的连接，markdown的链接形式：  [链接名称](xxURL)
+								ds.Markdown = strings.Replace(ds.Markdown, "("+href+")", "($"+identify+")", -1)
+								// 直接identify就好了，比如在 /read/BookIdentify/DocIdentify.md 文档下，xx_identify.md 浏览器会转为 /read/BookIdentify/xx_identify.md
+								selection.SetAttr("href", identify)
+							}
+						}
+					}
+				})
 			}
 			item.Release, _ = gq.Find("body").Html()
 		}
+		ds.Content = item.Release
+		ModelStore.InsertOrUpdate(ds, "markdown", "content")
 
 		_, err = o.Update(item, "release")
 		if err != nil {

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -45,4 +46,13 @@ func (this *DocumentStore) DeleteById(docId ...interface{}) {
 	if len(docId) > 0 {
 		orm.NewOrm().QueryTable(TableDocumentStore).Filter("document_id__in", docId...).Delete()
 	}
+}
+
+//查询markdown内容或者content内容
+func (this *DocumentStore) GetById(docId interface{}) (ds DocumentStore, err error) {
+	err = orm.NewOrm().QueryTable(TableDocumentStore).Filter("document_id", docId).One(&ds)
+	if err != nil {
+		beego.Error(err)
+	}
+	return
 }
