@@ -779,6 +779,7 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 	var resp *http.Response
 	var b []byte
 	ext := ".png"
+	src = strings.Replace(src, "/./", "/", -1)
 	file := cryptil.Md5Crypt(src)
 	filename = "cache/" + file
 	srcLower := strings.ToLower(src)
