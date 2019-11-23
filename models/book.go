@@ -657,3 +657,29 @@ func (n *Book) SearchBook(wd string, page, size int) (books []Book, cnt int, err
 
 	return
 }
+
+// search books with labels
+func (b *Book) SearchBookByLabel(labels []string, limit int, excludeIds []int) (bookIds []int, err error) {
+	bookIds = []int{}
+	if len(labels) == 0 {
+		return
+	}
+
+	rawRegex := strings.Join(labels, "|")
+
+	excludeClause := ""
+	if len(excludeIds) == 1 {
+		excludeClause = fmt.Sprintf("book_id != %d AND", excludeIds[0])
+	} else if len(excludeIds) > 1 {
+		excludeVal := strings.Replace(strings.Trim(fmt.Sprint(excludeIds), "[]"), " ", ",", -1)
+		excludeClause = fmt.Sprintf("book_id NOT IN (%s) AND", excludeVal)
+	}
+
+	sql := fmt.Sprintf("SELECT book_id FROM md_books WHERE %v label REGEXP ? ORDER BY star DESC LIMIT ?", excludeClause)
+	o := orm.NewOrm()
+	_, err = o.Raw(sql, rawRegex, limit).QueryRows(&bookIds)
+	if err != nil {
+		logs.Error("failed to execute sql: %s, err: %s", sql, err.Error())
+	}
+	return
+}
