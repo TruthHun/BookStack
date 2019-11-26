@@ -258,12 +258,22 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 					if href, ok := selection.Attr("href"); ok {
 						lowerHref := strings.ToLower(href)
 						if strings.HasPrefix(lowerHref, "https://") || strings.HasPrefix(lowerHref, "http://") {
+							// 需要区别处理存在#号的链接与不存在#号的链接，并不是存在#号的链接都是锚点，如vue开发的hash模式的url
 							identify := utils.MD5Sub16(strings.Trim(href, "/")) + ".md"
 							if _, ok := docMap[identify]; ok {
 								// 替换markdown中的连接，markdown的链接形式：  [链接名称](xxURL)
 								ds.Markdown = strings.Replace(ds.Markdown, "("+href+")", "($"+identify+")", -1)
 								// 直接identify就好了，比如在 /read/BookIdentify/DocIdentify.md 文档下，xx_identify.md 浏览器会转为 /read/BookIdentify/xx_identify.md
 								selection.SetAttr("href", identify)
+							} else {
+								if strings.Contains(href, "#") {
+									slice := strings.Split(href, "#")
+									identify = utils.MD5Sub16(strings.Trim(slice[0], "/")) + ".md"
+									if _, ok := docMap[identify]; ok {
+										ds.Markdown = strings.Replace(ds.Markdown, "("+slice[0]+"#", "($"+identify+"#", -1)
+										selection.SetAttr("href", slice[0]+"#"+strings.Join(slice[1:], "#"))
+									}
+								}
 							}
 						}
 					}
