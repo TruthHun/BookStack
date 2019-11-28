@@ -18,40 +18,43 @@
                     <div class="box-head">
                         <strong class="box-title">我的收藏</strong>
                     </div>
+                    <ul class="nav nav-tabs" style="margin-top: 15px;">
+                        <li {{if eq .Sort "read"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=read">最近阅读</a></li>
+                        <li {{if eq .Sort "new"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=new">最新收藏</a></li>
+                    </ul>
                 </div>
-
                 <div id="bookList" class="box-body">
-                    <div class="book-list">
+                    <div class="book-list book-star">
                         {{range .Books}}
-                        <div class="list-item clearfix">
-                            <div class="col-sm-2 col-xs-12" style="padding-left: 0px;">
-                                <a class="{{if gt .OrderIndex 0}}recommend-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" title="阅读文档">
-                                    <img onerror="this.src='/static/images/book.png'"  src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
-                                </a>
-                            </div>
-                            <div class="col-sm-10 col-xs-12" style="padding-right: 0px; padding-left: 0px;">
-                                <div class="book-title">
-                                    <div class="pull-left">
-                                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="阅读文档" data-toggle="tooltip">
-                                            {{.BookName}}
-                                        </a>
+                            <div class="list-item clearfix">
+                                <div class="col-sm-2 col-xs-12" style="padding-left: 0px;">
+                                    <a class="{{if gt .OrderIndex 0}}recommend-book{{end}}" href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" title="阅读书籍">
+                                        <img onerror="this.src='/static/images/book.png'"  src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
+                                    </a>
+                                </div>
+                                <div class="col-sm-10 col-xs-12" style="padding-right: 0px; padding-left: 0px;">
+                                    <div class="book-title">
+                                        <div class="pull-left">
+                                            <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" title="阅读书籍" data-toggle="tooltip">
+                                                {{.BookName}}
+                                            </a>
+                                        </div>
+                                        <div class="clearfix"></div>
                                     </div>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="info">
-                                    <span title="" data-toggle="tooltip" data-original-title="创建者"><i class="fa fa-user"></i> {{.Nickname}}</span>
-                                    <span title="" data-toggle="tooltip" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
-                                    <span title="" data-toggle="tooltip" data-original-title="收藏人次"><i class="fa fa-heart"></i> {{.Star}}</span>
-                                    <span title="" data-toggle="tooltip" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
-                                    <span title="" data-toggle="tooltip" data-original-title="文档评分"><i class="fa fa-line-chart"></i> {{scoreFloat .Score}}</span>
-                                </div>
-                                <div class="desc-text">{{.Description}}</div>
-                                <div class="btns">
-                                    <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" target="_blank" class="btn btn-default btn-sm" title="阅读文档"><i class="fa fa-eye"></i> 阅读文档</a>
-                                    <a href="{{urlfor "BookController.Star" ":id" .BookId}}" data-toggle="tooltip" class="btn btn-default btn-sm ajax-get confirm" class="ajax-get" title="取消收藏"><i aria-hidden="true" class="fa fa-remove"></i> 取消收藏</a>
+                                    <div class="info">
+                                        <span title="" data-toggle="tooltip" data-original-title="创建者"><i class="fa fa-user"></i> {{.Nickname}}</span>
+                                        <span title="" data-toggle="tooltip" data-original-title="文档数量"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
+                                        <span title="" data-toggle="tooltip" data-original-title="收藏人次"><i class="fa fa-heart"></i> {{.Star}}</span>
+                                        <span title="" data-toggle="tooltip" data-original-title="阅读人次"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                        <span title="" data-toggle="tooltip" data-original-title="文档评分"><i class="fa fa-line-chart"></i> {{scoreFloat .Score}}</span>
+                                    </div>
+                                    <div class="desc-text" title="阅读书籍" data-url="{{urlfor "DocumentController.Index" ":key" .Identify}}">{{.Description}}</div>
+                                    <div class="btns">
+{{/*                                        <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" data-toggle="tooltip" target="_blank" class="btn btn-default btn-sm" title="阅读文档"><i class="fa fa-eye"></i> 阅读文档</a>*/}}
+                                        <a href="{{urlfor "BookController.Star" ":id" .BookId}}" data-toggle="tooltip" class="btn btn-default btn-sm ajax-get confirm" class="ajax-get" title="取消收藏"><i aria-hidden="true" class="fa fa-remove"></i> 取消收藏</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         {{end}}
                         <nav class="pagination-container">
                             {{.PageHtml}}
@@ -116,6 +119,9 @@
             window.modalHtml = $("#upload-logo-panel").find(".modal-body").html();
         });
 
+        $(".desc-text").click(function () {
+           location.href=$(this).attr("data-url");
+        });
 
         $("#memberInfoForm").ajaxForm({
             beforeSubmit : function () {

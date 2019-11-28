@@ -107,6 +107,7 @@ func (this *SettingController) Star() {
 	if page < 1 {
 		page = 1
 	}
+	sort := this.GetString("sort", "read")
 
 	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, conf.PageSize)
 	if cnt > 1 {
@@ -114,6 +115,7 @@ func (this *SettingController) Star() {
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(cnt), conf.PageSize, page, beego.URLFor("SettingController.Star"), "")
 	}
 	this.Data["Books"] = books
+	this.Data["Sort"] = sort
 	this.Data["SettingStar"] = true
 	this.Data["SeoTitle"] = "我的收藏 - " + this.Sitename
 	this.TplName = "setting/star.html"

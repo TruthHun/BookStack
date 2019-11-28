@@ -51,9 +51,10 @@
                     </div>
                 {{end}}
                 <ul class="nav nav-tabs">
-                    <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}&lang={{$.Lang}}">最新发布</a></li>
-                    <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}&lang={{$.Lang}}">热门书籍</a></li>
-                    <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}&lang={{$.Lang}}" title="站长推荐">站长推荐</a></li>
+                    <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}&lang={{$.Lang}}">最新<span class="hidden-xs">发布</span></a></li>
+                    <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}&lang={{$.Lang}}">热门<span class="hidden-xs">书籍</span></a></li>
+                    <li {{if eq $.Tab "recommend"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=recommend&cid={{$.Cid}}&lang={{$.Lang}}" title="网站推荐"><span class="hidden-xs">网站</span>推荐</a></li>
+                    <li ><a href="{{urlfor "SettingController.Star"}}" target="_blank" style="color: #f44336" title="我的收藏"><i class="fa fa-heart"></i> 我的收藏</a></li>
                 </ul>
             </div>
 

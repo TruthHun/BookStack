@@ -315,8 +315,6 @@ textarea{
 .book-list .list-item:hover{
     background: #eaeaea;
 }
-/*.book-list .list-item .btns{display: none}*/
-/*.book-list .list-item:hover .btns{display: block}*/
 .book-list .list-item a{
     color: #666666;
     font-size: 16px;
@@ -338,7 +336,20 @@ textarea{
     color: #666;
     height: 91px;
     overflow: hidden;
+    cursor: pointer;
 }
+
+@media (max-width: 768px) {
+    .book-list .list-item .desc-text{
+        height: auto;
+        max-height: 91px;
+    }
+    .book-list .list-item .btns{display: none}
+    .book-list.book-star .list-item .btns{display: block}
+    .box-head button{display: none}
+    .book-title{padding: 5px 0;}
+}
+
 .book-list .list-item .info{
     font-size: 12px;
     color: #999999;
@@ -347,14 +358,21 @@ textarea{
     display: inline-block;
     padding-right: 10px;
 }
-
+.book-list.book-star .list-item .btns{
+    display: none;
+}
+.book-list.book-star .list-item:hover .btns{
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
 .book-list .list-item .btns .btn-group{
     position: relative;top:-3px;
 }
 .book-list .list-item .btns .btn-group .btn{
     padding: 7px 12px;
 }
-
 /************文档概述*****************/
 .dashboard{
 
