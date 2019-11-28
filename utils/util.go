@@ -827,9 +827,9 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 	return
 }
 
-// 截取md5前8个字符
+// 截取md5前16个字符
 func MD5Sub16(str string) string {
-	return cryptil.Md5Crypt(str)[0:16]
+	return cryptil.Md5Crypt(strings.ToLower(str))[0:16]
 }
 
 func JoinURL(rawURL string, urlPath string) string {
