@@ -109,7 +109,7 @@ func (this *SettingController) Star() {
 	}
 	sort := this.GetString("sort", "read")
 
-	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, conf.PageSize)
+	cnt, books, _ := new(models.Star).List(this.Member.MemberId, page, conf.PageSize, sort)
 	if cnt > 1 {
 		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, page, listRows, int(cnt))
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(cnt), conf.PageSize, page, beego.URLFor("SettingController.Star"), "")
