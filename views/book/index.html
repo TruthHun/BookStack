@@ -56,12 +56,12 @@
                                 <input type="text" name="identify" value="">
                             </form>
                             <div class="list-item clearfix" v-for="item in lists">
-                                <div class="col-sm-2 col-xs-12" style="padding-left: 0px">
+                                <div class="col-sm-2 col-xs-4" style="padding-left: 0px">
                                     <a :class="item.order_index>0 ? 'recommend-book' : ''" :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
                                         <img  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" :src="item.cover" alt="">
                                     </a>
                                 </div>
-                                <div class="col-sm-10 col-xs-12" style="padding-right: 0px;padding-left: 0px;">
+                                <div class="col-sm-10 col-xs-8" style="padding-right: 0px;padding-left: 0px;">
                                     <div class="book-title">
                                         <div class="pull-left">
                                             <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" data-toggle="tooltip">
@@ -77,7 +77,7 @@
 
                                         <div class="clearfix"></div>
                                     </div>
-                                    <div class="info">
+                                    <div class="info hidden-xs">
                                         <span title="创建者" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user"></i> ${item.create_name}</span>
                                         <span title="文档数量" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pie-chart"></i> ${item.doc_count}</span>
                                         <span title="项目角色" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user-secret"></i> ${item.role_name}</span>
