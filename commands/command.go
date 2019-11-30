@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"database/sql"
 	"encoding/gob"
 	"flag"
 	"fmt"
@@ -36,6 +37,17 @@ func RegisterDataBase() {
 	password := beego.AppConfig.String("db_password")
 
 	port := beego.AppConfig.String("db_port")
+
+	createDB := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci", database)
+	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", username, password, host, port)
+	db, err := sql.Open("mysql", conn)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.Exec(createDB)
+	if err != nil {
+		panic(err)
+	}
 
 	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local", username, password, host, port, database)
 

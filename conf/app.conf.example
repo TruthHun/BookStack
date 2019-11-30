@@ -90,7 +90,7 @@ db_username=
 # 您的数据库密码
 db_password=
 
-#您使用的数据库
+# utf8或者utf8mb4数据库。如果数据库还没创建，并且账号有创建权限，将自动创建。
 db_database=bookstack
 
 # 谷歌浏览器，用于发布内容的时候渲染未被渲染的markdown。建议安装最新版的Chrome浏览器，并把Chrome浏览器加入系统环境变量。
