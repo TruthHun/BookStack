@@ -67,6 +67,9 @@ func webRouter() {
 	beego.Router("/manager/submit-book", &controllers.ManagerController{}, "get:SubmitBook")
 	beego.Router("/manager/submit-book/update", &controllers.ManagerController{}, "get:UpdateSubmitBook")
 	beego.Router("/manager/submit-book/delete", &controllers.ManagerController{}, "get:DeleteSubmitBook")
+	beego.Router("/manager/tags", &controllers.ManagerController{}, "get:Tags")
+	beego.Router("/manager/add-tags", &controllers.ManagerController{}, "post:AddTags")
+	beego.Router("/manager/del-tags", &controllers.ManagerController{}, "get:DelTags")
 
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
 	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")

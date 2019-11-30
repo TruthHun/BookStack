@@ -12,6 +12,11 @@
             </div>
             <div class="clearfix mgt-15px text-center">
                 <div class="col-xs-12 mgt-15px">
+                    {{if eq .HideTag true}}
+                        {{/* 如果导航栏隐藏了标签，则这里显示标签 */}}
+                        <span><a target="_blank" title="热门标签" href="{{urlfor "LabelController.List" }}">热门标签</a> </span>
+                        <span>&nbsp;·&nbsp;</span>
+                    {{end}}
                     <span><a target="_blank" title="赞助我们" href="/read/help/support">赞助我们</a> </span>
                     <span>&nbsp;·&nbsp;</span>
                     <span><a target="_blank" title="使用帮助" href="/books/help">使用帮助</a> </span>

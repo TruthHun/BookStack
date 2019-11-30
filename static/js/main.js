@@ -174,14 +174,20 @@ $(function () {
     //ajax-get
     $(document).on("click",".ajax-get",function (e) {
         e.preventDefault();
-        if($(this).hasClass("confirm") && !confirm("您确定要执行该操作吗？")){
+        var _this = $(this)
+        if(_this.hasClass("confirm") && !confirm("您确定要执行该操作吗？")){
             return true;
         }
         var _url=$(this).attr("href"),_this=$(this);
         $.get(_url,function (ret) {
             ret=parseJson(ret);
             if(ret.errcode==0){//操作成功
-                alertTips("success",ret.message,3000,location.href);
+                var parent = _this.parents(".rm-ajax-get")
+                if (parent && parent.length>0){
+                    parent.remove()
+                }else{
+                    alertTips("success",ret.message,3000,location.href);
+                }
             }else{
                 alertTips("danger",ret.message,3000,"");
             }

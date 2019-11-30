@@ -89,6 +89,45 @@ func (this *ManagerController) Users() {
 	this.Data["Wd"] = wd
 }
 
+// 标签管理.
+func (this *ManagerController) Tags() {
+	this.TplName = "manager/tags.html"
+	this.Data["IsTag"] = true
+	size := 150
+	wd := this.GetString("wd")
+	pageIndex, _ := this.GetInt("page", 1)
+	tags, totalCount, err := models.NewLabel().FindToPager(pageIndex, size, wd)
+	if err != nil {
+		this.Data["ErrorMessage"] = err.Error()
+		return
+	}
+	if totalCount > 0 {
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(totalCount), size, pageIndex, beego.URLFor("ManagerController.Tags"), "")
+	} else {
+		this.Data["PageHtml"] = ""
+	}
+	this.Data["Total"] = totalCount
+	this.Data["Tags"] = tags
+	this.Data["Wd"] = wd
+}
+
+func (this *ManagerController) AddTags() {
+	tags := this.GetString("tags")
+	if tags != "" {
+		tags = strings.Join(strings.Split(tags, "\n"), ",")
+		models.NewLabel().InsertOrUpdateMulti(tags)
+	}
+	this.JsonResult(0, "新增标签成功")
+}
+
+func (this *ManagerController) DelTags() {
+	id, _ := this.GetInt("id")
+	if id > 0 {
+		orm.NewOrm().QueryTable(models.NewLabel()).Filter("label_id", id).Delete()
+	}
+	this.JsonResult(0, "标签删除成功")
+}
+
 // 添加用户.
 func (this *ManagerController) CreateMember() {
 
