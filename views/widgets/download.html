@@ -6,11 +6,28 @@
                 <h4 class="modal-title" id="ModalDownloadLabel">文档下载</h4>
             </div>
             <div class="modal-body clearfix">
-                <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
                 <div class="help-block">
-                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> PDF<span class="hidden-xs">文档</span></a>
-                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> EPUB<span class="hidden-xs">文档</span></a>
-                    <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
+                    {{if .APP_QRCODE}}
+                        <div class="row">
+                            <div class="col-sm-6 col-xs-6 text-center">
+                                <div class="help-block">
+                                    你与大神的距离，只差一个APP
+                                </div>
+                                <img src="{{.APP_QRCODE}}" style="width:100%;max-width: 133px;" alt="APP下载">
+                            </div>
+                            <div class="col-sm-6 col-xs-6">
+                                <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
+                                <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown btn-block"> <i class="fa fa-cloud-download"></i> PDF<span class="hidden-xs">文档</span></a>
+                                <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown btn-block"> <i class="fa fa-cloud-download"></i> EPUB<span class="hidden-xs">文档</span></a>
+                                <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown btn-block"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
+                            </div>
+                        </div>
+                    {{else}}
+                        <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
+                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> PDF<span class="hidden-xs">文档</span></a>
+                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> EPUB<span class="hidden-xs">文档</span></a>
+                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
+                    {{end}}
                 </div>
             </div>
             <div class="modal-footer">

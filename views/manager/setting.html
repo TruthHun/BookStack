@@ -185,20 +185,24 @@
                             <input type="number" name="MOBILE_BANNER_SIZE" class="form-control" value="{{.MOBILE_BANNER_SIZE.OptionValue}}">
                         </div>
 
-                        <div class="form-group">
-                            <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
-                            <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
-                        </div>
 
                         <div class="form-group">
                             <label>手机APP版本号( <span class="text-muted">应用版本号，必须是整数，用于提示用户升级APP</span> )</label>
                             <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
                         </div>
-
+                        <div class="form-group">
+                            <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
+                            <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
+                        </div>
+                        <div class="form-group">
+                            <label>是否展示APP下载二维码( <span class="text-muted">请填写二维码图片链接。如果不为空，则用户在下载电子书的时候展示APP下载二维码</span> )</label>
+                            <input type="text" name="APP_QRCODE" class="form-control" value="{{.APP_QRCODE.OptionValue}}">
+                        </div>
                         <div class="form-group">
                             <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
                             <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
                         </div>
+
 
                         <div class="form-group">
                             <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>

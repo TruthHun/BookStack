@@ -242,9 +242,9 @@
 <script type="text/javascript" src="{{$.StaticDomain}}/static/js/toast.script.js"></script>
 <script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
 <script type="text/javascript" src="/static/js/clipboard.min.js"></script>
+<script type="text/javascript" src="/static/katex/katex.min.js"></script>
 <script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
-<script type="text/javascript" src="/static/katex/katex.min.js"></script>
 
 <script type="text/javascript">
     'use strict';
@@ -278,8 +278,6 @@ $(function () {
     });
 
     show_copy_btn();
-
-
 
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);

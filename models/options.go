@@ -210,6 +210,10 @@ func (m *Option) Init() error {
 			OptionValue: "0",
 			OptionName:  "APP_VERSION",
 			OptionTitle: "Android APP版本号（数字）",
+		}, {
+			OptionValue: "",
+			OptionName:  "APP_QRCODE",
+			OptionTitle: "是否在用户下载电子书的时候显示APP下载二维码",
 		},
 	}
 

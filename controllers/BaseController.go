@@ -83,6 +83,9 @@ func (this *BaseController) Prepare() {
 			if item.OptionName == "SITE_NAME" {
 				this.Sitename = item.OptionValue
 			}
+
+			beego.Debug(item.OptionName, item.OptionValue)
+
 			this.Data[item.OptionName] = item.OptionValue
 			this.Option[item.OptionName] = item.OptionValue
 			if strings.EqualFold(item.OptionName, "ENABLE_ANONYMOUS") && item.OptionValue == "true" {
