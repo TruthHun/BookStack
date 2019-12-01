@@ -43,3 +43,4 @@ node_modules
 dist
 output
 virtualroot
+docker
