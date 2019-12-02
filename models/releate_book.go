@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
@@ -22,20 +22,16 @@ func NewRelateBook() *RelateBook {
 	return &RelateBook{}
 }
 
+// Get the related books for a given book
 func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
+	day, _ := strconv.Atoi(GetOptionValue("RELATE_BOOK", "0"))
+	if day <= 0 {
+		return
+	}
 
 	length := 6
 	if len(limit) > 0 && limit[0] > 0 {
 		length = limit[0]
-	}
-
-	if GetOptionValue("ELASTICSEARCH_ON", "false") != "true" {
-		return
-	}
-
-	day, _ := strconv.Atoi(GetOptionValue("RELATE_BOOK", "0"))
-	if day <= 0 {
-		return
 	}
 
 	var rb RelateBook
@@ -50,13 +46,13 @@ func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
 	fields := []string{"book_id", "book_name", "cover", "identify"}
 
 	if rb.BookId > 0 && rb.Expire > now {
-		if slice := strings.Split(rb.BookIds, ","); len(slice) > 0 {
-			for _, item := range slice {
-				id, _ := strconv.Atoi(item)
-				if id > 0 && len(ids) < length {
-					ids = append(ids, id)
-				}
-			}
+		bookIds := rb.BookIds
+		if !strings.HasPrefix(bookIds, "[") {
+			bookIds = "[" + bookIds + "]"
+		}
+
+		err := json.Unmarshal([]byte(bookIds), &ids)
+		if err == nil && len(ids) > 0 {
 			books, _ = bookModel.GetBooksById(ids, fields...)
 			return
 		}
@@ -67,36 +63,65 @@ func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
 		return
 	}
 
-	client := NewElasticSearchClient()
-	client.IsRelateSearch = true
-	client.Timeout = 1 * time.Second
-	wd := book.Label
-	if len(wd) == 0 {
-		wd = book.BookName
-	}
-	res, err := client.Search(wd, 1, 12, false)
-	if err != nil {
-		beego.Error(err.Error())
-		return
+	if GetOptionValue("ELASTICSEARCH_ON", "false") == "true" {
+		ids = listByES(book, length)
+	} else {
+		ids = listByDBWithLabel(book, length)
 	}
 
-	var bookIds []string
-	for _, item := range res.Hits.Hits {
-		if item.Source.Id != bookId {
-			if len(ids) < length {
-				ids = append(ids, item.Source.Id)
-			}
-			bookIds = append(bookIds, fmt.Sprint(item.Source.Id))
-		}
-	}
 	books, _ = bookModel.GetBooksById(ids, fields...)
 	rb.BookId = bookId
-	rb.BookIds = strings.Join(bookIds, ",")
+	if ids == nil {
+		ids = []int{}
+	}
+	relatedIdBytes, _ := json.Marshal(ids)
+	rb.BookIds = string(relatedIdBytes)
 	rb.Expire = now + day*24*3600
 	if rb.Id > 0 {
 		o.Update(&rb)
 	} else {
 		o.Insert(&rb)
 	}
+	return
+}
+
+// Use ES to get the related books
+func listByES(book *Book, length int) (ids []int) {
+	client := NewElasticSearchClient()
+	client.IsRelateSearch = true
+	client.Timeout = 1 * time.Second
+	keyWord := book.Label
+	if len(keyWord) == 0 {
+		keyWord = book.BookName
+	}
+	res, err := client.Search(keyWord, 1, 12, false)
+	if err != nil {
+		beego.Error(err.Error())
+		return
+	}
+
+	bookId := book.BookId
+	for _, item := range res.Hits.Hits {
+		if len(ids) >= length {
+			break
+		}
+		if item.Source.Id == bookId {
+			continue
+		}
+		ids = append(ids, item.Source.Id)
+	}
+
+	return ids
+}
+
+// Get the related books directly from DB by SQL composed with Labels
+func listByDBWithLabel(book *Book, length int) (ids []int) {
+	rawKeyWords := book.Label
+	if rawKeyWords == "" {
+		return
+	}
+
+	bookModel := NewBook()
+	ids, _ = bookModel.SearchBookByLabel(strings.Split(rawKeyWords, ","), length, []int{book.BookId})
 	return
 }
