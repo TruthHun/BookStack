@@ -29,7 +29,7 @@ func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
 		return
 	}
 
-	length := 6
+	length := 12
 	if len(limit) > 0 && limit[0] > 0 {
 		length = limit[0]
 	}
@@ -89,12 +89,14 @@ func (r *RelateBook) Lists(bookId int, limit ...int) (books []Book) {
 func listByES(book *Book, length int) (ids []int) {
 	client := NewElasticSearchClient()
 	client.IsRelateSearch = true
-	client.Timeout = 1 * time.Second
+	client.Timeout = 3 * time.Second
+	listRows := 13 // 这里要填 13，因为有可能返回的id恰好是本书的id
 	keyWord := book.Label
 	if len(keyWord) == 0 {
 		keyWord = book.BookName
 	}
-	res, err := client.Search(keyWord, 1, 12, false)
+
+	res, err := client.Search(keyWord, 1, listRows, false)
 	if err != nil {
 		beego.Error(err.Error())
 		return
@@ -105,7 +107,7 @@ func listByES(book *Book, length int) (ids []int) {
 		if len(ids) >= length {
 			break
 		}
-		if item.Source.Id == bookId {
+		if item.Source.Id == bookId || len(ids) == listRows-1 {
 			continue
 		}
 		ids = append(ids, item.Source.Id)
