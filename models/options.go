@@ -215,6 +215,25 @@ func (m *Option) Init() error {
 			OptionName:  "APP_QRCODE",
 			OptionTitle: "是否在用户下载电子书的时候显示APP下载二维码",
 		},
+		{
+			OptionValue: "5",
+			OptionName:  "SIGN_BASIC_REWARD",
+			OptionTitle: "用户每次签到基础奖励阅读时长(秒)",
+		},
+		{
+			OptionValue: "10",
+			OptionName:  "SIGN_APP_REWARD",
+			OptionTitle: "使用APP签到额外奖励阅读时长(秒)",
+		},
+		{
+			OptionValue: "0",
+			OptionName:  "SIGN_CONTINUOUS_REWARD", //
+			OptionTitle: "用户连续签到奖励阅读时长(秒)",
+		}, {
+			OptionValue: "0",
+			OptionName:  "SIGN_CONTINUOUS_DAY",
+			OptionTitle: "连续签到奖励天数",
+		},
 	}
 
 	for _, op := range options {
