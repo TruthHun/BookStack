@@ -231,8 +231,8 @@ func (m *Option) Init() error {
 			OptionTitle: "用户连续签到奖励阅读时长(秒)",
 		}, {
 			OptionValue: "0",
-			OptionName:  "SIGN_CONTINUOUS_DAY",
-			OptionTitle: "连续签到奖励天数",
+			OptionName:  "SIGN_CONTINUOUS_MAX_REWARD",
+			OptionTitle: "连续签到奖励阅读时长上限(秒)",
 		},
 	}
 
