@@ -36,6 +36,7 @@ type Member struct {
 	LastLoginTime              time.Time `orm:"type(datetime);column(last_login_time);null" json:"last_login_time"`
 	Wxpay                      string    `json:"wxpay"`                                                // 微信支付的收款二维码
 	Alipay                     string    `json:"alipay"`                                               // 支付宝支付的收款二维码
+	TotalReadingTime           int       `json:"total_reading_time" orm:"default(0)"`                  // 总阅读时长
 	TotalSign                  int       `json:"total_sign" orm:"default(0);index"`                    // 总签到天数
 	TotalContinuousSign        int       `json:"total_continuous_sign" orm:"default(0);index"`         // 总连续签到天数
 	HistoryTotalContinuousSign int       `json:"history_total_continuous_sign" orm:"default(0);index"` // 历史最高连续签到天数

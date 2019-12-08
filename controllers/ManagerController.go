@@ -531,7 +531,8 @@ func (this *ManagerController) Setting() {
 		if err := models.NewElasticSearchClient().Init(); err != nil {
 			this.JsonResult(1, err.Error())
 		}
-
+		models.NewSign().UpdateSignRule()
+		models.NewReadRecord().UpdateReadingRule()
 		this.JsonResult(0, "ok")
 	}
 

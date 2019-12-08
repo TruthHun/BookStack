@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"time"
 
 	"strconv"
@@ -23,12 +24,14 @@ type ReadRecord struct {
 	CreateAt int //记录创建时间，也就是内容阅读时间
 }
 
-//阅读统计
+// 阅读统计
+// 用来记录一本书（假设有100个章节），用户已经阅读了多少章节，以标识用户书籍的阅读进度
+// 从而不用每次从阅读记录的表 read_record 表里面进行mysql 的 count 统计
 type ReadCount struct {
-	Id     int //自增主键
-	BookId int //书籍
-	Uid    int //用户id
-	Cnt    int //阅读的文档数
+	Id     int // 自增主键
+	BookId int // 书籍
+	Uid    int // 用户id
+	Cnt    int // 阅读的文档数
 }
 
 //阅读记录列表（非表）
@@ -45,6 +48,17 @@ type ReadProgress struct {
 	Total        int    `json:"total"`   //总文档
 	Percent      string `json:"percent"` //占的百分比
 	BookIdentify string `json:"book_identify"`
+}
+
+// 阅读计时规则
+type ReadingRule struct {
+	Min       int
+	Max       int
+	MaxReward int
+}
+
+func NewReadRecord() *ReadRecord {
+	return &ReadRecord{}
 }
 
 // 多字段唯一键
@@ -64,50 +78,113 @@ func (this *ReadRecord) TableUnique() [][]string {
 var (
 	tableReadRecord = "md_read_record"
 	tableReadCount  = "md_read_count"
+	_readingRule    = &ReadingRule{}
 )
 
 //添加阅读记录
 func (this *ReadRecord) Add(docId, uid int) (err error) {
-	//1、根据文档id查询书籍id
-	//2、写入或者更新阅读记录
-	//3、更新书籍被阅读的文档统计
+	// 1、根据文档id查询书籍id
+	// 2、写入或者更新阅读记录
+	// 3、更新书籍被阅读的文档统计
+	// 4、更新用户阅读时长
 	var (
-		doc Document
-		r   ReadRecord
+		doc      Document
+		r        ReadRecord
+		o        = orm.NewOrm()
+		tableDoc = NewDocument()
+		member   = NewMember()
+		now      = time.Now()
+		rt       = NewReadingTime()
 	)
-	o := orm.NewOrm()
-	tableDoc := new(Document)
+
 	err = o.QueryTable(tableDoc).Filter("document_id", docId).One(&doc, "book_id")
-	if doc.BookId > 0 { //书籍id大于0
-		record := ReadRecord{
-			BookId:   doc.BookId,
-			DocId:    docId,
-			Uid:      uid,
-			CreateAt: int(time.Now().Unix()),
-		}
+	if err != nil {
+		beego.Error(err)
+		return
+	}
 
-		go new(Star).SetLastReadTime(uid, doc.BookId)
+	if doc.BookId <= 0 {
+		return
+	}
 
-		o.QueryTable(tableReadRecord).Filter("doc_id", docId).Filter("uid", uid).One(&r, "id")
-		readCnt := 1
-		if r.Id > 0 { //先删再增，以便根据主键id索引的倒序查询列表
-			o.QueryTable(tableReadRecord).Filter("id", r.Id).Delete()
-			readCnt = 0 //如果是更新，则阅读次数
+	record := ReadRecord{
+		BookId:   doc.BookId,
+		DocId:    docId,
+		Uid:      uid,
+		CreateAt: int(now.Unix()),
+	}
+
+	// 更新书架中的书籍最后的阅读时间
+	go new(Star).SetLastReadTime(uid, doc.BookId)
+
+	// 计算奖励的阅读时长
+	readingTime := this.calcReadingTime(uid, docId, now)
+
+	o.Begin()
+	defer func() {
+		if err != nil {
+			o.Rollback()
+			beego.Error(err)
+		} else {
+			o.Commit()
 		}
-		if _, err = o.Insert(&record); err == nil && readCnt == 1 {
-			var rc = ReadCount{
-				BookId: doc.BookId,
-				Uid:    uid,
-				Cnt:    1,
-			}
-			o.QueryTable(tableReadCount).Filter("uid", uid).Filter("book_id", doc.BookId).One(&rc, "id")
-			if rc.Id > 0 { //更新统计
-				err = SetIncreAndDecre(tableReadCount, "cnt", "id="+strconv.Itoa(rc.Id), true, 1)
-			} else { //增加统计
-				_, err = o.Insert(&rc)
-			}
+	}()
+
+	o.QueryTable(tableReadRecord).Filter("doc_id", docId).Filter("uid", uid).One(&r, "id")
+
+	readCnt := 1
+	if r.Id > 0 { // 先删再增，以便根据主键id索引的倒序查询列表
+		o.QueryTable(tableReadRecord).Filter("id", r.Id).Delete()
+		readCnt = 0 // 如果是更新，则阅读次数
+	}
+
+	// 更新阅读记录
+	_, err = o.Insert(&record)
+	if err != nil {
+		return
+	}
+
+	if readCnt == 1 {
+		rc := &ReadCount{}
+		o.QueryTable(tableReadCount).Filter("uid", uid).Filter("book_id", doc.BookId).One(rc)
+		if rc.Id > 0 { // 更新已存在的阅读进度统计记录
+			rc.Cnt += 1
+			_, err = o.Update(rc)
+		} else { // 增加阅读进度统计记录
+			rc = &ReadCount{BookId: doc.BookId, Uid: uid, Cnt: 1}
+			_, err = o.Insert(rc)
 		}
 	}
+	if err != nil {
+		return
+	}
+	if readingTime <= 0 {
+		return
+	}
+
+	o.QueryTable(member).Filter("member_id", uid).One(member, "member_id", "total_reading_time")
+	if member.MemberId > 0 {
+		_, err = o.QueryTable(member).Update(orm.Params{"total_reading_time": member.TotalReadingTime + readingTime})
+		if err != nil {
+			return
+		}
+		o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(signDayLayout)).One(rt)
+		if rt.Id > 0 {
+			rt.Duration += readingTime
+			_, err = o.Update(rt)
+		} else {
+			rt.Day, _ = strconv.Atoi(now.Format(signDayLayout))
+			rt.Uid = uid
+			rt.Duration = readingTime
+			_, err = o.Insert(rt)
+		}
+	}
+	return
+}
+
+// 查询用户最后的一条阅读记录
+func (this *ReadRecord) LastReading(uid int, cols ...string) (r ReadRecord) {
+	orm.NewOrm().QueryTable(this).Filter("uid", uid).OrderBy("-id").One(&r)
 	return
 }
 
@@ -172,7 +249,7 @@ func (this *ReadRecord) Progress(uid, bookId int) (rp ReadProgress, err error) {
 	return
 }
 
-//查询阅读进度
+// 查询阅读进度
 func (this *ReadRecord) BooksProgress(uid int, bookId ...int) (read map[int]int) {
 	read = make(map[int]int)
 	var count []ReadCount
@@ -206,4 +283,44 @@ func (this *ReadRecord) Delete(uid, docId int) (err error) {
 		}
 	}
 	return
+}
+
+// 更新签到奖励规则
+func (*ReadRecord) UpdateReadingRule() {
+	ops := []string{"READING_MIN_INTERVAL", "READING_MAX_INTERVAL", "READING_INTERVAL_MAX_REWARD"}
+	for _, op := range ops {
+		num, _ := strconv.Atoi(GetOptionValue(op, ""))
+		switch op {
+		case "READING_MIN_INTERVAL":
+			_readingRule.Min = num
+		case "READING_MAX_INTERVAL":
+			_readingRule.Max = num
+		case "READING_INTERVAL_MAX_REWARD":
+			_readingRule.MaxReward = num
+		}
+	}
+}
+
+// 获取阅读计时规则
+func (*ReadRecord) GetReadingRule() (r *ReadingRule) {
+	return _readingRule
+}
+
+func (*ReadRecord) calcReadingTime(uid, docId int, t time.Time) (val int) {
+	r := NewReadRecord()
+	rr := r.LastReading(uid, "uid", "doc_id", "created_at")
+	if rr.DocId == docId {
+		return
+	}
+
+	rule := r.GetReadingRule()
+	diff := int(t.Unix()) - rr.CreateAt
+	if diff <= 0 || diff < rule.Min {
+		return
+	}
+
+	if diff > rule.MaxReward {
+		return rule.Max
+	}
+	return diff
 }

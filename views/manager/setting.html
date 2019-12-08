@@ -245,6 +245,20 @@
 
 
                         <div class="form-group">
+                            <label>内容最小阅读计时间隔(秒)</label>
+                            <input type="number" name="READING_MIN_INTERVAL" class="form-control" value="{{.READING_MIN_INTERVAL.OptionValue}}">
+                        </div>
+                        <div class="form-group">
+                            <label>内容最大阅读计时间隔(秒)</label>
+                            <input type="number" name="READING_MAX_INTERVAL" class="form-control" value="{{.READING_MAX_INTERVAL.OptionValue}}">
+                        </div>
+                        <div class="form-group">
+                            <label>内容阅读计时间隔最大奖励(秒)</label>
+                            <input type="number" name="READING_INTERVAL_MAX_REWARD" class="form-control" value="{{.READING_INTERVAL_MAX_REWARD.OptionValue}}">
+                        </div>
+
+
+                        <div class="form-group">
                             <label>是否开启全文搜索( <span class="text-muted">每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果 </span> )</label>
                             <div class="radio">
                                 <label class="radio-inline">

@@ -74,9 +74,7 @@ func (p *Option) InsertOrUpdate() error {
 }
 
 func (p *Option) InsertMulti(option ...Option) error {
-
 	o := orm.NewOrm()
-
 	_, err := o.InsertMulti(len(option), option)
 	return err
 }
@@ -233,6 +231,21 @@ func (m *Option) Init() error {
 			OptionValue: "0",
 			OptionName:  "SIGN_CONTINUOUS_MAX_REWARD",
 			OptionTitle: "连续签到奖励阅读时长上限(秒)",
+		},
+		{
+			OptionValue: "0",
+			OptionName:  "READING_MIN_INTERVAL",
+			OptionTitle: "内容最小阅读计时间隔(秒)",
+		},
+		{
+			OptionValue: "600",
+			OptionName:  "READING_MAX_INTERVAL",
+			OptionTitle: "内容最大阅读计时间隔(秒)",
+		},
+		{
+			OptionValue: "600",
+			OptionName:  "READING_INTERVAL_MAX_REWARD",
+			OptionTitle: "内容阅读计时间隔最大奖励(秒)",
 		},
 	}
 
