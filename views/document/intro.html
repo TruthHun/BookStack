@@ -21,6 +21,11 @@
                     <a href="{{urlfor "ManagerController.EditBook" ":key" .Book.Identify}}" class="tooltips" title="管理员项目设置"> &nbsp;<small><i class="fa fa-cogs"></i></small> </a>
                 {{end}}
             </h1>
+            {{if (ads "intro-under-book-name" $.IsMobile)}}
+                <div class="ap ap-intro-under-book-name">
+                    {{str2html (ads "intro-under-book-name" $.IsMobile)}}
+                </div>
+            {{end}}
         </div>
         <div class="col-sm-3 col-xs-6 col-md-3">
             <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}} mgt-15px">

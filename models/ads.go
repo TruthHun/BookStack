@@ -44,6 +44,7 @@ const (
 	AdsPositionSearchRight             = "search-right"
 	AdsPositionSearchTop               = "search-top"
 	AdsPositionSearchBottom            = "search-bottom"
+	AdsPositionUnderBookName           = "intro-under-book-name"
 	AdsPositionBeforeMenu              = "intro-before-menu"
 	AdsPositionBeforeRelatedBooks      = "intro-before-related-books"
 	AdsPositionUnderExploreNav         = "explore-under-nav"
@@ -89,6 +90,11 @@ func InstallAdsPosition() {
 			IsMobile: false,
 			Title:    "[搜索页]搜索结果下方",
 			Identify: AdsPositionSearchBottom,
+		},
+		{
+			IsMobile: false,
+			Title:    "[书籍介绍页]书籍名称下方",
+			Identify: AdsPositionUnderBookName,
 		},
 		{
 			IsMobile: false,
@@ -149,6 +155,11 @@ func InstallAdsPosition() {
 			IsMobile: true,
 			Title:    "[搜索页]搜索结果下方",
 			Identify: AdsPositionSearchBottom,
+		},
+		{
+			IsMobile: true,
+			Title:    "[书籍介绍页]书籍名称下方",
+			Identify: AdsPositionUnderBookName,
 		},
 		{
 			IsMobile: true,
