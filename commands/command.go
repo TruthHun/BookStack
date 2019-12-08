@@ -96,6 +96,8 @@ func RegisterModel() {
 		new(models.RegLimit),
 		models.NewAdsPosition(),
 		models.NewAdsCont(),
+		models.NewReadingTime(),
+		models.NewSign(),
 	)
 	migrate.RegisterMigration()
 }
