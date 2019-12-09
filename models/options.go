@@ -243,6 +243,11 @@ func (m *Option) Init() error {
 			OptionTitle: "内容最大阅读计时间隔(秒)",
 		},
 		{
+			OptionValue: "1200",
+			OptionName:  "READING_INVALID_INTERVAL",
+			OptionTitle: "内容阅读无效计时间隔(秒)",
+		},
+		{
 			OptionValue: "600",
 			OptionName:  "READING_INTERVAL_MAX_REWARD",
 			OptionTitle: "内容阅读计时间隔最大奖励(秒)",

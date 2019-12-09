@@ -55,6 +55,7 @@ type ReadingRule struct {
 	Min       int
 	Max       int
 	MaxReward int
+	Invalid   int
 }
 
 func NewReadRecord() *ReadRecord {
@@ -287,7 +288,7 @@ func (this *ReadRecord) Delete(uid, docId int) (err error) {
 
 // 更新签到奖励规则
 func (*ReadRecord) UpdateReadingRule() {
-	ops := []string{"READING_MIN_INTERVAL", "READING_MAX_INTERVAL", "READING_INTERVAL_MAX_REWARD"}
+	ops := []string{"READING_MIN_INTERVAL", "READING_MAX_INTERVAL", "READING_INTERVAL_MAX_REWARD", "READING_INVALID_INTERVAL"}
 	for _, op := range ops {
 		num, _ := strconv.Atoi(GetOptionValue(op, ""))
 		switch op {
@@ -297,6 +298,8 @@ func (*ReadRecord) UpdateReadingRule() {
 			_readingRule.Max = num
 		case "READING_INTERVAL_MAX_REWARD":
 			_readingRule.MaxReward = num
+		case "READING_INVALID_INTERVAL":
+			_readingRule.Invalid = num
 		}
 	}
 }
@@ -306,17 +309,20 @@ func (*ReadRecord) GetReadingRule() (r *ReadingRule) {
 	return _readingRule
 }
 
-func (*ReadRecord) calcReadingTime(uid, docId int, t time.Time) (val int) {
+// 在 5 - 600 秒之间的阅读计时，正常计时
+// 在 600 - 1800 秒(半个小时)之间的计时，按最大计时来计算时长
+// 超过半个小时之后才有阅读记录，则在此期间的阅读时长为0
+func (*ReadRecord) calcReadingTime(uid, docId int, t time.Time) int {
 	r := NewReadRecord()
 	rr := r.LastReading(uid, "uid", "doc_id", "created_at")
 	if rr.DocId == docId {
-		return
+		return 0
 	}
 
 	rule := r.GetReadingRule()
 	diff := int(t.Unix()) - rr.CreateAt
-	if diff <= 0 || diff < rule.Min {
-		return
+	if diff <= 0 || diff < rule.Min || diff >= rule.Invalid {
+		return 0
 	}
 
 	if diff > rule.MaxReward {
