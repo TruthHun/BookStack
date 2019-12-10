@@ -152,6 +152,9 @@ func webRouter() {
 	beego.Router("/tag/:key", &controllers.LabelController{}, "get:Index")
 	beego.Router("/tag", &controllers.LabelController{}, "get:List")
 	beego.Router("/tags", &controllers.LabelController{}, "get:List")
+
+	beego.Router("/rank", &controllers.RankController{}, "get:Index")
+
 	beego.Router("/sitemap.html", &controllers.BaseController{}, "get:Sitemap")
 	beego.Router("/local-render", &controllers.LocalhostController{}, "get,post:RenderMarkdown")
 	beego.Router("/local-render-cover", &controllers.LocalhostController{}, "get:RenderCover")

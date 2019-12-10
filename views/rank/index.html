@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>榜单 - {{.SITE_NAME}}</title>
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
+    <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+</head>
+<body id="page-rank">
+<div class="manual-container">
+    {{template "widgets/header.html" .}}
+    <div class="container manual-body">
+        <div class="row">
+            <div class="col-sm-4 col-xs-12 pull-right">
+                这是榜单
+            </div>
+            <div class="col-sm-8 col-xs-12 pull-left">
+                这是榜单
+            </div>
+
+        </div>
+    </div>
+    {{template "widgets/footer.html" .}}
+</div>
+
+
+
+</body>
+</html>

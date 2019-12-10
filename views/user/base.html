@@ -2,21 +2,56 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <div class="ucenter-avatar text-center">
-                    <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
-                    <h3>{{.User.Nickname}}</h3>
-                    <div class="help-block"><span class="text-muted">(@{{.User.Account}})</span></div>
-                    {{if .IsSelf}}
-                        <div><a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a></div>
-                    {{else}}
-                        {{if (IsFollow .User.MemberId  .Member.MemberId)}}
-                            <div><a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a></div>
-                        {{else}}
-                            <div><a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-success btn-sm btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a></div>
-                        {{end}}
-                    {{end}}
-                    <div class="help-block mgt-15px">{{.User.Description}}</div>
+                <div class="ucenter-avatar">
+                    <div class="clearfix">
+                        <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
+                        <div class="ucenter-info">
+                            <h3>
+                                <span>{{.User.Nickname}}</span>
+                                <small class="text-muted">(@{{.User.Account}})</small>
+
+                            </h3>
+                            <div class="btns">
+                                {{if .IsSelf}}
+                                    <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-xs"><i class="fa fa-cogs"></i> 设置</a>
+                                    <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-default btn-xs"><i class="fa fa-calendar-check-o"></i> 今日已签到</a>
+                                    <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-xs"><i class="fa fa-calendar-plus-o"></i> 签到</a>
+                                {{else}}
+                                    {{if (IsFollow .User.MemberId  .Member.MemberId)}}
+                                        <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-xs btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a>
+                                    {{else}}
+                                        <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-success btn-xs btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a>
+                                    {{end}}
+                                {{end}}
+                            </div>
+                            <div class="user-stat">
+                                <ul>
+                                    <li>
+                                        <div>连续签到</div>
+                                        <div class="stat-item"><span>10</span> <small>天</small></div>
+                                    </li>
+                                    <li>
+                                        <div>最高连签</div>
+                                        <div class="stat-item"><span>10</span> <small>天</small></div>
+                                    </li>
+                                    <li>
+                                        <div>累计签到</div>
+                                        <div class="stat-item"><span>123</span> <small>天</small></div>
+                                    </li>
+                                    <li>
+                                        <div>加入网站</div>
+                                        <div class="stat-item"><span>103</span> <small>天</small></div>
+                                    </li>
+                                    <li>
+                                        <div>阅读时长</div>
+                                        <div class="stat-item"><span>1323</span> <small>小时</small> <span>1</span> <small>分钟</small></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="help-block mgt-15px">{{.User.Description}}</div>
             </div>
         </div>
     </div>

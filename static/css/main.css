@@ -780,10 +780,13 @@ a{color: #333}
 .nopadding{padding: 0px !important;}
 
 /*用户主页*/
-.ucenter{margin-top: 55px;}
-.ucenter .well{border-radius: 0px;border: 0px;box-shadow: none;}
-.ucenter h3{margin:0px;font-size: 20px;font-weight: 400;text-align: center;}
-.ucenter .ucenter-avatar .thumbnail{margin:15px auto;border-radius: 50%;max-width: 120px;}
+.ucenter{margin-top: 80px;}
+.ucenter .well{border-radius: 0px;border: 0;box-shadow: none;background-color: #fff;padding: 15px 0;}
+.ucenter h3{margin:0px;font-size: 20px;font-weight: 400;}
+.ucenter .ucenter-avatar{border-bottom: 1px solid #EFEFEF;}
+.ucenter .ucenter-info{float: left;}
+.ucenter .btns{margin:10px 0px 7px;}
+.ucenter .ucenter-avatar .thumbnail{width: 120px;height:120px;border-radius: 0;float: left;margin-right: 15px;}
 .ucenter .ucenter-content{min-height: 150px;}
 .ucenter-content ul,.ucenter-content li{list-style: none;padding: 0px;}
 .ucenter-content li.clearfix{border-bottom: 1px dashed #EFEFEF;padding:20px;padding-left: 5px;}
@@ -800,7 +803,11 @@ a{color: #333}
 .ucenter .fans-item .btn{margin-top: 5px;}
 .ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;max-width: 100px;}
 .ucenter .fans-item .thumbnail img{border-radius: 50%;max-width: 100px;}
-
+.ucenter .user-stat li,.ucenter .user-stat ul{padding: 0;list-style: none;display: inline-block;color: #888888}
+.ucenter .user-stat li{padding: 5px 0;margin-right: 15px;text-align: center;}
+.ucenter .user-stat .stat-item{font-size: 1.3em;}
+.ucenter .user-stat span{color: #f44336;}
+.ucenter .user-stat small{font-size: 12px;}
 
 .recommend-book:before{
     content: url("../images/recommend-red.png");
