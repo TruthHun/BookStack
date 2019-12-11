@@ -165,7 +165,7 @@ func (this *ReadRecord) Add(docId, uid int) (err error) {
 
 	o.QueryTable(member).Filter("member_id", uid).One(member, "member_id", "total_reading_time")
 	if member.MemberId > 0 {
-		_, err = o.QueryTable(member).Update(orm.Params{"total_reading_time": member.TotalReadingTime + readingTime})
+		_, err = o.QueryTable(member).Filter("member_id", uid).Update(orm.Params{"total_reading_time": member.TotalReadingTime + readingTime})
 		if err != nil {
 			return
 		}
