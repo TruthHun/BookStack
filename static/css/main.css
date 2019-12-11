@@ -863,3 +863,8 @@ a{color: #333}
 .submit-book .right{border-left: 1px solid #EFEFEF;line-height: 180%;}
 .submit-book .right div{text-indent: 2em;}
 .submit-book .right strong,.submit-book .right h4{font-weight: normal;color: #000;}
+
+#page-rank .rank-head{margin:30px 0;}
+#page-rank .panel{border-radius: 0;box-shadow: none;}
+#page-rank .panel-default{border-color: #EEEEEE}
+#page-rank .panel-default>.panel-heading{background-color: #ffffff;}
