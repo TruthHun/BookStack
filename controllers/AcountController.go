@@ -590,31 +590,6 @@ func (this *AccountController) Logout() {
 	this.Redirect(beego.URLFor("AccountController.Login"), 302)
 }
 
-//验证码.
-//func (this *AccountController) Captcha() {
-//	captchaImage, err := gocaptcha.NewCaptchaImage(140, 40, gocaptcha.RandLightColor())
-//
-//	if err != nil {
-//		beego.Error(err)
-//		this.Abort("404")
-//	}
-//
-//	captchaImage.DrawNoise(gocaptcha.CaptchaComplexLower)
-//
-//	//captchaImage.DrawTextNoise(gocaptcha.CaptchaComplexHigh)
-//	txt := gocaptcha.RandText(4)
-//
-//	this.SetSession(conf.CaptchaSessionName, txt)
-//
-//	captchaImage.DrawText(txt)
-//	//captchaImage.Drawline(3);
-//	captchaImage.DrawBorder(gocaptcha.ColorToRGB(0x17A7A7A))
-//	//captchaImage.DrawHollowLine()
-//
-//	captchaImage.SaveImage(this.Ctx.ResponseWriter, gocaptcha.ImageFormatJpeg)
-//	this.StopRun()
-//}
-
 //记录笔记
 func (this *AccountController) Note() {
 	docid, _ := this.GetInt("doc_id")

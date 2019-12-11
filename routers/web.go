@@ -147,6 +147,7 @@ func webRouter() {
 	beego.Router("/user/:username/follow", &controllers.UserController{}, "get:Follow")
 	beego.Router("/user/:username/fans", &controllers.UserController{}, "get:Fans")
 	beego.Router("/follow/:uid", &controllers.BaseController{}, "get:SetFollow") //关注或取消关注
+	beego.Router("/user/sign", &controllers.BaseController{}, "get:SignToday")   //关注或取消关注
 	//用户中心 【end】
 
 	beego.Router("/tag/:key", &controllers.LabelController{}, "get:Index")

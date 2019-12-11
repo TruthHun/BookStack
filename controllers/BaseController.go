@@ -448,7 +448,7 @@ func (this *BaseController) Crawl() {
 //关注或取消关注
 func (this *BaseController) SetFollow() {
 	var cancel bool
-	if this.Member.MemberId == 0 {
+	if this.Member == nil || this.Member.MemberId == 0 {
 		this.JsonResult(1, "请先登录")
 	}
 	uid, _ := this.GetInt(":uid")
@@ -460,6 +460,18 @@ func (this *BaseController) SetFollow() {
 		this.JsonResult(0, "您已经成功取消了关注")
 	}
 	this.JsonResult(0, "您已经成功关注了Ta")
+}
+
+//关注或取消关注
+func (this *BaseController) SignToday() {
+	if this.Member == nil || this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+	err := models.NewSign().Sign(this.Member.MemberId, false)
+	if err != nil {
+		this.JsonResult(1, "签到失败："+err.Error())
+	}
+	this.JsonResult(0, "恭喜您，签到成功")
 }
 
 func (this *BaseController) forbidGeneralRole() bool {

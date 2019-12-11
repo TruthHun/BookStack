@@ -24,6 +24,10 @@ func (this *UserController) Prepare() {
 	this.Data["IsSelf"] = this.UcenterMember.MemberId == this.Member.MemberId
 	this.Data["User"] = this.UcenterMember
 	this.Data["Tab"] = "share"
+	this.Data["IsSign"] = false
+	if this.Member != nil && this.Member.MemberId > 0 {
+		this.Data["IsSign"] = models.NewSign().IsSignToday(this.Member.MemberId)
+	}
 }
 
 //首页

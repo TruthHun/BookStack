@@ -123,6 +123,16 @@ func (m *Sign) Sign(uid int, fromApp bool) (err error) {
 		s.Reward = s.Reward + rule.AppReward
 	}
 
+	if _, err = o.Insert(s); err != nil {
+		return
+	}
+
+	_, err = o.QueryTable(user).Filter("member_id", user.MemberId).Update(orm.Params{
+		"total_sign":                    user.TotalSign,
+		"total_continuous_sign":         user.TotalContinuousSign,
+		"history_total_continuous_sign": user.HistoryTotalContinuousSign,
+	})
+
 	return
 }
 
