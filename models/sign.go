@@ -56,11 +56,11 @@ func (m *Sign) IsSignToday(uid int) bool {
 
 // 是否未断签
 func (m *Sign) IsContinuousSign(uid int) bool {
+	s := &Sign{}
 	now := time.Now()
-	days := []interface{}{now.Format(signDayLayout), now.Add(-24 * time.Hour).Format(signDayLayout)}
-	var ss []Sign
-	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day__in", days...).All(&ss)
-	return len(ss) == len(days)
+	yesterday := now.Add(-24 * time.Hour).Format(signDayLayout)
+	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("day", yesterday).One(s)
+	return s.Id > 0
 }
 
 // 执行签到。使用事务

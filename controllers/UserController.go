@@ -5,6 +5,7 @@ import (
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
+	"time"
 )
 
 type UserController struct {
@@ -23,6 +24,9 @@ func (this *UserController) Prepare() {
 	}
 	this.Data["IsSelf"] = this.UcenterMember.MemberId == this.Member.MemberId
 	this.Data["User"] = this.UcenterMember
+	this.Data["JoinedDays"] = int(time.Now().Sub(this.UcenterMember.CreateTime).Seconds()/(24*3600)) + 1
+	this.Data["ReadHours"] = int(this.UcenterMember.TotalReadingTime / 3600)
+	this.Data["ReadMinute"] = int(this.UcenterMember.TotalReadingTime % 3600 / 60)
 	this.Data["Tab"] = "share"
 	this.Data["IsSign"] = false
 	if this.Member != nil && this.Member.MemberId > 0 {

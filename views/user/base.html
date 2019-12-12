@@ -31,25 +31,25 @@
                                 <ul>
                                     <li>
                                         <div>连续签到</div>
-                                        <div class="stat-item"><span>10</span> <small>天</small></div>
+                                        <div class="stat-item"><span>{{.User.TotalContinuousSign}}</span> <small>天</small></div>
                                     </li>
                                     <li>
                                         <div>最高连签</div>
-                                        <div class="stat-item"><span>10</span> <small>天</small></div>
+                                        <div class="stat-item"><span>{{.User.HistoryTotalContinuousSign}}</span> <small>天</small></div>
                                     </li>
-                                    <li>
-                                        <div>阅读时长</div>
-                                        <div class="stat-item"><span>1323</span> <small>小时</small> <span>1</span> <small>分钟</small></div>
-                                    </li>
+
                                     <li>
                                         <div>累计签到</div>
-                                        <div class="stat-item"><span>123</span> <small>天</small></div>
+                                        <div class="stat-item"><span>{{.User.TotalSign}}</span> <small>天</small></div>
                                     </li>
                                     <li>
                                         <div>加入网站</div>
-                                        <div class="stat-item"><span>103</span> <small>天</small></div>
+                                        <div class="stat-item"><span>{{.JoinedDays}}</span> <small>天</small></div>
                                     </li>
-
+                                    <li>
+                                        <div>阅读时长</div>
+                                        <div class="stat-item"><span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small></div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
