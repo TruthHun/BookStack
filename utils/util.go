@@ -964,7 +964,10 @@ func IsMobile(userAgent string) bool {
 	return user_agent.New(userAgent).Mobile()
 }
 
-func FormatReadingTime(seconds int) string {
+func FormatReadingTime(seconds int, withoutTag ...bool) string {
 	strFmt := "<span>%v</span> <small>小时</small> <span>%v</span> <small>分钟</small>"
+	if len(withoutTag) > 0 && withoutTag[0] {
+		strFmt = "%v 小时 %v 分钟"
+	}
 	return fmt.Sprintf(strFmt, int(seconds/3600), int(seconds%3600/60))
 }

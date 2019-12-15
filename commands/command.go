@@ -219,6 +219,8 @@ func RegisterFunction() {
 	beego.AddFuncMap("IsFollow", new(models.Fans).Relation)
 	beego.AddFuncMap("isubstr", utils.Substr)
 	beego.AddFuncMap("ads", models.GetAdsCode)
+	beego.AddFuncMap("formatReadingTime", utils.FormatReadingTime)
+	beego.AddFuncMap("add", func(a, b int) int { return a + b })
 }
 
 func ResolveCommand(args []string) {

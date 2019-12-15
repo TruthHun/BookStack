@@ -29,119 +29,71 @@
                 </div>
                 <div class="rank-body">
                     <div class="row">
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">时长榜</div>
+                                <div class="panel-heading">阅读时长榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
                                 <div class="panel-body">
-                                    <ol>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                    </ol>
+                                    <ul>
+                                        {{range $idx,$user:=.TotalReadingUsers}}
+                                            <li>
+                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
+                                                    <span class="rank-cont">{{$user.Nickname}}</span>
+                                                    <small class="pull-right">{{str2html (formatReadingTime $user.TotalContinuousSign true)}}</small>
+                                                </a>
+                                            </li>
+                                        {{end}}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">签到榜</div>
+                                <div class="panel-heading">连续签到榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
                                 <div class="panel-body">
-                                    <ol>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                    </ol>
+                                    <ul>
+                                        <li></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">人气榜</div>
+                                <div class="panel-heading">累计签到榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
                                 <div class="panel-body">
-                                    <ol>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                    </ol>
+                                    <ul>
+                                       <li></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">收藏榜</div>
+                                <div class="panel-heading">热门收藏榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
                                 <div class="panel-body">
-                                    <ol>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                        <li>路人甲</li>
-                                    </ol>
+                                    <ul>
+                                       <li></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">人气热读榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
+                                <div class="panel-body">
+                                    <ul>
+                                       <li></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">热门点评榜 <small class="pull-right"><a href="" class="text-muted">更多>></a></small></div>
+                                <div class="panel-body">
+                                    <ul>
+                                        <li></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -152,8 +104,5 @@
     </div>
     {{template "widgets/footer.html" .}}
 </div>
-
-
-
 </body>
 </html>

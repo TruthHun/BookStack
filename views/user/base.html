@@ -7,10 +7,12 @@
                 <h3>
                     <span>{{.User.Nickname}}</span>
                     <small class="text-muted">(@{{.User.Account}})</small>
+                    {{if .IsSelf}}
                     <span class="sign-rule">
                         <small class="text-muted">|</small>
                         <a href="/read/help/sign-rule.md" title="签到规则" target="_blank"><small>签到规则</small></a>
                     </span>
+                    {{end}}
                 </h3>
                 <div class="btns">
                     {{if .IsSelf}}

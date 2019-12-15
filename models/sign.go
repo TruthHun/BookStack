@@ -158,3 +158,10 @@ func (m *Sign) UpdateSignRule() {
 		}
 	}
 }
+
+func (m *Sign) SortedContinuousSign(limit int) (members []Member) {
+	member := NewMember()
+	o := orm.NewOrm()
+	o.QueryTable(member).OrderBy("-total_continuous_sign").Limit(limit).All(&members, "member_id", "account", "nickname", "total_continuous_sign")
+	return
+}
