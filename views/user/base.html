@@ -1,62 +1,65 @@
-<div class="well">
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="ucenter-avatar">
-                    <div class="clearfix">
-                        <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
-                        <div class="ucenter-info">
-                            <h3>
-                                <span>{{.User.Nickname}}</span>
-                                <small class="text-muted">(@{{.User.Account}})</small>
-
-                            </h3>
-                            <div class="btns">
-                                {{if .IsSelf}}
-                                    <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a>
-                                    {{if .IsSign}}
-                                        <a target="_blank" href="javascript:void(0);" class="btn btn-success btn-sm disabled"><i class="fa fa-calendar-check-o"></i> 今日已签到</a>
-                                    {{else}}
-                                        <a target="_blank" href="{{urlfor "BaseController.SignToday"}}" class="btn btn-success btn-sm ajax-get"><i class="fa fa-calendar-plus-o"></i> 每日签到</a>
-                                    {{end}}
-                                {{else}}
-                                    {{if (IsFollow .User.MemberId  .Member.MemberId)}}
-                                        <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a>
-                                    {{else}}
-                                        <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-success btn-sm btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a>
-                                    {{end}}
-                                {{end}}
-                            </div>
-                            <div class="user-stat">
-                                <ul>
-                                    <li>
-                                        <div>连续签到</div>
-                                        <div class="stat-item"><span>{{.User.TotalContinuousSign}}</span> <small>天</small></div>
-                                    </li>
-                                    <li>
-                                        <div>最高连签</div>
-                                        <div class="stat-item"><span>{{.User.HistoryTotalContinuousSign}}</span> <small>天</small></div>
-                                    </li>
-
-                                    <li>
-                                        <div>累计签到</div>
-                                        <div class="stat-item"><span>{{.User.TotalSign}}</span> <small>天</small></div>
-                                    </li>
-                                    <li>
-                                        <div>加入网站</div>
-                                        <div class="stat-item"><span>{{.JoinedDays}}</span> <small>天</small></div>
-                                    </li>
-                                    <li>
-                                        <div>累计阅读</div>
-                                        <div class="stat-item"><span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small></div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+<div class="ucenter-avatar">
+    <div class="panel panel-default">
+        <div class="panel-heading">个人主页</div>
+        <div class="panel-body">
+            <img class="thumbnail" src="{{showImg .User.Avatar "avatar"}}" alt="{{.User.Nickname}}">
+            <div class="ucenter-info">
+                <h3>
+                    <span>{{.User.Nickname}}</span>
+                    <small class="text-muted">(@{{.User.Account}})</small>
+                </h3>
+                <div class="btns">
+                    {{if .IsSelf}}
+                        <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a>
+                        {{if .IsSign}}
+                            <a target="_blank" href="javascript:void(0);" class="btn btn-success btn-sm disabled"><i class="fa fa-calendar-check-o"></i> 今日已签到</a>
+                        {{else}}
+                            <a target="_blank" href="{{urlfor "BaseController.SignToday"}}" class="btn btn-success btn-sm ajax-get"><i class="fa fa-calendar-plus-o"></i> 每日签到</a>
+                        {{end}}
+                    {{else}}
+                        {{if (IsFollow .User.MemberId  .Member.MemberId)}}
+                            <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a>
+                        {{else}}
+                            <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-success btn-sm btn-follow"><i class="fa fa-heart-o"></i> 关注Ta</a>
+                        {{end}}
+                    {{end}}
                 </div>
-{{/*                <div class="help-block mgt-15px">{{.User.Description}}</div>*/}}
+                <div class="user-stat">
+                    <ul>
+                        <li>
+                            <span>加入网站</span> <span>{{.JoinedDays}}</span> <small>天</small>
+                        </li>
+                        <li>
+                            <span>连续签到</span> <span>{{.User.TotalContinuousSign}}</span> <small>天</small>
+                        </li>
+                        <li>
+                            <span>最高连签</span> <span>{{.User.HistoryTotalContinuousSign}}</span> <small>天</small>
+                        </li>
+
+                        <li>
+                            <span>累计签到</span> <span>{{.User.TotalSign}}</span> <small>天</small>
+                        </li>
+                        <li>
+                            <span>今日阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                        </li>
+                        <li>
+                            <span>本周阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                        </li>
+                        <li>
+                            <span>本月阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                        </li>
+                        <li>
+                            <span>上月阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                        </li>
+                        <li>
+                            <span>累计阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="clearfix">
+
     </div>
 </div>

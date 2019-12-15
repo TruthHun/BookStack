@@ -6,57 +6,55 @@
 <body>
 <div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
-    <div class="ucenter">
-        {{template "user/base.html" .}}
+    <div class="container ucenter">
+        <div class="row">
 
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-12">
-                    <ul class="nav nav-tabs">
-                        <li {{if eq $.Tab "share"}}class="active"{{end}}><a href="{{urlfor "UserController.Index" ":username" .User.Account}}">分享</a></li>
-                        <li {{if eq $.Tab "collection"}}class="active"{{end}}><a href="{{urlfor "UserController.Collection" ":username" .User.Account}}">收藏</a></li>
-                        <li {{if eq $.Tab "follow"}}class="active"{{end}}><a href="{{urlfor "UserController.Follow" ":username" .User.Account}}">关注</a></li>
-                        <li {{if eq $.Tab "fans"}}class="active"{{end}}><a href="{{urlfor "UserController.Fans" ":username" .User.Account}}">粉丝</a></li>
-                    </ul>
-                </div>
-                <div class="col-xs-12">
-                    <div class="ucenter-content">
-                        <ul>
-                            {{range .Books}}
-                            <li class="clearfix">
-                                <div class="col-sm-2 col-md-2 col-lg-1 col-xs-3 {{if gt .OrderIndex 0}}recommend-book{{end}}" style="padding: 0px;">
-                                    <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank" title="{{.BookName}}">
-                                        <img onerror="this.src='/static/images/book.png'" src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
-                                    </a>
-                                </div>
-                                <div class="col-sm-10 col-md-10 col-lg-11 col-xs-9">
-                                    <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank"><h4>{{.BookName}}</h4></a>
-                                    <div class="text-muted book-info hidden-xs">
-                                        <span title="文档数量" class="tooltips"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
-                                        <span title="阅读人次" class="tooltips"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
-                                        <span title="收藏人次" class="tooltips"><i class="fa fa-heart-o"></i> {{.Star}}</span>
-                                        <span title="创建时间" class="tooltips"><i class="fa fa-clock-o"></i> {{date .CreateTime "Y-m-d H:i:s"}}</span>
-                                    </div>
-                                    <div class="help-block book-description">
-                                        {{.Description}}
-                                    </div>
-                                </div>
-                            </li>
-                            {{end}}
-                        </ul>
-
-
+            <div class="col-xs-12 col-sm-4 col-md-3">
+                {{template "user/base.html" .}}
+            </div>
+            <div class="col-xs-12 col-sm-8 col-md-9">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{template "user/tabs.html" .}}
                     </div>
-                </div>
-                <div class="pagination-container">
-                    {{.PageHtml}}
+                    <div class="col-xs-12">
+                <div class="ucenter-content">
+                    <ul>
+                        {{range .Books}}
+                        <li class="clearfix">
+                            <div class="col-sm-2 col-xs-3 {{if gt .OrderIndex 0}}recommend-book{{end}}">
+                                <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank" title="{{.BookName}}">
+                                    <img onerror="this.src='/static/images/book.png'" src="{{showImg .Cover "cover"}}" alt="" class="img-responsive border-cover-img">
+                                </a>
+                            </div>
+                            <div class="col-sm-10 col-xs-9">
+                                <a href="{{urlfor "DocumentController.Index" ":key" .Identify}}" target="_blank"><h4>{{.BookName}}</h4></a>
+                                <div class="text-muted book-info hidden-xs">
+                                    <span title="文档数量" class="tooltips"><i class="fa fa-pie-chart"></i> {{.DocCount}}</span>
+                                    <span title="阅读人次" class="tooltips"><i class="fa fa-eye"></i> {{.Vcnt}}</span>
+                                    <span title="收藏人次" class="tooltips"><i class="fa fa-heart-o"></i> {{.Star}}</span>
+                                    <span title="创建时间" class="tooltips"><i class="fa fa-clock-o"></i> {{date .CreateTime "Y-m-d H:i:s"}}</span>
+                                </div>
+                                <div class="help-block book-description">
+                                    {{.Description}}
+                                </div>
+                            </div>
+                        </li>
+                        {{end}}
+                    </ul>
+
+
                 </div>
             </div>
+            <div class="pagination-container">
+                {{.PageHtml}}
+            </div>
         </div>
-
     </div>
 
 
+        </div>
+    </div>
 </div>
 {{template "widgets/footer.html" .}}
 <script src="/static/js/main.js?version={{$.Version}}"></script>

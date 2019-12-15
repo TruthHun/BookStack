@@ -780,13 +780,15 @@ a{color: #333}
 .nopadding{padding: 0px !important;}
 
 /*用户主页*/
-.ucenter{margin-top: 50px;}
+.ucenter{margin-top: 65px;}
+.ucenter .panel{border-radius: 0;box-shadow: none !important;}
 .ucenter .well{border-radius: 0px;border: 0;box-shadow: none;padding: 15px 0;}
-.ucenter h3{font-size: 20px;font-weight: 400;}
-.ucenter .ucenter-info{text-align: center;}
+.ucenter h3{font-size: 18px;font-weight: 400;}
 .ucenter .btns{margin:15px auto;}
-.ucenter .ucenter-avatar .thumbnail{width: 120px;height:120px;margin: 0 auto;border-radius: 60px;}
+.ucenter .ucenter-avatar{text-align: center;}
+.ucenter .ucenter-avatar .thumbnail{width: 100px;height:100px;margin: 0 auto;border-radius: 50%;}
 .ucenter .ucenter-content{min-height: 150px;}
+.ucenter .ucenter-content .col-sm-2{padding-left: 0}
 .ucenter-content ul,.ucenter-content li{list-style: none;padding: 0px;}
 .ucenter-content li.clearfix{border-bottom: 1px dashed #EFEFEF;padding:20px;padding-left: 5px;}
 .ucenter-content li.clearfix:hover{background-color: #EFEFEF;}
@@ -802,10 +804,12 @@ a{color: #333}
 .ucenter .fans-item .btn{margin-top: 5px;}
 .ucenter .fans-item .thumbnail{border-radius: 50%;margin-bottom: 5px;margin: 5px auto;max-width: 100px;}
 .ucenter .fans-item .thumbnail img{border-radius: 50%;max-width: 100px;}
-.ucenter .user-stat li,.ucenter .user-stat ul{padding: 0;list-style: none;display: inline-block;color: #888888}
-.ucenter .user-stat li{padding: 5px 0;margin: 0 8px;text-align: center;}
+.ucenter .user-stat li,.ucenter .user-stat ul{padding: 0;list-style: none;color: #888888}
+.ucenter .user-stat li{padding: 10px 0;border-bottom: 1px dashed #EFEFEF;}
+.ucenter .user-stat{border-top: 1px dashed #EFEFEF;text-align: left;margin-top:20px;}
 .ucenter .user-stat .stat-item{font-size: 1.3em;}
-.ucenter .user-stat span{color: #f44336;}
+.ucenter .user-stat span{color: #f44336;margin-right: 5px;}
+.ucenter .user-stat span:first-child{display: inline-block;width: 70px;color:#666;}
 .ucenter .user-stat small{font-size: 12px;}
 
 .recommend-book:before{

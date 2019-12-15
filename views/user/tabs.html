@@ -1,0 +1,6 @@
+<ul class="nav nav-tabs">
+    <li {{if eq $.Tab "share"}}class="active"{{end}}><a href="{{urlfor "UserController.Index" ":username" .User.Account}}">分享</a></li>
+    <li {{if eq $.Tab "collection"}}class="active"{{end}}><a href="{{urlfor "UserController.Collection" ":username" .User.Account}}">收藏</a></li>
+    <li {{if eq $.Tab "follow"}}class="active"{{end}}><a href="{{urlfor "UserController.Follow" ":username" .User.Account}}">关注</a></li>
+    <li {{if eq $.Tab "fans"}}class="active"{{end}}><a href="{{urlfor "UserController.Fans" ":username" .User.Account}}">粉丝</a></li>
+</ul>
