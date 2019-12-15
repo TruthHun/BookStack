@@ -963,3 +963,8 @@ func GetIP(ctx *context.Context, field string) (ip string) {
 func IsMobile(userAgent string) bool {
 	return user_agent.New(userAgent).Mobile()
 }
+
+func FormatReadingTime(seconds int) string {
+	strFmt := "<span>%v</span> <small>小时</small> <span>%v</span> <small>分钟</small>"
+	return fmt.Sprintf(strFmt, int(seconds/3600), int(seconds%3600/60))
+}

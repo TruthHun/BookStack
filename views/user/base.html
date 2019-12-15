@@ -7,6 +7,10 @@
                 <h3>
                     <span>{{.User.Nickname}}</span>
                     <small class="text-muted">(@{{.User.Account}})</small>
+                    <span class="sign-rule">
+                        <small class="text-muted">|</small>
+                        <a href="/read/help/sign-rule.md" title="签到规则" target="_blank"><small>签到规则</small></a>
+                    </span>
                 </h3>
                 <div class="btns">
                     {{if .IsSelf}}
@@ -40,19 +44,16 @@
                             <span>累计签到</span> <span>{{.User.TotalSign}}</span> <small>天</small>
                         </li>
                         <li>
-                            <span>今日阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                            <span>今日阅读</span> {{str2html .TodayReading}}
                         </li>
                         <li>
-                            <span>本周阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                            <span>本周阅读</span> {{str2html .WeekReading}}
                         </li>
                         <li>
-                            <span>本月阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                            <span>本月阅读</span> {{str2html .MonthReading}}
                         </li>
                         <li>
-                            <span>上月阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
-                        </li>
-                        <li>
-                            <span>累计阅读</span> <span>{{.ReadHours}}</span> <small>小时</small> <span>{{.ReadMinute}}</span> <small>分钟</small>
+                            <span>累计阅读</span> {{str2html .TotalReading}}
                         </li>
                     </ul>
                 </div>

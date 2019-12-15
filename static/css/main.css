@@ -808,9 +808,11 @@ a{color: #333}
 .ucenter .user-stat li{padding: 10px 0;border-bottom: 1px dashed #EFEFEF;}
 .ucenter .user-stat{border-top: 1px dashed #EFEFEF;text-align: left;margin-top:20px;}
 .ucenter .user-stat .stat-item{font-size: 1.3em;}
-.ucenter .user-stat span{color: #f44336;margin-right: 5px;}
+.ucenter .user-stat span{color: #f44336;}
 .ucenter .user-stat span:first-child{display: inline-block;width: 70px;color:#666;}
 .ucenter .user-stat small{font-size: 12px;}
+.ucenter .sign-rule .text-muted{color: #cccccc}
+.ucenter .sign-rule a{color: #777}
 
 .recommend-book:before{
     content: url("../images/recommend-red.png");

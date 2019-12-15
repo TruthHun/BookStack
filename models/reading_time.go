@@ -16,13 +16,13 @@ type ReadingTime struct {
 type period string
 
 const (
-	periodDay      period = "day"
-	periodWeek     period = "week"
-	periodLastWeek period = "last-week"
-	periodMonth    period = "month"
-	periodLastMoth period = "last-month"
-	periodAll      period = "all"
-	periodYear     period = "year"
+	PeriodDay      period = "day"
+	PeriodWeek     period = "week"
+	PeriodLastWeek period = "last-week"
+	PeriodMonth    period = "month"
+	PeriodLastMoth period = "last-month"
+	PeriodAll      period = "all"
+	PeriodYear     period = "year"
 )
 
 const dateFormat = "20060102"
@@ -48,7 +48,7 @@ func (r *ReadingTime) GetReadingTime(uid int, prd period) int {
 	o := orm.NewOrm()
 	sqlSum := "select sum(duration) sum_val from md_reading_time where uid = ? and day>=? and day<=? limit 1"
 	now := time.Now()
-	if prd == periodAll {
+	if prd == PeriodAll {
 		m := NewMember()
 		o.QueryTable(m).Filter("member_id", uid).One(m, "total_reading_time")
 		return m.TotalReadingTime
@@ -67,21 +67,21 @@ func (r *ReadingTime) Sort(prd period, limit int) (users []ReadingSortedUser) {
 
 func (r *ReadingTime) getTimeRange(t time.Time, prd period) (start, end string) {
 	switch prd {
-	case periodWeek:
+	case PeriodWeek:
 		start, end = r.getWeek(t)
-	case periodLastWeek:
+	case PeriodLastWeek:
 		start, end = r.getWeek(t.AddDate(0, 0, -7))
-	case periodMonth:
+	case PeriodMonth:
 		start, end = r.getWeek(t)
-	case periodLastMoth:
+	case PeriodLastMoth:
 		start, end = r.getWeek(t.AddDate(0, -1, 0))
-	case periodAll:
+	case PeriodAll:
 		start = "20060102"
 		end = "20401231"
-	case periodDay:
+	case PeriodDay:
 		start = t.Format(dateFormat)
 		end = start
-	case periodYear:
+	case PeriodYear:
 		start, end = r.getWeek(t.AddDate(0, -1, 0))
 	default:
 		start = t.Format(dateFormat)

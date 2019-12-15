@@ -22,11 +22,14 @@ func (this *UserController) Prepare() {
 		this.Abort("404")
 		return
 	}
+	rt := models.NewReadingTime()
 	this.Data["IsSelf"] = this.UcenterMember.MemberId == this.Member.MemberId
 	this.Data["User"] = this.UcenterMember
 	this.Data["JoinedDays"] = int(time.Now().Sub(this.UcenterMember.CreateTime).Seconds()/(24*3600)) + 1
-	this.Data["ReadHours"] = int(this.UcenterMember.TotalReadingTime / 3600)
-	this.Data["ReadMinute"] = int(this.UcenterMember.TotalReadingTime % 3600 / 60)
+	this.Data["TotalReading"] = utils.FormatReadingTime(this.UcenterMember.TotalReadingTime)
+	this.Data["MonthReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodMonth))
+	this.Data["WeekReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodWeek))
+	this.Data["TodayReading"] = utils.FormatReadingTime(rt.GetReadingTime(this.UcenterMember.MemberId, models.PeriodDay))
 	this.Data["Tab"] = "share"
 	this.Data["IsSign"] = false
 	if this.Member != nil && this.Member.MemberId > 0 {
