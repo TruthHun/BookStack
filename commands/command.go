@@ -98,6 +98,7 @@ func RegisterModel() {
 		models.NewAdsCont(),
 		models.NewReadingTime(),
 		models.NewSign(),
+		models.NewBookCounter(),
 	)
 	migrate.RegisterMigration()
 }

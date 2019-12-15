@@ -305,6 +305,8 @@ func (this *DocumentController) Read() {
 
 	doc.Vcnt = doc.Vcnt + 1
 
+	models.NewBookCounter().Increase(bookResult.BookId, true)
+
 	if this.IsAjax() {
 		var data struct {
 			Id        int    `json:"doc_id"`

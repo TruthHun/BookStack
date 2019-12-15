@@ -53,9 +53,11 @@ func (this *Star) Star(uid, bid int) (cancel bool, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable("md_star")
 	o.Read(&star, "Uid", "Bid")
+	sc := NewBookCounter()
 	if star.Id > 0 { //取消收藏
 		if _, err = qs.Filter("id", star.Id).Delete(); err == nil {
 			SetIncreAndDecre("md_books", "star", fmt.Sprintf("book_id=%v and star>0", bid), false, 1)
+			sc.Decrease(bid, false)
 		}
 		cancel = true
 	} else { //添加收藏
@@ -63,6 +65,7 @@ func (this *Star) Star(uid, bid int) (cancel bool, err error) {
 		star.LastRead = int(time.Now().Unix())
 		if _, err = o.Insert(&star); err == nil { //收藏计数+1
 			SetIncreAndDecre("md_books", "star", "book_id="+strconv.Itoa(bid), true, 1)
+			sc.Increase(bid, false)
 		}
 	}
 	return

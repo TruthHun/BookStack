@@ -16,6 +16,20 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+type period string
+
+const (
+	PeriodDay      period = "day"
+	PeriodWeek     period = "week"
+	PeriodLastWeek period = "last-week"
+	PeriodMonth    period = "month"
+	PeriodLastMoth period = "last-month"
+	PeriodAll      period = "all"
+	PeriodYear     period = "year"
+)
+
+const dateFormat = "20060102"
+
 func Init() {
 	initAPI()
 	initAdsCache()
@@ -215,4 +229,55 @@ func CountCategory() {
 			}
 		}
 	}
+}
+
+func getTimeRange(t time.Time, prd period) (start, end string) {
+	switch prd {
+	case PeriodWeek:
+		start, end = getWeek(t)
+	case PeriodLastWeek:
+		start, end = getWeek(t.AddDate(0, 0, -7))
+	case PeriodMonth:
+		start, end = getWeek(t)
+	case PeriodLastMoth:
+		start, end = getWeek(t.AddDate(0, -1, 0))
+	case PeriodAll:
+		start = "20060102"
+		end = "20401231"
+	case PeriodDay:
+		start = t.Format(dateFormat)
+		end = start
+	case PeriodYear:
+		start, end = getWeek(t.AddDate(0, -1, 0))
+	default:
+		start = t.Format(dateFormat)
+		end = start
+	}
+	return
+}
+
+func getWeek(t time.Time) (start, end string) {
+	if t.Weekday() == 0 {
+		start = t.Add(-7 * 24 * time.Hour).Format(dateFormat)
+		end = t.Format(dateFormat)
+	} else {
+		s := t.Add(-time.Duration(t.Weekday()-1) * 24 * time.Hour)
+		start = s.Format(dateFormat)
+		end = s.Add(6 * 24 * time.Hour).Format(dateFormat)
+	}
+	return
+}
+
+func getYear(t time.Time) (start, end string) {
+	month := time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.Local)
+	start = month.Format(dateFormat)
+	end = month.AddDate(0, 12, 0).Add(-24 * time.Hour).Format(dateFormat)
+	return
+}
+
+func getMonth(t time.Time) (start, end string) {
+	month := time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+	start = month.Format(dateFormat)
+	end = month.AddDate(0, 1, 0).Add(-24 * time.Hour).Format(dateFormat)
+	return
 }
