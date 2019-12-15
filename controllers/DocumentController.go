@@ -160,8 +160,12 @@ func (this *DocumentController) Index() {
 	//当前默认展示100条评论
 	this.Data["Comments"], _ = new(models.Comments).Comments(1, 100, bookResult.BookId, 1)
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
+	title := "《" + bookResult.BookName + "》"
+	if tab == "comment" {
+		title = "点评 - " + title
+	}
 	this.GetSeoByPage("book_info", map[string]string{
-		"title":       "《" + bookResult.BookName + "》",
+		"title":       title,
 		"keywords":    bookResult.Label,
 		"description": bookResult.Description,
 	})
