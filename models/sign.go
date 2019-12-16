@@ -159,9 +159,10 @@ func (m *Sign) UpdateSignRule() {
 	}
 }
 
-func (m *Sign) SortedContinuousSign(limit int) (members []Member) {
+func (m *Sign) Sorted(limit int, orderField string) (members []Member) {
 	member := NewMember()
 	o := orm.NewOrm()
-	o.QueryTable(member).OrderBy("-total_continuous_sign").Limit(limit).All(&members, "member_id", "account", "nickname", "total_continuous_sign")
+	fields := []string{"member_id", "account", "nickname", "total_continuous_sign", "total_sign", "total_reading_time", "history_total_continuous_sign"}
+	o.QueryTable(member).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
 	return
 }

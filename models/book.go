@@ -107,6 +107,13 @@ func (m *Book) HasProjectAccess(identify string, memberId int, minRole int) bool
 	return rel.RoleId <= minRole
 }
 
+func (m *Book) Sorted(limit int, orderField string) (books []Book) {
+	o := orm.NewOrm()
+	fields := []string{"book_id", "book_name", "identify", "cover", "vcnt", "star", "cnt_comment"}
+	o.QueryTable(m).Filter("order_index__gte", 0).Filter("privately_owned", 0).OrderBy("-"+orderField).Limit(limit).All(&books, fields...)
+	return
+}
+
 func (m *Book) Insert() (err error) {
 	o := orm.NewOrm()
 	if _, err = o.Insert(m); err != nil {

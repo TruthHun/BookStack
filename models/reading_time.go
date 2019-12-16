@@ -19,7 +19,7 @@ type sum struct {
 
 type ReadingSortedUser struct {
 	Uid      int
-	Username string
+	Account  string
 	Nickname string
 	Avatar   string
 	SumTime  int
