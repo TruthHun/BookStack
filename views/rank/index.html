@@ -40,7 +40,7 @@
                                     <ul>
                                         {{range $idx,$user:=.TotalReadingUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{formatReadingTime $user.TotalReadingTime true}}</small>
@@ -58,7 +58,7 @@
                                     <ul>
                                         {{range $idx,$user:=.ContinuousSignUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{$user.TotalContinuousSign}} 天</small>
@@ -76,7 +76,7 @@
                                     <ul>
                                         {{range $idx,$user:=.TotalSignUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{$user.TotalSign}} 天</small>
@@ -94,7 +94,7 @@
                                     <ul>
                                         {{range $idx,$book:=.StarBooks}}
                                             <li>
-                                                <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$book.BookName}}</span>
                                                     <small class="pull-right">{{$book.Star}}</small>
@@ -112,10 +112,10 @@
                                     <ul>
                                         {{range $idx,$book:=.VcntBooks}}
                                             <li>
-                                                <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$book.BookName}}</span>
-                                                    <small class="pull-right">{{$book.Vcnt}}{{$book.Vcnt}}{{$book.Vcnt}}</small>
+                                                    <small class="pull-right">{{$book.Vcnt}}</small>
                                                 </a>
                                             </li>
                                         {{end}}
@@ -132,7 +132,7 @@
                                     <ul>
                                         {{range $idx,$book:=.CommentBooks}}
                                             <li>
-                                                <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$book.BookName}}</span>
                                                     <small class="pull-right">{{$book.CntComment}}</small>
@@ -156,7 +156,7 @@
                                         <ul>
                                             {{range $idx,$user:=.TodayReading}}
                                                 <li>
-                                                    <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                         <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                         <span class="rank-cont">{{$user.Nickname}}</span>
                                                         <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
@@ -169,25 +169,25 @@
                             </div>
                         {{end}}
 
-                            {{if .WeekReading}}
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">本周阅读</div>
-                                    <div class="panel-body">
-                                        <ul>
-                                            {{range $idx,$user:=.WeekReading}}
-                                                <li>
-                                                    <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
-                                                        <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
-                                                        <span class="rank-cont">{{$user.Nickname}}</span>
-                                                        <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
-                                                    </a>
-                                                </li>
-                                            {{end}}
-                                        </ul>
-                                    </div>
+                        {{if .WeekReading}}
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">本周阅读</div>
+                                <div class="panel-body">
+                                    <ul>
+                                        {{range $idx,$user:=.WeekReading}}
+                                            <li>
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
+                                                    <span class="rank-cont">{{$user.Nickname}}</span>
+                                                    <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
+                                                </a>
+                                            </li>
+                                        {{end}}
+                                    </ul>
                                 </div>
                             </div>
+                        </div>
                         {{end}}
 
                         {{if .MonthReading}}
@@ -198,7 +198,7 @@
                                     <ul>
                                         {{range $idx,$user:=.MonthReading}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
@@ -219,7 +219,7 @@
                                         <ul>
                                             {{range $idx,$user:=.LastWeekReading}}
                                                 <li>
-                                                    <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                         <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                         <span class="rank-cont">{{$user.Nickname}}</span>
                                                         <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
@@ -240,7 +240,7 @@
                                     <ul>
                                         {{range $idx,$user:=.LastMonthReading}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
@@ -261,7 +261,7 @@
                                         <ul>
                                             {{range $idx,$user:=.AllReading}}
                                                 <li>
-                                                    <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                         <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                         <span class="rank-cont">{{$user.Nickname}}</span>
                                                         <small class="pull-right">{{formatReadingTime $user.SumTime true}}</small>
@@ -281,15 +281,15 @@
                     <div class="row">
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">阅读时长榜</div>
+                                <div class="panel-heading">累计签到榜</div>
                                 <div class="panel-body">
                                     <ul>
-                                        {{range $idx,$user:=.TotalReadingUsers}}
+                                        {{range $idx,$user:=.TotalSignUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
-                                                    <small class="pull-right">{{formatReadingTime $user.TotalReadingTime true}}</small>
+                                                    <small class="pull-right">{{$user.TotalSign}} 天</small>
                                                 </a>
                                             </li>
                                         {{end}}
@@ -304,7 +304,7 @@
                                     <ul>
                                         {{range $idx,$user:=.ContinuousSignUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
                                                     <small class="pull-right">{{$user.TotalContinuousSign}} 天</small>
@@ -317,15 +317,15 @@
                         </div>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">累计签到榜</div>
+                                <div class="panel-heading">历史最高连签榜</div>
                                 <div class="panel-body">
                                     <ul>
-                                        {{range $idx,$user:=.TotalSignUsers}}
+                                        {{range $idx,$user:=.HistoryContinuousSignUsers}}
                                             <li>
-                                                <a href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                     <span class="rank-cont">{{$user.Nickname}}</span>
-                                                    <small class="pull-right">{{$user.TotalSign}} 天</small>
+                                                    <small class="pull-right">{{$user.HistoryTotalContinuousSign}} 天</small>
                                                 </a>
                                             </li>
                                         {{end}}
@@ -346,7 +346,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Today}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -367,7 +367,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Week}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -388,7 +388,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Month}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -409,7 +409,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.LastWeek}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -430,7 +430,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.LastMonth}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -451,7 +451,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.All}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -478,7 +478,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Today}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -499,7 +499,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Week}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -520,7 +520,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.Month}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -541,7 +541,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.LastWeek}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -562,7 +562,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.LastMonth}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>
@@ -583,7 +583,7 @@
                                             <ul>
                                                 {{range $idx,$book:=.All}}
                                                     <li>
-                                                        <a href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
+                                                        <a class="tooltips" href="{{urlfor "DocumentController.Index" ":key" $book.Identify}}" target="_blank" title="{{$book.BookName}}">
                                                             <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
                                                             <span class="rank-cont">{{$book.BookName}}</span>
                                                             <small class="pull-right">{{$book.Cnt}}</small>

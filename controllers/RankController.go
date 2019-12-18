@@ -28,24 +28,24 @@ func (this *RankController) Index() {
 		sign := models.NewSign()
 		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign")
 		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign")
-		this.Data["TotalReadingUsers"] = sign.Sorted(limit, "total_reading_time")
+		this.Data["HistoryContinuousSignUsers"] = sign.Sorted(limit, "history_total_continuous_sign")
 	case "popular":
 		this.Data["SeoTitle"] = "文档人气榜"
 		bookCounter := models.NewBookCounter()
-		this.Data["Today"] = bookCounter.PageViewSort(models.PeriodDay, limit, true)
+		//this.Data["Today"] = bookCounter.PageViewSort(models.PeriodDay, limit, true)
 		this.Data["Week"] = bookCounter.PageViewSort(models.PeriodWeek, limit, true)
 		this.Data["Month"] = bookCounter.PageViewSort(models.PeriodMonth, limit, true)
-		this.Data["LastWeek"] = bookCounter.PageViewSort(models.PeriodLastWeek, limit, true)
-		this.Data["LastMonth"] = bookCounter.PageViewSort(models.PeriodLastMoth, limit, true)
+		//this.Data["LastWeek"] = bookCounter.PageViewSort(models.PeriodLastWeek, limit, true)
+		//this.Data["LastMonth"] = bookCounter.PageViewSort(models.PeriodLastMoth, limit, true)
 		this.Data["All"] = bookCounter.PageViewSort(models.PeriodAll, limit, true)
 	case "star":
 		this.Data["SeoTitle"] = "热门收藏榜"
 		bookCounter := models.NewBookCounter()
-		this.Data["Today"] = bookCounter.StarSort(models.PeriodDay, limit, true)
+		//this.Data["Today"] = bookCounter.StarSort(models.PeriodDay, limit, true)
 		this.Data["Week"] = bookCounter.StarSort(models.PeriodWeek, limit, true)
 		this.Data["Month"] = bookCounter.StarSort(models.PeriodMonth, limit, true)
-		this.Data["LastWeek"] = bookCounter.StarSort(models.PeriodLastWeek, limit, true)
-		this.Data["LastMonth"] = bookCounter.StarSort(models.PeriodLastMoth, limit, true)
+		//this.Data["LastWeek"] = bookCounter.StarSort(models.PeriodLastWeek, limit, true)
+		//this.Data["LastMonth"] = bookCounter.StarSort(models.PeriodLastMoth, limit, true)
 		this.Data["All"] = bookCounter.StarSort(models.PeriodAll, limit, true)
 	default:
 		tab = "all"
