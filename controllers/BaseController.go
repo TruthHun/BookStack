@@ -76,7 +76,10 @@ func (this *BaseController) Prepare() {
 	}
 	this.Data["Member"] = this.Member
 	this.Data["BaseUrl"] = this.BaseUrl()
-
+	this.Data["IsSignedToday"] = false
+	if this.Member.MemberId > 0 {
+		this.Data["IsSignedToday"] = models.NewSign().IsSignToday(this.Member.MemberId)
+	}
 	if options, err := models.NewOption().All(); err == nil {
 		this.Option = make(map[string]string, len(options))
 		for _, item := range options {
@@ -462,16 +465,15 @@ func (this *BaseController) SetFollow() {
 	this.JsonResult(0, "您已经成功关注了Ta")
 }
 
-//关注或取消关注
 func (this *BaseController) SignToday() {
 	if this.Member == nil || this.Member.MemberId == 0 {
 		this.JsonResult(1, "请先登录")
 	}
-	err := models.NewSign().Sign(this.Member.MemberId, false)
+	reward, err := models.NewSign().Sign(this.Member.MemberId, false)
 	if err != nil {
 		this.JsonResult(1, "签到失败："+err.Error())
 	}
-	this.JsonResult(0, "恭喜您，签到成功")
+	this.JsonResult(0, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
 }
 
 func (this *BaseController) forbidGeneralRole() bool {

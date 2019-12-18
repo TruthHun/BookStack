@@ -29,7 +29,7 @@
                         <a href="{{urlfor "SettingController.Index"}}" title="个人中心"><i class="fa fa-user-o" aria-hidden="true"></i> 个人中心</a>
                     </li>
                     <li>
-                        <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页</a>
+                        <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
                     </li>
                     <li>
                         <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>
@@ -105,8 +105,6 @@
 
 
             </nav>
-
-
         </div>
         <nav class="navbar-collapse hidden-xs hidden-sm" style="position: absolute;right: 0px;" role="navigation">
             <ul class="nav navbar-nav navbar-right" style="margin-right: 15px;">
@@ -125,7 +123,7 @@
                             <a href="{{urlfor "SettingController.Index"}}" title="个人中心"><i class="fa fa-user-o" aria-hidden="true"></i> 个人中心</a>
                         </li>
                         <li>
-                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页</a>
+                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页 {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
                         </li>
                         <li>
                             <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>

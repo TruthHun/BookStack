@@ -17,11 +17,19 @@
                 <div class="btns">
                     {{if .IsSelf}}
                         <a target="_blank" href="{{urlfor "SettingController.Index"}}" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> 个人设置</a>
-                        {{if .IsSign}}
+                        {{if .IsSignedToday}}
                             <a target="_blank" href="javascript:void(0);" class="btn btn-success btn-sm disabled"><i class="fa fa-calendar-check-o"></i> 今日已签到</a>
                         {{else}}
                             <a target="_blank" href="{{urlfor "BaseController.SignToday"}}" class="btn btn-success btn-sm ajax-get"><i class="fa fa-calendar-plus-o"></i> 每日签到</a>
                         {{end}}
+
+                        {{if gt .LatestSign.Id 0}}
+                            <div class="help-block text-left">
+                                <div><small class="text-muted">最近一次签到:  </small> <span class="text-success">{{date .LatestSign.CreatedAt "Y-m-d H:i:s"}}</span></div>
+                                <div><small class="text-muted">阅读时长增加:  </small> <span class="text-red">{{.LatestSign.Reward}}</span> <small class="text-muted">秒</small></div>
+                            </div>
+                        {{end}}
+
                     {{else}}
                         {{if (IsFollow .User.MemberId  .Member.MemberId)}}
                             <a href="{{urlfor "BaseController.SetFollow" ":uid" .User.MemberId}}" class="btn btn-default btn-sm btn-cancel"><i class="fa fa-heart text-danger"></i> 取消关注</a>

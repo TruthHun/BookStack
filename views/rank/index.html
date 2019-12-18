@@ -25,6 +25,9 @@
                         <li {{if eq .Tab "sign"}}class="active"{{end}}><a href="{{urlfor "RankController.Index"}}?tab=sign">签到<span class="hidden-xs">榜</span></a></li>
                         <li {{if eq .Tab "popular"}}class="active"{{end}}><a href="{{urlfor "RankController.Index"}}?tab=popular">人气<span class="hidden-xs">榜</span> </a></li>
                         <li {{if eq .Tab "star"}}class="active"{{end}}><a href="{{urlfor "RankController.Index"}}?tab=star">收藏<span class="hidden-xs">榜</span></a></li>
+                        {{if and (gt $.Member.MemberId 0) (eq $.IsSignedToday false)}}
+                        <li class="hidden-xs"><a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" target="_blank" class="text-red" title="每日签到"><i class="fa fa-calendar-plus-o"></i> 每日签到</a></li>
+                        {{end}}
                     </ul>
                 </div>
                 <div class="rank-body">

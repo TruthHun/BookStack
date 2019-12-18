@@ -64,7 +64,7 @@ func (m *Sign) IsContinuousSign(uid int) bool {
 }
 
 // 执行签到。使用事务
-func (m *Sign) Sign(uid int, fromApp bool) (err error) {
+func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 	s := &Sign{}
 	o := orm.NewOrm()
 	now := time.Now()
@@ -72,7 +72,8 @@ func (m *Sign) Sign(uid int, fromApp bool) (err error) {
 	// 1. 检测用户有没有签到
 	o.QueryTable(s).Filter("uid", uid).Filter("day", day).One(s)
 	if m.IsSignToday(uid) {
-		return errors.New(messageSigned)
+		err = errors.New(messageSigned)
+		return
 	}
 	isContinuousSign := m.IsContinuousSign(uid) // 昨天有没有断签
 
@@ -81,7 +82,8 @@ func (m *Sign) Sign(uid int, fromApp bool) (err error) {
 	cols := []string{"member_id", "total_sign", "total_continuous_sign", "history_total_continuous_sign"}
 	o.QueryTable(user).Filter("member_id", uid).One(user, cols...)
 	if user.MemberId < 0 {
-		return errors.New(messageNotExistUser)
+		err = errors.New(messageNotExistUser)
+		return
 	}
 	// 3. 查询奖励规则
 	rule := s.GetSignRule()
@@ -132,7 +134,7 @@ func (m *Sign) Sign(uid int, fromApp bool) (err error) {
 		"total_continuous_sign":         user.TotalContinuousSign,
 		"history_total_continuous_sign": user.HistoryTotalContinuousSign,
 	})
-
+	reward = s.Reward
 	return
 }
 
@@ -164,5 +166,10 @@ func (m *Sign) Sorted(limit int, orderField string) (members []Member) {
 	o := orm.NewOrm()
 	fields := []string{"member_id", "account", "nickname", "total_continuous_sign", "total_sign", "total_reading_time", "history_total_continuous_sign"}
 	o.QueryTable(member).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
+	return
+}
+
+func (*Sign) LatestOne(uid int) (s Sign) {
+	orm.NewOrm().QueryTable(&s).Filter("uid", uid).OrderBy("-id").One(&s)
 	return
 }

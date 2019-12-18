@@ -33,7 +33,7 @@ func (this *UserController) Prepare() {
 	this.Data["Tab"] = "share"
 	this.Data["IsSign"] = false
 	if this.Member != nil && this.Member.MemberId > 0 {
-		this.Data["IsSign"] = models.NewSign().IsSignToday(this.Member.MemberId)
+		this.Data["LatestSign"] = models.NewSign().LatestOne(this.Member.MemberId)
 	}
 }
 

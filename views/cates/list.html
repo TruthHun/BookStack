@@ -22,6 +22,9 @@
                         <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"><i class="fa fa-thumbs-o-up"></i> 最新推荐</a>
                         <span style="color: #ddd;"> &nbsp;|&nbsp; </span>
                         <a href="{{urlfor "SettingController.Star"}}" style="color: #f44336" title="我的收藏"><i class="fa fa-heart"></i> 我的收藏</a>
+{{/*                        {{if and (gt $.Member.MemberId 0) (eq .IsSignedToday false)}}*/}}
+{{/*                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" class="text-red" title="每日签到"><i class="fa fa-calendar-plus-o" aria-hidden="true"></i> 每日签到</a>*/}}
+{{/*                        {{end}}*/}}
                         <small class="pull-right">
                             <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"> 更多 <i class="fa fa-angle-right"></i><i class="fa fa-angle-right"></i></a>
                         </small>

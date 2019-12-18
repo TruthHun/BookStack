@@ -785,6 +785,7 @@ a{color: #333}
 .ucenter .well{border-radius: 0px;border: 0;box-shadow: none;padding: 15px 0;}
 .ucenter h3{font-size: 18px;font-weight: 400;}
 .ucenter .btns{margin:15px auto;}
+.ucenter .btns .btn{margin-bottom: 15px;}
 .ucenter .ucenter-avatar{text-align: center;}
 .ucenter .ucenter-avatar .thumbnail{width: 100px;height:100px;margin: 0 auto;border-radius: 50%;}
 .ucenter .ucenter-content{min-height: 150px;}
@@ -901,3 +902,5 @@ a{color: #333}
 }
 #page-rank .panel-body li small{float: right;color: #aaaaaa}
 #page-rank .panel-body li a:hover{background-color: #EFEFEF;}
+
+.text-red{color: red !important;}
