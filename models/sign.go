@@ -1,9 +1,13 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"time"
 )
@@ -35,6 +39,20 @@ const (
 	messageNotExistUser = "您的账户不存在"
 	messageSignInnerErr = "签到失败，内部错误"
 )
+
+const (
+	signCacheDir = "cache/rank/sign"
+	signCacheFmt = "cache/rank/sign/%v-%v.json"
+)
+
+func init() {
+	if _, err := os.Stat(signCacheDir); err != nil {
+		err = os.MkdirAll(signCacheDir, os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
 
 func NewSign() *Sign {
 	return &Sign{}
@@ -161,11 +179,35 @@ func (m *Sign) UpdateSignRule() {
 	}
 }
 
-func (m *Sign) Sorted(limit int, orderField string) (members []Member) {
+func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members []Member) {
+	var b []byte
+	cache := false
+	if len(withCache) > 0 {
+		cache = withCache[0]
+	}
+	file := fmt.Sprintf(signCacheFmt, orderField, limit)
+	if cache {
+		if info, err := os.Stat(file); err == nil && info.ModTime().Sub(time.Now()).Seconds() <= cacheTime {
+			// 文件存在，且在缓存时间内
+			if b, err = ioutil.ReadFile(file); err == nil {
+				json.Unmarshal(b, &members)
+				if len(members) > 0 {
+					return
+				}
+			}
+		}
+	}
+
 	member := NewMember()
 	o := orm.NewOrm()
 	fields := []string{"member_id", "account", "nickname", "total_continuous_sign", "total_sign", "total_reading_time", "history_total_continuous_sign"}
 	o.QueryTable(member).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
+
+	if cache && len(members) > 0 {
+		b, _ = json.Marshal(members)
+		ioutil.WriteFile(file, b, os.ModePerm)
+	}
+
 	return
 }
 

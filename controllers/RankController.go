@@ -26,9 +26,9 @@ func (this *RankController) Index() {
 	case "sign":
 		this.Data["SeoTitle"] = "用户签到榜"
 		sign := models.NewSign()
-		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign")
-		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign")
-		this.Data["HistoryContinuousSignUsers"] = sign.Sorted(limit, "history_total_continuous_sign")
+		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign", true)
+		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign", true)
+		this.Data["HistoryContinuousSignUsers"] = sign.Sorted(limit, "history_total_continuous_sign", true)
 	case "popular":
 		this.Data["SeoTitle"] = "文档人气榜"
 		bookCounter := models.NewBookCounter()
@@ -53,9 +53,9 @@ func (this *RankController) Index() {
 		limit = 10
 		sign := models.NewSign()
 		book := models.NewBook()
-		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign")
-		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign")
-		this.Data["TotalReadingUsers"] = sign.Sorted(limit, "total_reading_time")
+		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign", true)
+		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign", true)
+		this.Data["TotalReadingUsers"] = sign.Sorted(limit, "total_reading_time", true)
 		this.Data["StarBooks"] = book.Sorted(limit, "star")
 		this.Data["VcntBooks"] = book.Sorted(limit, "vcnt")
 		this.Data["CommentBooks"] = book.Sorted(limit, "cnt_comment")

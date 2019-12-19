@@ -30,6 +30,8 @@ const (
 
 const dateFormat = "20060102"
 
+var cacheTime = beego.AppConfig.DefaultFloat("CacheTime", 60) // 1 分钟
+
 func Init() {
 	initAPI()
 	initAdsCache()
