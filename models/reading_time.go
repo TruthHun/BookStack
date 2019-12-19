@@ -74,7 +74,7 @@ func (r *ReadingTime) Sort(prd period, limit int, withCache ...bool) (users []Re
 	}
 	file := fmt.Sprintf(readingTimeCacheFmt, prd, limit)
 	if cache {
-		if info, err := os.Stat(file); err == nil && info.ModTime().Sub(time.Now()).Seconds() <= cacheTime {
+		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
 			// 文件存在，且在缓存时间内
 			if b, err = ioutil.ReadFile(file); err == nil {
 				json.Unmarshal(b, &users)

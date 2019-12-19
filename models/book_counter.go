@@ -115,7 +115,7 @@ func (m *BookCounter) PageViewSort(prd period, limit int, withCache ...bool) (bo
 func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ...bool) (books []SortedBook) {
 	field := "vcnt" // 浏览
 	if orderField != "vcnt" {
-		orderField = "star" // 收藏
+		field = "star" // 收藏
 	}
 
 	if prd == PeriodAll {
@@ -142,7 +142,7 @@ func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ..
 	file := fmt.Sprintf(bookCounterCacheFmt, string(prd)+"-"+field, limit)
 
 	if cache {
-		if info, err := os.Stat(file); err == nil && info.ModTime().Sub(time.Now()).Seconds() <= cacheTime {
+		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
 			// 文件存在，且在缓存时间内
 			if b, err = ioutil.ReadFile(file); err == nil {
 				json.Unmarshal(b, &books)

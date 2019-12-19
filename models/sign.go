@@ -187,7 +187,7 @@ func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members 
 	}
 	file := fmt.Sprintf(signCacheFmt, orderField, limit)
 	if cache {
-		if info, err := os.Stat(file); err == nil && info.ModTime().Sub(time.Now()).Seconds() <= cacheTime {
+		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
 			// 文件存在，且在缓存时间内
 			if b, err = ioutil.ReadFile(file); err == nil {
 				json.Unmarshal(b, &members)
