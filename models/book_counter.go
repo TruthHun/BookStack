@@ -3,11 +3,12 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego/orm"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/orm"
 )
 
 type BookCounter struct {

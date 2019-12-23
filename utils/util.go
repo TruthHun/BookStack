@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/mssola/user_agent"
 	"image"
 	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
 	"sync"
+
+	"github.com/mssola/user_agent"
 
 	"github.com/astaxie/beego/context"
 

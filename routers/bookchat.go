@@ -1,8 +1,9 @@
 package routers
 
 import (
-	"github.com/astaxie/beego/plugins/cors"
 	"strings"
+
+	"github.com/astaxie/beego/plugins/cors"
 
 	"github.com/TruthHun/BookStack/controllers/api"
 	"github.com/astaxie/beego"

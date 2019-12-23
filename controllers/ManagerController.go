@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/araddon/dateparse"
 	"html/template"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/araddon/dateparse"
 
 	"path/filepath"
 	"strconv"

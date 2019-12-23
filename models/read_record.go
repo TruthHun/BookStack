@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
 	"time"
+
+	"github.com/astaxie/beego"
 
 	"strconv"
 
