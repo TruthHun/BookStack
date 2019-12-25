@@ -970,5 +970,11 @@ func FormatReadingTime(seconds int, withoutTag ...bool) string {
 	if len(withoutTag) > 0 && withoutTag[0] {
 		strFmt = "%v 小时 %v 分钟"
 	}
-	return fmt.Sprintf(strFmt, int(seconds/3600), int(seconds%3600/60))
+	hour := int(seconds / 3600)
+	second := int(seconds % 3600 / 60)
+	secondStr := strconv.Itoa(second)
+	if second < 10 {
+		secondStr = "0" + secondStr
+	}
+	return fmt.Sprintf(strFmt, hour, secondStr)
 }
