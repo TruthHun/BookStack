@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"time"
+
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
-	"time"
 )
 
 type UserController struct {

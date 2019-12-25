@@ -240,9 +240,9 @@ func getTimeRange(t time.Time, prd period) (start, end string) {
 	case PeriodLastWeek:
 		start, end = getWeek(t.AddDate(0, 0, -7))
 	case PeriodMonth:
-		start, end = getWeek(t)
+		start, end = getMonth(t)
 	case PeriodLastMoth:
-		start, end = getWeek(t.AddDate(0, -1, 0))
+		start, end = getMonth(t.AddDate(0, -1, 0))
 	case PeriodAll:
 		start = "20060102"
 		end = "20401231"
@@ -250,7 +250,7 @@ func getTimeRange(t time.Time, prd period) (start, end string) {
 		start = t.Format(dateFormat)
 		end = start
 	case PeriodYear:
-		start, end = getWeek(t.AddDate(0, -1, 0))
+		start, end = getYear(t.AddDate(-1, 0, 0))
 	default:
 		start = t.Format(dateFormat)
 		end = start
