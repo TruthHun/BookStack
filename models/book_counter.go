@@ -122,12 +122,16 @@ func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ..
 	if prd == PeriodAll {
 		books2 := NewBook().Sorted(limit, field)
 		for _, book := range books2 {
+			cnt := book.Vcnt
+			if field != "vcnt" {
+				cnt = book.Star
+			}
 			books = append(books, SortedBook{
 				BookId:   book.BookId,
 				Identify: book.Identify,
 				Cover:    book.Cover,
 				BookName: book.BookName,
-				Cnt:      book.Vcnt,
+				Cnt:      cnt,
 			})
 		}
 		return
