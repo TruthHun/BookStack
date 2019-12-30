@@ -217,3 +217,17 @@ func (this *LoginedController) ChangePassword() {
 	}
 	this.Response(http.StatusOK, messageSuccess)
 }
+
+// 执行签到
+func (this *LoginedController) SignToday() {
+	reward, err := models.NewSign().Sign(this.isLogin(), true)
+	if err != nil {
+		this.Response(http.StatusBadRequest, "签到失败："+err.Error())
+	}
+	this.Response(http.StatusOK, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
+}
+
+// 查询签到状态
+func (this *LoginedController) SignStatus() {
+	this.Response(http.StatusOK, messageSuccess, map[string]bool{"status": models.NewSign().IsSignToday(this.isLogin())})
+}

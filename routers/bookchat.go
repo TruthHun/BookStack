@@ -28,6 +28,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/login-bind-wechat", &api.CommonController{}, "post:LoginBindWechat")
 	beego.Router(prefix+"/api/v1/logout", &api.LoginedController{}, "get:Logout")
 	beego.Router(prefix+"/api/v1/banners", &api.CommonController{}, "get:Banners")
+	beego.Router(prefix+"/api/v1/rank", &api.CommonController{}, "get:Rank")
 	beego.Router(prefix+"/api/v1/book/categories", &api.CommonController{}, "get:Categories")
 	beego.Router(prefix+"/api/v1/book/lists", &api.CommonController{}, "get:BookLists")
 	beego.Router(prefix+"/api/v1/book/lists-by-cids", &api.CommonController{}, "get:BookListsByCids")
@@ -51,6 +52,8 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/book/related", &api.CommonController{}, "get:RelatedBook")
 	beego.Router(prefix+"/api/v1/user/change-avatar", &api.LoginedController{}, "post:ChangeAvatar")
 	beego.Router(prefix+"/api/v1/user/change-password", &api.LoginedController{}, "post:ChangePassword")
+	beego.Router(prefix+"/api/v1/user/sign", &api.LoginedController{}, "post:SignToday")
+	beego.Router(prefix+"/api/v1/user/sign", &api.LoginedController{}, "get:SignStatus")
 
 	// developing
 	//beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")

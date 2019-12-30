@@ -1040,3 +1040,57 @@ func (this *CommonController) LatestVersion() {
 	page := models.GetOptionValue("APP_PAGE", "")
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"version": version, "url": page})
 }
+
+func (this *CommonController) Rank() {
+	limit, _ := this.GetInt("limit", 50)
+	if limit > 200 {
+		limit = 200
+	}
+
+	data := make(map[string]interface{})
+
+	tab := this.GetString("tab", "all")
+	switch tab {
+	case "reading":
+		rt := models.NewReadingTime()
+		data["today"] = rt.Sort(models.PeriodDay, limit, true)
+		data["week"] = rt.Sort(models.PeriodWeek, limit, true)
+		data["month"] = rt.Sort(models.PeriodMonth, limit, true)
+		data["last_week"] = rt.Sort(models.PeriodLastWeek, limit, true)
+		data["last_month"] = rt.Sort(models.PeriodLastMoth, limit, true)
+		data["all"] = rt.Sort(models.PeriodAll, limit, true)
+	case "sign":
+		sign := models.NewSign()
+		data["continuous_sign_users"] = sign.Sorted(limit, "total_continuous_sign", true)
+		data["total_sign_users"] = sign.Sorted(limit, "total_sign", true)
+		data["history_continuous_sign_users"] = sign.Sorted(limit, "history_total_continuous_sign", true)
+	case "popular":
+		bookCounter := models.NewBookCounter()
+		data["today"] = bookCounter.PageViewSort(models.PeriodDay, limit, true)
+		data["week"] = bookCounter.PageViewSort(models.PeriodWeek, limit, true)
+		data["month"] = bookCounter.PageViewSort(models.PeriodMonth, limit, true)
+		data["last_week"] = bookCounter.PageViewSort(models.PeriodLastWeek, limit, true)
+		data["last_month"] = bookCounter.PageViewSort(models.PeriodLastMoth, limit, true)
+		data["all"] = bookCounter.PageViewSort(models.PeriodAll, limit, true)
+	case "star":
+		bookCounter := models.NewBookCounter()
+		data["today"] = bookCounter.StarSort(models.PeriodDay, limit, true)
+		data["week"] = bookCounter.StarSort(models.PeriodWeek, limit, true)
+		data["month"] = bookCounter.StarSort(models.PeriodMonth, limit, true)
+		data["last_week"] = bookCounter.StarSort(models.PeriodLastWeek, limit, true)
+		data["last_month"] = bookCounter.StarSort(models.PeriodLastMoth, limit, true)
+		data["all"] = bookCounter.StarSort(models.PeriodAll, limit, true)
+	default:
+		tab = "all"
+		limit = 10
+		sign := models.NewSign()
+		book := models.NewBook()
+		data["continuous_sign_users"] = sign.Sorted(limit, "total_continuous_sign", true)
+		data["total_sign_users"] = sign.Sorted(limit, "total_sign", true)
+		data["total_reading_users"] = sign.Sorted(limit, "total_reading_time", true)
+		data["star_books"] = book.Sorted(limit, "star")
+		data["vcnt_books"] = book.Sorted(limit, "vcnt")
+		data["comment_books"] = book.Sorted(limit, "cnt_comment")
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
+}
