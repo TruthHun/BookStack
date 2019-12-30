@@ -55,6 +55,17 @@ function load_doc(url,wd,without_history) {
             active_readed_menu(url);
             NProgress.done();
             pre_and_next_link();
+            //重新生成脑图
+ 	      $('.mindmap svg').detach();
+			try {
+			$('.mindmap').each(function() {
+				drawMindMap(this);
+			});				
+
+			} catch (e) {
+				console.log(e);
+
+			}           
             if(wd) {
                 var wds = wd.split(","),l=wds.length;
                 for (var i = 0; i < l; i++) {
