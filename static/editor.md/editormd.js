@@ -3648,15 +3648,15 @@
 				// //editor.md里面实现思维导图有两种模式，一种是现在这种模式，该模式胜在简单，另一种可以采取插件的方式，即弹出对话框，在对话框中用百度的kityminder-editor编辑好后，生成json文件，在这里面来解析，后者胜在功能强大。还有一种比较笨的方法就是用百度脑图编辑好后，导出km文件，把km文件放在这里来解析。或者在这里编写后，去百度脑图美化
 				//喜欢动手的朋友还可加一个参数，将本章节的内容自动生成一个脑图，但必须注意的是，脑图必须有且只能有一个根节点，即“#根节点”。
 				//各参数解析开始
-				var sizeps = lang.match(/(?<=size:)(mindmap-sm|mindmap-md|mindmap-lg)(?= )/i);
-				var Templateps = lang.match(/(?<=Template:)(fresh-blue|filetree|fish-bone|right|structure|tianpan)(?= )/i);
-				var Themeps = lang.match(/(?<=Theme:)(classic|classic-compact|fish|fresh-blue|fresh-blue-compat|fresh-green|fresh-green-compat|fresh-pink|fresh-pink-compat|fresh-purple|fresh-purple-compat|fresh-red|fresh-red-compat|fresh-soil|fresh-soil-compat|snow|snow-compact|tianpan|tianpan-compact|wire)(?= )/i);
-				var protocolps=lang.match(/(?<=protocol:)(json|text|markdown|list)(?= )/i);
-				var tmpshowps=lang.match(/(?<=tmpshow:)(true)(?= )/i);
-				var size=(sizeps!== null)?sizeps[0]:"mindmap-md";
-				var Theme=(Themeps!== null)?Themeps[0]:"fresh-blue";
-				var protocol=(protocolps!== null)?protocolps[0]:"markdown";
-				var Template=(Templateps!== null)?Templateps[0]:"default";
+				var sizeps = lang.match(/size:(mindmap-sm|mindmap-md|mindmap-lg)(?= )/i);
+				var Templateps = lang.match(/Template:(fresh-blue|filetree|fish-bone|right|structure|tianpan)(?= )/i);
+				var Themeps = lang.match(/Theme:(classic|classic-compact|fish|fresh-blue|fresh-blue-compat|fresh-green|fresh-green-compat|fresh-pink|fresh-pink-compat|fresh-purple|fresh-purple-compat|fresh-red|fresh-red-compat|fresh-soil|fresh-soil-compat|snow|snow-compact|tianpan|tianpan-compact|wire)(?= )/i);
+				var protocolps=lang.match(/protocol:(json|text|markdown|list)(?= )/i);
+				var tmpshowps=lang.match(/tmpshow:(true)(?= )/i);
+				var size=(sizeps!== null)?sizeps[1]:"mindmap-md";
+				var Theme=(Themeps!== null)?Themeps[1]:"fresh-blue";
+				var protocol=(protocolps!== null)?protocolps[1]:"markdown";
+				var Template=(Templateps!== null)?Templateps[1]:"default";
 				var tmpshow=(tmpshowps!== null)?"":"style=\"display:none;\"";
 				//参数解析结束
 				
