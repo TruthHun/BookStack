@@ -14,9 +14,12 @@
     <link href="{{$.StaticDomain}}/static/css/toast.css" rel="stylesheet">
     <link href="/static/css/bookstack.css?version={{$.Version}}"rel="stylesheet">
     <link rel="stylesheet" href="/static/katex/katex.min.css">
+
+	<link rel="stylesheet" href="/static/mind-map/mindmap.css">
+
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
-
+    
     <style>
         .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
             display: block;
@@ -30,6 +33,26 @@
     </style>
 </head>
 <body>
+
+<!-- Modal -->
+<!-- 这个Modal主要用于显示思维导图的备注信息。 -->
+<div class="modal fade" id="ModalNote" tabindex="-1" role="dialog" aria-labelledby="ModalReplaceLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+				<h1 class="modal-title" id="ModalReplaceLabel" style="align:center;">思维导图备注</h1></div>
+			<div class="modal-body" style="overflow-y:auto; height:400px;"></div>
+			<div class="modal-footer">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 <div class="m-manual manual-mode-view manual-reader">
     <header class="navbar navbar-static-top manual-head" role="banner">
         <div class="container-fluid">
@@ -245,6 +268,12 @@
 <script type="text/javascript" src="/static/katex/katex.min.js"></script>
 <script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
+
+<script src="/static/editor.md/lib/marked.min.js" type="text/javascript"></script>
+
+<script src="/static/mind-map/kity.min.js" type="text/javascript"></script>
+<script src="/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
+<script src="/static/mind-map/mindmap.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     'use strict';
