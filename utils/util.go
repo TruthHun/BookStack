@@ -836,6 +836,10 @@ func MD5Sub16(str string) string {
 func JoinURL(rawURL string, urlPath string) string {
 	rawURL = strings.TrimSpace(rawURL)
 
+	if strings.HasPrefix(urlPath, "#") {
+		return urlPath
+	}
+
 	lowerURLPath := strings.ToLower(urlPath)
 	if strings.HasPrefix(lowerURLPath, "//") {
 		return "http:" + urlPath

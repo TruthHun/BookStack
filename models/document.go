@@ -200,7 +200,12 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			beego.Error(err)
 			continue
 		}
-		if len(utils.GetTextFromHtml(ds.Content)) == 0 {
+
+		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
+			// 如果markdown内容为空，则查询下一级目录内容来填充
+			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
+			ds.Markdown = "[TOC]\n\n" + ds.Markdown
+		} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
 			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
 			ds, _ = ModelStore.GetById(item.DocumentId)
@@ -551,7 +556,7 @@ func (m *Document) BookStackAuto(bookId, docId int) (md, cont string) {
 	var newMd []string   //新markdown内容
 	for _, doc := range docs {
 		newMd = append(newMd, fmt.Sprintf(`- [%v]($%v)`, doc.DocumentName, doc.Identify))
-		newCont = append(newCont, fmt.Sprintf(`<li><a href="$%v">%v</a></li>`, doc.Identify, doc.DocumentName))
+		newCont = append(newCont, fmt.Sprintf(`<li><a href="%v">%v</a></li>`, doc.Identify, doc.DocumentName))
 	}
 	md = strings.Join(newMd, "\n")
 	cont = "<ul>" + strings.Join(newCont, "") + "</ul>"
