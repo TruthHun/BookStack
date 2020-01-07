@@ -477,7 +477,7 @@ func (this *CommonController) SearchDoc() {
 		}
 		total = count
 		for _, book := range result {
-			ids = append(ids, book.BookId)
+			ids = append(ids, book.DocumentId)
 		}
 	}
 
