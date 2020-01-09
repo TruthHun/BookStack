@@ -153,6 +153,18 @@ func (m *Sign) Sign(uid int, fromApp bool) (reward int, err error) {
 		"total_continuous_sign":         user.TotalContinuousSign,
 		"history_total_continuous_sign": user.HistoryTotalContinuousSign,
 	})
+
+	rt := NewReadingTime()
+	o.QueryTable(rt).Filter("uid", uid).Filter("day", now.Format(signDayLayout)).One(rt)
+	if rt.Id > 0 {
+		rt.Duration += s.Reward
+		_, err = o.Update(rt)
+	} else {
+		rt.Day, _ = strconv.Atoi(now.Format(signDayLayout))
+		rt.Uid = uid
+		rt.Duration = s.Reward
+		_, err = o.Insert(rt)
+	}
 	reward = s.Reward
 	return
 }
