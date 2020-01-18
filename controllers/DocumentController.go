@@ -1011,9 +1011,10 @@ func (this *DocumentController) Content() {
 		content, markdown, _ = new(models.Document).BookStackCrawl(content, markdown, bookId, this.Member.MemberId)
 	}
 
-	if strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
-		//自动生成文档内容
+	content = this.replaceLinks(identify, content, isSummary)
 
+	if isSummary || strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
+		//自动生成文档内容
 		var imd, icont string
 		newDoc := models.NewDocument()
 		if strings.ToLower(doc.Identify) == "summary.md" {
@@ -1023,12 +1024,10 @@ func (this *DocumentController) Content() {
 		} else {
 			imd, icont = newDoc.BookStackAuto(bookId, docId)
 		}
-
-		markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
-		content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
+		markdown = strings.Replace(imd, "<bookstack-auto></bookstack-auto>", "", -1)
+		content = strings.Replace(icont, "<bookstack-auto></bookstack-auto>", "", -1)
 		isAuto = true
 	}
-	content = this.replaceLinks(identify, content, isSummary)
 
 	var ds = models.DocumentStore{}
 	var actionName string

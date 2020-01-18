@@ -14,6 +14,10 @@ type DocumentStore struct {
 	Content    string `orm:"type(text);"`                 //文本内容
 }
 
+func NewDocumentStore() *DocumentStore {
+	return &DocumentStore{}
+}
+
 //插入或者更新
 func (this *DocumentStore) InsertOrUpdate(ds DocumentStore, fields ...string) (err error) {
 	o := orm.NewOrm()

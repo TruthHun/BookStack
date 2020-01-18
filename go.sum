@@ -16,6 +16,8 @@ github.com/TruthHun/html2md v0.0.0-20191201015448-df9bb95f2766 h1:jIiQE55lc91r85
 github.com/TruthHun/html2md v0.0.0-20191201015448-df9bb95f2766/go.mod h1:krLpLGgGKK7lv2Ru8snV4DW1bPa3oPW/FVTL13E/Dws=
 github.com/TruthHun/html2md v0.0.0-20200103021813-42640c281ac8 h1:ehl5nICeqS2K/chBxq1GQNBxgrg4lAQlc4a34MoNoUM=
 github.com/TruthHun/html2md v0.0.0-20200103021813-42640c281ac8/go.mod h1:krLpLGgGKK7lv2Ru8snV4DW1bPa3oPW/FVTL13E/Dws=
+github.com/TruthHun/html2md v0.0.0-20200118014402-d559de841f42 h1:Ix59SKYh0UpFsQDBuyfWgJ/7mbKOTBBHFfA1hwSNdqQ=
+github.com/TruthHun/html2md v0.0.0-20200118014402-d559de841f42/go.mod h1:krLpLGgGKK7lv2Ru8snV4DW1bPa3oPW/FVTL13E/Dws=
 github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d h1:ir/IFJU5xbja5UaBEQLjcvn7aAU01nqU/NUyOBEU+ew=
 github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d/go.mod h1:PRWNwWq0yifz6XDPZu48aSld8BWwBfr2JKB2bGWiEd4=
 github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17 h1:S0JNYJ6Gv0RGmbz8w23BETY4hLz81RtpSiyqw3l4Z0k=

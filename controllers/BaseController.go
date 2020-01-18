@@ -316,7 +316,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	_, _ = qs.Update(orm.Params{"order_sort": 100000})
 
 	doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-		docName := selection.Text()
+		docName := strings.TrimSpace(selection.Text())
 		pid := 0
 		if docId, exist := selection.Attr("data-pid"); exist {
 			did, _ := strconv.Atoi(docId)
@@ -328,6 +328,9 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 				pid, _ = strconv.Atoi(pidstr)
 			}
 			if did > 0 {
+				if docName == "$auto-title" {
+					docName = models.NewDocument().AutoTitle(did, docName)
+				}
 				qs.Filter("document_id", did).Update(orm.Params{
 					"parent_id": pid, "document_name": docName,
 					"order_sort": idx, "modify_time": time.Now(),
@@ -343,7 +346,9 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 					pid = one.DocumentId
 				}
 			}
-
+			if docName == "$auto-title" {
+				docName = models.NewDocument().AutoTitle(identify, docName)
+			}
 			if _, err := qs.Filter("identify", identify).Update(orm.Params{
 				"parent_id": pid, "document_name": docName,
 				"order_sort": idx, "modify_time": time.Now(),

@@ -548,7 +548,7 @@ func (m *Document) GetParentTitle(pid int) (title string) {
 }
 
 //自动生成下一级的内容
-func (m *Document) BookStackAuto(bookId, docId int) (md, cont string) {
+func (m *Document) BookStackAuto(bookId, docId int, isSummary ...bool) (md, cont string) {
 	//自动生成文档内容
 	var docs []Document
 	orm.NewOrm().QueryTable("md_documents").Filter("book_id", bookId).Filter("parent_id", docId).OrderBy("order_sort").All(&docs, "document_id", "document_name", "identify")
@@ -654,6 +654,22 @@ func (m *Document) BookStackCrawl(html, md string, bookId, uid int) (content, ma
 			}
 		})
 		content, _ = gq.Find("body").Html()
+	}
+	return
+}
+
+func (m *Document) AutoTitle(identify interface{}, defaultTitle ...string) (title string) {
+	if len(defaultTitle) > 0 {
+		title = defaultTitle[0]
+	}
+	d := NewDocument()
+	sqlQuery := "select document_id from md_documents where identify = ? or document_id = ? limit 1"
+	orm.NewOrm().Raw(sqlQuery, identify, identify).QueryRow(&d)
+	if d.DocumentId > 0 {
+		tmpTitle := strings.TrimSpace(utils.ParseTitleFromMdHtml(mdtil.Md2html(NewDocumentStore().GetFiledById(d.DocumentId, "markdown"))))
+		if tmpTitle != "" {
+			title = tmpTitle
+		}
 	}
 	return
 }
