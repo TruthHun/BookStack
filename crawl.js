@@ -37,20 +37,16 @@ async function screenshot() {
 
     page.setExtraHTTPHeaders({
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,co;q=0.7,fr;q=0.6,zh-HK;q=0.5,zh-TW;q=0.4",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3766.2 Safari/537.36"
+        "User-Agent": "Mozi lla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3766.2 Safari/537.36"
     });
 
     await page.setRequestInterception(true);
     page.on("request", request => {
-        if(getHost(request.url()).indexOf("google")>-1){
-        request.abort();
-    }else{
-        request.continue();
-    }
-});
+        getHost(request.url()).indexOf("google")>-1 ? request.abort() : request.continue();
+    });
     let timeout =  shot ? 120000 : 60000;
-    await page.goto(url, {"waitUntil" :  ['networkidle2', 'domcontentloaded'], "timeout":timeout});
 
+    await page.goto(url, {"waitUntil" :  ['networkidle2', 'domcontentloaded'], "timeout":timeout});
     let res;
     if(shot){
         if (folder.substr(folder.length-1,1)!="/"){

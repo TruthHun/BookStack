@@ -1024,9 +1024,9 @@ func (this *DocumentController) Content() {
 		} else {
 			imd, icont = newDoc.BookStackAuto(bookId, docId)
 		}
-		markdown = strings.Replace(imd, "<bookstack-auto></bookstack-auto>", "", -1)
-		content = strings.Replace(icont, "<bookstack-auto></bookstack-auto>", "", -1)
-		isAuto = true
+		markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
+		content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
+		isAuto = true && !isSummary
 	}
 
 	var ds = models.DocumentStore{}
