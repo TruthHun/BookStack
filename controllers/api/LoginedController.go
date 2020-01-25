@@ -229,5 +229,5 @@ func (this *LoginedController) SignToday() {
 
 // 查询签到状态
 func (this *LoginedController) SignStatus() {
-	this.Response(http.StatusOK, messageSuccess, map[string]bool{"status": models.NewSign().IsSignToday(this.isLogin())})
+	this.Response(http.StatusOK, messageSuccess, map[string]int{"sign_at": models.NewSign().LatestSignTime(this.isLogin())})
 }

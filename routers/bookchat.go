@@ -54,6 +54,7 @@ func bookChatRouters() {
 	beego.Router(prefix+"/api/v1/user/change-password", &api.LoginedController{}, "post:ChangePassword")
 	beego.Router(prefix+"/api/v1/user/sign", &api.LoginedController{}, "post:SignToday")
 	beego.Router(prefix+"/api/v1/user/sign", &api.LoginedController{}, "get:SignStatus")
+	beego.Router(prefix+"/api/v1/user/more-info", &api.CommonController{}, "get:GetUserMoreInfo")
 
 	// developing
 	//beego.Router(prefix+"/api/v1/user/find-password", &api.CommonController{}, "get:TODO")

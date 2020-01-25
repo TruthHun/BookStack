@@ -190,7 +190,33 @@ func (this *CommonController) login(member models.Member) {
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
 	user.Avatar = this.completeLink(utils.ShowImg(user.Avatar, "avatar"))
-	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"user": user})
+	data := map[string]interface{}{"user": user}
+	this.Response(http.StatusOK, messageSuccess, data)
+}
+
+func (this *CommonController) GetUserMoreInfo() {
+	uid, _ := this.GetInt("uid")
+	if uid <= 0 {
+		this.Response(http.StatusBadRequest, messageBadRequest)
+	}
+	cols := []string{"create_time", "total_reading_time", "total_sign", "total_continuous_sign", "history_total_continuous_sign"}
+	m, err := models.NewMember().Find(uid, cols...)
+	if err != nil {
+		this.Response(http.StatusInternalServerError, messageInternalServerError)
+	}
+	rt := models.NewReadingTime()
+	u := UserMoreInfo{
+		MemberId:              uid,
+		SignedAt:              models.NewSign().LatestSignTime(uid),
+		CreatedAt:             int(m.CreateTime.Unix()),
+		TotalSign:             m.TotalSign,
+		TotalContinuousSign:   m.TotalContinuousSign,
+		HistoryContinuousSign: m.HistoryTotalContinuousSign,
+		TodayReading:          rt.GetReadingTime(uid, models.PeriodDay),
+		MonthReading:          rt.GetReadingTime(uid, models.PeriodMonth),
+		TotalReading:          m.TotalReadingTime,
+	}
+	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"info": u})
 }
 
 // 【OK】

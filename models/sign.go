@@ -73,6 +73,15 @@ func (m *Sign) IsSignToday(uid int) bool {
 	return s.Id > 0
 }
 
+func (m *Sign) LatestSignTime(uid int) (date int) {
+	s := &Sign{}
+	err := orm.NewOrm().QueryTable(m).Filter("uid", uid).OrderBy("-id").One(s)
+	if err != nil {
+		return
+	}
+	return int(s.CreatedAt.Unix())
+}
+
 // 是否未断签
 func (m *Sign) IsContinuousSign(uid int) bool {
 	s := &Sign{}

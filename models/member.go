@@ -224,10 +224,11 @@ func (m *Member) Update(cols ...string) error {
 	return nil
 }
 
-func (m *Member) Find(id int) (*Member, error) {
+func (m *Member) Find(id int, cols ...string) (*Member, error) {
 	o := orm.NewOrm()
 	m.MemberId = id
-	if err := o.Read(m); err != nil {
+	err := o.QueryTable(m).Filter("member_id", id).One(m, cols...)
+	if err != nil {
 		return m, err
 	}
 	m.ResolveRoleName()

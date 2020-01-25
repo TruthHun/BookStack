@@ -92,6 +92,18 @@ type APIDoc struct {
 	Bookmark     bool      `json:"bookmark"`
 }
 
+type UserMoreInfo struct {
+	MemberId              int `json:"uid"`
+	SignedAt              int `json:"signed_at"`               // 签到时间
+	CreatedAt             int `json:"created_at"`              // 注册时间
+	TotalSign             int `json:"total_sign"`              // 总签到天数
+	TotalContinuousSign   int `json:"total_continuous_sign"`   // 总连续签到天数
+	HistoryContinuousSign int `json:"history_continuous_sign"` // 历史连续签到天数
+	TodayReading          int `json:"today_reading"`           // 今日阅读时长
+	MonthReading          int `json:"month_reading"`           // 本月阅读时长
+	TotalReading          int `json:"total_reading"`           // 总阅读时长
+}
+
 type APIDocV2 struct {
 	DocumentId   int         `json:"id"`
 	ParentId     int         `json:"pid"`
