@@ -1087,9 +1087,9 @@ func (this *CommonController) Rank() {
 		data["all"] = rt.Sort(models.PeriodAll, limit, true)
 	case "sign":
 		sign := models.NewSign()
-		data["continuous_sign_users"] = sign.Sorted(limit, "total_continuous_sign", true)
-		data["total_sign_users"] = sign.Sorted(limit, "total_sign", true)
-		data["history_continuous_sign_users"] = sign.Sorted(limit, "history_total_continuous_sign", true)
+		data["continuous_sign"] = sign.Sorted(limit, "total_continuous_sign", true)
+		data["total_sign"] = sign.Sorted(limit, "total_sign", true)
+		data["history_continuous_sign"] = sign.Sorted(limit, "history_total_continuous_sign", true)
 	case "popular":
 		bookCounter := models.NewBookCounter()
 		data["today"] = bookCounter.PageViewSort(models.PeriodDay, limit, true)
@@ -1108,12 +1108,11 @@ func (this *CommonController) Rank() {
 		data["all"] = bookCounter.StarSort(models.PeriodAll, limit, true)
 	default:
 		tab = "all"
-		limit = 10
 		sign := models.NewSign()
 		book := models.NewBook()
-		data["continuous_sign_users"] = sign.Sorted(limit, "total_continuous_sign", true)
-		data["total_sign_users"] = sign.Sorted(limit, "total_sign", true)
-		data["total_reading_users"] = sign.Sorted(limit, "total_reading_time", true)
+		data["continuous_sign"] = sign.Sorted(limit, "total_continuous_sign", true)
+		data["total_sign"] = sign.Sorted(limit, "total_sign", true)
+		data["total_reading"] = sign.Sorted(limit, "total_reading_time", true)
 		data["star_books"] = book.Sorted(limit, "star")
 		data["vcnt_books"] = book.Sorted(limit, "vcnt")
 		data["comment_books"] = book.Sorted(limit, "cnt_comment")
