@@ -220,11 +220,16 @@ func (this *LoginedController) ChangePassword() {
 
 // 执行签到
 func (this *LoginedController) SignToday() {
-	reward, err := models.NewSign().Sign(this.isLogin(), true)
+	s := models.NewSign()
+	reward, err := s.Sign(this.isLogin(), true)
 	if err != nil {
 		this.Response(http.StatusBadRequest, "签到失败："+err.Error())
 	}
-	this.Response(http.StatusOK, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
+	data := map[string]interface{}{
+		"message":   fmt.Sprintf("恭喜您，签到成功，阅读时长增加 %v 秒", reward),
+		"signed_at": s.LatestSignTime(this.isLogin()),
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
 }
 
 // 查询签到状态
