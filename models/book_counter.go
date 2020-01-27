@@ -20,12 +20,12 @@ type BookCounter struct {
 }
 
 type SortedBook struct {
-	Id       int
-	BookId   int
-	Identify string
-	Cover    string
-	BookName string
-	Cnt      int
+	Id       int    `json:"id"`
+	BookId   int    `json:"book_id"`
+	Identify string `json:"identify"`
+	Cover    string `json:"cover"`
+	BookName string `json:"book_name"`
+	Cnt      int    `json:"cnt"`
 }
 
 const (

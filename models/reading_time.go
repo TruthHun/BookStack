@@ -3,10 +3,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego/orm"
 	"io/ioutil"
 	"os"
 	"time"
+
+	"github.com/astaxie/beego/orm"
 )
 
 // 阅读时长
@@ -22,11 +23,11 @@ type sum struct {
 }
 
 type ReadingSortedUser struct {
-	Uid      int
-	Account  string
-	Nickname string
-	Avatar   string
-	SumTime  int
+	Uid      int    `json:"uid"`
+	Account  string `json:"account"`
+	Nickname string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+	SumTime  int    `json:"sum_time"`
 }
 
 const (
