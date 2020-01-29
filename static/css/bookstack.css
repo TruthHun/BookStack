@@ -442,10 +442,7 @@ table>tbody>tr:hover{
     color: #444
 }
 .manual-article .article-content{
-    /*min-width: 980px;*/
-    /*max-width: 98%;*/
-    /*min-width: 760px;*/
-    max-width: 1000px;
+    max-width: 900px;
     padding: 10px;
     margin-left: auto!important;
     margin-right: auto!important

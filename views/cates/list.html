@@ -22,9 +22,6 @@
                         <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"><i class="fa fa-thumbs-o-up"></i> 最新推荐</a>
                         <span style="color: #ddd;"> &nbsp;|&nbsp; </span>
                         <a href="{{urlfor "SettingController.Star"}}" style="color: #f44336" title="我的收藏"><i class="fa fa-heart"></i> 我的收藏</a>
-{{/*                        {{if and (gt $.Member.MemberId 0) (eq .IsSignedToday false)}}*/}}
-{{/*                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" class="text-red" title="每日签到"><i class="fa fa-calendar-plus-o" aria-hidden="true"></i> 每日签到</a>*/}}
-{{/*                        {{end}}*/}}
                         <small class="pull-right">
                             <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"> 更多 <i class="fa fa-angle-right"></i><i class="fa fa-angle-right"></i></a>
                         </small>
@@ -34,7 +31,6 @@
                     <div class="row">
                         {{range $idx,$item:=.Recommends}}
                             <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" target="_blank" title="{{$item.BookName}}" class="col-xs-3 col-sm-2 col-md-1 {{if gt $idx 7}}hidden-xs{{end}}">
-                                {{/*<img src="http://localhost:8181/static/images/book.png" class="img-responsive" alt="{{$item.BookName}}">*/}}
                                 <img class="img-responsive" onerror="this.src='/static/images/book.png'" src="{{showImg $item.Cover "cover"}}" class="cover" alt="{{$item.BookName}}">
                                 <div class="help-block">{{$item.BookName}}</div>
                             </a>
@@ -49,34 +45,51 @@
             </div>
         {{end}}
 
-        {{range $idx,$cate:=.Cates}}
-            {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
+        <div class="row">
+            <div class="col-sm-2 hidden-xs col-md-2">
                 <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">
-                            <!--这里不显示一级分类的计数，主要是为了避免误导用户，因为一本书籍，可能属于多个子分类，但是一级分类下的计数并不是所有子分类计数的和-->
-                            <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}&tab=popular" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} <!-- （{{$cate.Cnt}}） --></a>
-                        </h3>
-                    </div>
-                    <div class="panel-body" style="padding-left: 0px;padding-right:0px;margin-left: -8px;margin-right: -8px;">
-                        {{range $idx1,$children:=$.Cates}}
-                            {{if and (gt $children.Cnt 0) (eq $cate.Id $children.Pid)}}
-                            <div class="col-xs-12 col-sm-6 col-md-4">
-                                <div class="cate-item clearfix" data-placement="bottom" title="{{$children.Intro}}">
-                                    <div>
-                                        <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
-                                        <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
-                                        <div class="help-block">{{$children.Intro}}</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-globe"></i> 分类索引</h3></div>
+                    <div class="panel-body">
+                        <ul>
+                            {{range $idx,$cate:=.Cates}}
+                                {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
+                                    <li>{{$cate.Title}}</li>
+                                {{end}}
                             {{end}}
-                        {{end}}
+                        </ul>
                     </div>
                 </div>
-            {{end}}
-        {{end}}
-
+            </div>
+            <div class="col-sm-10 col-xs-12 col-md-10">
+                {{range $idx,$cate:=.Cates}}
+                    {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <!--这里不显示一级分类的计数，主要是为了避免误导用户，因为一本书籍，可能属于多个子分类，但是一级分类下的计数并不是所有子分类计数的和-->
+                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$cate.Id}}&tab=popular" title="{{$cate.Title}}"><i class="fa fa-th"></i> {{$cate.Title}} <!-- （{{$cate.Cnt}}） --></a>
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="padding-left: 0px;padding-right:0px;margin-left: -8px;margin-right: -8px;">
+                                {{range $idx1,$children:=$.Cates}}
+                                    {{if and (gt $children.Cnt 0) (eq $cate.Id $children.Pid)}}
+                                        <div class="col-xs-12 col-sm-6 col-md-4">
+                                            <div class="cate-item clearfix" data-placement="bottom" title="{{$children.Intro}}">
+                                                <div>
+                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
+                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
+                                                    <div class="help-block">{{$children.Intro}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                {{end}}
+                            </div>
+                        </div>
+                    {{end}}
+                {{end}}
+            </div>
+        </div>
 
 
     </div>
