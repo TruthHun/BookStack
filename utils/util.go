@@ -66,6 +66,8 @@ var (
 	BasePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	StoreType   = beego.AppConfig.String("store_type") //存储类型
 	langs       sync.Map
+	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
+	transfer    = strings.TrimRight(strings.TrimSpace(beego.AppConfig.String("http_transfer")), "/") + "/"
 )
 
 func init() {
@@ -165,7 +167,7 @@ func RenderDocumentById(id int) {
 	cmd := exec.Command(name, args...)
 	beego.Info("render document by document_id:", cmd.Args)
 	// 超过10秒，杀掉进程，避免长期占用
-	time.AfterFunc(30*time.Second, func() {
+	time.AfterFunc(httpTimeout, func() {
 		if cmd.Process != nil && cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
@@ -239,7 +241,7 @@ func RenderCoverByBookIdentify(identify string) (err error) {
 	cmd := exec.Command(name, args...)
 	beego.Info("render cover by book id:", cmd.Args)
 	// 超过30秒，杀掉进程，避免长期占用
-	time.AfterFunc(30*time.Second, func() {
+	time.AfterFunc(httpTimeout, func() {
 		if cmd.Process != nil && cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
@@ -276,11 +278,11 @@ func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) 
 		args = []string{"--headless", "--disable-gpu", "--dump-dom", "--no-sandbox", urlStr}
 	}
 	cmd := exec.Command(name, args...)
-	expire := 180
+	expire := 2 * httpTimeout
 	if isScreenshot {
-		expire = 300
+		expire = 10 * httpTimeout
 	}
-	time.AfterFunc(time.Duration(expire)*time.Second, func() {
+	time.AfterFunc(expire, func() {
 		if cmd.Process != nil && cmd.Process.Pid != 0 {
 			cmd.Process.Kill()
 		}
@@ -406,9 +408,12 @@ func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence in
 	if force { //强力模式
 		cont, err = CrawlByChrome(urlstr, project)
 	} else {
-		req := util.BuildRequest("get", urlstr, "", "", "", true, false, headers...)
-		req.SetTimeout(30*time.Second, 30*time.Second)
+		req := util.BuildRequest("get", urlstr, "", "", "", true, false, headers...).SetTimeout(httpTimeout, httpTimeout)
 		cont, err = req.String()
+		if err != nil && transfer != "" {
+			req := util.BuildRequest("get", transfer+urlstr, urlstr, "", "", true, false, headers...).SetTimeout(httpTimeout, httpTimeout)
+			cont, err = req.String()
+		}
 	}
 
 	cont = strings.Replace(cont, "¶", "", -1)
@@ -804,12 +809,16 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 		}
 		return
 	}
-
 	//url链接图片
 	resp, err = util.BuildRequest("get", src, src, "", "", true, false, headers...).Response()
 	if err != nil {
+		if transfer == "" {
+			return
+		}
+		resp, err = util.BuildRequest("get", transfer+src, src, "", "", true, false, headers...).Response()
 		return
 	}
+
 	defer resp.Body.Close()
 	if tmp := strings.TrimPrefix(strings.ToLower(resp.Header.Get("Content-Type")), "image/"); tmp != "" {
 		if strings.HasPrefix(strings.ToLower(tmp), "svg") {
