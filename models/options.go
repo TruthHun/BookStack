@@ -129,7 +129,7 @@ func (m *Option) Init() error {
 			OptionName:  "SPIDER",
 			OptionTitle: "采集器，是否只对管理员开放",
 		}, {
-			OptionValue: "true",
+			OptionValue: "false",
 			OptionName:  "SHOW_CATEGORY_INDEX",
 			OptionTitle: "首页是否显示分类索引",
 		}, {

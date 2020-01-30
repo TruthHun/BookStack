@@ -904,3 +904,40 @@ a{color: #333}
 #page-rank .panel-body li a:hover{background-color: #EFEFEF;}
 
 .text-red{color: red !important;}
+
+.category-index{
+    padding-right: 0;
+}
+
+.category-index .panel-body{
+    border:1px solid #f1f2f3;
+    padding: 0;
+}
+
+.category-index ul,.category-index li{padding: 0;list-style: none;margin: 0}
+.category-index li>a{
+    display: block;
+    line-height: 40px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #f1f2f3;
+    text-decoration: none;
+    padding: 0 15px;
+}
+
+.category-index li>a:hover{
+    background-color: #f8f8f8;
+}
+
+.category-index li>a.active,.category-index li>a:hover{
+    color: #f44336;
+}
+.category-index li>a:last-of-type{border-bottom: 0}
+.category-index.fixed{
+    position: fixed;
+    z-index: 999;
+    top: 50px;
+    bottom: 0;
+}

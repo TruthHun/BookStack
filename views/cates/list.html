@@ -46,24 +46,27 @@
         {{end}}
 
         <div class="row">
-            <div class="col-sm-2 hidden-xs col-md-2">
+            {{if eq .SHOW_CATEGORY_INDEX "true"}}
+            <div class="col-sm-2 hidden-xs col-md-2 category-index">
                 <div class="panel panel-default">
                     <div class="panel-heading"><h3 class="panel-title"><i class="fa fa-globe"></i> 分类索引</h3></div>
                     <div class="panel-body">
                         <ul>
+                            <li><a href="javascript:void(0)" data-show="all" class="active" title="全部分类">全部分类</a></li>
                             {{range $idx,$cate:=.Cates}}
                                 {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
-                                    <li>{{$cate.Title}}</li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="{{$cate.Title}}">{{$cate.Title}}</a></li>
                                 {{end}}
                             {{end}}
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-10 col-xs-12 col-md-10">
+            <div class="col-sm-10 col-xs-12 col-md-10 category-detail">
+            {{else}}<div class="col-xs-12">{{end}}
                 {{range $idx,$cate:=.Cates}}
                     {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
-                        <div class="panel panel-default">
+                        <div class="panel panel-default" id="{{$cate.Title}}">
                             <div class="panel-heading">
                                 <h3 class="panel-title">
                                     <!--这里不显示一级分类的计数，主要是为了避免误导用户，因为一本书籍，可能属于多个子分类，但是一级分类下的计数并不是所有子分类计数的和-->
@@ -98,11 +101,28 @@
 <script>
     $(function () {
         $(".cate-item").tooltip();
+        $(".category-index a").tooltip();
         $(".panel-recommend .panel-body a").tooltip();
         $(".cate-item").click(function (e) {
             e.preventDefault()
             location.href=$(this).find("a").attr("href")
         });
+
+        $(".category-index a").click(function () {
+            var show=$(this).attr("data-show"),panels = $('.category-detail .panel');
+            $(".category-index a").removeClass("active");
+            $(this).addClass("active");
+
+            if(show == 'all'){
+                panels.show()
+            }else{
+                $.each(panels,function () {
+                    console.log($(this).attr("id"),show)
+                    $(this).attr("id") == show ? $(this).show() : $(this).hide();
+                })
+            }
+        });
+
     })
 </script>
 </body>
