@@ -32,11 +32,23 @@ const dateFormat = "20060102"
 
 var cacheTime = beego.AppConfig.DefaultFloat("CacheTime", 60) // 1 分钟
 
+var (
+	AllowRegister = true
+	AllowVisitor  = true
+)
+
 func Init() {
 	initAPI()
 	initAdsCache()
 	NewSign().UpdateSignRule()          // 更新签到规则的全局变量
 	NewReadRecord().UpdateReadingRule() // 更新阅读计时规则的全局变量
+	go func() {
+		for {
+			AllowRegister = GetOptionValue("ENABLED_REGISTER", "true") == "true"
+			AllowVisitor = GetOptionValue("ENABLE_ANONYMOUS", "true") == "true"
+			time.Sleep(time.Second * 30)
+		}
+	}()
 }
 
 //设置增减

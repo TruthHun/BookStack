@@ -53,6 +53,7 @@
                             <div class="form-group mgt-15px">
                                 <button type="button" id="btn-login" class="btn btn-success" style="width: 100%"  data-loading-text="正在登录..." autocomplete="off">立即登录</button>
                             </div>
+                            {{if eq .ENABLED_REGISTER "true"}}
                             <div class="form-group">
                                 <div class="help-block">
                                     <span>没有账号？ <a href="{{urlfor "AccountController.Oauth" ":oauth" "email"}}" title="使用邮箱注册" class="tooltips text-primary">邮箱注册</a></span>
@@ -81,6 +82,7 @@
                                 </div>
                                 {{end}}
                             </div>
+                            {{end}}
                         </form>
                     </div>
         </div>

@@ -30,6 +30,7 @@ type BaseController struct {
 	Member                *models.Member
 	Option                map[string]string
 	EnableAnonymous       bool
+	AllowRegister         bool
 	EnableDocumentHistory int
 	Sitename              string
 	IsMobile              bool
@@ -48,6 +49,7 @@ func (this *BaseController) Prepare() {
 	this.Data["IsMobile"] = this.IsMobile
 	this.Member = models.NewMember() //初始化
 	this.EnableAnonymous = false
+	this.AllowRegister = true
 	this.EnableDocumentHistory = 0
 	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
 	this.Data["OssDomain"] = this.OssDomain
@@ -91,6 +93,11 @@ func (this *BaseController) Prepare() {
 			if strings.EqualFold(item.OptionName, "ENABLE_ANONYMOUS") && item.OptionValue == "true" {
 				this.EnableAnonymous = true
 			}
+
+			if strings.EqualFold(item.OptionName, "ENABLED_REGISTER") && item.OptionValue == "false" {
+				this.AllowRegister = false
+			}
+
 			if verNum, _ := strconv.Atoi(item.OptionValue); strings.EqualFold(item.OptionName, "ENABLE_DOCUMENT_HISTORY") && verNum > 0 {
 				this.EnableDocumentHistory = verNum
 			}
@@ -110,6 +117,35 @@ func (this *BaseController) Prepare() {
 
 	this.Data["SiteName"] = this.Sitename
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
+
+	if this.Member.MemberId == 0 {
+		if this.EnableAnonymous == false { // 不允许游客访问
+			allowPaths := map[string]bool{
+				beego.URLFor("AccountController.Login"):        true,
+				beego.URLFor("AccountController.Logout"):       true,
+				beego.URLFor("AccountController.FindPassword"): true,
+				beego.URLFor("AccountController.ValidEmail"):   true,
+			}
+			if _, ok := allowPaths[this.Ctx.Request.URL.Path]; !ok {
+				this.Redirect(beego.URLFor("AccountController.Login"), 302)
+				return
+			}
+		}
+
+		if this.AllowRegister == false { // 不允许用户注册
+			denyPaths := map[string]bool{
+				// 第三方登录，如果是新注册的话，需要绑定信息，这里不让绑定信息就是不让注册
+				beego.URLFor("AccountController.Bind"): true,
+				// 禁止邮箱注册
+				beego.URLFor("AccountController.Oauth", ":oauth", "email"): true,
+			}
+			if _, ok := denyPaths[this.Ctx.Request.URL.Path]; ok {
+				this.Redirect("/login", 302)
+				return
+			}
+		}
+	}
+
 }
 
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session

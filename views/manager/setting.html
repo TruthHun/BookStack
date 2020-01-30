@@ -37,32 +37,41 @@
                             <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
                         </div>
 
-
-                            {{/*肯定要允许游客进行访问*/}}
-                            <div class="form-group hide">
-                                <label>启用匿名访问</label>
-                                <div class="radio">
-                                    <label class="radio-inline">
-                                        <input type="radio" checked name="ENABLE_ANONYMOUS" value="true">开启<span class="text"></span>
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="ENABLE_ANONYMOUS" value="false">关闭<span class="text"></span>
-                                    </label>
-                                </div>
-                            </div>
-
-                        {{/*肯定要允许用户注册行为*/}}
-                        <div class="form-group hide">
-                            <label>启用注册</label>
+                        <div class="form-group">
+                            <label>是否显示分类索引 ( <span class="text-muted">首页一级分类太多的时候，建议显示，以便用户快速定位分类位置</span>)</label>
                             <div class="radio">
                                 <label class="radio-inline">
-                                    <input type="radio" checked name="ENABLED_REGISTER" value="true">开启<span class="text"></span>
+                                    <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "true"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="true">显示<span class="text"></span>
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="ENABLED_REGISTER" value="false">关闭<span class="text"></span>
+                                    <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "false"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="false">不显示<span class="text"></span>
                                 </label>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>是否允许游客访问 ( <span class="text-muted">禁止游客访问之后，用户必须先登录才能访问内容</span>)</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "true"}}checked{{end}} name="ENABLE_ANONYMOUS" value="true">允许<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "false"}}checked{{end}} name="ENABLE_ANONYMOUS" value="false">禁止<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>是否开放注册</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "true"}}checked{{end}} name="ENABLED_REGISTER" value="true">开放注册<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "false"}}checked{{end}} name="ENABLED_REGISTER" value="false">关闭注册<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>启用验证码</label>
                             <div class="radio">
