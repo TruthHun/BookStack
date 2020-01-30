@@ -23,11 +23,12 @@ type sum struct {
 }
 
 type ReadingSortedUser struct {
-	Uid      int    `json:"uid"`
-	Account  string `json:"account"`
-	Nickname string `json:"nickname"`
-	Avatar   string `json:"avatar"`
-	SumTime  int    `json:"sum_time"`
+	Uid              int    `json:"uid"`
+	Account          string `json:"account"`
+	Nickname         string `json:"nickname"`
+	Avatar           string `json:"avatar"`
+	SumTime          int    `json:"sum_time"`
+	TotalReadingTime int    `json:"total_reading_time"`
 }
 
 const (

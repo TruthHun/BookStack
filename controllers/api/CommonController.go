@@ -1110,13 +1110,18 @@ func (this *CommonController) Rank() {
 		tab = "all"
 		sign := models.NewSign()
 		book := models.NewBook()
-		rt := models.NewReadingTime()
 		data["continuous_sign"] = sign.Sorted(limit, "total_continuous_sign", true)
 		data["total_sign"] = sign.Sorted(limit, "total_sign", true)
-		data["total_reading"] = rt.Sort(models.PeriodAll, limit, true)
 		data["star_books"] = book.Sorted(limit, "star")
 		data["vcnt_books"] = book.Sorted(limit, "vcnt")
 		data["comment_books"] = book.Sorted(limit, "cnt_comment")
+		// 这里要适配一下APP端，将错就错的写法，转换一下字段
+		readers := models.NewReadingTime().Sort(models.PeriodAll, limit, true)
+		for idx, reader := range readers {
+			reader.TotalReadingTime = reader.SumTime
+			readers[idx] = reader
+		}
+		data["total_reading"] = readers
 	}
 	this.Response(http.StatusOK, messageSuccess, data)
 }
