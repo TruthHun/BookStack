@@ -816,7 +816,9 @@ func DownImage(src string, headers ...map[string]string) (filename string, err e
 			return
 		}
 		resp, err = util.BuildRequest("get", transfer+src, src, "", "", true, false, headers...).Response()
-		return
+		if err != nil {
+			return
+		}
 	}
 
 	defer resp.Body.Close()
