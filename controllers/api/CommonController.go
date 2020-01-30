@@ -1110,9 +1110,10 @@ func (this *CommonController) Rank() {
 		tab = "all"
 		sign := models.NewSign()
 		book := models.NewBook()
+		rt := models.NewReadingTime()
 		data["continuous_sign"] = sign.Sorted(limit, "total_continuous_sign", true)
 		data["total_sign"] = sign.Sorted(limit, "total_sign", true)
-		data["total_reading"] = sign.Sorted(limit, "total_reading_time", true)
+		data["total_reading"] = rt.Sort(models.PeriodAll, limit, true)
 		data["star_books"] = book.Sorted(limit, "star")
 		data["vcnt_books"] = book.Sorted(limit, "vcnt")
 		data["comment_books"] = book.Sorted(limit, "cnt_comment")
