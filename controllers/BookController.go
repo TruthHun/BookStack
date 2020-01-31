@@ -1168,20 +1168,37 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 
 			//图片链接处理
 			doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-				//非http开头的图片地址，即是相对地址
-				if src, ok := selection.Attr("src"); ok && !strings.HasPrefix(strings.ToLower(src), "http") {
-					newSrc := src                                  //默认为旧地址
-					if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
-						newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
+				//非http://、// 和 https:// 开头的图片地址，即是相对地址
+				src, ok := selection.Attr("src")
+				lowerSrc := strings.ToLower(src)
+				if ok &&
+					!strings.HasPrefix(lowerSrc, "http://") &&
+					!strings.HasPrefix(lowerSrc, "https://") {
+					newSrc := src //默认为旧地址
+					if strings.HasPrefix(lowerSrc, "//") {
+						newSrc = "https:" + newSrc
+					} else {
+						if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
+							newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
+						}
+						newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
 					}
-					newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
 					mdCont = strings.Replace(mdCont, src, newSrc, -1)
 				}
 			})
 
 			//a标签链接处理。要注意判断有锚点的情况
 			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-				if href, ok := selection.Attr("href"); ok && !strings.HasPrefix(strings.ToLower(href), "http") && !strings.HasPrefix(href, "#") {
+				href, ok := selection.Attr("href")
+				lowerHref := strings.TrimSpace(strings.ToLower(href))
+				// 链接存在，且不以 // 、 http、https、mailto 开头，且以 .md 或者 .markdown 结尾
+				if ok &&
+					!strings.HasPrefix(lowerHref, "//") &&
+					!strings.HasPrefix(lowerHref, "http://") &&
+					!strings.HasPrefix(lowerHref, "https://") &&
+					!strings.HasPrefix(lowerHref, "mailto:") &&
+					!strings.HasPrefix(lowerHref, "#") &&
+					(strings.HasSuffix(lowerHref, ".md") || strings.HasSuffix(lowerHref, ".markdown")) {
 					newHref := href //默认
 					if cnt := strings.Count(href, "../"); cnt < l {
 						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
