@@ -137,7 +137,7 @@ table>tbody>tr:hover{
     top: 55px;
     z-index: 301;
     bottom: 0;
-    width: 279px;
+    width: 300px;
     border-right: 1px solid #ddd;
     background-color: #fafafa;
 }
@@ -442,7 +442,7 @@ table>tbody>tr:hover{
     color: #444
 }
 .manual-article .article-content{
-    max-width: 900px;
+    max-width: 880px;
     padding: 10px;
     margin-left: auto!important;
     margin-right: auto!important
@@ -1231,7 +1231,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .manual-left-toggle{margin-left: -279px;}
 .m-manual .manual-right{transition: left 0.3s;}
 .m-manual .manual-right-toggle{left: 0px;}
-.article-menu{overflow:auto;padding:10px 0px 15px 13px;position: absolute;top:60px;bottom: 33px;width: 278px;}
+.article-menu{overflow:auto;padding:10px 0px 15px 13px;position: absolute;top:60px;bottom: 33px;width: 300px;}
 .article-menu ul,.article-menu li{list-style: none;padding: 0px;margin: 0px;}
 .article-menu li{padding-left: 1em;}
 .article-menu a{display: block;white-space: nowrap;line-height: 234%;color: #666666;}

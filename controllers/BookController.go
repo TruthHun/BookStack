@@ -1191,14 +1191,13 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
 				href, ok := selection.Attr("href")
 				lowerHref := strings.TrimSpace(strings.ToLower(href))
-				// 链接存在，且不以 // 、 http、https、mailto 开头，且以 .md 或者 .markdown 结尾
+				// 链接存在，且不以 // 、 http、https、mailto 开头
 				if ok &&
 					!strings.HasPrefix(lowerHref, "//") &&
 					!strings.HasPrefix(lowerHref, "http://") &&
 					!strings.HasPrefix(lowerHref, "https://") &&
 					!strings.HasPrefix(lowerHref, "mailto:") &&
-					!strings.HasPrefix(lowerHref, "#") &&
-					(strings.HasSuffix(lowerHref, ".md") || strings.HasSuffix(lowerHref, ".markdown")) {
+					!strings.HasPrefix(lowerHref, "#") {
 					newHref := href //默认
 					if cnt := strings.Count(href, "../"); cnt < l {
 						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
