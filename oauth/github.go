@@ -56,11 +56,13 @@ func GetGithubAccessToken(code string) (token GithubAccessToken, err error) {
 //获取用户信息
 func GetGithubUserInfo(accessToken string) (info GithubUser, err error) {
 	var resp string
-	Api := beego.AppConfig.String("oauth::githubUserInfo") + "?access_token=" + accessToken
+	//Api := beego.AppConfig.String("oauth::githubUserInfo") + "?access_token=" + accessToken
+	Api := beego.AppConfig.String("oauth::githubUserInfo")
 	req := httplib.Get(Api)
 	if strings.HasPrefix(Api, "https") {
 		req.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
+	req.Header("Authorization", "token "+accessToken)
 	if resp, err = req.String(); err == nil {
 		beego.Debug(resp)
 		err = json.Unmarshal([]byte(resp), &info)

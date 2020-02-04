@@ -40,6 +40,7 @@
 - [x] 内容采集转发
 - [x] markdown项目导入的时候，`//`开头的链接或者非`.md`和`.markdown`结尾的链接，不转成`$`开头的相对链接
 - [x] 删除用户的时候，提示并确认删除，避免误删
+- [x] Github oauth登录调整(Please use the Authorization HTTP header instead as using the `access_token` query parameter is deprecated.)
 
 
 ## v2.4 升级日志
