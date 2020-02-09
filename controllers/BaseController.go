@@ -287,7 +287,7 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 }
 
 //在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
-func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) {
+func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) string {
 	debug := beego.AppConfig.String("runmod") != "prod"
 	o := orm.NewOrm()
 	qs := o.QueryTable("md_documents").Filter("book_id", bookId)
@@ -308,6 +308,10 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 		if href, ok := selection.Attr("href"); ok && strings.HasPrefix(href, "$") {
 			href = strings.TrimLeft(strings.Replace(href, "/", "-", -1), "$")
 			if utf8.RuneCountInString(href) <= 100 {
+				if href == "" {
+					href = strings.Replace(selection.Text(), " ", "", -1) + ".md"
+					selection.SetAttr("href", "$"+href)
+				}
 				hrefs[href] = selection.Text()
 				hrefSlice = append(hrefSlice, href)
 			}
@@ -329,15 +333,15 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	if len(hrefs) > 0 { //存在未创建的文档，先创建
 		ModelStore := new(models.DocumentStore)
 		for identify, docName := range hrefs {
-			doc := models.Document{
-				BookId:       bookId,
-				Identify:     identify,
-				DocumentName: docName,
-				CreateTime:   time.Now(),
-				ModifyTime:   time.Now(),
-			}
 			// 如果文档标识超过了规定长度（100），则进行忽略
 			if utf8.RuneCountInString(identify) <= 100 {
+				doc := models.Document{
+					BookId:       bookId,
+					Identify:     identify,
+					DocumentName: docName,
+					CreateTime:   time.Now(),
+					ModifyTime:   time.Now(),
+				}
 				if docId, err := doc.InsertOrUpdate(); err == nil {
 					if err = ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(docId), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 						beego.Error(err.Error())
@@ -395,9 +399,11 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 		idx++
 	})
 
+	htmlStr, _ = doc.Find("body").Html()
 	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
-		this.replaceLinks(bookIdentify, htmlStr, true)
+		htmlStr = this.replaceLinks(bookIdentify, htmlStr, true)
 	}
+	return htmlStr
 }
 
 //排序
@@ -455,7 +461,7 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 				if newHtml, err := gq.Find("body").Html(); err == nil {
 					docHtml = newHtml
 					if len(isSummary) > 0 && isSummary[0] == true { //更新排序
-						this.sortBySummary(bookIdentify, docHtml, book.BookId) //更新排序
+						docHtml = this.sortBySummary(bookIdentify, docHtml, book.BookId) //更新排序
 					}
 				}
 			} else {
@@ -463,7 +469,6 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 			}
 		}
 	}
-
 	return docHtml
 }
 

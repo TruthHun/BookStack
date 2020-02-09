@@ -992,6 +992,7 @@ func (this *DocumentController) Content() {
 		replaces := []string{"<bookstack-summary></bookstack-summary>", "<bookstack-summary/>"}
 		for _, r := range replaces {
 			markdown = strings.Replace(markdown, r, "", -1)
+			content = strings.Replace(content, r, "", -1)
 		}
 	}
 
@@ -1018,9 +1019,10 @@ func (this *DocumentController) Content() {
 		var imd, icont string
 		newDoc := models.NewDocument()
 		if strings.ToLower(doc.Identify) == "summary.md" {
-			icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
-			imd = html2md.Convert(icont)
+			//icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
+			imd = html2md.Convert(content)
 			imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
+			markdown = imd
 		} else {
 			imd, icont = newDoc.BookStackAuto(bookId, docId)
 		}
