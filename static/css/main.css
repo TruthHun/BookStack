@@ -941,3 +941,7 @@ a{color: #333}
     top: 50px;
     bottom: 0;
 }
+
+@media (max-width: 768px) {
+    .ucenter-content li .col-xs-3{padding-right: 0}
+}
