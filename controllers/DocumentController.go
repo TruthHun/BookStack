@@ -1013,14 +1013,17 @@ func (this *DocumentController) Content() {
 	}
 
 	content = this.replaceLinks(identify, content, isSummary)
-
-	if isSummary || strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>") {
+	auto := strings.Contains(markdown, "<bookstack-auto></bookstack-auto>") || strings.Contains(doc.Markdown, "<bookstack-auto/>")
+	if isSummary || auto {
 		//自动生成文档内容
 		var imd, icont string
 		newDoc := models.NewDocument()
 		if strings.ToLower(doc.Identify) == "summary.md" {
-			//icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
-			imd = html2md.Convert(content)
+			if auto {
+				icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
+			} else {
+				imd = html2md.Convert(content)
+			}
 			imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
 			markdown = imd
 		} else {
