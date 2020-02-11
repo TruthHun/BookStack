@@ -1,6 +1,10 @@
 # 程序名称
 appname = BookStack
 
+# 内容采集转发。如： https://http-transfer.abc.com
+# 需要部署`http-transfer`服务：https://github.com/TruthHun/http-transfer
+http_transfer =
+
 # 微信小程序 appid
 appId=""
 

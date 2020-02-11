@@ -1021,16 +1021,17 @@ func (this *DocumentController) Content() {
 		if strings.ToLower(doc.Identify) == "summary.md" {
 			if auto {
 				icont, _ = newDoc.CreateDocumentTreeForHtml(doc.BookId, doc.DocumentId)
+				imd = html2md.Convert(icont)
 			} else {
 				imd = html2md.Convert(content)
+				markdown = imd
 			}
-			imd = strings.Replace(imd, "(/read/"+identify+"/", "($", -1)
-			markdown = imd
 		} else {
 			imd, icont = newDoc.BookStackAuto(bookId, docId)
 		}
 		markdown = strings.Replace(markdown, "<bookstack-auto></bookstack-auto>", imd, -1)
 		content = strings.Replace(content, "<bookstack-auto></bookstack-auto>", icont, -1)
+		markdown = strings.Replace(markdown, "(/read/"+identify+"/", "($", -1)
 		isAuto = true && !isSummary
 	}
 
