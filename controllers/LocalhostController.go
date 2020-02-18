@@ -18,6 +18,10 @@ type LocalhostController struct {
 	BaseController
 }
 
+func (c *LocalhostController) Prepare() {
+	c.NoNeedLoginRouter = true
+}
+
 //渲染markdown.
 //根据文档id来。
 func (this *LocalhostController) RenderMarkdown() {
