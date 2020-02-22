@@ -647,16 +647,29 @@ a{color: #333}
     padding-top: 15px;
 }
 .manual-list .manual-item-standard dd a{
-    display: block;word-break: break-all;
-    white-space: nowrap;
+    display: -webkit-box;
+    word-break: break-all;
     margin-top: 10px;
+    -webkit-line-clamp:2;
     line-height: 180%;
+    -webkit-box-orient:vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 30px;
-    /*height: 45px;*/
-    /*overflow-y: hidden;*/
+    height: 45px;
 }
+
+/*.manual-list .manual-item-standard dd a{*/
+/*    display: block;word-break: break-all;*/
+/*    white-space: nowrap;*/
+/*    margin-top: 10px;*/
+/*    line-height: 180%;*/
+/*    overflow: hidden;*/
+/*    text-overflow: ellipsis;*/
+/*    margin-bottom: 30px;*/
+/*    !*height: 45px;*!*/
+/*    !*overflow-y: hidden;*!*/
+/*}*/
 
 
 .border{border: 1px solid #efefef;}
@@ -754,6 +767,9 @@ a{color: #333}
 .cate-list .panel-recommend .panel-body a .help-block{
     font-size: 12px;word-break: break-all;height: 35px;overflow: hidden;
     margin-bottom: 0px;text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient: vertical;
 }
 .cate-list .panel-recommend .panel-body img{width: auto;height: auto;border-radius: 3px;}
 .cate-list .panel-recommend .panel-body .col-md-1{padding: 5px;}

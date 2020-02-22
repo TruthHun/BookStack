@@ -58,6 +58,8 @@ func (this *StaticController) ProjectsFile() {
 			beego.Error(err.Error())
 			this.Abort("404")
 		}
+		defer reader.Close()
+
 		b, err := ioutil.ReadAll(reader)
 		if err != nil {
 			beego.Error(err.Error())
