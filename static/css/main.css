@@ -648,7 +648,6 @@ a{color: #333}
 }
 .manual-list .manual-item-standard dd a{
     display: -webkit-box;
-    word-break: break-all;
     margin-top: 10px;
     -webkit-line-clamp:2;
     line-height: 180%;
@@ -765,7 +764,7 @@ a{color: #333}
 .cate-list .panel-recommend .pull-right{position: relative;top:3px;color: #06f;}
 .cate-list .panel-recommend .panel-body{padding: 15px 9px;}
 .cate-list .panel-recommend .panel-body a .help-block{
-    font-size: 12px;word-break: break-all;height: 35px;overflow: hidden;
+    font-size: 12px;height: 35px;overflow: hidden;
     margin-bottom: 0px;text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp:2;
