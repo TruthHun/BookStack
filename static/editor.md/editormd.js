@@ -3564,20 +3564,22 @@
             text = trim(text);
             
             var escapedText    = text.toLowerCase().replace(/[^\w]+/g, "-");
+            var id = Math.floor(Math.random() * 1000000000 ).toString(36);
             var toc = {
                 text  : text,
                 level : level,
-                slug  : escapedText
+                slug  : escapedText,
+                id    : id
             };
             
-            var isChinese = /^[\u4e00-\u9fa5]+$/.test(text);
-            var id        = (isChinese) ? escape(text).replace(/\%/g, "") : text.toLowerCase().replace(/[^\w]+/g, "-");
+            //var isChinese = /^[\u4e00-\u9fa5]+$/.test(text);
+            //var id        = (isChinese) ? escape(text).replace(/\%/g, "") : text.toLowerCase().replace(/[^\w]+/g, "-");
 
             markdownToC.push(toc);
             
-            var headingHTML = "<h" + level + " id=\"h"+ level + "-" + this.options.headerPrefix + id +"\">";
+            var headingHTML = "<h" + level + " id=\""+ id +"\">";
             
-            headingHTML    += "<a name=\"" + text + "\" class=\"reference-link\"></a>";
+            headingHTML    += "<a name=\"" + id + "\" class=\"reference-link\"></a>";
             headingHTML    += "<span class=\"header-link octicon octicon-link\"></span>";
             headingHTML    += (hasLinkReg) ? this.atLink(this.emoji(linkText)) : this.atLink(this.emoji(text));
             headingHTML    += "</h" + level + ">";
@@ -3686,6 +3688,7 @@
         {
             var text  = toc[i].text;
             var level = toc[i].level;
+            var id    = toc[i].id;
             
             if (level < startLevel) {
                 continue;
@@ -3704,7 +3707,7 @@
                 html += "</ul></li>";
             }
 
-            html += "<li><a class=\"toc-level-" + level + "\" href=\"#" + text + "\" level=\"" + level + "\">" + text + "</a><ul>";
+            html += "<li><a class=\"toc-level-" + level + "\" href=\"#" + id + "\" level=\"" + level +"\" title=\""+text+ "\">" + text + "</a><ul>";
             lastLevel = level;
         }
         
