@@ -44,7 +44,12 @@
                 <li><span>阅读人次：</span>{{.Book.Vcnt}}</li>
                 <li><span>收藏数量：</span>{{.Book.Star}}</li>
                 {{if .Book.Author}}
-                <li><span>内容来源：</span><a href="{{.Book.AuthorURL}}" target="_blank" title="内容来源：{{.Book.Author}}">{{.Book.Author}}</a></li>
+                <li><span>内容来源：</span><a href="{{.Book.AuthorURL}}" target="_blank" title="内容来源：{{.Book.Author}}">{{.Book.Author}}</a>
+                    {{if .Book.AdTitle}}
+                        <span class="text-muted">&nbsp; | &nbsp;</span>
+                        <a target="_blank" rel="nofollow" class="text-red" title="{{.Book.AdTitle}}" href="{{.Book.AdLink}}">{{.Book.AdTitle}}</a>
+                    {{end}}
+                </li>
                 {{end}}
                 <li><span>整理分享：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
                 <li class="hidden-xs">
