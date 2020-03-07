@@ -2851,38 +2851,6 @@
   margin-bottom: 0;
 }
 
-/*  当表格过长时，原样式word-break设置导致横向拖动，很不便阅读 修改为纵向滚动，表头固定,begin*/
-
-.markdown-body table {
-    display: block;
-    width: 100%;
-    overflow: auto;
-    word-break: normal;
-    font-size: 10px;
-    border-spacing: 0;
-    border-collapse: collapse;
-    text-align: center;
-    table-layout: fixed;
-}
-
-.markdown-body table tbody {
-    display: block;
-    max-height: 400px;
-    overflow-y: scroll;
-}
-
-.markdown-body table thead, tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-.markdown-body table thead {
-    width: calc(100% - 7px);
-}
-
-/*  当表格过长时，原样式word-break设置导致横向拖动，很不便阅读 修改为纵向滚动，表头固定,end*/
-
 .markdown-body table th {
   font-weight: bold;
 }
