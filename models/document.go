@@ -446,7 +446,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 		}
 
 		//生成html
-		if htmlStr, err := utils.ExecuteViewPathTemplate("document/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": baseUrl, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
+		if htmlStr, err := utils.ExecuteViewPathTemplate("ebook/tpl_export.html", map[string]interface{}{"Model": book, "Doc": doc, "BaseUrl": baseUrl, "Nickname": Nickname, "Date": ExpCfg.Timestamp}); err == nil {
 			htmlName := folder + toc.Link
 			ioutil.WriteFile(htmlName, []byte(htmlStr), os.ModePerm)
 		} else {
