@@ -607,7 +607,7 @@ func (m *Book) Replace(bookId int, src, dst string) {
 			o.QueryTable(ds).Filter("document_id", doc.DocumentId).One(ds)
 			if ds.DocumentId > 0 {
 				ds.Markdown = strings.Replace(ds.Markdown, src, dst, -1)
-				ds.Content = strings.Replace(ds.Content, src, dst, -1)
+				ds.Content = ""
 				o.Update(ds)
 			}
 		}
