@@ -568,7 +568,7 @@ $(function () {
 
 	//去除冗余属性和标签
 	function filterPasteWord(str) {
-	    return str.replace(/[\t\r\n]+/g, ' ').replace(/<!--[\s\S]*?-->/ig, "")
+	    return str.replace(/[\t\r]+/g, ' ').replace(/<!--[\s\S]*?-->/ig, "")
 	    //转换图片
 	    .replace(/<v:shape [^>]*>[\s\S]*?.<\/v:shape>/gi,
 	        function (str) {
@@ -600,7 +600,7 @@ $(function () {
 	    .replace(/v:\w+=(["']?)[^'"]+\1/g, '')
 	    .replace(/<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|xml|meta|link|style|\w+:\w+)(?=[\s\/>]))[^>]*>/gi, "").replace(/<p [^>]*class="?MsoHeading"?[^>]*>(.*?)<\/p>/gi, "<p><strong>$1</strong></p>")
 	    //去掉多余的属性
-	    .replace(/\s+(class|lang|align)\s*=\s*(['"]?)([\w-]+)\2/gi, '')
+	    .replace(/\s+(lang|align)\s*=\s*(['"]?)([\w-]+)\2/gi, '')
 	    //清除多余的font/span不能匹配&nbsp;有可能是空格
 	    .replace(/<(font|span)[^>]*>(\s*)<\/\1>/gi,
 	        function (a, b, c) {
@@ -609,9 +609,18 @@ $(function () {
 	    //去掉style属性
 	    .replace(/(<[a-z][^>]*)\sstyle=(["'])([^\2]*?)\2/gi, "$1")
 	    // 去除不带引号的属性
-	    .replace(/(class|border|cellspacing|MsoNormalTable|valign|width|center|&nbsp;|x:str|height|x:num|cellpadding)(=[^ \f\n\r\t\v>]*)?/g, "")
-	    // 去除多余空格
-	    .replace(/(\S+)(\s+)/g, function (match, p1, p2) {
+	    .replace(/(border|cellspacing|MsoNormalTable|valign|width|center|&nbsp;|x:str|height|x:num|cellpadding)(=[^ \f\n\r\t\v>]*)?/g, "")
+		//保留code代码块的language
+		.replace(/class=[\"|'](.*?)[\"|'].*?/g,function(p, p1){
+			if (/language-(\S+)/.test(p1)){
+				return p;
+			}else
+			{
+				return "";
+			}
+		})	    	    
+        // 去除多余空格
+	    .replace(/(\S+)([ \t\r]+)/g, function (match, p1, p2) {
 	        return p1 + ' ';
 	    })
 	    .replace(/(\s)(>|<)/g, function (match, p1, p2) {
@@ -678,7 +687,7 @@ $(function () {
 	            headingStyle: 'atx',
 	            hr: '- - -',
 	            bulletListMarker: '-',
-	            codeBlockStyle: 'indented',
+	            codeBlockStyle: 'fenced',
 	            fence: '```',
 	            emDelimiter: '_',
 	            strongDelimiter: '**'
