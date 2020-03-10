@@ -35,6 +35,7 @@ type BaseController struct {
 	Sitename              string
 	IsMobile              bool
 	OssDomain             string
+	NoNeedLoginRouter     bool
 }
 type CookieRemember struct {
 	MemberId int
@@ -119,7 +120,7 @@ func (this *BaseController) Prepare() {
 	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 
 	if this.Member.MemberId == 0 {
-		if this.EnableAnonymous == false { // 不允许游客访问
+		if this.EnableAnonymous == false && !this.NoNeedLoginRouter { // 不允许游客访问
 			allowPaths := map[string]bool{
 				beego.URLFor("AccountController.Login"):        true,
 				beego.URLFor("AccountController.Logout"):       true,
