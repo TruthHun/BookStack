@@ -568,75 +568,89 @@ $(function () {
 
 	//去除冗余属性和标签
 	function filterPasteWord(str) {
-	    return str.replace(/[\t\r\n]+/g, ' ').replace(/<!--[\s\S]*?-->/ig, "")
-	    //转换图片
-	    .replace(/<v:shape [^>]*>[\s\S]*?.<\/v:shape>/gi,
-	        function (str) {
-	        //opera能自己解析出image所这里直接返回空
-	        if (!!window.opera && window.opera.version) {
-	            return '';
-	        }
-	        try {
-	            //有可能是bitmap占为图，无用，直接过滤掉，主要体现在粘贴excel表格中
-	            if (/Bitmap/i.test(str)) {
+	    str = str.replace(/[\t\r]+/g, ' ').replace(/<!--[\s\S]*?-->/ig, "")
+	        //转换图片
+	        .replace(/<v:shape [^>]*>[\s\S]*?.<\/v:shape>/gi,
+	            function (str) {
+	            //opera能自己解析出image所这里直接返回空
+	            if (!!window.opera && window.opera.version) {
 	                return '';
 	            }
-	            var src = str.match(/src=\s*"([^"]*)"/i)[1];
-	            return '<img  src="' + src + '" />';
-	        } catch (e) {
-	            return '';
-	        }
-	    })
+	            try {
+	                //有可能是bitmap占为图，无用，直接过滤掉，主要体现在粘贴excel表格中
+	                if (/Bitmap/i.test(str)) {
+	                    return '';
+	                }
+	                var src = str.match(/src=\s*"([^"]*)"/i)[1];
+	                return '<img  src="' + src + '" />';
+	            } catch (e) {
+	                return '';
+	            }
+	        })
 
-	    //针对wps添加的多余标签处理
-	    .replace(/<\/?div[^>]*>/g, '')
-	    .replace(/<\/?span[^>]*>/g, '')
-	    .replace(/<\/?font[^>]*>/g, '')
-	    .replace(/<\/?col[^>]*>/g, '')
-	    .replace(/<\/?(span|div|o:p|v:.*?|input|label)[\s\S]*?>/g, '')
-	    //去掉所有属性,需要保留单元格合并
-	    //.replace(/<([a-zA-Z]+)\s*[^><]*>/g, "<$1>")
-	    //去掉多余的属性
-	    .replace(/v:\w+=(["']?)[^'"]+\1/g, '')
-	    .replace(/<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|xml|meta|link|style|\w+:\w+)(?=[\s\/>]))[^>]*>/gi, "").replace(/<p [^>]*class="?MsoHeading"?[^>]*>(.*?)<\/p>/gi, "<p><strong>$1</strong></p>")
-	    //去掉多余的属性
-	    .replace(/\s+(class|lang|align)\s*=\s*(['"]?)([\w-]+)\2/gi, '')
-	    //清除多余的font/span不能匹配&nbsp;有可能是空格
-	    .replace(/<(font|span)[^>]*>(\s*)<\/\1>/gi,
-	        function (a, b, c) {
-	        return c.replace(/[\t\r\n ]+/g, " ");
-	    })
-	    //去掉style属性
-	    .replace(/(<[a-z][^>]*)\sstyle=(["'])([^\2]*?)\2/gi, "$1")
-	    // 去除不带引号的属性
-	    .replace(/(class|border|cellspacing|MsoNormalTable|valign|width|center|&nbsp;|x:str|height|x:num|cellpadding)(=[^ \f\n\r\t\v>]*)?/g, "")
-	    // 去除多余空格
-	    .replace(/(\S+)(\s+)/g, function (match, p1, p2) {
-	        return p1 + ' ';
-	    })
-	    .replace(/(\s)(>|<)/g, function (match, p1, p2) {
-	        return p2;
-	    })
+	        //针对wps添加的多余标签处理
+	        .replace(/<\/?div[^>]*>/g, '')
+	        .replace(/<\/?span[^>]*>/g, '')
+	        .replace(/<\/?font[^>]*>/g, '')
+	        .replace(/<\/?col[^>]*>/g, '')
+	        .replace(/<\/?(span|div|o:p|v:.*?|input|label)[\s\S]*?>/g, '')
+	        //去掉所有属性,需要保留单元格合并
+	        //.replace(/<([a-zA-Z]+)\s*[^><]*>/g, "<$1>")
+	        //去掉多余的属性
+	        .replace(/v:\w+=(["']?)[^'"]+\1/g, '')
+	        .replace(/<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|xml|meta|link|style|\w+:\w+)(?=[\s\/>]))[^>]*>/gi, "").replace(/<p [^>]*class="?MsoHeading"?[^>]*>(.*?)<\/p>/gi, "<p><strong>$1</strong></p>")
+	        //去掉多余的属性
+	        .replace(/\s+(class|lang|align)\s*=\s*(['"]?)([\w-]+)\2/gi, '')
+	        //清除多余的font/span不能匹配&nbsp;有可能是空格
+	        .replace(/<(font|span)[^>]*>(\s*)<\/\1>/gi,
+	            function (a, b, c) {
+	            return c.replace(/[\t\r\n ]+/g, " ");
+	        })
+	        //去掉style属性
+	        .replace(/(<[a-z][^>]*)\sstyle=(["'])([^\2]*?)\2/gi, "$1")
+	        // 去除不带引号的属性
+	        .replace(/(border|cellspacing|MsoNormalTable|valign|width|center|&nbsp;|x:str|height|x:num|cellpadding)(=[^ \f\n\r\t\v>]*)?/g, "")
+	        //保留code代码块的language
+	        .replace(/class=[\"|'](.*?)[\"|'].*?/g, function (p, p1) {
+	            if (/language-(\S+)/.test(p1)) {
+	                return p;
+	            } else {
+	                return "";
+	            }
+	        })
+	        // 去除多余空格
+	        .replace(/(\S+)([ \t\r]+)/g, function (match, p1, p2) {
+	            return p1 + ' ';
+	        })
+	        .replace(/(\s)(>|<)/g, function (match, p1, p2) {
+	            return p2;
+	        });
 	    //处理表格中的p标签
-	    .replace(/(<table[^>]*[\s\S]*?><\/table>)/gi, function (a) {
-			//嵌套表格不处理
+	    return str.replace(/(<table[^>]*[\s\S]*?>[\s]*<\/table>)/gi, function (a) {
+	        a = a.replace(/(\S+)(\s+)/g, function (match, p1, p2) {
+	                return p1 + ' ';
+	            })
+	            .replace(/(\s)(>|<)/g, function (match, p1, p2) {
+	                return p2;
+	            });
+
+	        //嵌套表格不处理
 	        if (a.match(/(<table>)/gi).length > 1) {
 	            return a
 
 	        }
 	        if (!/<thead>/i.test(a) && !/(rowspan|colspan)/i.test(a)) {
 	            //没有表头，将第一行作为表头
-                //修复，当表格只有一行时，正则错误 
-	            const firstrow = "<table><thead>" + a.match(/<tr>[\s\S]*?(<\/tr>)/i)[0]  + "</thead>";
+	            //修复，当表格只有一行时，正则错误
+	            const firstrow = "<table><thead>" + a.match(/<tr>[\s\S]*?(<\/tr>)/i)[0] + "</thead>";
 	            a = a.replace(/<tr>[\s\S]*?(<\/tr>)/i, "")
 	                .replace(/<table>/, firstrow);
 	        } else if (/<thead>/i.test(a) && /(rowspan|colspan)/i.test(a)) {
-				a=a.replace(/<thead>/, "");
-			}
-			return a.replace(/<\/p><p>/ig, "<br/>")
-	            .replace(/<\/?p[^>]*>/ig, '')
-				//.replace(/<td><\/td>/ig,"<td>&nbsp;</td>")
-	            .replace(/<td>&nbsp;<\/td>/g, "<td></td>")
+	            a = a.replace(/<thead>/, "");
+	        }
+	        return a.replace(/<\/p><p>/ig, "<br/>")
+	        .replace(/<\/?p[^>]*>/ig, '')
+	        .replace(/<td>&nbsp;<\/td>/g, "<td></td>")
 	    });
 
 	}
@@ -678,7 +692,7 @@ $(function () {
 	            headingStyle: 'atx',
 	            hr: '- - -',
 	            bulletListMarker: '-',
-	            codeBlockStyle: 'indented',
+	            codeBlockStyle: 'fenced',
 	            fence: '```',
 	            emDelimiter: '_',
 	            strongDelimiter: '**'
