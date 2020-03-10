@@ -715,7 +715,15 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6005, "保存文件失败")
 		}
 	}
-	osspath := fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
+
+	//文件和图片分开放在项目文件夹内
+	var osspath = ""
+	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
+		osspath = fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
+	} else {
+		osspath = strings.Replace(filepath.Join("projects", identify, "files", fileName+ext), "\\", "/", -1)
+	}
+
 	switch utils.StoreType {
 	case utils.StoreOss:
 		if err := store.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
@@ -725,10 +733,23 @@ func (this *DocumentController) Upload() {
 		attachment.HttpPath = "/" + osspath
 	case utils.StoreLocal:
 		osspath = "uploads/" + osspath
-		if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
-			beego.Error(err.Error())
+		//图片是正确的，先不修改
+		if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
+			if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
+				beego.Error(err.Error())
+			}
+			attachment.HttpPath = "/" + osspath
+			attachment.FilePath = filepath.Join(commands.WorkingDirectory, osspath)
+		} else {
+			if err := store.ModelStoreLocal.MoveToStore(filePath, osspath); err != nil {
+				beego.Error(err.Error())
+			}
+			attachment.FilePath = osspath
 		}
-		attachment.HttpPath = "/" + osspath
+		if err := attachment.Update(); err != nil {
+			beego.Error("SaveToFile => ", err)
+			this.JsonResult(6005, "保存文件失败")
+		}
 	}
 
 	result := map[string]interface{}{
