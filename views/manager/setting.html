@@ -73,6 +73,18 @@
                         </div>
 
                         <div class="form-group">
+                            <label>目录默认状态</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "true"}}checked{{end}} name="COLLAPSE_HIDE" value="true">收起<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "false"}}checked{{end}} name="COLLAPSE_HIDE" value="false">展开<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label>启用验证码</label>
                             <div class="radio">
                                 <label class="radio-inline">

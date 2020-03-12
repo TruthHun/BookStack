@@ -361,13 +361,18 @@ func (this *DocumentController) Read() {
 				}
 			}
 		})
+		hide := models.GetOptionValue("COLLAPSE_HIDE", "true") == "true"
 		menuDoc.Find("ul").Each(func(i int, selection *goquery.Selection) {
 			if selection.Parent().Is("li") {
 				selection.Parent().AddClass("collapse-node")
 				selection.Parent().PrependHtml("<span></span>")
 				this.Data["ToggleMenu"] = true
+				if hide {
+					selection.Parent().AddClass("collapse-hide")
+				}
 			}
 		})
+		menuDoc.Find(".jstree-clicked").Parents().RemoveClass("collapse-hide")
 		tree, _ = menuDoc.Find("body").Html()
 	}
 

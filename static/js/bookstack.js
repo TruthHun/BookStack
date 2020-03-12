@@ -428,7 +428,6 @@ $(function () {
     });
 
     $('.article-menu').animate({scrollTop:$('.article-menu a.jstree-clicked').offset().top-180}, 300);
-
     window.onpopstate=function(e){
         if (location.href.indexOf("#")<0) {
             load_doc(location.pathname,"",true);

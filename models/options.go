@@ -256,6 +256,11 @@ func (m *Option) Init() error {
 			OptionName:  "READING_INTERVAL_MAX_REWARD",
 			OptionTitle: "内容阅读计时间隔最大奖励(秒)",
 		},
+		{
+			OptionValue: "false",
+			OptionName:  "COLLAPSE_HIDE",
+			OptionTitle: "目录是否默认收起",
+		},
 	}
 
 	for _, op := range options {
