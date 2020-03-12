@@ -341,25 +341,34 @@ func (this *DocumentController) Read() {
 	}
 
 	// 查询用户哪些文档阅读了
+	var readMap = make(map[string]bool)
 	if this.Member.MemberId > 0 {
 		modelRecord := new(models.ReadRecord)
 		lists, cnt, _ := modelRecord.List(this.Member.MemberId, bookResult.BookId)
 		if cnt > 0 {
-			var readMap = make(map[string]bool)
 			for _, item := range lists {
 				readMap[strconv.Itoa(item.DocId)] = true
 			}
-			if doc, err := goquery.NewDocumentFromReader(strings.NewReader(tree)); err == nil {
-				doc.Find("li").Each(func(i int, selection *goquery.Selection) {
-					if id, exist := selection.Attr("id"); exist {
-						if _, ok := readMap[id]; ok {
-							selection.AddClass("readed")
-						}
-					}
-				})
-				tree, _ = doc.Find("body").Html()
-			}
 		}
+	}
+
+	this.Data["ToggleMenu"] = false
+	if menuDoc, err := goquery.NewDocumentFromReader(strings.NewReader(tree)); err == nil {
+		menuDoc.Find("li").Each(func(i int, selection *goquery.Selection) {
+			if id, exist := selection.Attr("id"); exist {
+				if _, ok := readMap[id]; ok {
+					selection.AddClass("readed")
+				}
+			}
+		})
+		menuDoc.Find("ul").Each(func(i int, selection *goquery.Selection) {
+			if selection.Parent().Is("li") {
+				selection.Parent().AddClass("collapse-node")
+				selection.Parent().PrependHtml("<span></span>")
+				this.Data["ToggleMenu"] = true
+			}
+		})
+		tree, _ = menuDoc.Find("body").Html()
 	}
 
 	if beego.AppConfig.DefaultBool("showWechatCode", false) && bookResult.PrivatelyOwned == 0 {

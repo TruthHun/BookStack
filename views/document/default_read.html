@@ -207,7 +207,7 @@
                     </div>
                 </div>
                 <div class="article-menu">
-                <div class="article-menu-detail">
+                <div class="article-menu-detail {{if $.ToggleMenu}}collapse-menu{{end}}">
                     {{.Result}}
                 </div>
                 <div class="search-result">
@@ -338,6 +338,13 @@ $(function () {
             $("body").addClass("article-menu-hide");
         }
     });
+    $(".collapse-menu .collapse-node span").click(function (e) {
+        if($(this).parent().hasClass("collapse-hide")){
+            $(this).parent().removeClass("collapse-hide")
+        }else {
+            $(this).parent().addClass("collapse-hide")
+        }
+    })
 });
 </script>
 </body>

@@ -107,6 +107,7 @@ function active_readed_menu(url){
         href=$(this).attr("href");
         if (href==url) {
             $(this).addClass("jstree-clicked");
+            $(this).parents().removeClass("collapse-hide")
             $(this).parent().addClass("readed");
         }else{
             $(this).removeClass("jstree-clicked");

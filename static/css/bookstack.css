@@ -1231,10 +1231,10 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .manual-left-toggle{margin-left: -279px;}
 .m-manual .manual-right{transition: left 0.3s;}
 .m-manual .manual-right-toggle{left: 0px;}
-.article-menu{overflow:auto;padding:10px 0px 15px 13px;position: absolute;top:60px;bottom: 33px;width: 300px;}
+.article-menu{overflow:auto;padding:10px 0 15px 10px;position: absolute;top:60px;bottom: 33px;width: 300px;}
 .article-menu ul,.article-menu li{list-style: none;padding: 0px;margin: 0px;}
 .article-menu li{padding-left: 1em;}
-.article-menu a{display: block;white-space: nowrap;line-height: 234%;color: #666666;}
+.article-menu a{display: block;white-space: nowrap;line-height: 34px;color: #666666;}
 .article-menu a:hover{color: #008cff;}
 .article-menu a.jstree-clicked,.article-menu a.active{color:#008cff !important;}
 .article-menu .readed>a:first-child{color: #999999;}
@@ -1352,3 +1352,23 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .mgt-15px{margin-top: 15px;}
 
 /*.article-menu a:hover{color: #008cff;}*/
+
+.collapse-menu{margin-left: 10px;}
+.collapse-menu .collapse-node{position: relative;}
+.collapse-menu .collapse-node span {
+    display: inline-block;
+    width: 32px;height: 32px;
+    box-sizing: border-box;
+    position: absolute;left: -19px;
+    cursor: pointer;
+    background: url("/static/images/angle-down.png") no-repeat center center;
+}
+.collapse-menu .collapse-node.collapse-hide{
+    height: 32px;
+}
+.collapse-menu .collapse-node.collapse-hide ul{
+    display: none;
+}
+.collapse-menu .collapse-node.collapse-hide span{
+    background: url("/static/images/angle-right.png") no-repeat center center;
+}
