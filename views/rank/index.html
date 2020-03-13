@@ -333,6 +333,42 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">本月累计签到</div>
+                                <div class="panel-body">
+                                    <ul>
+                                        {{range $idx,$user:=.ThisMonthSign}}
+                                            <li>
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
+                                                    <span class="rank-cont">{{$user.Nickname}}</span>
+                                                    <small class="pull-right">{{$user.TotalSign}} 天</small>
+                                                </a>
+                                            </li>
+                                        {{end}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">上月累计签到</div>
+                                <div class="panel-body">
+                                    <ul>
+                                        {{range $idx,$user:=.LastMonthSign}}
+                                            <li>
+                                                <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
+                                                    <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>
+                                                    <span class="rank-cont">{{$user.Nickname}}</span>
+                                                    <small class="pull-right">{{$user.TotalSign}} 天</small>
+                                                </a>
+                                            </li>
+                                        {{end}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     {{end}}
 

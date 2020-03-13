@@ -16,8 +16,8 @@ import (
 // 会员签到表
 type Sign struct {
 	Id        int
-	Uid       int // 签到的用户id
-	Day       int // 签到日期，如20200101
+	Uid       int `orm:"index"` // 签到的用户id
+	Day       int `orm:"index"` // 签到日期，如20200101
 	Reward    int // 奖励的阅读秒数
 	FromApp   bool
 	CreatedAt time.Time
@@ -235,5 +235,35 @@ func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members 
 
 func (*Sign) LatestOne(uid int) (s Sign) {
 	orm.NewOrm().QueryTable(&s).Filter("uid", uid).OrderBy("-id").One(&s)
+	return
+}
+
+func (m *Sign) SortedByPeriod(limit int, prd period, withCache ...bool) (members []Member) {
+
+	var b []byte
+	cache := false
+	if len(withCache) > 0 {
+		cache = withCache[0]
+	}
+	file := fmt.Sprintf(signCacheFmt, "month-"+prd, limit)
+	if cache {
+		if info, err := os.Stat(file); err == nil && time.Now().Sub(info.ModTime()).Seconds() <= cacheTime {
+			// 文件存在，且在缓存时间内
+			if b, err = ioutil.ReadFile(file); err == nil {
+				json.Unmarshal(b, &members)
+				if len(members) > 0 {
+					return
+				}
+			}
+		}
+	}
+
+	sqlSort := "SELECT t.uid,count(t.id) total_sign,m.account,m.avatar,m.nickname FROM `md_sign` t left JOIN md_members m on t.uid=m.member_id WHERE t.day>=? and t.day<=? GROUP BY t.uid ORDER BY total_sign desc limit ?"
+	start, end := getTimeRange(time.Now(), prd)
+	orm.NewOrm().Raw(sqlSort, start, end, limit).QueryRows(&members)
+	if cache && len(members) > 0 {
+		b, _ = json.Marshal(members)
+		ioutil.WriteFile(file, b, os.ModePerm)
+	}
 	return
 }

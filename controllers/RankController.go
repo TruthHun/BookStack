@@ -29,6 +29,8 @@ func (this *RankController) Index() {
 		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign", true)
 		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign", true)
 		this.Data["HistoryContinuousSignUsers"] = sign.Sorted(limit, "history_total_continuous_sign", true)
+		this.Data["ThisMonthSign"] = sign.SortedByPeriod(limit, models.PeriodMonth, true)
+		this.Data["LastMonthSign"] = sign.SortedByPeriod(limit, models.PeriodLastMoth, true)
 	case "popular":
 		this.Data["SeoTitle"] = "文档人气榜"
 		bookCounter := models.NewBookCounter()
