@@ -1089,6 +1089,8 @@ func (this *CommonController) Rank() {
 		sign := models.NewSign()
 		data["continuous_sign"] = sign.Sorted(limit, "total_continuous_sign", true)
 		data["total_sign"] = sign.Sorted(limit, "total_sign", true)
+		data["this_month_sign"] = sign.SortedByPeriod(limit, models.PeriodMonth, true)
+		data["last_month_sign"] = sign.SortedByPeriod(limit, models.PeriodLastMoth, true)
 		data["history_continuous_sign"] = sign.Sorted(limit, "history_total_continuous_sign", true)
 	case "popular":
 		bookCounter := models.NewBookCounter()
