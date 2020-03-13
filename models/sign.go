@@ -258,7 +258,7 @@ func (m *Sign) SortedByPeriod(limit int, prd period, withCache ...bool) (members
 		}
 	}
 
-	sqlSort := "SELECT t.uid,count(t.id) total_sign,m.account,m.avatar,m.nickname FROM `md_sign` t left JOIN md_members m on t.uid=m.member_id WHERE t.day>=? and t.day<=? GROUP BY t.uid ORDER BY total_sign desc limit ?"
+	sqlSort := "SELECT t.uid member_id,count(t.id) total_sign,m.account,m.avatar,m.nickname FROM `md_sign` t left JOIN md_members m on t.uid=m.member_id WHERE t.day>=? and t.day<=? GROUP BY t.uid ORDER BY total_sign desc limit ?"
 	start, end := getTimeRange(time.Now(), prd)
 	orm.NewOrm().Raw(sqlSort, start, end, limit).QueryRows(&members)
 	if cache && len(members) > 0 {
