@@ -71,10 +71,10 @@
                         </div>
                         <div class="col-xs-12 col-sm-6 col-md-4">
                             <div class="panel panel-default">
-                                <div class="panel-heading">累计签到榜 <small class="pull-right"><a href="{{urlfor "RankController.Index"}}?tab=sign" class="text-muted">更多>></a></small></div>
+                                <div class="panel-heading">本月签到榜 <small class="pull-right"><a href="{{urlfor "RankController.Index"}}?tab=sign" class="text-muted">更多>></a></small></div>
                                 <div class="panel-body">
                                     <ul>
-                                        {{range $idx,$user:=.TotalSignUsers}}
+                                        {{range $idx,$user:=.ThisMonthSign}}
                                             <li>
                                                 <a class="tooltips" href="{{urlfor "UserController.Index" ":username" $user.Account}}" target="_blank" title="{{$user.Nickname}}">
                                                     <span class="rank-order rank-order-no{{add $idx 1}}">{{add $idx 1}}</span>

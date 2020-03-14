@@ -56,7 +56,7 @@ func (this *RankController) Index() {
 		sign := models.NewSign()
 		book := models.NewBook()
 		this.Data["ContinuousSignUsers"] = sign.Sorted(limit, "total_continuous_sign", true)
-		this.Data["TotalSignUsers"] = sign.Sorted(limit, "total_sign", true)
+		this.Data["ThisMonthSign"] = sign.SortedByPeriod(limit, models.PeriodMonth, true)
 		this.Data["TotalReadingUsers"] = sign.Sorted(limit, "total_reading_time", true)
 		this.Data["StarBooks"] = book.Sorted(limit, "star")
 		this.Data["VcntBooks"] = book.Sorted(limit, "vcnt")
