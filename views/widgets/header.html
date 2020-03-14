@@ -26,10 +26,10 @@
                     {{end}}
                 {{if gt .Member.MemberId 0}}
                     <li>
-                        <a href="{{urlfor "SettingController.Index"}}" title="个人中心"><i class="fa fa-user-o" aria-hidden="true"></i> 个人中心</a>
+                        <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
                     </li>
                     <li>
-                        <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
+                        <a href="{{urlfor "SettingController.Index"}}" title="个人设置"><i class="fa fa-cogs" aria-hidden="true"></i> 个人设置</a>
                     </li>
                     <li>
                         <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>
@@ -120,10 +120,10 @@
                     </div>
                     <ul class="dropdown-menu user-info-dropdown" role="menu">
                         <li>
-                            <a href="{{urlfor "SettingController.Index"}}" title="个人中心"><i class="fa fa-user-o" aria-hidden="true"></i> 个人中心</a>
+                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页  {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
                         </li>
                         <li>
-                            <a href="{{urlfor "UserController.Index" ":username" $.Member.Account}}" title="个人主页"><i class="fa fa-home" aria-hidden="true"></i> 个人主页 {{if eq $.IsSignedToday false}}<small class="text-red">签到</small>{{end}}</a>
+                            <a href="{{urlfor "SettingController.Index"}}" title="个人设置"><i class="fa fa-cogs" aria-hidden="true"></i> 个人设置</a>
                         </li>
                         <li>
                             <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>

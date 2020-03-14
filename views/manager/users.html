@@ -65,7 +65,8 @@
                                     <td>
                                         <a :href="'/user/'+item.account" target="_blank">${item.nickname}(${item.account})</a>
                                         <br>
-                                        <span class="text-muted">email：${item.email}</span>
+                                        <span class="text-muted">email：${item.email}</span><br>
+                                        <span class="text-muted" v-if="item.wechat_no">微信：${item.wechat_no}</span>
                                     </td>
                                     <td>
                                         <template v-if="item.role == 0">
@@ -104,14 +105,14 @@
                                         </template>
                                         <template v-else-if="item.role != 0">
                                             <a :href="'{{urlfor "ManagerController.EditMember" ":id" ""}}' + item.member_id" class="btn btn-sm btn-default" @click="editMember(item.member_id)">
-                                                编辑
+                                               编辑
                                             </a>
                                             <template v-if="item.status == 0">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="setMemberStatus(item.member_id,1,$event)" data-loading-text="启用中...">禁用</button>
-                                            </template>
-                                            <template v-else>
-                                                <button type="button" class="btn btn-success btn-sm" @click="setMemberStatus(item.member_id,0,$event)" data-loading-text="禁用中...">启用</button>
-                                            </template>
+                                                    <button type="button" class="btn btn-danger btn-sm" @click="setMemberStatus(item.member_id,1,$event)" data-loading-text="启用中...">禁用</button>
+                                                </template>
+                                                <template v-else>
+                                                    <button type="button" class="btn btn-success btn-sm" @click="setMemberStatus(item.member_id,0,$event)" data-loading-text="禁用中...">启用</button>
+                                                </template>
                                             <button type="button" class="btn btn-danger btn-sm" @click="deleteMember(item.member_id,$event)" :data-user="item.nickname" data-loading-text="删除中">删除</button>
                                         </template>
                                     </td>

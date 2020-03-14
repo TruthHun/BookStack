@@ -30,6 +30,7 @@ func (this *SettingController) Index() {
 	if this.Ctx.Input.IsPost() {
 		email := strings.TrimSpace(this.GetString("email", ""))
 		phone := strings.TrimSpace(this.GetString("phone"))
+		wechatNO := strings.TrimSpace(this.GetString("wechat_no"))
 		description := strings.TrimSpace(this.GetString("description"))
 		if email == "" {
 			this.JsonResult(601, "邮箱不能为空")
@@ -37,6 +38,7 @@ func (this *SettingController) Index() {
 		member := this.Member
 		member.Email = email
 		member.Phone = phone
+		member.WechatNO = wechatNO
 		member.Description = description
 		if err := member.Update(); err != nil {
 			this.JsonResult(602, err.Error())

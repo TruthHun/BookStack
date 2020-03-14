@@ -1,6 +1,6 @@
 <div class="page-left">
     <ul class="menu">
-        <li {{if .SettingBasic}}class="active"{{end}}><a href="{{urlfor "SettingController.Index"}}" class="item"><i class="fa fa-sitemap" aria-hidden="true"></i> 基本信息</a> </li>
+        <li {{if .SettingBasic}}class="active"{{end}}><a href="{{urlfor "SettingController.Index"}}" class="item"><i class="fa fa-cogs" aria-hidden="true"></i> 个人设置</a> </li>
     {{if ne .Member.AuthMethod "ldap"}}
         <li {{if .SettingPwd}}class="active"{{end}}><a href="{{urlfor "SettingController.Password"}}" class="item"><i class="fa fa-user-o" aria-hidden="true"></i> 修改密码</a> </li>
     {{end}}

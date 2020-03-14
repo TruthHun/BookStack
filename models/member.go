@@ -40,6 +40,7 @@ type Member struct {
 	TotalSign                  int       `json:"total_sign" orm:"default(0);index"`                    // 总签到天数
 	TotalContinuousSign        int       `json:"total_continuous_sign" orm:"default(0);index"`         // 总连续签到天数
 	HistoryTotalContinuousSign int       `json:"history_total_continuous_sign" orm:"default(0);index"` // 历史最高连续签到天数
+	WechatNO                   string    `json:"wechat_no" orm:"column(wechat_no);size(50)"`           // 微信号
 }
 
 // TableName 获取对应数据库表名.
