@@ -1237,9 +1237,10 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .article-menu a{display: block;white-space: nowrap;line-height: 34px;color: #666666;}
 .article-menu a:hover{color: #008cff;}
 .article-menu a.jstree-clicked,.article-menu a.active{color:#008cff !important;}
-.article-menu .readed>a:first-child{color: #999999;}
-.article-menu .readed>a:first-child:before{content:url("../images/readed.png");margin-left: -19px;
+.article-menu .readed>a{color: #999999;}
+.article-menu .readed>a:before{content:url("../images/readed.png");margin-left: -19px;
     position: relative;top: 3px;margin-right: 3px;}
+.article-menu .readed.collapse-node>a:before{content: none}
 .article-search{padding: 10px;border-bottom: 1px solid #dddddd;}
 .article-search .input-group-addon{padding: 0px;}
 .article-search .input-group-addon button{padding: 8px 10px;background-color: transparent;border: 0px;}
@@ -1376,3 +1377,5 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .editormd-preview-container pre, .editormd-preview-container code, .editormd-preview-container kbd, .editormd-html-preview pre, .editormd-html-preview code, .editormd-html-preview kbd{
     font-family: Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;
 }
+
+.pun, .opn, .clo{color: #607D8B;}

@@ -4474,3 +4474,11 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .editormd-preview-container pre code{
   display: inline-block !important;
 }
+
+.pun, .opn, .clo{
+  color: #607D8B;
+}
+
+.editormd-preview-container pre, .editormd-preview-container code, .editormd-preview-container kbd, .editormd-html-preview pre, .editormd-html-preview code, .editormd-html-preview kbd{
+  font-family: Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;
+}
