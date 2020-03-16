@@ -117,7 +117,6 @@ func (this *BaseController) Prepare() {
 	}
 
 	this.Data["SiteName"] = this.Sitename
-	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 
 	if this.Member.MemberId == 0 {
 		if this.EnableAnonymous == false && !this.NoNeedLoginRouter { // 不允许游客访问

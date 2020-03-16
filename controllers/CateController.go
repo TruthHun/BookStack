@@ -30,6 +30,7 @@ func (this *CateController) List() {
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	this.Data["IsCate"] = true
+	this.Data["Friendlinks"] = new(models.FriendLink).GetList(false)
 	this.Data["Recommends"], _, _ = models.NewBook().HomeData(1, 12, models.OrderLatestRecommend, "", 0)
 	this.TplName = "cates/list.html"
 }
