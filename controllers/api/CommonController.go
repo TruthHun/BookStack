@@ -915,6 +915,12 @@ func (this *CommonController) Banners() {
 	if bannerSize <= 0 {
 		bannerSize = 2.619
 	}
+
+	for idx, banner := range banners {
+		banner.Image = this.completeLink(banner.Image)
+		banners[idx] = banner
+	}
+
 	this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"banners": banners, "size": bannerSize})
 }
 
