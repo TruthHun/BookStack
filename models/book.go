@@ -369,7 +369,7 @@ func (m *Book) HomeData(pageIndex, pageSize int, orderType BookOrder, lang strin
 		order = "pin desc,order_index desc"
 	case OrderLatestRecommend: //最新推荐
 		cond = append(cond, "order_index>0")
-		order = "book_id desc"
+		order = "release_time desc"
 	case OrderPopular: //受欢迎
 		order = "pin desc,star desc,vcnt desc"
 	case OrderLatest, OrderNew: //最新发布

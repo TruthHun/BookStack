@@ -7,10 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="renderer" content="webkit" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>页面不存在 - {{.SITE_NAME}}</title>
+    <title>{{if .BookName}}文档不存在 - {{.BookName}}{{else}}页面不存在{{end}} - {{.SITE_NAME}}</title>
     <style>
         .container{
-            width: 600px;
+            width: 800px;
             max-width: 80%;
             text-align: center;
             margin:150px auto;
@@ -27,15 +27,28 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h3>Page Not Foud</h3>
+    {{if .BookName}}
+        <div class="container">
+            <div class="header">
+                <h3>章节不存在</h3>
+            </div>
+            <div class="body">
+                <div class="err404">404</div>
+                <a href="{{.BookLink}}" title="返回《{{.BookName}}》" class="button">返回《{{.BookName}}》</a><br />
+                <div class="footer">Powered by <a href="https://github.com/TruthHun/BookStack" target="_blank">BookStack</a></div>
+            </div>
         </div>
-        <div class="body">
-            <div class="err404">404</div>
-            <a href="/" title="返回首页" class="button">返回首页</a><br />
-            <div class="footer">Powered by <a href="https://github.com/TruthHun/BookStack" target="_blank">BookStack</a></div>
+    {{else}}
+        <div class="container">
+            <div class="header">
+                <h3>Page Not Foud</h3>
+            </div>
+            <div class="body">
+                <div class="err404">404</div>
+                <a href="/" title="返回首页" class="button">返回首页</a><br />
+                <div class="footer">Powered by <a href="https://github.com/TruthHun/BookStack" target="_blank">BookStack</a></div>
+            </div>
         </div>
-    </div>
+    {{end}}
 </body>
 </html>

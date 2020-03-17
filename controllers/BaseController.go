@@ -37,6 +37,7 @@ type BaseController struct {
 	OssDomain             string
 	NoNeedLoginRouter     bool
 }
+
 type CookieRemember struct {
 	MemberId int
 	Account  string

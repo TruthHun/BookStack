@@ -37,6 +37,19 @@ type DocumentController struct {
 	BaseController
 }
 
+func (this *DocumentController) Abort404(bookName, bookLink string) {
+	this.Ctx.ResponseWriter.WriteHeader(404)
+	this.Data["BookName"] = bookName
+	this.Data["BookLink"] = bookLink
+	this.TplName = "errors/404.html"
+	b, err := this.RenderBytes()
+	if err != nil {
+		this.Abort("404")
+	}
+	this.Ctx.ResponseWriter.Write(b)
+	this.StopRun()
+}
+
 // 解析并提取版本控制的commit内容
 func parseGitCommit(str string) (cont, commit string) {
 	var slice []string
@@ -205,6 +218,8 @@ func (this *DocumentController) Read() {
 	}
 
 	bookResult := isReadable(identify, token, this)
+	bookName := bookResult.BookName
+	bookLink := beego.URLFor("DocumentController.Index", ":key", bookResult.Identify)
 
 	this.TplName = "document/" + bookResult.Theme + "_read.html"
 
@@ -215,7 +230,7 @@ func (this *DocumentController) Read() {
 		doc, err = doc.Find(docId) //文档id
 		if err != nil {
 			beego.Error(err)
-			this.Abort("404")
+			this.Abort404(bookName, bookLink)
 		}
 	} else {
 		//此处的id是字符串，标识文档标识，根据文档标识和文档所属的书的id作为key去查询
@@ -224,12 +239,12 @@ func (this *DocumentController) Read() {
 			if err != orm.ErrNoRows {
 				beego.Error(err, docId, id, bookResult)
 			}
-			this.Abort("404")
+			this.Abort404(bookName, bookLink)
 		}
 	}
 
 	if doc.BookId != bookResult.BookId {
-		this.Abort("404")
+		this.Abort404(bookName, bookLink)
 	}
 
 	bodyText := ""
@@ -337,7 +352,7 @@ func (this *DocumentController) Read() {
 
 	if err != nil {
 		beego.Error(err)
-		this.Abort("404")
+		this.Abort404(bookName, bookLink)
 	}
 
 	// 查询用户哪些文档阅读了
