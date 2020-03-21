@@ -120,7 +120,7 @@ func (m *Category) CategoryOfUserCollection(uid int) (cates []Category) {
 			LEFT JOIN md_category c ON c.id = bc.category_id
 		WHERE s.uid = ?
 		GROUP BY c.id
-		ORDER BY c.sort DESC
+		ORDER BY c.sort asc,c.title asc
 	`
 	if _, err := orm.NewOrm().Raw(sql, uid).QueryRows(&cates); err != nil {
 		beego.Error(err.Error())
