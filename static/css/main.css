@@ -638,7 +638,9 @@ textarea{
 .navbar-brand{padding-left: 0px;}
 a{color: #333}
 .mgt-15px{margin-top: 15px;}
+.mgr-15px{margin-right: 15px;}
 .mgb-15px{margin-bottom: 15px;}
+.text-danger{color: orangered;}
 .none-listyle{list-style: none;padding: 0px;}
 .btn-group.dropdown-menu-right.pull-right.slidebar.visible-xs-inline-block.visible-sm-inline-block{margin-top: 7px;}
 .navbar-nav>li.active a{background-color: #EFEFEF;color: #06f;padding-bottom: 16px;}

@@ -22,6 +22,27 @@
                         <li {{if eq .Sort "read"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=read">最近阅读</a></li>
                         <li {{if eq .Sort "new"}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}?sort=new">最新收藏</a></li>
                     </ul>
+                    {{if $.Cates}}
+                    <div class="mgt-15px help-block">
+                        <div>
+                            <a href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}" class="mgr-15px {{if eq $.Cid 0}}text-danger{{end}}">全部分类</a>
+                            {{range .Cates}}
+                                {{if eq .Pid 0}}
+                                    <a class="mgr-15px {{if eq $.Cid .Id}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
+                                {{end}}
+                            {{end}}
+                        </div>
+                        {{if gt $.Pid 0}}
+                        <div class="mgt-15px">
+                            {{range .Cates}}
+                                {{if eq .Pid $.Pid}}
+                                    <a class="mgr-15px {{if eq .Id $.Cid}}text-danger{{end}}" href="{{urlfor "SettingController.Star"}}?sort={{$.Sort}}&cid={{.Id}}">{{.Title}}</a>
+                                {{end}}
+                            {{end}}
+                        </div>
+                        {{end}}
+                    </div>
+                    {{end}}
                 </div>
                 <div id="bookList" class="box-body">
                     <div class="book-list book-star">

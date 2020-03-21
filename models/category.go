@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"strings"
 
 	"github.com/TruthHun/BookStack/models/store"
@@ -108,4 +109,21 @@ func (this *Category) Find(id int) (cate Category) {
 	cate.Id = id
 	orm.NewOrm().Read(&cate)
 	return cate
+}
+
+// 用户收藏了的书籍的分类
+func (m *Category) CategoryOfUserCollection(uid int) (cates []Category) {
+	sql := `
+		SELECT c.id,c.pid,c.title
+		FROM md_book_category bc
+			LEFT JOIN md_star s ON s.bid = bc.book_id
+			LEFT JOIN md_category c ON c.id = bc.category_id
+		WHERE s.uid = ?
+		GROUP BY c.id
+		ORDER BY c.sort DESC
+	`
+	if _, err := orm.NewOrm().Raw(sql, uid).QueryRows(&cates); err != nil {
+		beego.Error(err.Error())
+	}
+	return
 }

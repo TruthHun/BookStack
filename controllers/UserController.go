@@ -68,12 +68,13 @@ func (this *UserController) Index() {
 //收藏
 func (this *UserController) Collection() {
 	page, _ := this.GetInt("page")
+	cid, _ := this.GetInt("cid")
 	pageSize := 10
 	if page < 1 {
 		page = 1
 	}
 
-	totalCount, books, _ := new(models.Star).List(this.UcenterMember.MemberId, page, pageSize)
+	totalCount, books, _ := new(models.Star).List(this.UcenterMember.MemberId, page, pageSize, cid)
 	this.Data["Books"] = books
 
 	if totalCount > 0 {

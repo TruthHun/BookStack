@@ -972,16 +972,15 @@ func (this *CommonController) Bookshelf() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
+	cid, _ := this.GetInt("cid")
+	withCate, _ := this.GetInt("with-cate", 0)
 	size, _ := this.GetInt("size", 10)
-
 	size = utils.RangeNumber(size, 10, maxPageSize)
-
 	page, _ := this.GetInt("page", 1)
 	if page <= 0 {
 		page = 1
 	}
-
-	total, res, err := new(models.Star).List(uid, page, size)
+	total, res, err := new(models.Star).List(uid, page, size, cid)
 	if err != nil {
 		beego.Error(err.Error())
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
@@ -1004,6 +1003,10 @@ func (this *CommonController) Bookshelf() {
 	if len(booksId) > 0 {
 		//data["readed"] = new(models.ReadRecord).BooksProgress(uid, booksId...)
 		data["books"] = books
+	}
+
+	if withCate > 0 {
+		this.Data["Categories"] = models.NewCategory().CategoryOfUserCollection(uid)
 	}
 
 	this.Response(http.StatusOK, messageSuccess, data)
