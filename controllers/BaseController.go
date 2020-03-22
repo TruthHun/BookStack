@@ -35,6 +35,7 @@ type BaseController struct {
 	Sitename              string
 	IsMobile              bool
 	OssDomain             string
+	StaticDomain          string
 	NoNeedLoginRouter     bool
 }
 
@@ -55,7 +56,8 @@ func (this *BaseController) Prepare() {
 	this.EnableDocumentHistory = 0
 	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
 	this.Data["OssDomain"] = this.OssDomain
-	this.Data["StaticDomain"] = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
+	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
+	this.Data["StaticDomain"] = this.StaticDomain
 	//从session中获取用户信息
 	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
 		m, _ := models.NewMember().Find(member.MemberId)
