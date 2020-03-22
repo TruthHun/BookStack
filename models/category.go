@@ -16,8 +16,8 @@ var tableCategory = "md_category"
 
 // 分类
 type Category struct {
-	Id     int    `json:"id,omitempty"`                          //自增主键
-	Pid    int    `json:"pid,omitempty"`                         //分类id
+	Id     int    `json:"id"`                                    //自增主键
+	Pid    int    `json:"pid"`                                   //分类id
 	Title  string `orm:"size(30);unique" json:"title,omitempty"` //分类名称
 	Intro  string `json:"intro,omitempty"`                       //介绍
 	Icon   string `json:"icon,omitempty"`                        //分类icon
@@ -120,7 +120,7 @@ func (m *Category) CategoryOfUserCollection(uid int) (cates []Category) {
 			LEFT JOIN md_category c ON c.id = bc.category_id
 		WHERE s.uid = ?
 		GROUP BY c.id
-		ORDER BY c.sort asc,c.title asc
+		ORDER BY c.title asc
 	`
 	if _, err := orm.NewOrm().Raw(sql, uid).QueryRows(&cates); err != nil {
 		beego.Error(err.Error())
