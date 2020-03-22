@@ -21,6 +21,7 @@
         window.historyURL = "{{urlfor "DocumentController.History"}}";
         window.removeAttachURL = "{{urlfor "DocumentController.RemoveAttachment"}}";
         window.onpop=false;
+        window.staticURL ="{{$.StaticDomain}}";
     </script>
     <!-- Bootstrap -->
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -589,13 +590,13 @@
 <script src="/static/js/markdown.js?version={{$.Version}}" type="text/javascript"></script>
 
 <!-- 脑图 -->
-<script src="/static/mind-map/kity.min.js" type="text/javascript"></script>
-<script src="/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
-<script src="/static/mind-map/mindmap.min.js?version={{$.Version}}" type="text/javascript"></script>
-<script src="/static/word2md/turndown.js?version={{$.Version}}"></script>
-<script src="/static/word2md/turndown-plugin-gfm.js?version={{$.Version}}"></script>
-<script src="/static/word2md/mammoth.browser.js?version={{$.Version}}"></script>
-<script src="/static/word2md/word2md.js?version={{$.Version}}"></script>
+<script src="{{$.StaticDomain}}/static/mind-map/kity.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/mind-map/mindmap.min.js?version={{$.Version}}" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/word2md/turndown.js?version={{$.Version}}"></script>
+<script src="{{$.StaticDomain}}/static/word2md/turndown-plugin-gfm.js?version={{$.Version}}"></script>
+<script src="{{$.StaticDomain}}/static/word2md/mammoth.browser.js?version={{$.Version}}"></script>
+<script src="{{$.StaticDomain}}/static/word2md/word2md.js?version={{$.Version}}"></script>
 
 <script type="text/javascript">
     $(function () {

@@ -7,6 +7,7 @@ $(function () {
         width : "100%",
         height : "100%",
         path : "/static/editor.md/lib/",
+        codeFold: true,
         toolbar : true,
         placeholder: "本编辑器支持Markdown编辑，左边编写，右边预览",
         imageUpload: true,

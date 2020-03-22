@@ -16,14 +16,14 @@ var tableCategory = "md_category"
 
 // 分类
 type Category struct {
-	Id     int    `json:"id"`                          //自增主键
-	Pid    int    `json:"pid"`                         //分类id
-	Title  string `orm:"size(30);unique" json:"title"` //分类名称
-	Intro  string `json:"intro"`                       //介绍
-	Icon   string `json:"icon"`                        //分类icon
-	Cnt    int    `json:"cnt"`                         //分类下的文档项目统计
-	Sort   int    `json:"sort"`                        //排序
-	Status bool   `json:"status"`                      //分类状态，true表示显示，否则表示隐藏
+	Id     int    `json:"id,omitempty"`                          //自增主键
+	Pid    int    `json:"pid,omitempty"`                         //分类id
+	Title  string `orm:"size(30);unique" json:"title,omitempty"` //分类名称
+	Intro  string `json:"intro,omitempty"`                       //介绍
+	Icon   string `json:"icon,omitempty"`                        //分类icon
+	Cnt    int    `json:"cnt,omitempty"`                         //分类下的文档项目统计
+	Sort   int    `json:"sort,omitempty"`                        //排序
+	Status bool   `json:"status,omitempty"`                      //分类状态，true表示显示，否则表示隐藏
 	//PrintBookCount int    `orm:"default(0)" json:"print_book_count"`
 	//WikiCount      int    `orm:"default(0)" json:"wiki_count"`
 	//ArticleCount   int    `orm:"default(0)" json:"article_count"`
