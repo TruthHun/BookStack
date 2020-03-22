@@ -112,16 +112,18 @@ func (this *Category) Find(id int) (cate Category) {
 }
 
 // 用户收藏了的书籍的分类
-func (m *Category) CategoryOfUserCollection(uid int) (cates []Category) {
+func (m *Category) CategoryOfUserCollection(uid int, forAPI ...bool) (cates []Category) {
+	order := " ORDER BY c.sort asc,c.title asc "
+	if len(forAPI) > 0 && forAPI[0] {
+		order = " ORDER BY c.title asc "
+	}
 	sql := `
 		SELECT c.id,c.pid,c.title
 		FROM md_book_category bc
 			LEFT JOIN md_star s ON s.bid = bc.book_id
 			LEFT JOIN md_category c ON c.id = bc.category_id
 		WHERE s.uid = ?
-		GROUP BY c.id
-		ORDER BY c.title asc
-	`
+		GROUP BY c.id ` + order
 	if _, err := orm.NewOrm().Raw(sql, uid).QueryRows(&cates); err != nil {
 		beego.Error(err.Error())
 	}

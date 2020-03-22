@@ -1006,7 +1006,7 @@ func (this *CommonController) Bookshelf() {
 	}
 
 	if withCate > 0 {
-		data["categories"] = models.NewCategory().CategoryOfUserCollection(uid)
+		data["categories"] = models.NewCategory().CategoryOfUserCollection(uid, true)
 	}
 
 	this.Response(http.StatusOK, messageSuccess, data)
