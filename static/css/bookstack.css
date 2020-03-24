@@ -1228,7 +1228,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 #ModalHistory .text-muted{color: #999}
 
 .manual-left{transition: margin-left 0.3s;}
-.manual-left-toggle{margin-left: -279px;}
+.manual-left-toggle{margin-left: -300px;}
 .m-manual .manual-right{transition: left 0.3s;}
 .m-manual .manual-right-toggle{left: 0px;}
 .article-menu{overflow:auto;padding:10px 0 15px 10px;position: absolute;top:60px;bottom: 33px;width: 300px;}
