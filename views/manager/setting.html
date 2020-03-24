@@ -320,7 +320,12 @@
 
                         <div class="form-group">
                             <label>站点统计</label>
-                            <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="3">{{.TONGJI.OptionValue}}</textarea>
+                            <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="4">{{.TONGJI.OptionValue}}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>禁止的Referer (<small class="text-muted">多个请换行，每行输入referer的关键字</small>)</label>
+                            <textarea name="FORBIDDEN_REFERER" PLACEHOLDER=""  class="form-control" rows="4">{{.FORBIDDEN_REFERER.OptionValue}}</textarea>
                         </div>
 
 

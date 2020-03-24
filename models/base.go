@@ -40,6 +40,7 @@ var (
 func Init() {
 	initAPI()
 	initAdsCache()
+	initOptionCache()
 	NewSign().UpdateSignRule()          // 更新签到规则的全局变量
 	NewReadRecord().UpdateReadingRule() // 更新阅读计时规则的全局变量
 	go func() {

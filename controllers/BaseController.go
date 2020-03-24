@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"strconv"
 	"unicode/utf8"
 
@@ -45,8 +46,25 @@ type CookieRemember struct {
 	Time     time.Time
 }
 
+func (this *BaseController) refreshReferer() {
+	referer := this.Ctx.Request.Header.Get("referer")
+	if referer != "" {
+		referer, _ = url.QueryUnescape(referer)
+		referer = strings.ToLower(referer)
+		forbid := models.NewOption().ForbiddenReferer()
+		for _, item := range forbid {
+			if strings.Contains(referer, strings.ToLower(strings.TrimSpace(item))) {
+				this.Redirect("/", 302)
+				this.StopRun()
+			}
+		}
+	}
+}
+
 // Prepare 预处理.
 func (this *BaseController) Prepare() {
+	this.refreshReferer()
+
 	this.Data["Version"] = utils.Version
 	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
 	this.Data["IsMobile"] = this.IsMobile
