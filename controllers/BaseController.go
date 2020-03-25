@@ -52,10 +52,13 @@ func (this *BaseController) refreshReferer() {
 		referer, _ = url.QueryUnescape(referer)
 		referer = strings.ToLower(referer)
 		forbid := models.NewOption().ForbiddenReferer()
-		for _, item := range forbid {
-			if strings.Contains(referer, strings.ToLower(strings.TrimSpace(item))) {
-				this.Redirect("/", 302)
-				this.StopRun()
+		if len(forbid) > 0 {
+			for _, item := range forbid {
+				item = strings.ToLower(strings.TrimSpace(item))
+				if item != "" && strings.Contains(referer, item) {
+					this.Redirect("/", 302)
+					return
+				}
 			}
 		}
 	}
