@@ -1171,8 +1171,7 @@ table>tbody>tr:hover{
 }
 .markdown-body table th{font-weight: normal;}
 li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
-.markdown-body img{margin: 8px 0px;}
-
+.markdown-body img{margin: 8px 0;cursor: zoom-in}
 
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
     display: block;
@@ -1185,9 +1184,14 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .hung-read-link{margin: 30px 0px 180px;line-height: 200%;}
 .hung-read-link .col-xs-12{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 0px;}
 .hung-read-link .col-xs-12 a{margin-left: 5px;}
-.bookstack-bars{position: fixed;right: 15px;bottom: 30px;border:1px solid rgba(0,0,0,.1);
+.bookstack-bars{position: fixed;right: 50px;bottom: 50px;border:1px solid rgba(0,0,0,.1);
     z-index: 9999;box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;background-color: #fff;
 }
+
+@media screen and (max-width: 768px){
+    .bookstack-bars{right: 15px;bottom: 30px;}
+}
+
 .bookstack-bars ul,.bookstack-bars li{list-style: none;padding:0px;margin: 0px;}
 .bookstack-bars li a{display: block;height: 40px;width: 40px;text-align: center;line-height: 40px;color: #666}
 .bookstack-bars li{border-bottom: 1px solid #efefef;}
@@ -1302,10 +1306,14 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 @media screen and (min-width: 1450px) {
     .markdown-toc{
         position: fixed;background-color: #fff;
-        right: 15px;z-index: 99;
-        top: 115px;transition: width 0.5s;
-        width: 230px;max-height: 360px;overflow-y: auto;
-        border:1px solid #EEEEEE;border-radius: 3px;border-top-left-radius: 0px;
+        z-index: 1;
+        top: 55px;transition: width 0.5s;
+        width: 245px;overflow-y: auto;
+        border-left:1px solid #dddddd;
+        /*border-radius: 3px;*/
+        /*border-top-left-radius: 0px;*/
+        bottom: 0;
+        right: 15px;
     }
     .article-menu-hide .markdown-toc{
         width: 0px;overflow: hidden;border: 0px;
@@ -1332,7 +1340,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     }
     .markdown-toc a.active,.markdown-toc a:hover{color: #008cff;}
     .article-toggle{
-        position: fixed;right: 212px;top:116px;cursor: pointer;transition: right 0.5s;
+        position: fixed;right: 227px;top:56px;cursor: pointer;transition: right 0.5s;
         border: 0px;background-color: #fff; padding:5px 5px;
     }
     .article-menu-hide .article-toggle{
