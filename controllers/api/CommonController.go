@@ -1070,6 +1070,26 @@ func (this *CommonController) RelatedBook() {
 	this.Response(http.StatusOK, messageSuccess, data)
 }
 
+// 查询最近阅读过的书籍，返回最近50本
+func (this *CommonController) HistoryReadBook() {
+	page, _ := this.GetInt("page", 1)
+	size, _ := this.GetInt("size", 10)
+	if size <= 0 {
+		size = 10
+	}
+	data := map[string]interface{}{"books": []string{}}
+	uid := this.isLogin()
+	if uid > 0 {
+		books := models.NewReadRecord().HistoryReadBook(uid, page, size)
+		for idx, book := range books {
+			book.Cover = this.completeLink(book.Cover)
+			books[idx] = book
+		}
+		data["books"] = books
+	}
+	this.Response(http.StatusOK, messageSuccess, data)
+}
+
 func (this *CommonController) LatestVersion() {
 	version, _ := strconv.Atoi(models.GetOptionValue("APP_VERSION", "0"))
 	page := models.GetOptionValue("APP_PAGE", "")
