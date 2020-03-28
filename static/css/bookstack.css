@@ -1387,3 +1387,19 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 }
 
 .pun, .opn, .clo{color: #607D8B;}
+
+.bookstack-viewer{
+    background-color: rgba(0,0,0,0.3);
+    position: fixed;
+    left: 0;top: 0;bottom: 0;right: 0;
+    z-index: 9999;
+    display: none;
+    overflow: auto;
+    cursor: zoom-out;
+}
+
+.bookstack-viewer img{
+    max-width: 100%;
+    margin: 60px auto;
+    display: block;
+}

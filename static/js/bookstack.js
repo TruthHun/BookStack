@@ -144,6 +144,24 @@ $(function () {
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);
     });
+
+    $(".markdown-body").on("click", "img",function () {
+        var src = $(this).attr("src")
+        var bv = $(".bookstack-viewer")
+        var img = bv.find("img")
+        console.log(src)
+        if(img.length>0){
+            img.attr("src", src)
+        }else {
+            bv.append('<img src="'+src+'"/>')
+        }
+        bv.fadeIn();
+    });
+
+    $(".bookstack-viewer").click(function () {
+        $(this).fadeOut()
+    });
+
     $(".manual-right").scroll(function () {
         var top = $(".manual-right").scrollTop();
         if(top > 100){
