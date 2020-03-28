@@ -1399,7 +1399,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 }
 
 .bookstack-viewer img{
-    max-width: 100%;
+    max-width: 95%;
     margin: 60px auto;
     display: block;
 }
