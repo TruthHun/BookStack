@@ -41,7 +41,7 @@ type Document struct {
 	Release      string        `orm:"column(release);type(text);null" json:"release"` // Release 发布后的Html格式内容.
 	CreateTime   time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
 	MemberId     int           `orm:"column(member_id);type(int)" json:"member_id"`
-	ModifyTime   time.Time     `orm:"column(modify_time);type(datetime);default(null);auto_now" json:"modify_time"`
+	ModifyTime   time.Time     `orm:"column(modify_time);type(datetime);default(null)" json:"modify_time"`
 	ModifyAt     int           `orm:"column(modify_at);type(int)" json:"-"`
 	Version      int64         `orm:"type(bigint);column(version)" json:"version"`
 	AttachList   []*Attachment `orm:"-" json:"attach"`
@@ -97,7 +97,7 @@ func (m *Document) Find(id int) (doc *Document, err error) {
 func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o := orm.NewOrm()
 	id = int64(m.DocumentId)
-	m.ModifyTime = time.Now()
+
 	m.DocumentName = strings.TrimSpace(m.DocumentName)
 	if m.DocumentId > 0 { //文档id存在，则更新
 		_, err = o.Update(m, cols...)
@@ -183,7 +183,7 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 	qs.One(&book)
 
 	//全部重新发布。查询该书籍的所有文档id
-	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id", "identify")
+	_, err := o.QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).Limit(20000).All(&docs, "document_id", "identify", "modify_time")
 	if err != nil {
 		beego.Error("发布失败 => ", err)
 		return
@@ -198,6 +198,10 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		ds, err := ModelStore.GetById(item.DocumentId)
 		if err != nil {
 			beego.Error(err)
+			continue
+		}
+
+		if !ds.UpdatedAt.After(item.ModifyTime) {
 			continue
 		}
 
@@ -287,9 +291,9 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			item.Release, _ = gq.Find("body").Html()
 		}
 		ds.Content = item.Release
-		ModelStore.InsertOrUpdate(ds, "markdown", "content")
-
-		_, err = o.Update(item, "release")
+		ModelStore.InsertOrUpdate(ds, "markdown", "content", "-updated_at") // 不修改更新时间
+		item.ModifyTime = ds.UpdatedAt
+		_, err = o.Update(item, "release", "modify_time")
 		if err != nil {
 			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
 		}

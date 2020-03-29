@@ -606,9 +606,12 @@ func (m *Book) Replace(bookId int, src, dst string) {
 			ds := new(DocumentStore)
 			o.QueryTable(ds).Filter("document_id", doc.DocumentId).One(ds)
 			if ds.DocumentId > 0 {
-				ds.Markdown = strings.Replace(ds.Markdown, src, dst, -1)
-				ds.Content = ""
-				o.Update(ds)
+				if count := strings.Count(ds.Markdown, src); count > 0 { // 如果没找到内容，则不更新这篇文章
+					ds.Markdown = strings.Replace(ds.Markdown, src, dst, count)
+					ds.Content = ""
+					ds.UpdatedAt = time.Now()
+					o.Update(ds)
+				}
 			}
 		}
 	}

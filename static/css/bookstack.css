@@ -1309,7 +1309,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
         z-index: 1;
         top: 55px;transition: width 0.5s;
         width: 245px;overflow-y: auto;
-        border-left:1px solid #dddddd;
+        border-left:1px solid #EFEFEF;
         /*border-radius: 3px;*/
         /*border-top-left-radius: 0px;*/
         bottom: 0;
