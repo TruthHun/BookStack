@@ -27,7 +27,8 @@ func (this *DocumentStore) InsertOrUpdate(ds DocumentStore, fields ...string) (e
 	var one DocumentStore
 
 	// 全部要修改更新时间，除非用fields 参数指定不修改，即"-updated_at"
-	ds.UpdatedAt = time.Now()
+	// 这里要多加 1 秒的时间。因为在项目导入的时候，这个时间跟文档的创建时间是一样的，在内容发布的时候会发布不了。
+	ds.UpdatedAt = time.Now().Add(1 * time.Second)
 
 	o.QueryTable(TableDocumentStore).Filter("document_id", ds.DocumentId).One(&one, "document_id")
 
