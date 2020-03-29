@@ -50,6 +50,13 @@
                         {{end}}
                     </div>
                 {{end}}
+
+                {{if .Cate.Intro}}
+                    <div class="cate-intro">
+                        <div>{{.Cate.Title}}，{{.Cate.Intro}}</div>
+                    </div>
+                {{end}}
+
                 <ul class="nav nav-tabs">
                     <li {{if eq $.Tab "latest"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=latest&cid={{$.Cid}}&lang={{$.Lang}}">最新<span class="hidden-xs">发布</span></a></li>
                     <li {{if eq $.Tab "popular"}}class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}?tab=popular&cid={{$.Cid}}&lang={{$.Lang}}">热门<span class="hidden-xs">书籍</span></a></li>
