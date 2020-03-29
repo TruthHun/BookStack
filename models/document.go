@@ -109,6 +109,7 @@ func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
 	o.QueryTable("md_documents").Filter("identify", m.Identify).Filter("book_id", m.BookId).One(&mm, "document_id")
 	if mm.DocumentId == 0 {
 		m.CreateTime = time.Now()
+		m.ModifyTime = m.CreateTime
 		id, err = o.Insert(m)
 		NewBook().ResetDocumentNumber(m.BookId)
 	} else { //identify存在，则执行更新
