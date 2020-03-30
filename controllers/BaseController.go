@@ -55,8 +55,8 @@ func (this *BaseController) refreshReferer() {
 		if len(forbid) > 0 {
 			for _, item := range forbid {
 				item = strings.ToLower(strings.TrimSpace(item))
-				if item != "" && strings.Contains(referer, item) {
-					this.Redirect("/", 302)
+				if item != "" && strings.Contains(referer, item) && !strings.HasSuffix(referer, strings.ToLower(this.Ctx.Request.RequestURI)) {
+					this.Redirect(this.Ctx.Request.RequestURI, 302)
 					return
 				}
 			}
