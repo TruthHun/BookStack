@@ -202,10 +202,6 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			continue
 		}
 
-		if !ds.UpdatedAt.After(item.ModifyTime) {
-			continue
-		}
-
 		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
 			// 如果markdown内容为空，则查询下一级目录内容来填充
 			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
