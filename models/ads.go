@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -293,13 +294,12 @@ func GetAdsCode(positionIdentify string, isMobile bool) (code string) {
 		}
 	}
 	lenAds := len(ads)
-	if len(data.([]AdsCont)) != lenAds {
-		adsCache.Store(pid.(int), ads)
-	}
+
 	if lenAds == 0 {
 		return
 	} else if lenAds == 1 {
 		return ads[0].Code
 	}
-	return ads[time.Now().UnixNano()%int64(lenAds)].Code
+	rand.Seed(time.Now().UnixNano())
+	return ads[rand.Intn(lenAds)].Code
 }
