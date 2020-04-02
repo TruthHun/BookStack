@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/static/css/toast.css">
     <style>
         td{vertical-align: middle}
+        .col-name{max-width: 200px;}
     </style>
 </head>
 <body>
@@ -45,10 +46,8 @@
                     <table class="table table-hover table-striped">
                         <thead>
                         <tr>
-                            <th>位置</th>
-                            <th>广告名称</th>
+                            <th>位置/名称/起止时间</th>
                             <th>广告代码</th>
-                            <th>起止时间</th>
                             <th>广告状态</th>
                             <th>操作管理</th>
                         </tr>
@@ -56,7 +55,7 @@
                         <tbody>
                             {{range $i,$item:=.Lists}}
                                 <tr>
-                                    <td>
+                                    <td class="col-name">
                                         <select data-refresh="true" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" name="pid" class="form-control change-update">
                                             {{range $idx,$p:=$.Positions}}
                                                 <option  {{if eq $item.Pid $p.Id}}selected{{end}} value="{{$p.Id}}">
@@ -64,17 +63,18 @@
                                                 </option>
                                             {{end}}
                                         </select>
+                                        <div class="input-group mgt-15px">
+                                            <span class="input-group-addon">名称</span>
+                                            <input type="text" name="title" class="form-control change-update" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" value="{{$item.Title}}">
+                                        </div>
+                                        <div class="input-group mgt-15px">
+                                            <input type="text" readonly class="form-control" value="{{$item.StartTime}}">
+                                            <span class="input-group-addon">-</span>
+                                            <input type="text" readonly class="form-control" value="{{$item.EndTime}}">
+                                        </div>
                                     </td>
                                     <td>
-                                        <input type="text" name="title" class="form-control change-update" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" value="{{$item.Title}}">
-                                    </td>
-                                    <td>
-                                        <textarea name="code" class="form-control change-update" data-method="post" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" rows="3">{{$item.Code}}</textarea>
-                                    </td>
-                                    <td>
-                                        <span>{{$item.StartTime}}</span>
-                                        <br>
-                                        <span>{{$item.EndTime}}</span>
+                                        <textarea name="code" class="form-control change-update" data-method="post" data-url="{{urlfor "ManagerController.UpdateAds"}}?id={{$item.Id}}" rows="6">{{$item.Code}}</textarea>
                                     </td>
                                     <td>
                                         {{if $item.Status}}
