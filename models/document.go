@@ -288,8 +288,16 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			item.Release, _ = gq.Find("body").Html()
 		}
 		ds.Content = item.Release
-		ModelStore.InsertOrUpdate(ds, "markdown", "content", "-updated_at") // 不修改更新时间
+		fields := []string{"markdown", "content"}
+		if ds.UpdatedAt.Unix() < 0 {
+			ds.UpdatedAt = time.Now()
+			fields = append(fields, "updated_at")
+		} else { // 不修改更新时间
+			fields = append(fields, "-updated_at")
+		}
 		item.ModifyTime = ds.UpdatedAt
+		ModelStore.InsertOrUpdate(ds, fields...)
+
 		_, err = o.Update(item, "release", "modify_time")
 		if err != nil {
 			beego.Error(fmt.Sprintf("发布失败 => %+v", item), err)
