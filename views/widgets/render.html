@@ -5,37 +5,69 @@
     <title>BookStack</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="/static/editor.md/css/editormd.preview.css" />
+    <link href="/static/editor.md/css/editormd.css" rel="stylesheet">
+    <link href="/static/highlight/styles/zenburn.css" rel="stylesheet">
+    <link href="/static/css/markdown.css?version={{$.Version}}" rel="stylesheet">
+    <link href="/static/css/markdown.preview.css?version={{$.Version}}" rel="stylesheet">
+    <style>
+        .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
+            line-height: 1.7;
+        }
+        .markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{
+            font-weight: normal !important;
+        }
+        .markdown-body{font-size: 1.2em !important;line-height: 1.7;}
+        .editormd-preview-container ol.linenums li, .editormd-html-preview ol.linenums li{
+            min-height: 20px;
+        }
+        .markdown-body table th{font-weight: normal;}
+        li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
+        .markdown-body img{margin: 8px 0px;}
+    </style>
 </head>
 <body>
     <div id="bookstack-render-data"></div>
-    <div id="bookstack-links"></div>
     <textarea id="bookstack-data" style="display:none;">{{.Markdown}}</textarea>
     <script src="/static/jquery/1.12.4/jquery.js"></script>
-    <script src="/static/editor.md/lib/marked.min.js"></script>
-    <script src="/static/editor.md/lib/prettify.min.js"></script>
-    <script src="/static/editor.md/lib/raphael.min.js"></script>
-    <script src="/static/editor.md/lib/underscore.min.js"></script>
-    <script src="/static/editor.md/lib/sequence-diagram.min.js"></script>
-    <script src="/static/editor.md/lib/flowchart.min.js"></script>
-    <script src="/static/editor.md/lib/jquery.flowchart.min.js"></script>
     <script src="/static/editor.md/editormd.js"></script>
 <script type="text/javascript">
     $(function() {
-        editormd.markdownToHTML("bookstack-render-data", {
-           htmlDecode      : "style,script,iframe",  // you can filter tags decode
-           atLink    : false,    // disable @link
-           emailLink : false,    // disable email address auto link
-           emoji : false,       // Support Github emoji, Twitter Emoji(Twemoji), fontAwesome, Editor.md logo emojis.
+        var editor = editormd("bookstack-render-data", {
+            atLink    : false,    // disable @link
+            emailLink : false,    // disable email address auto link
+            emoji : false,       // Support Github emoji, Twitter Emoji(Twemoji), fontAwesome, Editor.md logo emojis.
+            width : "100%",
+            height : "100%",
+            path : "/static/editor.md/lib/",
+            codeFold: true,
+            toolbar : true,
+            placeholder: "本编辑器支持Markdown编辑，左边编写，右边预览",
+            imageUpload: true,
+            imageFormats: ["jpg", "jpeg", "gif", "png", "JPG", "JPEG", "GIF", "PNG"],
+            toolbarModes : "full",
+            fileUpload: true,
             taskList : true,
             tex  : true,
             flowChart : true,
             sequenceDiagram: true,
-           markdown:$("#bookstack-data").val(),
+            htmlDecode : "style,script,iframe,title,onmouseover,onmouseout,style",
+            lineNumbers : true,
+            tocStartLevel : 1,
+            tocm : true,
+            saveHTMLToTextarea : true,
+            markdown:$("#bookstack-data").val(),
         });
-        $.post(location.href,{content:$("#bookstack-render-data").html()},function (res) {
-            console.log(res);
-        });
+
+        var ipost = setInterval(function () {
+            var html = $(".markdown-body").html()
+            if(html){
+                $.post(location.href,{content:html},function (res) {
+                    console.log(res);
+                    clearTimeout(ipost)
+                });
+                clearInterval(ipost)
+            }
+        },10)
     });
 </script>
 </body>
