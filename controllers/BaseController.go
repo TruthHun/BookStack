@@ -55,9 +55,16 @@ func (this *BaseController) refreshReferer() {
 		if len(forbid) > 0 {
 			for _, item := range forbid {
 				item = strings.ToLower(strings.TrimSpace(item))
+				// 先判断是否带有非法关键字
 				if item != "" && strings.Contains(referer, item) && !strings.HasSuffix(referer, strings.ToLower(this.Ctx.Request.RequestURI)) {
-					this.Redirect(this.Ctx.Request.RequestURI, 302)
-					return
+					if u, err := url.Parse(referer); err == nil {
+						// 且referer的host与当前请求的host不是同一个，则进行302跳转以刷新过滤当前referer
+						if strings.ToLower(u.Host) != strings.ToLower(this.Ctx.Request.Host) {
+							this.Redirect(this.Ctx.Request.RequestURI, 302)
+							this.StopRun()
+							return
+						}
+					}
 				}
 			}
 		}
