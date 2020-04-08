@@ -99,6 +99,7 @@ func RegisterModel() {
 		models.NewReadingTime(),
 		models.NewSign(),
 		models.NewBookCounter(),
+		models.NewDownloadCounter(),
 	)
 	migrate.RegisterMigration()
 }

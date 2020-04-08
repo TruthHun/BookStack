@@ -1185,20 +1185,31 @@ func (this *DocumentController) Export() {
 	}
 	//查询文档是否存在
 	obj := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, book.GenerateTime.Unix(), ext)
+	link := ""
 	switch utils.StoreType {
 	case utils.StoreOss:
 		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
 			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 		}
-		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": this.OssDomain + "/" + obj})
+		link = this.OssDomain + "/" + obj
 	case utils.StoreLocal:
 		obj = "uploads/" + obj
 		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
 			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 		}
-		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": "/" + obj})
+		link = "/" + obj
+	}
+	if link != "" {
+		// 查询是否可以下载
+		counter := models.NewDownloadCounter()
+		times, min := counter.DoesICanDownload(this.Member.MemberId)
+		if times == 0 {
+			this.JsonResult(1, fmt.Sprintf("下载失败。每天每阅读学习 %v 分钟可下载1个离线文档。请您再阅读学习 %v 分钟", min, min))
+		}
+		counter.Increase(this.Member.MemberId)
+		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
 	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
 }

@@ -290,6 +290,11 @@ func (m *Option) Init() error {
 			OptionName:  "FORBIDDEN_REFERER",
 			OptionTitle: "禁止的Referer",
 		},
+		{
+			OptionValue: "1",
+			OptionName:  "DOWNLOAD_INTERVAL",
+			OptionTitle: "每阅读多少秒可以下载一个电子书",
+		},
 	}
 
 	for _, op := range options {
