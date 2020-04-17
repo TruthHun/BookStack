@@ -146,14 +146,21 @@ $(function () {
     });
 
     $(".markdown-body").on("click", "img",function () {
+        var imgHeight = $(this).height()
+        var winHeight = $(window).height()
+        var style="margin-top: 30px;"
         var src = $(this).attr("src")
         var bv = $(".bookstack-viewer")
         var img = bv.find("img")
-        console.log(src)
+        if(winHeight>imgHeight + 60){
+            style="margin-top: " + (winHeight - imgHeight - 60)/2 +"px"
+        }
+
         if(img.length>0){
             img.attr("src", src)
+            img.attr("style", style)
         }else {
-            bv.append('<img src="'+src+'"/>')
+            bv.append('<img style="'+style+'" src="'+src+'"/>')
         }
         bv.fadeIn();
     });
