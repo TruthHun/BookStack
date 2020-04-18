@@ -1234,7 +1234,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .manual-left-toggle{margin-left: -300px;}
 .m-manual .manual-right{transition: left 0.3s;}
 .m-manual .manual-right-toggle{left: 0px;}
-.article-menu{overflow:auto;padding:10px 0 15px 10px;position: absolute;top:60px;bottom: 33px;width: 300px;}
+.article-menu{overflow:auto;padding:10px 0 15px 10px;position: absolute;top:55px;bottom: 33px;width: 300px;}
 .article-menu ul,.article-menu li{list-style: none;padding: 0px;margin: 0px;}
 .article-menu li{padding-left: 1em;}
 .article-menu a{display: block;white-space: nowrap;line-height: 34px;color: #666666;}
