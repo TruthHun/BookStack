@@ -1156,7 +1156,6 @@ table>tbody>tr:hover{
     }
 }
 
-
 .bookstack-item a{color: #333;}
 
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
@@ -1307,12 +1306,13 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     .markdown-toc{
         position: fixed;background-color: #fff;
         z-index: 1;
-        top: 55px;transition: width 0.5s;
+        top: 70px;
+        transition: width 0.5s;
         width: 245px;overflow-y: auto;
         border-left:1px solid #EFEFEF;
         /*border-radius: 3px;*/
         /*border-top-left-radius: 0px;*/
-        bottom: 0;
+        /*bottom: 0;*/
         right: 15px;
     }
     .article-menu-hide .markdown-toc{
@@ -1333,14 +1333,16 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     .article-toggle{position: relative;z-index: 999}
 
     .markdown-toc ul{
-        list-style: none;padding-left: 1em;margin-top: 45px;
+        list-style: none;
+        padding-left: 1em;
+        margin-top: 45px;
     }
     .markdown-toc a{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;color: #999999;
         font-size: 15px;
     }
     .markdown-toc a.active,.markdown-toc a:hover{color: #008cff;}
     .article-toggle{
-        position: fixed;right: 227px;top:56px;cursor: pointer;transition: right 0.5s;
+        position: fixed;right: 227px;top:71px;cursor: pointer;transition: right 0.5s;
         border: 0px;background-color: #fff; padding:5px 5px;
     }
     .article-menu-hide .article-toggle{
