@@ -1164,7 +1164,7 @@ table>tbody>tr:hover{
 .markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{
     font-weight: 400 !important;
 }
-.markdown-body{font-size: 1.14em !important;line-height: 1.7;}
+.markdown-body{font-size: 1.14em !important;line-height: 2;}
 .editormd-preview-container ol.linenums li, .editormd-html-preview ol.linenums li{
     min-height: 20px;
 }
