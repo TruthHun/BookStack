@@ -130,13 +130,16 @@ func (this *CommonController) LoginBindWechat() {
 		we.Bind(we.Openid, member.MemberId)
 	} else {
 		*member, _ = models.NewMember().GetByUsername(form.Username)
-		if ok, _ := utils.PasswordVerify(member.Password, form.Password); !ok {
-			this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
+
+		if member.MemberId == 0 {
+			this.Response(http.StatusBadRequest, "您要绑定的用户不存在")
 		}
+
 		if ok, _ := utils.PasswordVerify(member.Password, form.Password); !ok {
 			beego.Error(err)
 			this.Response(http.StatusBadRequest, messageUsernameOrPasswordError)
 		}
+
 		we.Bind(we.Openid, member.MemberId)
 	}
 	this.login(*member)
