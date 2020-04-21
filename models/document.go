@@ -692,43 +692,21 @@ func (m *Document) AutoTitle(identify interface{}, defaultTitle ...string) (titl
 
 // markdown 文档拆分
 func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int) (err error) {
-	var mapReplace = map[string]string{
-		"${7}$": "#######",
-		"${6}$": "######",
-		"${5}$": "#####",
-		"${4}$": "####",
-		"${3}$": "###",
-		"${2}$": "##",
-		"${1}$": "#",
-	}
-
 	m, err = m.Find(docId)
 	if err != nil {
 		return
 	}
+	identifyFmt := "spilt.%v." + m.Identify
 
-	newIdentifyFmt := "spilt.%v." + m.Identify
-
-	seg = fmt.Sprintf("${%v}$", strings.Count(seg, "#"))
-	for i := 7; i > 0; i-- {
-		slice := make([]string, i+1)
-		k := "\n" + strings.Join(slice, "#")
-		markdown = strings.Replace(markdown, k, fmt.Sprintf("\n${%v}$", i), -1)
-	}
-	contSlice := strings.Split(markdown, seg)
-
-	for idx, val := range contSlice {
-		var doc = NewDocument()
-
-		if idx != 0 {
-			val = seg + val
-		}
-		for k, v := range mapReplace {
-			val = strings.Replace(val, k, v, -1)
+	markdowns := utils.SplitMarkdown(seg, markdown)
+	for idx, md := range markdowns {
+		if !strings.Contains(md, "[TOC]") {
+			md = "[TOC]\n\n" + md
 		}
 
-		doc.Identify = fmt.Sprintf(newIdentifyFmt, idx)
-		if idx == 0 { //不需要使用newIdentify
+		doc := NewDocument()
+		doc.Identify = fmt.Sprintf(identifyFmt, idx)
+		if idx == 0 { //不需要使用新标识
 			doc = m
 		} else {
 			doc.OrderSort = idx
@@ -736,8 +714,8 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 		}
 		doc.Release = ""
 		doc.BookId = m.BookId
-		doc.Markdown = val
-		doc.DocumentName = utils.ParseTitleFromMdHtml(mdtil.Md2html(val))
+		doc.Markdown = md
+		doc.DocumentName = utils.ParseTitleFromMdHtml(mdtil.Md2html(md))
 		doc.Version = time.Now().Unix()
 		doc.MemberId = m.MemberId
 

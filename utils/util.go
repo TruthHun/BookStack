@@ -763,11 +763,6 @@ func GitClone(url, folder string) error {
 	return exec.Command("git", args...).Run()
 }
 
-type SplitMD struct {
-	Identify string
-	Cont     string
-}
-
 // 处理http响应成败
 func HandleResponse(resp *http.Response, err error) error {
 	if err == nil {
@@ -992,4 +987,66 @@ func FormatReadingTime(seconds int, withoutTag ...bool) string {
 		secondStr = "0" + secondStr
 	}
 	return fmt.Sprintf(strFmt, hour, secondStr)
+}
+
+// 拆分markdown
+func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
+	var (
+		segIdx       []int
+		sharp        = "#"
+		sharpReplace = []string{
+			"#######",
+			"######",
+			"#####",
+			"####",
+			"###",
+			"##",
+			"#",
+		}
+	)
+
+	replaceFmt := "\n${%v}$"
+	for _, item := range sharpReplace {
+		k := "\n" + item
+		markdown = strings.Replace(markdown, k, fmt.Sprintf(replaceFmt, strings.Count(item, sharp)), -1)
+	}
+
+	seg := fmt.Sprintf("${%v}$", strings.Count(segSharp, sharp))
+	slice := strings.Split(markdown, "\n")
+	stop := 0
+
+	for idx, item := range slice {
+		item = strings.TrimSpace(item)
+		if strings.Contains(item, "```") || strings.Contains(item, "<pre") || strings.Contains(item, "/pre>") {
+			if stop > 0 {
+				stop -= 1
+			} else {
+				stop += 1
+			}
+		}
+
+		if stop == 0 && strings.HasPrefix(item, seg) {
+			item = strings.Replace(item, seg, segSharp, -1)
+			slice[idx] = item
+			segIdx = append(segIdx, idx)
+		}
+	}
+
+	recoverSharp := func(md string) string {
+		for _, item := range sharpReplace {
+			md = strings.Replace(md, fmt.Sprintf("${%v}$", strings.Count(item, sharp)), item, -1)
+		}
+		return md
+	}
+
+	start := 0
+	for idx, line := range segIdx {
+		md := recoverSharp(strings.Join(slice[start:line], "\n"))
+		start = line
+		markdowns = append(markdowns, md)
+		if idx == len(segIdx) {
+			markdowns = append(markdowns, recoverSharp(strings.Join(slice[start:], "\n")))
+		}
+	}
+	return
 }
