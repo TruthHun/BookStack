@@ -1199,6 +1199,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .bookstack-bars li:hover a{color: #10af88}
 .editormd-preview-container code, .editormd-html-preview code{
     border:0px;display: inline-block;padding-bottom: 0px;
+    line-height: 1.7;
 }
 .editormd-preview-container blockquote, .editormd-html-preview blockquote{font-style: normal;color: #777;}
 
