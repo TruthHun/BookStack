@@ -1003,6 +1003,8 @@ func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
 			"##",
 			"#",
 		}
+		indexCodeBlockStart = -1
+		indexCodeBlockEnd   = -1
 	)
 
 	replaceFmt := "\n${%v}$"
@@ -1013,19 +1015,26 @@ func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
 
 	seg := fmt.Sprintf("${%v}$", strings.Count(segSharp, sharp))
 	slice := strings.Split(markdown, "\n")
-	stop := 0
 
 	for idx, item := range slice {
 		item = strings.TrimSpace(item)
-		if strings.Contains(item, "```") || strings.Contains(item, "<pre") || strings.Contains(item, "/pre>") {
-			if stop > 0 {
-				stop -= 1
+		if strings.Contains(item, "<pre") {
+			indexCodeBlockStart = idx
+		}
+
+		if strings.Contains(item, "/pre>") {
+			indexCodeBlockEnd = idx
+		}
+
+		if strings.Contains(item, "```") {
+			if indexCodeBlockEnd >= indexCodeBlockStart {
+				indexCodeBlockStart = idx
 			} else {
-				stop += 1
+				indexCodeBlockEnd = idx
 			}
 		}
 
-		if stop == 0 && strings.HasPrefix(item, seg) {
+		if idx > indexCodeBlockEnd && indexCodeBlockEnd >= indexCodeBlockStart && strings.HasPrefix(item, seg) {
 			item = strings.Replace(item, seg, segSharp, -1)
 			slice[idx] = item
 			segIdx = append(segIdx, idx)
@@ -1044,9 +1053,14 @@ func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
 		md := recoverSharp(strings.Join(slice[start:line], "\n"))
 		start = line
 		markdowns = append(markdowns, md)
-		if idx == len(segIdx) {
-			markdowns = append(markdowns, recoverSharp(strings.Join(slice[start:], "\n")))
+		if idx+1 == len(segIdx) {
+			markdowns = append(markdowns, recoverSharp(strings.Join(slice[line:], "\n")))
 		}
+	}
+
+	// 如果没有拆分到文档，则直接返回传过来的文档
+	if len(markdowns) == 0 {
+		markdowns = []string{markdown}
 	}
 	return
 }
