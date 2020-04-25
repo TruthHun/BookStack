@@ -13,7 +13,7 @@ type DocumentStore struct {
 	DocumentId int       `orm:"pk;auto;column(document_id)"` //文档id，对应Document中的document_id
 	Markdown   string    `orm:"type(text);"`                 //markdown内容
 	Content    string    `orm:"type(text);"`                 //文本内容
-	UpdatedAt  time.Time `orm:"default(null)"`
+	UpdatedAt  time.Time `orm:"null"`
 }
 
 func NewDocumentStore() *DocumentStore {

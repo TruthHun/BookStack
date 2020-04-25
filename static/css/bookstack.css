@@ -1311,10 +1311,8 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
         transition: width 0.5s;
         width: 245px;overflow-y: auto;
         border-left:1px solid #EFEFEF;
-        /*border-radius: 3px;*/
-        /*border-top-left-radius: 0px;*/
-        /*bottom: 0;*/
         right: 15px;
+        max-height: calc(100vh - 85px);
     }
     .article-menu-hide .markdown-toc{
         width: 0px;overflow: hidden;border: 0px;
