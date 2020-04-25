@@ -86,7 +86,7 @@ func depress(md string, maps map[string]string) string {
 // trip attr
 func trimAttr(doc *goquery.Document) *goquery.Document {
 	attrs := []string{
-		"border", "colspan", "rowspan", "style", "cellspacing",
+		"border", "style", "cellspacing",
 		"cellpadding", "bgcolor", "width", "align", "frame", "id", "class",
 	}
 	elements := []string{
