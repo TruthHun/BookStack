@@ -151,23 +151,28 @@ func compress(doc *goquery.Document, backslash ...bool) (*goquery.Document, map[
 		})
 	}
 
+	htmlStr, _ := doc.Html()
+
 	replaces := map[string]string{"\n": " ", "\r": " ", "\t": " ", "<dl": "<ul",
 		"</dl": "</ul", "<dt": "<li", "</dt": "</li", "<dd": "<li", "</dd": "</li",
 	}
-	htmlStr, _ := doc.Html()
 
 	for old, new := range replaces {
 		htmlStr = strings.Replace(htmlStr, old, new, -1)
 	}
 
+	// 移除<!-- xxx -->
+	re, _ := regexp.Compile("\\<\\!\\-\\-(.|(\\n))*?\\-\\-\\>")
+	htmlStr = re.ReplaceAllString(htmlStr, "")
+
 	//正则匹配，把“>”和“<”直接的空格全部去掉
 	//去除标签之间的空格，如果是存在代码预览的页面，不要替换空格，否则预览的代码会错乱
-	r, _ := regexp.Compile(">\\s+<")
-	htmlStr = r.ReplaceAllString(htmlStr, "> <")
+	re, _ = regexp.Compile(">\\s+<")
+	htmlStr = re.ReplaceAllString(htmlStr, "> <")
 
 	//多个空格替换成一个空格
-	r2, _ := regexp.Compile("\\s+")
-	htmlStr = r2.ReplaceAllString(htmlStr, " ")
+	re, _ = regexp.Compile("\\s+")
+	htmlStr = re.ReplaceAllString(htmlStr, " ")
 
 	if len(backslash) > 0 && backslash[0] {
 		symbols := []string{"*", "+", "-", "_", "`", "~"}
