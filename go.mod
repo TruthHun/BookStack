@@ -12,7 +12,7 @@ require (
 	github.com/TruthHun/html2json v0.0.0-20191003085735-6ba0884c8c03
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
 	github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17
-	github.com/aliyun/aliyun-oss-go-sdk v2.0.4+incompatible
+	github.com/aliyun/aliyun-oss-go-sdk v2.1.0+incompatible
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/astaxie/beego v1.12.0
@@ -32,7 +32,7 @@ require (
 	github.com/unknwon/com v1.0.1
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
 	golang.org/x/sys v0.0.0-20191002091554-b397fe3ad8ed // indirect
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/ldap.v2 v2.5.1
