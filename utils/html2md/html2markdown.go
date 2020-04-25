@@ -15,13 +15,11 @@ import (
 )
 
 var tag2tag = map[string]string{
-	"b":      "*",
-	"strong": "*",
-	"i":      "_",
-	"em":     "_",
-	"dfn":    "_",
-	"var":    "_",
-	"cite":   "_",
+	"b":    "strong",
+	"i":    "em",
+	"dfn":  "em",
+	"var":  "em",
+	"cite": "em",
 }
 
 var blockTag = []string{
@@ -40,7 +38,7 @@ func Convert(htmlstr string) (md string) {
 	var maps map[string]string
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(htmlstr))
 	doc = trimAttr(doc)
-	doc, maps = compress(doc, true)
+	doc, maps = compress(doc)
 	doc = handleNextLine(doc) //<div>...
 	doc = handleBlockTag(doc) //<div>...
 	doc = handleA(doc)        //<a>
@@ -48,6 +46,7 @@ func Convert(htmlstr string) (md string) {
 	doc = handleHead(doc)     //h1~h6
 	doc = handleTag2Tag(doc)  //<strong>、<i>、eg..
 	doc = handleHr(doc)       //<hr>
+	doc = handleLi(doc)       //<li>
 	md, _ = doc.Find("body").Html()
 	md = depress(md, maps)
 	return
@@ -76,6 +75,16 @@ func depress(md string, maps map[string]string) string {
 
 	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(md)); err == nil {
 		doc = trimAttr(doc)
+		backslashes := []string{"+", "-", "_", "*"}
+		doc.Find("code").Each(func(i int, selection *goquery.Selection) {
+			if !selection.Parent().Is("pre") {
+				text := selection.Text()
+				for _, item := range backslashes {
+					text = strings.Replace(text, item, "\\"+item, -1)
+				}
+				selection.SetHtml(text)
+			}
+		})
 		md, _ = doc.Find("body").Html()
 		md = strings.Replace(md, "<span>", "", -1)
 		md = strings.Replace(md, "</span>", "", -1)
@@ -86,7 +95,7 @@ func depress(md string, maps map[string]string) string {
 // trip attr
 func trimAttr(doc *goquery.Document) *goquery.Document {
 	attrs := []string{
-		"border", "style", "cellspacing",
+		"border", "colspan", "rowspan", "style", "cellspacing",
 		"cellpadding", "bgcolor", "width", "align", "frame", "id", "class",
 	}
 	elements := []string{
@@ -105,10 +114,10 @@ func trimAttr(doc *goquery.Document) *goquery.Document {
 	return doc
 }
 
-// 压缩html
-// withBackslash 表示是否对"*"和"_"做转义处理
-func compress(doc *goquery.Document, backslash ...bool) (*goquery.Document, map[string]string) {
+//压缩html
+func compress(doc *goquery.Document) (*goquery.Document, map[string]string) {
 	//blockquote、pre、code，并替换 span 为空
+
 	var maps = make(map[string]string)
 
 	if ele := doc.Find("textarea"); len(ele.Nodes) > 0 {
@@ -151,37 +160,25 @@ func compress(doc *goquery.Document, backslash ...bool) (*goquery.Document, map[
 		})
 	}
 
-	htmlStr, _ := doc.Html()
-
-	replaces := map[string]string{"\n": " ", "\r": " ", "\t": " ", "<dl": "<ul",
-		"</dl": "</ul", "<dt": "<li", "</dt": "</li", "<dd": "<li", "</dd": "</li",
+	replaces := map[string]string{
+		"\n": " ", "\r": " ", "\t": " ", "<dl": "<ul",
+		"</dl": "</ul", "<dt": "<li", "</dt": "</li",
+		"<dd": "<li", "</dd": "</li",
 	}
 
+	htmlstr, _ := doc.Html()
 	for old, new := range replaces {
-		htmlStr = strings.Replace(htmlStr, old, new, -1)
+		htmlstr = strings.Replace(htmlstr, old, new, -1)
 	}
-
-	// 移除<!-- xxx -->
-	re, _ := regexp.Compile("\\<\\!\\-\\-(.|(\\n))*?\\-\\-\\>")
-	htmlStr = re.ReplaceAllString(htmlStr, "")
 
 	//正则匹配，把“>”和“<”直接的空格全部去掉
 	//去除标签之间的空格，如果是存在代码预览的页面，不要替换空格，否则预览的代码会错乱
-	re, _ = regexp.Compile(">\\s+<")
-	htmlStr = re.ReplaceAllString(htmlStr, "> <")
-
+	r, _ := regexp.Compile(">\\s+<")
+	htmlstr = r.ReplaceAllString(htmlstr, "> <")
 	//多个空格替换成一个空格
-	re, _ = regexp.Compile("\\s+")
-	htmlStr = re.ReplaceAllString(htmlStr, " ")
-
-	if len(backslash) > 0 && backslash[0] {
-		symbols := []string{"*", "+", "-", "_", "`", "~"}
-		for _, symbol := range symbols {
-			htmlStr = strings.Replace(htmlStr, symbol, "\\"+symbol, -1)
-		}
-	}
-
-	doc, _ = goquery.NewDocumentFromReader(strings.NewReader(htmlStr))
+	r2, _ := regexp.Compile("\\s+")
+	htmlstr = r2.ReplaceAllString(htmlstr, " ")
+	doc, _ = goquery.NewDocumentFromReader(strings.NewReader(htmlstr))
 	return doc, maps
 }
 
@@ -304,7 +301,7 @@ func handleHead(doc *goquery.Document) *goquery.Document {
 	for tag, replace := range heads {
 		doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
 			text, _ := selection.Html()
-			selection.BeforeHtml("\n\r" + replace + strings.TrimSpace(text) + "\n\r")
+			selection.BeforeHtml("\n\r" + replace + text + "\n\r")
 			selection.Remove()
 		})
 	}
