@@ -244,8 +244,12 @@ func handleLi(doc *goquery.Document) *goquery.Document {
 	})
 	for _, tag := range tags {
 		doc.Find(tag).Each(func(i int, selection *goquery.Selection) {
-			if tag == "ul" {
-				selection.BeforeHtml("\n" + selection.Text() + "\n")
+			if tag == "ul" || tag == "ol" {
+				text := "\n" + selection.Text() + "\n"
+				if !(selection.Parent().Is("ul") || selection.Parent().Is("ol")) {
+					text = "\n" + text + "\n"
+				}
+				selection.BeforeHtml(text)
 			} else {
 				selection.BeforeHtml(selection.Text())
 			}
