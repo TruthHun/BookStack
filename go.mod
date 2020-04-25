@@ -10,7 +10,6 @@ require (
 	github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45
 	github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b
 	github.com/TruthHun/html2json v0.0.0-20191003085735-6ba0884c8c03
-	github.com/TruthHun/html2md v0.0.0-20200329134907-a2247d003367
 	github.com/adamzy/cedar-go v0.0.0-20170805034717-80a9c64b256d // indirect
 	github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.4+incompatible
@@ -29,6 +28,7 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/russross/blackfriday v2.0.0+incompatible
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/unknwon/com v1.0.1
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5 // indirect
 	golang.org/x/sys v0.0.0-20191002091554-b397fe3ad8ed // indirect

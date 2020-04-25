@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/TruthHun/BookStack/utils/html2md"
 	"image"
 	"io/ioutil"
 	"os"
@@ -44,7 +45,6 @@ import (
 	"github.com/huichen/sego"
 
 	"github.com/TruthHun/gotil/cryptil"
-	"github.com/TruthHun/html2md"
 )
 
 //存储类型

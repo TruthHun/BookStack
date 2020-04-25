@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TruthHun/html2md"
+	"github.com/TruthHun/BookStack/utils/html2md"
 
 	"image/png"
 
