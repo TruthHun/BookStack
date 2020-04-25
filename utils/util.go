@@ -384,6 +384,12 @@ func CropImage(file string, width, height int) (err error) {
 //diySelecter:自定义选择器
 //注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
 func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, links map[string]string, headers ...map[string]string) (cont string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprint(r))
+			return
+		}
+	}()
 
 	//记录已经存在了的图片，避免重复图片出现重复采集的情况
 	var existImage bool
