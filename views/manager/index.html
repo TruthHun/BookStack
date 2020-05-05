@@ -22,21 +22,57 @@
                         <span class="fa fa-book" aria-hidden="true"></span>
                         <span class="fa-class">项目数量</span>
                         <span class="fa-class">{{.Model.BookNumber}}</span>
+                        <div>( <span class="text-danger">
+                                {{if gt .Model.BookNumberToday 1000}}
+                                    1000+
+                                {{else if gt .Model.BookNumberToday 0}}
+                                    +{{.Model.BookNumberToday}}
+                                {{else}}
+                                    0
+                                {{end}}
+                            </span> )</div>
                     </a>
                     <div class="dashboard-item">
                         <span class="fa fa-file-text-o" aria-hidden="true"></span>
                         <span class="fa-class">文章数量</span>
                         <span class="fa-class">{{.Model.DocumentNumber}}</span>
+                        <div>( <span class="text-danger">
+                                {{if gt .Model.DocumentNumberToday 1000}}
+                                    1000+
+                                {{else if gt .Model.DocumentNumberToday 0}}
+                                    +{{.Model.DocumentNumberToday}}
+                                {{else}}
+                                    0
+                                {{end}}
+                            </span> )</div>
                     </div>
                     <a href="{{urlfor "ManagerController.Users"}}" class="dashboard-item">
                             <span class="fa fa-users" aria-hidden="true"></span>
                             <span class="fa-class">会员数量</span>
                             <span class="fa-class">{{.Model.MemberNumber}}</span>
+                        <div>( <span class="text-danger">
+                                {{if gt .Model.MemberNumberToday 1000}}
+                                    1000+
+                                {{else if gt .Model.MemberNumberToday 0}}
+                                   +{{.Model.MemberNumberToday}}
+                                {{else}}
+                                    0
+                                {{end}}
+                            </span> )</div>
                     </a>
                     <a href="{{urlfor "ManagerController.Comments"}}" class="dashboard-item">
                         <span class="fa fa-comments-o" aria-hidden="true"></span>
                         <span class="fa-class">评论数量</span>
                         <span class="fa-class">{{.Model.CommentNumber}}</span>
+                        <div>( <span class="text-danger">
+                                {{if gt .Model.CommentNumberToday 1000}}
+                                    1000+
+                                {{else if gt .Model.CommentNumberToday 0}}
+                                    +{{.Model.CommentNumberToday}}
+                                {{else}}
+                                    0
+                                {{end}}
+                            </span> )</div>
                     </a>
 {{/*                    <a href="{{urlfor "ManagerController.AttachList" }}" class="dashboard-item">*/}}
 {{/*                        <span class="fa fa-cloud-download" aria-hidden="true"></span>*/}}
