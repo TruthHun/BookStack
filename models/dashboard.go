@@ -23,16 +23,16 @@ func NewDashboard() *Dashboard {
 
 func (m *Dashboard) Query() *Dashboard {
 	var (
-		o        = orm.NewOrm()
-		doc      = NewDocument()
-		member   = NewMember()
-		comment  = NewComments()
-		book     = NewBook()
-		now      = time.Now().Local()
-		max      = 1000
-		layout   = "2006-01-02"
-		today, _ = time.Parse(layout, now.Format(layout))
+		o       = orm.NewOrm()
+		doc     = NewDocument()
+		member  = NewMember()
+		comment = NewComments()
+		book    = NewBook()
+		max     = 1000
+		layout  = "2006-01-02 00:00:00"
+		today   = time.Now().Format(layout)
 	)
+
 	bookNumber, _ := o.QueryTable(NewBook().TableNameWithPrefix()).Count()
 
 	m.BookNumber = bookNumber
