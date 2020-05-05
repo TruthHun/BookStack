@@ -146,18 +146,23 @@ $(function () {
     });
 
     $(".markdown-body").on("click", "img",function () {
+        var src = $(this).attr("src")
         var nHeight = $(this)[0].naturalHeight
         var nWidth = $(this)[0].naturalWidth
         var winHeight = $(window).height()
         var winWidth = $(window).width()
         var displayWidth = nWidth
         var displayHeight = nHeight
+        if(src.toLowerCase().endsWith(".svg")){
+            displayWidth = $(this)[0].clientWidth
+            displayHeight = $(this)[0].clientHeight
+        }
         if (displayWidth>=winWidth*0.95){
             displayWidth = winWidth*0.95
             displayHeight=nHeight*(displayWidth/nWidth)
         }
+        console.log(nWidth, nHeight, displayWidth,displayHeight,winWidth,winHeight)
         var style="margin-top: 30px;"
-        var src = $(this).attr("src")
         var bv = $(".bookstack-viewer")
         var img = bv.find("img")
         if(winHeight>displayHeight){
@@ -165,6 +170,7 @@ $(function () {
             if (mt<=30) mt=30
             style="margin-top: " + mt +"px"
         }
+        console.log('winheight',winWidth,'displayHeight',displayHeight)
         if(img.length>0){
             img.attr("src", src)
             img.attr("style", style)
