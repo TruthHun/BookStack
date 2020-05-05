@@ -1397,6 +1397,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     display: none;
     overflow: auto;
     padding-bottom: 30px;
+    cursor: zoom-out;
 }
 
 .bookstack-viewer img{

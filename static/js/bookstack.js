@@ -146,16 +146,25 @@ $(function () {
     });
 
     $(".markdown-body").on("click", "img",function () {
-        var imgHeight = $(this).height()
+        var nHeight = $(this)[0].naturalHeight
+        var nWidth = $(this)[0].naturalWidth
         var winHeight = $(window).height()
+        var winWidth = $(window).width()
+        var displayWidth = nWidth
+        var displayHeight = nHeight
+        if (displayWidth>=winWidth*0.95){
+            displayWidth = winWidth*0.95
+            displayHeight=nHeight*(displayWidth/nWidth)
+        }
         var style="margin-top: 30px;"
         var src = $(this).attr("src")
         var bv = $(".bookstack-viewer")
         var img = bv.find("img")
-        if(winHeight>imgHeight + 60){
-            style="margin-top: " + (winHeight - imgHeight - 60)/2 +"px"
+        if(winHeight>displayHeight){
+            var mt = (winHeight - displayHeight - 30 )/2
+            if (mt<=30) mt=30
+            style="margin-top: " + mt +"px"
         }
-
         if(img.length>0){
             img.attr("src", src)
             img.attr("style", style)
@@ -163,6 +172,7 @@ $(function () {
             bv.append('<img style="'+style+'" src="'+src+'"/>')
         }
         bv.fadeIn();
+        $(".bookstack-viewer").scrollTop(0)
     });
 
     $(".bookstack-viewer").click(function () {
