@@ -120,7 +120,11 @@ func (this *ReadRecord) Add(docId, uid int) (err error) {
 	go new(Star).SetLastReadTime(uid, doc.BookId)
 
 	// 计算奖励的阅读时长
-	readingTime := this.calcReadingTime(uid, docId, now)
+	readingTime, lastReadDocId := this.calcReadingTime(uid, docId, now)
+	// 如果现在阅读的文档id与上次阅读的文档id相同，则不更新阅读时长
+	if lastReadDocId == docId {
+		return
+	}
 
 	o.Begin()
 	defer func() {
@@ -341,21 +345,21 @@ func (*ReadRecord) GetReadingRule() (r *ReadingRule) {
 // 在 5 - 600 秒之间的阅读计时，正常计时
 // 在 600 - 1800 秒(半个小时)之间的计时，按最大计时来计算时长
 // 超过半个小时之后才有阅读记录，则在此期间的阅读时长为0
-func (*ReadRecord) calcReadingTime(uid, docId int, t time.Time) int {
+func (*ReadRecord) calcReadingTime(uid, docId int, t time.Time) (duration int, lastReadDocId int) {
 	r := NewReadRecord()
 	rr := r.LastReading(uid, "uid", "doc_id", "created_at")
 	if rr.DocId == docId {
-		return 0
+		return 0, docId
 	}
 
 	rule := r.GetReadingRule()
 	diff := int(t.Unix()) - rr.CreateAt
 	if diff <= 0 || diff < rule.Min || diff >= rule.Invalid {
-		return 0
+		return 0, rr.DocId
 	}
 
 	if diff > rule.MaxReward {
-		return rule.Max
+		return rule.Max, rr.DocId
 	}
-	return diff
+	return diff, rr.DocId
 }
