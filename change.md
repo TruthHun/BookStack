@@ -32,10 +32,14 @@
 - [ ] 程序员网址导航
 
 ## v2.8 升级日志
-- [x] 优化内容阅读体验：调整文字行高、章内目录和优化图片预览
+- [x] 优化内容阅读体验：调整文字行高、章内目录以及优化内容图片预览
 - [x] 优化`html2md`模块
 - [x] 修复上一版本数据库时间字段没有默认值导致的错误[#103](https://github.com/TruthHun/BookStack/issues/103)
-
+- [x] 优化阅读时长统计，减少统计误差
+- [x] 升级MySQL、阿里云OSS等相关依赖库
+- [x] 修正工信部备案链接地址（工信部更换域名了）
+- [x] 修复`runtime: goroutine stack exceeds 1000000000-byte limit`问题，提升程序稳定性。（由 [getSelectedNode](https://gitee.com/truthhun/BookStack/commit/cae29e5db6d69c6aae16be44c6133dcf41260e81)造成）
+- [x] 优化大markdown文件拆分
 
 ## v2.7 升级日志
 
