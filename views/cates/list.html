@@ -100,7 +100,19 @@
 </div>
 {{template "widgets/footer.html" .}}
 <script>
+    'use strict';
     $(function () {
+        function setFixedWith(){
+            $(".category-index .panel-default").attr("style","width:"+$(".category-index").width()+"px")
+        }
+        function fixed(){
+            var top = $(".category-index").offset().top
+            if($(window).scrollTop() -15>=top){
+                $(".category-index .panel-default").addClass("fixed")
+            }else{
+                $(".category-index .panel-default").removeClass("fixed")
+            }
+        }
         $(".cate-item").tooltip();
         $(".category-index a").tooltip();
         $(".panel-recommend .panel-body a").tooltip();
@@ -108,22 +120,26 @@
             e.preventDefault()
             location.href=$(this).find("a").attr("href")
         });
-
         $(".category-index a").click(function () {
             var show=$(this).attr("data-show"),panels = $('.category-detail .panel');
             $(".category-index a").removeClass("active");
             $(this).addClass("active");
-
-            if(show == 'all'){
-                panels.show()
+            var panel=$(".category-detail #"+show);
+            if(panel.length == 0){
+                $(window).scrollTop(0)
             }else{
-                $.each(panels,function () {
-                    console.log($(this).attr("id"),show)
-                    $(this).attr("id") == show ? $(this).show() : $(this).hide();
-                })
+                var scrollTo = panel.offset().top - 70;
+                $(window).scrollTop(scrollTo)
             }
         });
-
+        setFixedWith()
+        fixed()
+        $(window).resize(function () {
+            setFixedWith()
+        })
+        $(window).scroll(function () {
+            fixed()
+        })
     })
 </script>
 </body>

@@ -40,6 +40,7 @@
 - [x] 修正工信部备案链接地址（工信部更换域名了）
 - [x] 修复`runtime: goroutine stack exceeds 1000000000-byte limit`问题，提升程序稳定性。（由 [getSelectedNode](https://gitee.com/truthhun/BookStack/commit/cae29e5db6d69c6aae16be44c6133dcf41260e81)造成）
 - [x] 优化大markdown文件拆分
+- [x] 固定首页`分类索引`
 
 ## v2.7 升级日志
 

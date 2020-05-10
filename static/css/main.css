@@ -961,6 +961,11 @@ a{color: #333}
     bottom: 0;
 }
 
+.category-index .panel-default.fixed{
+    position: fixed;
+    top: 70px;
+}
+
 @media (max-width: 768px) {
     .ucenter-content li .col-xs-3{padding-right: 0}
 }
