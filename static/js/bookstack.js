@@ -141,6 +141,7 @@ function pre_and_next_link(){
 }
 
 $(function () {
+    $(".article-menu-detail>ul>li a").tooltip({placement: 'bottom'})
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);
     });
@@ -201,9 +202,6 @@ $(function () {
                 find=true;
             }
         }
-
-
-
     });
 
     $(".manual-left").on("click","a",function () {
