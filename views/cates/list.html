@@ -56,7 +56,7 @@
                             <li><a href="javascript:void(0)" data-show="all" class="active" title="全部分类">全部分类</a></li>
                             {{range $idx,$cate:=.Cates}}
                                 {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
-                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="{{$cate.Title}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
                                 {{end}}
                             {{end}}
                         </ul>
@@ -67,7 +67,7 @@
             {{else}}<div class="col-xs-12">{{end}}
                 {{range $idx,$cate:=.Cates}}
                     {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
-                        <div class="panel panel-default" id="{{$cate.Title}}">
+                        <div class="panel panel-default" id="cate-{{$cate.Id}}">
                             <div class="panel-heading">
                                 <h3 class="panel-title">
                                     <!--这里不显示一级分类的计数，主要是为了避免误导用户，因为一本书籍，可能属于多个子分类，但是一级分类下的计数并不是所有子分类计数的和-->
