@@ -471,6 +471,10 @@ func (this *CommonController) SearchDoc() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
+	if models.NewOption().IsResponseEmptyForAPP(this.Version, wd) {
+		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"total": 0})
+	}
+
 	var (
 		page, _ = this.GetInt("page", 1)
 		size, _ = this.GetInt("size", 10)
