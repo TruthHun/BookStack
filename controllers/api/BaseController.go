@@ -22,7 +22,8 @@ import (
 
 type BaseController struct {
 	beego.Controller
-	Token string
+	Token   string
+	Version string
 }
 
 type APIResponse struct {
@@ -207,6 +208,7 @@ func (this *BaseController) Prepare() {
 		}
 	}
 	this.Token = this.Ctx.Request.Header.Get("Authorization")
+	this.Version = this.Ctx.Request.Header.Get("x-version")
 
 	if !models.AllowVisitor && this.isLogin() == 0 { // 不允许游客访问，则除了部分涉及登录的API外，一律提示先登录
 		allowAPIs := map[string]bool{

@@ -291,6 +291,16 @@ func (m *Option) Init() error {
 			OptionTitle: "禁止的Referer",
 		},
 		{
+			OptionValue: "",
+			OptionName:  "CheckingAppVersion",
+			OptionTitle: "审核中的APP版本",
+		},
+		{
+			OptionValue: "Android, 安卓",
+			OptionName:  "CheckingForbidWords",
+			OptionTitle: "iOS APP提交审核时屏蔽的关键字",
+		},
+		{
 			OptionValue: "1",
 			OptionName:  "DOWNLOAD_INTERVAL",
 			OptionTitle: "每阅读多少秒可以下载一个电子书",
@@ -310,4 +320,22 @@ func (m *Option) Init() error {
 
 func (m *Option) ForbiddenReferer() []string {
 	return strings.Split(GetOptionValue("FORBIDDEN_REFERER", ""), "\n")
+}
+
+func (m *Option) IsResponseEmptyForAPP(requestVersion, word string) (yes bool) {
+	version := GetOptionValue("CheckingAppVersion", "")
+	if version == "" {
+		return
+	}
+	if strings.ToLower(strings.TrimSpace(requestVersion)) == version {
+		words := strings.Split(GetOptionValue("CheckingForbidWords", ""), ",")
+		word = strings.ToLower(strings.TrimSpace(word))
+		for _, item := range words {
+			item = strings.ToLower(strings.TrimSpace(item))
+			if strings.Contains(word, item) {
+				return true
+			}
+		}
+	}
+	return
 }

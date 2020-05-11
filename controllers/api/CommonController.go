@@ -408,6 +408,10 @@ func (this *CommonController) SearchBook() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
+	if models.NewOption().IsResponseEmptyForAPP(this.Version, wd) {
+		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"total": 0})
+	}
+
 	var (
 		page, _  = this.GetInt("page", 1)
 		size, _  = this.GetInt("size", 10)
@@ -562,9 +566,13 @@ func (this *CommonController) Categories() {
 	if err != nil {
 		pid = -1
 	}
-
+	m := models.NewOption()
 	categories, _ := model.GetCates(pid, 1)
 	for idx, category := range categories {
+		if m.IsResponseEmptyForAPP(this.Version, category.Title) {
+			// 为0，APP端就不会显示该分类
+			category.Cnt = 0
+		}
 		if category.Icon != "" {
 			if category.Icon == "" {
 				category.Icon = "/static/images/cate.png"

@@ -234,6 +234,14 @@
                             <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
                         </div>
                         <div class="form-group">
+                            <label>App Store审核中的版本( <span class="text-muted">如v1.5.0。iOS APP审核通过后，请务必置空，避免屏蔽的内容无法在APP端显示</span> )</label>
+                            <input type="text" name="CheckingAppVersion" class="form-control" value="{{.CheckingAppVersion.OptionValue}}">
+                        </div>
+                        <div class="form-group">
+                            <label>App Store审核时屏蔽的关键字( <span class="text-muted">多个关键字用英文逗号分隔</span> )</label>
+                            <input type="text" name="CheckingForbidWords" class="form-control" value="{{.CheckingForbidWords.OptionValue}}">
+                        </div>
+                        <div class="form-group">
                             <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
                             <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
                         </div>
