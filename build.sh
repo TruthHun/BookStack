@@ -9,7 +9,7 @@ GITHASH=`git rev-parse HEAD 2>/dev/null`
 BUILDAT=`date +%FT%T%z`
 
 # Setup the -ldflags option for go build here, interpolate the variable values
-LDFLAGS="-X github.com/TruthHun/BookStack/utils.GitHash=${GITHASH} -X github.com/TruthHun/BookStack/utils.BuildAt=${BUILDAT} -X github.com/TruthHun/BookStack/utils.Version=${VERSION} -X myquant.cn/algoserv/algoserv/admin.Binary=true"
+LDFLAGS="-s -w -X github.com/TruthHun/BookStack/utils.GitHash=${GITHASH} -X github.com/TruthHun/BookStack/utils.BuildAt=${BUILDAT} -X github.com/TruthHun/BookStack/utils.Version=${VERSION} -X myquant.cn/algoserv/algoserv/admin.Binary=true"
 
 ##########
 
