@@ -16,3 +16,6 @@ LDFLAGS="-s -w -X github.com/TruthHun/BookStack/utils.GitHash=${GITHASH} -X gith
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -v -o output/mac/BookStack -ldflags "${LDFLAGS}"
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o output/linux/BookStack -ldflags "${LDFLAGS}"
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -v -o output/windows/BookStack.exe -ldflags "${LDFLAGS}"
+upx -f -9 output/mac/BookStack
+upx -f -9 output/linux/BookStack
+upx -f -9 output/windows/BookStack.exe
