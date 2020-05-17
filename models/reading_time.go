@@ -87,7 +87,7 @@ func (r *ReadingTime) Sort(prd period, limit int, withCache ...bool) (users []Re
 		}
 	}
 
-	sqlSort := "SELECT t.uid,sum(t.duration) sum_time,m.account,m.avatar,m.nickname FROM `md_reading_time` t left JOIN md_members m on t.uid=m.member_id WHERE t.day>=? and t.day<=? GROUP BY t.uid ORDER BY sum_time desc limit ?"
+	sqlSort := "SELECT t.uid,sum(t.duration) sum_time,m.account,m.avatar,m.nickname FROM `md_reading_time` t left JOIN md_members m on t.uid=m.member_id WHERE m.no_rank=0 and t.day>=? and t.day<=? GROUP BY t.uid ORDER BY sum_time desc limit ?"
 	start, end := getTimeRange(time.Now(), prd)
 	orm.NewOrm().Raw(sqlSort, start, end, limit).QueryRows(&users)
 

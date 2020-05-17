@@ -30,6 +30,7 @@ func webRouter() {
 	beego.Router("/manager/member/create", &controllers.ManagerController{}, "post:CreateMember")
 	beego.Router("/manager/member/delete", &controllers.ManagerController{}, "post:DeleteMember")
 	beego.Router("/manager/member/update-member-status", &controllers.ManagerController{}, "post:UpdateMemberStatus")
+	beego.Router("/manager/member/update-member-no-rank", &controllers.ManagerController{}, "post:UpdateMemberNoRank")
 	beego.Router("/manager/member/change-member-role", &controllers.ManagerController{}, "post:ChangeMemberRole")
 	beego.Router("/manager/books", &controllers.ManagerController{}, "*:Books")
 	beego.Router("/manager/books/edit/:key", &controllers.ManagerController{}, "*:EditBook")

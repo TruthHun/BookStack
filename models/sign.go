@@ -223,7 +223,7 @@ func (m *Sign) Sorted(limit int, orderField string, withCache ...bool) (members 
 	member := NewMember()
 	o := orm.NewOrm()
 	fields := []string{"member_id", "account", "nickname", "total_continuous_sign", "total_sign", "total_reading_time", "history_total_continuous_sign"}
-	o.QueryTable(member).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
+	o.QueryTable(member).Filter("no_rank", 0).OrderBy("-"+orderField).Limit(limit).All(&members, fields...)
 
 	if cache && len(members) > 0 {
 		b, _ = json.Marshal(members)

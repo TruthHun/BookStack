@@ -50,6 +50,37 @@ func (this *ManagerController) Index() {
 	this.Data["IsDashboard"] = true
 }
 
+func (this *ManagerController) UpdateMemberNoRank() {
+	memberId, _ := this.GetInt("member_id", 0)
+	noRankInt, _ := this.GetInt("no_rank", 0)
+
+	if memberId <= 0 {
+		this.JsonResult(6001, "参数错误")
+	}
+	noRank := false
+	if noRankInt == 1 {
+		noRank = true
+	}
+	member := models.NewMember()
+
+	if _, err := member.Find(memberId); err != nil {
+		this.JsonResult(6002, "用户不存在")
+	}
+	if member.MemberId == this.Member.MemberId {
+		this.JsonResult(6004, "不能变更自己的状态")
+	}
+	if member.Role == conf.MemberSuperRole {
+		this.JsonResult(6005, "不能变更超级管理员的状态")
+	}
+	member.NoRank = noRank
+
+	if err := member.Update(); err != nil {
+		logs.Error("", err)
+		this.JsonResult(6003, "用户状态设置失败")
+	}
+	this.JsonResult(0, "ok", member)
+}
+
 // 用户列表.
 func (this *ManagerController) Users() {
 	this.TplName = "manager/users.html"
