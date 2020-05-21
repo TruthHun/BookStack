@@ -337,6 +337,7 @@ $(function () {
     pre_and_next_link();
     $(".article-menu-detail a").click(function (e) {
         e.preventDefault();
+        $(".tooltip").remove();
         load_doc($(this).attr("href"),"");
     });
     $(".hung-read-link").on("click","a",function (e) {
