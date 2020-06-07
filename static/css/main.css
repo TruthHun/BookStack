@@ -930,7 +930,7 @@ a{color: #333}
 
 .category-index .panel-body{
     border:1px solid #f1f2f3;
-    padding: 0;
+    padding: 0; background-color: #ffffff;
 }
 
 .category-index ul,.category-index li{padding: 0;list-style: none;margin: 0}

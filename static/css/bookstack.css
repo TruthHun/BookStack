@@ -1363,7 +1363,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 
 /*.article-menu a:hover{color: #008cff;}*/
 
-.collapse-menu{margin-left: 10px;}
+.collapse-menu{margin-left: 10px;padding-bottom: 50px;}
 .collapse-menu .collapse-node{position: relative;}
 .collapse-menu .collapse-node span {
     display: inline-block;
