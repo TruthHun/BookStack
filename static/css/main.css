@@ -894,6 +894,7 @@ a{color: #333}
 #page-rank .panel-default{border-color: #EEEEEE}
 #page-rank .panel-default>.panel-heading{background-color: #ffffff;}
 #page-rank .panel-body ul,#page-rank .panel-body li{padding: 0;margin: 0;list-style: none;}
+#page-rank .panel-body{padding-left: 0;padding-right: 0;}
 #page-rank .panel-body li span{
     display: inline-block;
     max-width: 180px;
@@ -916,7 +917,8 @@ a{color: #333}
     color: #fff;background-color: #e6bf25;
 }
 #page-rank .panel-body li a{
-    display: block;padding: 10px 0 0;border-bottom: 1px dashed #EFEFEF;
+    display: block;padding: 10px 15px 0;
+    border-bottom: 1px dashed #EFEFEF;
     line-height: 30px;
 }
 #page-rank .panel-body li small{float: right;color: #aaaaaa}
@@ -964,6 +966,7 @@ a{color: #333}
 .category-index .panel-default.fixed{
     position: fixed;
     top: 70px;
+    z-index: 999;
 }
 
 @media (max-width: 768px) {
