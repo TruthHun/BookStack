@@ -57,6 +57,13 @@
                             {{range $idx,$cate:=.Cates}}
                                 {{if and (eq $cate.Pid 0) (gt $cate.Cnt 0)}}
                                     <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
+                                    <li><a href="javascript:void(0);" title="{{$cate.Title}}" data-show="cate-{{$cate.Id}}">{{$cate.Title}}</a></li>
                                 {{end}}
                             {{end}}
                         </ul>
@@ -107,10 +114,14 @@
         }
         function fixed(){
             var top = $(".category-index").offset().top
+            var height = $(window).height() - 110 - 70
+            var style = 'max-height:'+height+'px';
             if($(window).scrollTop() -15>=top){
                 $(".category-index .panel-default").addClass("fixed")
+                $(".category-index .panel-body").attr("style",style)
             }else{
                 $(".category-index .panel-default").removeClass("fixed")
+                $(".category-index .panel-body").attr("style",'')
             }
         }
         $(".cate-item").tooltip();
