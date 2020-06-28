@@ -34,10 +34,11 @@
                     <li>
                         <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>
                     </li>
-
+                    {{if $.ShowCreateBookEntrance}}
                     <li>
                         <a href="{{urlfor "BookController.Index"}}" title="我的项目"><i class="fa fa-book" aria-hidden="true"></i> 我的项目</a>
                     </li>
+                    {{end}}
                 {{if eq .Member.Role 0 }}
                     <li>
                         <a href="{{urlfor "ManagerController.Index"}}" title="管理后台"><i class="fa fa-university" aria-hidden="true"></i> 管理后台</a>
@@ -128,9 +129,11 @@
                         <li>
                             <a href="{{urlfor "SettingController.Star"}}" title="我的收藏"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a>
                         </li>
+                        {{if $.ShowCreateBookEntrance}}
                         <li>
                             <a href="{{urlfor "BookController.Index"}}" title="我的项目"><i class="fa fa-book" aria-hidden="true"></i> 我的项目</a>
                         </li>
+                        {{end}}
                         {{if eq .Member.Role 0  1}}
                         <li>
                             <a href="{{urlfor "ManagerController.Index"}}" title="管理后台"><i class="fa fa-university" aria-hidden="true"></i> 管理后台</a>

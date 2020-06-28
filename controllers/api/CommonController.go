@@ -887,9 +887,7 @@ func (this *CommonController) handleReleaseV1(release string, bookIdentify strin
 			return true
 		})
 
-		hasImage := false
 		query.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
-			hasImage = true
 			if src, ok := contentSelection.Attr("src"); ok {
 				contentSelection.SetAttr("src", this.completeLink(src))
 			}

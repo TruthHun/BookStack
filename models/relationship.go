@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/TruthHun/BookStack/conf"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
@@ -179,4 +180,14 @@ func (m *Relationship) Transfer(bookId, founderId, receiveId int) error {
 	}
 
 	return o.Commit()
+}
+
+// HasRelatedBook 查询用户是否有相关联的书籍
+func (m *Relationship) HasRelatedBook(uid int) bool {
+	err := orm.NewOrm().QueryTable(m).Filter("member_id", uid).One(m, "relationship_id")
+	if err != nil {
+		beego.Error(err)
+		return false
+	}
+	return m.RelationshipId > 0
 }

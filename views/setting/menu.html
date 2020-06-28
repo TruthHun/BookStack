@@ -4,7 +4,11 @@
     {{if ne .Member.AuthMethod "ldap"}}
         <li {{if .SettingPwd}}class="active"{{end}}><a href="{{urlfor "SettingController.Password"}}" class="item"><i class="fa fa-user-o" aria-hidden="true"></i> 修改密码</a> </li>
     {{end}}
+
+        {{if $.ShowCreateBookEntrance}}
         <li {{if .SettingBook}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}" class="item"><i class="fa fa-sitemap" aria-hidden="true"></i> 我的项目</a> </li>
+        {{end}}
+
         <li {{if .SettingStar}}class="active"{{end}}><a href="{{urlfor "SettingController.Star"}}" class="item"><i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏</a> </li>
     </ul>
 </div>

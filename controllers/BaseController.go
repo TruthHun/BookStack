@@ -86,6 +86,7 @@ func (this *BaseController) Prepare() {
 	this.Data["OssDomain"] = this.OssDomain
 	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
 	this.Data["StaticDomain"] = this.StaticDomain
+
 	//从session中获取用户信息
 	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
 		m, _ := models.NewMember().Find(member.MemberId)
@@ -114,6 +115,7 @@ func (this *BaseController) Prepare() {
 	if this.Member.MemberId > 0 {
 		this.Data["IsSignedToday"] = models.NewSign().IsSignToday(this.Member.MemberId)
 	}
+
 	if options, err := models.NewOption().All(); err == nil {
 		this.Option = make(map[string]string, len(options))
 		for _, item := range options {
@@ -135,6 +137,7 @@ func (this *BaseController) Prepare() {
 			}
 		}
 	}
+
 	if v, ok := this.Option["CLOSE_OPEN_SOURCE_LINK"]; ok {
 		this.Data["CloseOpenSourceLink"] = v == "true"
 	}
@@ -148,6 +151,21 @@ func (this *BaseController) Prepare() {
 	}
 
 	this.Data["SiteName"] = this.Sitename
+
+	// 默认显示创建书籍的入口
+	ShowCreateBookEntrance := false
+
+	if this.Member.MemberId > 0 {
+		ShowCreateBookEntrance = true
+		if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+			if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole {
+				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍项目的权限并且创建了书籍，则也给用户显示入口
+				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(this.Member.MemberId)
+			}
+		}
+	}
+
+	this.Data["ShowCreateBookEntrance"] = ShowCreateBookEntrance
 
 	if this.Member.MemberId == 0 {
 		if this.EnableAnonymous == false && !this.NoNeedLoginRouter { // 不允许游客访问
