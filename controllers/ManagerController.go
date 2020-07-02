@@ -454,7 +454,7 @@ func (this *ManagerController) EditBook() {
 			}
 			client := models.NewElasticSearchClient()
 			if errSearch := client.BuildIndex(es); errSearch != nil && client.On {
-				beego.Error(err.Error())
+				beego.Error(errSearch.Error())
 			}
 		}()
 
