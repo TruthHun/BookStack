@@ -185,7 +185,7 @@ func (m *Relationship) Transfer(bookId, founderId, receiveId int) error {
 // HasRelatedBook 查询用户是否有相关联的书籍
 func (m *Relationship) HasRelatedBook(uid int) bool {
 	err := orm.NewOrm().QueryTable(m).Filter("member_id", uid).One(m, "relationship_id")
-	if err != nil {
+	if err != nil && err != orm.ErrNoRows {
 		beego.Error(err)
 		return false
 	}
