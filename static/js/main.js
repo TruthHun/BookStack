@@ -82,6 +82,27 @@ function alertTips(cls,msg,timeout,url) {
     },parseInt(timeout));
 }
 
+// 上传文件
+function upload(url, formData, callback){
+    // var formData = new FormData();
+    // formData.append('xxx name', 'xxx value')
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: formData ,　　//这里上传的数据使用了formData 对象
+        processData : false,
+        //必须false才会自动加上正确的Content-Type
+        contentType : false ,
+        //这里我们先拿到jQuery产生的 XMLHttpRequest对象，为其增加 progress 事件绑定，然后再返回交给ajax使用
+        success:function (res) {
+            callback(res)
+        },
+        error:function (e) {
+            callback(e)
+        }
+    });
+}
+
 $(function () {
     $(".tooltips").tooltip();
 
