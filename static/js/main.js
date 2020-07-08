@@ -306,12 +306,25 @@ $(function () {
         form.find("[name=id]").val($(this).attr("data-id"));
         form.find("[name=icon]").trigger("click");
     })
+
     $("#cate-icon").change(function () {
-       if($(this).val()!=""){
-           $("form.cate-icon-form").submit();
+        var _this = $(this),action = _this.parents("form").attr("action");
+       if(_this.val()!=""){
+           var formData = new FormData();
+           var id = _this.parents("form").find("[name=id]").val()
+            formData.append('icon', _this.get(0).files[0])
+            formData.append('id', id)
+            upload(action, formData, function(res){
+                if(res.errcode==0){ // 成功
+                    alertTips('success', res.message, 3000, "");
+                    $("[data-id="+id+"]").attr("src", res.data.icon)
+                }else{ // 失败
+                    alertTips('error', res.message, 3000, "")
+                }
+                _this.val('')
+            })
        }
     });
-
 
     $("#notarget").load(function () {
         var obj=JSON.parse($(this).contents().find('body').text());

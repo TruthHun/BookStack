@@ -981,6 +981,8 @@ func (this *ManagerController) UpdateCateIcon() {
 	if id == 0 {
 		this.JsonResult(1, "参数不正确")
 	}
+
+	data := make(map[string]interface{})
 	model := new(models.Category)
 	if cate := model.Find(id); cate.Id > 0 {
 		cate.Icon = strings.TrimLeft(cate.Icon, "/")
@@ -997,8 +999,10 @@ func (this *ManagerController) UpdateCateIcon() {
 			case utils.StoreOss:
 				store.ModelStoreOss.MoveToOss(tmpFile, tmpFile, true, false)
 				store.ModelStoreOss.DelFromOss(cate.Icon)
+				data["icon"] = utils.ShowImg(tmpFile)
 			case utils.StoreLocal:
 				store.ModelStoreLocal.DelFiles(cate.Icon)
+				data["icon"] = "/" + tmpFile
 			}
 			err = model.UpdateByField(cate.Id, "icon", "/"+tmpFile)
 		}
@@ -1007,7 +1011,7 @@ func (this *ManagerController) UpdateCateIcon() {
 	if err != nil {
 		this.JsonResult(1, err.Error())
 	}
-	this.JsonResult(0, "更新成功")
+	this.JsonResult(0, "更新成功", data)
 }
 
 //友情链接
