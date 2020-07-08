@@ -305,26 +305,32 @@
             form.find("input[type=file]").trigger("click");
         });
 
-        //change事件处理
-        $("#uploadZip input[type=file]").change(function () {
-            if($(this).val() && confirm("您确定要上传 "+$(this).val()+" 吗？")){
-                $(".btn-upload-zip").addClass("disabled");
-                $("#uploadZip").submit();
-            }
-        });
-
-         //批量上传文档图片[要放在vue执行代码的后面，否则获取不到identify的值]
-         $(".btn-upload-epub").click(function () {
+        //批量上传文档图片[要放在vue执行代码的后面，否则获取不到identify的值]
+        $(".btn-upload-epub").click(function () {
             var _this=$(this),identify=_this.attr("data-identify"),form=$("form#uploadEpub");
             form.find("[name=identify]").val(identify);
             form.find("input[type=file]").trigger("click");
         });
 
         //change事件处理
-        $("#uploadEpub input[type=file]").change(function () {
-            if($(this).val() && confirm("您确定要上传 "+$(this).val()+" 吗？")){
-                $(".btn-upload-epub").addClass("disabled");
-                $("#uploadEpub").submit();
+        $("#uploadZip input[type=file],#uploadEpub input[type=file]").change(function () {
+            var _this = $(this),action = _this.parents("form").attr("action");
+            if(_this.val() && confirm("您确定要上传 "+_this.val()+" 吗？")){
+                var formData = new FormData();
+                var identify = _this.parents("form").find("[name=identify]").val()
+                formData.append('zipfile', _this.get(0).files[0])
+                formData.append('identify', identify)
+                upload(action, formData, function(res){
+                    if(res.errcode==0){ // 成功
+                        alertTips('success', res.message, 3000, "");
+                        setTimeout(() => {
+                            location.reload()
+                        }, 3000);
+                    }else{ // 失败
+                        alertTips('error', res.message, 3000, "")
+                    }
+                    _this.val('')
+                })
             }
         });
 
