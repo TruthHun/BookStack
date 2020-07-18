@@ -77,6 +77,7 @@ function load_doc(url,wd,without_history) {
             $("#qrcode").qrcode(location.href);
             $(".read-count").text(res.data.view);
             $(".updated-at").text(res.data.updated_at);
+            initLinkWithImage()
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
@@ -92,6 +93,12 @@ function initHighlighting() {
         hljs.highlightBlock(block);
     });
     hljs.initLineNumbersOnLoad();
+}
+
+function initLinkWithImage(){
+    $(".markdown-body a img").each(function(){
+        $(this).after("<span class='btn btn-default btn-ilink btn-xs'><i class='fa fa-link'></i> 访问链接</span>")
+    })
 }
 
 var events = $("body");
@@ -145,7 +152,7 @@ $(function () {
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);
     });
-
+    
     $(".markdown-body").on("click", "img",function () {
         var src = $(this).attr("src")
         var nHeight = $(this)[0].naturalHeight

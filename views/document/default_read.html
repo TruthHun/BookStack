@@ -293,17 +293,28 @@ $(function () {
         load_doc(url,_this.attr("data-wd"));
     });
     //以https或者http开头的url链接，加上target='_blank'
+    $(".markdown-body").on("click",".btn-ilink",function (e) {
+        redirect($(this).parents("a").attr("href"));
+    })
     $(".markdown-body").on("click","a",function (e) {
         e.preventDefault();
-        var href=$(this).attr("href"),hrefLower=href.toLowerCase();
-        if($(this).attr("target")=="_blank" ||hrefLower.indexOf("http://")==0 || hrefLower.indexOf("https://")==0 ){
+        var _this = $(this);
+        if(_this.find("img").length == 0){
+            redirect(_this.attr("href"))
+        }
+    });
+
+    function redirect(href){
+        var hrefLower=href.toLowerCase();
+        if(hrefLower.indexOf("http://")==0 || hrefLower.indexOf("https://")==0 ){
             window.open(href);
         }else{
             location.href=href;
         }
-    });
+    }
 
     show_copy_btn();
+    initLinkWithImage();
 
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);
