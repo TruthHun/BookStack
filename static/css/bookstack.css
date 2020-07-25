@@ -1336,7 +1336,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
         padding-left: 1em;
         margin-top: 45px;
     }
-    .markdown-toc a{display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;color: #999999;
+    .markdown-toc a{display: block !important;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;color: #999999;
         font-size: 15px;
     }
     .markdown-toc a.active,.markdown-toc a:hover{color: #008cff;}
