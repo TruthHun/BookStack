@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/TruthHun/BookStack/utils/html2md"
 	"image"
 	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
 	"sync"
+
+	"github.com/TruthHun/BookStack/utils/html2md"
 
 	"github.com/mssola/user_agent"
 
@@ -42,7 +43,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/gotil/util"
 	"github.com/astaxie/beego"
-	"github.com/huichen/sego"
 
 	"github.com/TruthHun/gotil/cryptil"
 )
@@ -62,19 +62,14 @@ var (
 	Version     string = "unknown"
 	GitHash     string = "unknown"
 	BuildAt     string = "unknown"
-	Segmenter   sego.Segmenter
-	BasePath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
-	StoreType   = beego.AppConfig.String("store_type") //存储类型
+	BasePath, _        = filepath.Abs(filepath.Dir(os.Args[0]))
+	StoreType          = beego.AppConfig.String("store_type") //存储类型
 	langs       sync.Map
 	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
 	transfer    = strings.TrimRight(strings.TrimSpace(beego.AppConfig.String("http_transfer")), "/") + "/"
 )
 
 func init() {
-	//加载分词字典
-	go func() {
-		Segmenter.LoadDictionary(BasePath + "/dictionary/dictionary.txt")
-	}()
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
@@ -102,27 +97,6 @@ func GetLang(lang string) string {
 		return val.(string)
 	}
 	return "中文"
-}
-
-//分词
-//@param            str         需要分词的文字
-func SegWord(str interface{}) (wds string) {
-	//如果已经成功加载字典
-	if Segmenter.Dictionary() != nil {
-		wds = sego.SegmentsToString(Segmenter.Segment([]byte(fmt.Sprintf("%v", str))), true)
-		var wdslice []string
-		slice := strings.Split(wds, " ")
-		for _, wd := range slice {
-			w := strings.Split(wd, "/")[0]
-			if (strings.Count(w, "") - 1) >= 2 {
-				if i, _ := strconv.Atoi(w); i == 0 { //如果为0，则表示非数字
-					wdslice = append(wdslice, w)
-				}
-			}
-		}
-		wds = strings.Join(wdslice, ",")
-	}
-	return
 }
 
 //评分处理

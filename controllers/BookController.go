@@ -569,7 +569,7 @@ func (this *BookController) Create() {
 		this.JsonResult(6006, "项目标识已存在")
 	}
 
-	book.Label = utils.SegWord(bookName)
+	book.Label = ""
 	book.BookName = bookName
 	book.Author = author
 	book.AuthorURL = authorURL
