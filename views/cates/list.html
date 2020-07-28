@@ -98,6 +98,9 @@
 
     </div>
 </div>
+<div class="backtop tooltips" title="回到顶部">
+    <i class="fa fa-arrow-up"></i>
+</div>
 {{template "widgets/footer.html" .}}
 <script>
     'use strict';
@@ -144,6 +147,10 @@
         $(window).scroll(function () {
             fixed()
         })
+        
+        $(".backtop").click(function () {
+            $(window).scrollTop(0)
+        });
     })
 </script>
 </body>

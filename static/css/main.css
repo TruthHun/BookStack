@@ -981,3 +981,19 @@ a{color: #333}
 }
 
 .cate-intro{border: 1px dashed #ccc;margin: 0 0 15px 0;padding: 5px 10px;box-sizing: border-box;color: #787878}
+
+.backtop{
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    z-index: 9999;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 20px;
+    line-height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.backtop:hover{background-color: #dddddd;color: #10af88;}
