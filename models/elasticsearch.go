@@ -240,48 +240,6 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
 	    }}},"from": %v, "size": %v,"_source":["id"]}`
 		}
 	}
-
-	// 请求体
-	//if bid > 0 { // 搜索指定书籍的文档，不限私有和公有
-	//	queryBody = `{"query": {"bool": {"filter": [{
-	//			"term": {
-	//				"book_id": {$bookId}
-	//			}
-	//		}],
-	//     "must":{
-	//     	"query_string": {
-	//         "query": "%v",
-	//         "type": "phrase"
-	//       }
-	//     }
-	//	}},"from": %v,"size": %v,"_source":["id"]}`
-	//	queryBody = strings.Replace(queryBody, "{$bookId}", strconv.Itoa(bid), 1)
-	//} else {
-	//	if isSearchDoc { //搜索公开的文档
-	//		queryBody = `{"query": {"bool": {
-	//		"filter": [
-	//         {"range": {"book_id": {"gt": 0}}},
-	//         {"term": {"private": 0}}
-	//       ],"must":{
-	//     	"query_string": {
-	//         "query": "%v",
-	//         "type": "phrase"
-	//       }
-	//     }}},"from": %v,"size": %v,"_source":["id"]}`
-	//	} else { //搜索公开的书籍
-	//		queryBody = `{"query": {"bool": {
-	//		"filter": [
-	//       	{"term": {"book_id": 0}},
-	//           {"term": {"private": 0}}
-	//       ],"must":{
-	//     	"query_string": {
-	//         "query": "%v",
-	//         "type": "phrase"
-	//       }
-	//     }}},"from": %v, "size": %v,"_source":["id"]}`
-	//	}
-	//}
-
 	percent := GetOptionValue("SEARCH_ACCURACY", "50")
 	if this.IsRelateSearch {
 		percent = "10"
@@ -305,6 +263,9 @@ func (this *ElasticSearchClient) Search(wd string, p, listRows int, isSearchDoc 
 //采用批量重建索引的方式进行
 //每次操作100条数据
 func (this *ElasticSearchClient) RebuildAllIndex(bookId ...int) {
+	if !this.On {
+		return
+	}
 
 	bid := 0
 	if len(bookId) > 0 {
