@@ -32,9 +32,20 @@ func (this *SettingController) Index() {
 		phone := strings.TrimSpace(this.GetString("phone"))
 		wechatNO := strings.TrimSpace(this.GetString("wechat_no"))
 		description := strings.TrimSpace(this.GetString("description"))
+		nickname := strings.TrimSpace(this.GetString("nickname"))
 		if email == "" {
 			this.JsonResult(601, "邮箱不能为空")
 		}
+
+		if l := strings.Count(nickname, "") - 1; l < 2 || l > 20 {
+			this.JsonResult(6004, "用户昵称限制在2-20个字符")
+		}
+
+		existMember := models.NewMember().FindByNickname(nickname, "member_id")
+		if existMember.MemberId > 0 && this.Member.MemberId != existMember.MemberId {
+			this.JsonResult(6004, "用户昵称已存在，请换一个")
+		}
+
 		member := this.Member
 		member.Email = email
 		member.Phone = phone

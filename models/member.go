@@ -237,6 +237,11 @@ func (m *Member) Find(id int, cols ...string) (*Member, error) {
 	return m, nil
 }
 
+func (m *Member) FindByNickname(nickname string, cols ...string) (user Member) {
+	orm.NewOrm().QueryTable(m).Filter("nickname", nickname).One(&user, cols...)
+	return
+}
+
 func (m *Member) ResolveRoleName() {
 	switch m.Role {
 	case conf.MemberSuperRole:
