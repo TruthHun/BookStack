@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
 	"strings"
+
+	"github.com/astaxie/beego"
 
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
@@ -48,7 +49,7 @@ func (this *Category) AddCates(pid int, cates string) (err error) {
 				Title:  item,
 				Status: true,
 			}
-			if o.Read(&cate, "title"); cate.Id == 0 {
+			if cnt, _ := o.QueryTable(this).Filter("title", cate.Title).Filter("pid", cate.Pid).Count(); cnt == 0 {
 				_, err = orm.NewOrm().Insert(&cate)
 			}
 		}
