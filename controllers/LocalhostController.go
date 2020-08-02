@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/TruthHun/BookStack/models"
@@ -16,15 +17,20 @@ type LocalhostController struct {
 
 func (c *LocalhostController) Prepare() {
 	c.NoNeedLoginRouter = true
+	prefix := "localhost"
+	port := beego.AppConfig.String("httpport")
+	if port != "80" {
+		prefix = prefix + ":" + port
+	}
+	if !strings.HasPrefix(c.Ctx.Request.Host, prefix) {
+		c.Abort("404")
+		return
+	}
 }
 
 //渲染markdown.
 //根据文档id来。
 func (this *LocalhostController) RenderMarkdown() {
-	if this.Ctx.Request.Host != "localhost:"+beego.AppConfig.String("httpport") {
-		this.Abort("404")
-	}
-
 	id, _ := this.GetInt("id")
 	if id > 0 {
 		var doc models.Document
@@ -61,11 +67,6 @@ func (this *LocalhostController) RenderMarkdown() {
 
 // 渲染生成封面截图
 func (this *LocalhostController) RenderCover() {
-	if this.Ctx.Request.Host != "localhost:"+beego.AppConfig.String("httpport") {
-		this.Abort("404")
-		return
-	}
-
 	identify := this.GetString("id")
 	id, err := strconv.Atoi(identify)
 	if identify == "" && err != nil {
