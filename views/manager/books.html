@@ -15,11 +15,11 @@
             <div class="page-right">
                 <div class="m-box">
                     <div class="box-head">
-                        <strong class="box-title">项目列表</strong>
+                        <strong class="box-title">书籍列表</strong>
                     </div>
                     <ul class="nav nav-tabs" style="margin-top: 15px;">
-                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}">公开项目</a></li>
-                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}?private=1">私有项目</a></li>
+                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}">公开书籍</a></li>
+                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}?private=1">私有书籍</a></li>
                     </ul>
                 </div>
                 <div class="box-body" id="bookList">
@@ -42,8 +42,8 @@
                                     <div class="pull-right">
                                         <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="查看文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看文档</a>
                                         <a href="{{urlfor "DocumentController.Edit" ":key" $item.Identify ":id" ""}}" title="编辑文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-edit" aria-hidden="true"></i> 编辑文档</a>
-                                        <a href="{{urlfor "ManagerController.EditBook" ":key" $item.Identify}}" title="项目设置" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs" aria-hidden="true"></i> 项目设置</a>
-                                        <a href="javascript:void(0);" data-identify="{{$item.Identify}}" data-book="{{$item.BookName}}" data-action="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除项目" class="btn btn-danger btn-del-book" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除项目</a>
+                                        <a href="{{urlfor "ManagerController.EditBook" ":key" $item.Identify}}" title="书籍设置" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs" aria-hidden="true"></i> 书籍设置</a>
+                                        <a href="javascript:void(0);" data-identify="{{$item.Identify}}" data-book="{{$item.BookName}}" data-action="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除书籍" class="btn btn-danger btn-del-book" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除书籍</a>
                                     </div>
 
                                     <div class="clearfix"></div>
@@ -93,10 +93,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">删除项目</h4>
+                    <h4 class="modal-title">删除书籍</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="help-block">当前文档项目名称为<span class="text-danger book-name"></span>，标识为 <span class="text-danger book-identify"></span> ；删除项目后将无法找回。</div>
+                    <div class="help-block">当前书籍名称为<span class="text-danger book-name"></span>，标识为 <span class="text-danger book-identify"></span> ；删除书籍后将无法找回。</div>
                     <div class="help-block">如确定删除，请输入当前文档标识和您的登录密码。</div>
                     <div class="input-group">
                         <span class="input-group-addon">文档标识</span>

@@ -53,7 +53,7 @@ type APIBook struct {
 	Star        int       `json:"star"` // 收藏
 	Lang        string    `json:"lang"`
 	Cover       string    `json:"cover"`
-	Score       int       `json:"score"`       // 文档项目评分，默认40，即4.0星
+	Score       int       `json:"score"`       // 书籍评分，默认40，即4.0星
 	CntScore    int       `json:"cnt_score"`   // 评分个数
 	CntComment  int       `json:"cnt_comment"` // 评论人数
 	DocCount    int       `json:"cnt_doc"`     // 章节数量

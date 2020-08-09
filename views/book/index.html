@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <title>我的项目 - {{.SITE_NAME}}</title>
+    <title>我的书籍 - {{.SITE_NAME}}</title>
 
 
 {{/*<link href="{{cdncss "/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">*/}}
@@ -31,13 +31,13 @@
             <div class="page-right">
                 <div class="m-box">
                     <div class="box-head">
-                        <strong class="box-title">项目列表</strong>
-                        <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加项目</button>
+                        <strong class="box-title">书籍列表</strong>
+                        <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加书籍</button>
                     </div>
                     <div class="help-block text-left" style="margin-top: 15px;"><span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span></div>
                     <ul class="nav nav-tabs" style="margin-top: 15px;">
-                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有项目</a></li>
-                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开项目</a></li>
+                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有书籍</a></li>
+                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开书籍</a></li>
                     </ul>
                 </div>
                 <div class="box-body" id="bookList">
@@ -80,7 +80,7 @@
                                     <div class="info hidden-xs">
                                         <span title="创建者" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user"></i> ${item.create_name}</span>
                                         <span title="文档数量" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-pie-chart"></i> ${item.doc_count}</span>
-                                        <span title="项目角色" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user-secret"></i> ${item.role_name}</span>
+                                        <span title="书籍角色" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user-secret"></i> ${item.role_name}</span>
                                         <span title="创建时间" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clock-o"></i>
                                             ${(new Date(item.create_time)).format("yyyy-MM-dd hh:mm:ss")}
                                         </span>
@@ -97,7 +97,7 @@
 
                                     <div class="btns">
                                         <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看<span class="hidden-xs">文档</span></a>
-                                        <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="项目设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">项目</span>设置</a>
+                                        <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="书籍设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">书籍</span>设置</a>
                                         <a v-if="item.role_id < 2" :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
                                             <i class="fa fa-book"></i> 生成下载文档
                                         </a>
@@ -108,7 +108,7 @@
 
                                             <!-- Split button -->
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入项目</button>
+                                                <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
                                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <span class="caret"></span>
                                                     <span class="sr-only">Toggle Dropdown</span>
@@ -120,17 +120,17 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown项目导入。">
+                                                        <a href="javascript:void(0);" class="btn-upload-zip" data-toggle="tooltip" :data-identify="item.identify" title="支持任意zip压缩的markdown书籍导入。">
                                                             <i class="fa fa-cloud-upload"></i> ZIP 上传导入
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown项目">
+                                                        <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" :data-identify="item.identify" title="从任意源拉取zip压缩的markdown书籍">
                                                             <i class="fa fa-link"></i> ZIP 拉取导入
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown项目">
+                                                        <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" :data-identify="item.identify" title="从Git仓库导入markdown书籍">
                                                             <i class="fa fa-git"></i> Git Clone 导入
                                                         </a>
                                                     </li>
@@ -139,7 +139,7 @@
                                         </template>
 
                                         <div class="btn-group btn-group-download">
-                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出项目</button>
+                                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-download"></i> 导出书籍</button>
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span class="caret"></span>
                                                 <span class="sr-only">Toggle Dropdown</span>
@@ -178,7 +178,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">添加项目</h4>
+                <h4 class="modal-title" id="myModalLabel">添加书籍</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -200,9 +200,9 @@
                     <div class="pull-left" style="padding: 7px 5px 6px 0">
                         {{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" ""}}
                     </div>
-                    <input type="text" class="form-control pull-left" style="width: 220px;vertical-align: middle" placeholder="项目唯一标识(不能超过50字)" name="identify" id="identify">
+                    <input type="text" class="form-control pull-left" style="width: 220px;vertical-align: middle" placeholder="书籍唯一标识(不能超过50字)" name="identify" id="identify">
                     <div class="clearfix"></div>
-                    <p class="text" style="font-size: 12px;color: #999;margin-top: 6px;">项目标识只能包含字母、数字，以及“-”、"."和“_”符号，且不能是纯数字</p>
+                    <p class="text" style="font-size: 12px;color: #999;margin-top: 6px;">书籍标识只能包含字母、数字，以及“-”、"."和“_”符号，且不能是纯数字</p>
                 </div>
                 <div class="form-group">
                     <textarea name="description" id="description" class="form-control" placeholder="描述信息不超过500个字符" style="height: 90px;"></textarea>
@@ -251,18 +251,18 @@
             beforeSubmit : function () {
                 var bookName = $.trim($("#bookName").val());
                 if(bookName === ""){
-                    return showError("项目标题不能为空")
+                    return showError("书籍标题不能为空")
                 }
                 if(bookName.length > 100){
-                    return showError("项目标题必须小于100字符");
+                    return showError("书籍标题必须小于100字符");
                 }
 
                 var identify = $.trim($("#identify").val());
                 if(identify === ""){
-                    return showError("项目标识不能为空");
+                    return showError("书籍标识不能为空");
                 }
                 if(identify.length > 50){
-                    return showError("项目标识必须小于50字符");
+                    return showError("书籍标识必须小于50字符");
                 }
                 var description = $.trim($("#description").val());
 

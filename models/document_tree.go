@@ -23,7 +23,7 @@ type DocumentSelected struct {
 	Opened   bool `json:"opened"`
 }
 
-//获取项目的文档树状结构
+//获取书籍的文档树状结构
 func (m *Document) FindDocumentTree(bookId int, selectedId int, isEdit ...bool) ([]*DocumentTree, error) {
 	o := orm.NewOrm()
 

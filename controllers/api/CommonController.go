@@ -807,7 +807,7 @@ func (this *CommonController) Read() {
 		beego.Error(err.Error())
 	}
 
-	//项目阅读人次+1
+	//书籍阅读人次+1
 	if err = models.SetIncreAndDecre("md_books", "vcnt",
 		fmt.Sprintf("book_id=%v", doc.BookId),
 		true, 1,

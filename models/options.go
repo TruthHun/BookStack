@@ -1,10 +1,11 @@
 package models
 
 import (
-	"github.com/TruthHun/BookStack/conf"
-	"github.com/astaxie/beego/orm"
 	"strings"
 	"sync"
+
+	"github.com/TruthHun/BookStack/conf"
+	"github.com/astaxie/beego/orm"
 )
 
 var optionCache sync.Map // map[int || string]*Option
@@ -191,7 +192,7 @@ func (m *Option) Init() error {
 		}, {
 			OptionValue: "true",
 			OptionName:  "ALL_CAN_WRITE_BOOK",
-			OptionTitle: "是否都可以创建项目",
+			OptionTitle: "是否都可以创建书籍",
 		}, {
 			OptionValue: "false",
 			OptionName:  "CLOSE_SUBMIT_ENTER",
@@ -199,7 +200,7 @@ func (m *Option) Init() error {
 		}, {
 			OptionValue: "true",
 			OptionName:  "CLOSE_OPEN_SOURCE_LINK",
-			OptionTitle: "是否关闭开源项目入口",
+			OptionTitle: "是否关闭开源书籍入口",
 		}, {
 			OptionValue: "0",
 			OptionName:  "HOUR_REG_NUM",

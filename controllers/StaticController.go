@@ -38,7 +38,7 @@ func (this *StaticController) StaticFile() {
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
-// 项目静态文件
+// 书籍静态文件
 func (this *StaticController) ProjectsFile() {
 	prefix := "projects/"
 	object := prefix + strings.TrimLeft(this.GetString(":splat"), "./")

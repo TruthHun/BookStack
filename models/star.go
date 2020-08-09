@@ -83,7 +83,7 @@ func (this *Star) DoesStar(uid, bid interface{}) bool {
 	return false
 }
 
-//获取收藏列表，查询项目信息
+//获取收藏列表，查询书籍信息
 func (this *Star) List(uid, p, listRows int, cid int, order ...string) (cnt int64, books []StarResult, err error) {
 	//根据用户id查询用户的收藏，先从收藏表中查询book_id
 	o := orm.NewOrm()

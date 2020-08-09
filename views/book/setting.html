@@ -38,22 +38,22 @@
             <div class="page-right">
                 <div class="m-box">
                     <div class="box-head">
-                        <strong class="box-title"> 项目设置</strong>
+                        <strong class="box-title"> 书籍设置</strong>
 
                         <div class="btn-group pull-right btn-group-sm" style="margin-left: 5px;">
-                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入项目</button>
+                            <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="caret"></span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从任意源拉取zip压缩的markdown项目">
+                                    <a href="javascript:void(0);" class="btn-pull-by-zip" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从任意源拉取zip压缩的markdown书籍">
                                         <i class="fa fa-link"></i> ZIP 拉取导入
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从Git仓库导入markdown项目">
+                                    <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从Git仓库导入markdown书籍">
                                         <i class="fa fa-git"></i> Git Clone 导入
                                     </a>
                                 </li>
@@ -63,7 +63,7 @@
                         <a style="margin-left: 5px;" href="/api/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
 
                         {{if eq .Model.RoleId 0}}
-                        <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让项目</button>
+                        <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让书籍</button>
                         {{if eq .Model.PrivatelyOwned 1}}
                         <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#changePrivatelyOwnedModal" style="margin-right: 5px;">转为公有</button>
                         {{else}}
@@ -72,7 +72,7 @@
                         <a href="{{urlfor "BookController.Generate" ":key" .Model.Identify}}" style="margin-right: 5px;"  class="btn btn-success btn-sm ajax-get  pull-right">
                             生成下载文档
                         </a>
-                        <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除项目</button>
+                        <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除书籍</button>
                         {{end}}
 
 
@@ -81,7 +81,7 @@
                 </div>
                 <div class="box-body">
                     <div class="form-right">
-                        <label>项目封面 &nbsp; &nbsp; &nbsp;</label>
+                        <label>书籍封面 &nbsp; &nbsp; &nbsp;</label>
                         <label>
                             <a href="javascript:;" data-toggle="modal" data-target="#upload-logo-panel">
                                 <img src="{{showImg .Model.Cover "cover"}}" onerror="this.src='/static/images/book.png'" alt="封面" style="max-width: 120px;" class="border-cover-img" id="headimgurl">
@@ -93,11 +93,11 @@
                             <input type="hidden" name="identify" value="{{.Model.Identify}}">
                             <div class="form-group">
                                 <label>标题</label>
-                                <input type="text" class="form-control" name="book_name" id="bookName" placeholder="项目名称" value="{{.Model.BookName}}">
+                                <input type="text" class="form-control" name="book_name" id="bookName" placeholder="书籍名称" value="{{.Model.BookName}}">
                             </div>
                             <div class="form-group">
                                 <label>标识</label>
-                                <input type="text" class="form-control" value="{{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" placeholder="项目唯一标识" disabled>
+                                <input type="text" class="form-control" value="{{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" placeholder="书籍唯一标识" disabled>
                             </div>
                             <div class="form-group">
                                 <label>语种</label>
@@ -155,12 +155,12 @@
                             </div>
                             <div class="form-group">
                                 <label>描述</label>
-                                <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="项目描述">{{.Model.Description}}</textarea>
+                                <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="书籍描述">{{.Model.Description}}</textarea>
                                 <p class="text help-block">描述信息不超过500个字符,支持Markdown语法</p>
                             </div>
                             <div class="form-group">
                                 <label>标签</label>
-                                <input type="text" class="form-control" name="label" placeholder="项目标签" value="{{.Model.Label}}">
+                                <input type="text" class="form-control" name="label" placeholder="书籍标签" value="{{.Model.Label}}">
                                 <p class="text help-block">最多允许添加10个标签，多个标签请用“,”分割</p>
                             </div>
                             {{if eq .Model.PrivatelyOwned 1}}
@@ -211,13 +211,13 @@
                 </div>
                 <div class="modal-body">
                     {{if eq .Model.PrivatelyOwned 0}}
-                    <span style="font-size: 14px;font-weight: 400;">确定将项目转为私有吗？</span>
+                    <span style="font-size: 14px;font-weight: 400;">确定将书籍转为私有吗？</span>
                     <p></p>
-                    <p class="text error-message">转为私有后需要通过阅读令牌才能访问该项目。</p>
+                    <p class="text error-message">转为私有后需要通过阅读令牌才能访问该书籍。</p>
                     {{else}}
-                    <span style="font-size: 14px;font-weight: 400;"> 确定将项目转为公有吗？</span>
+                    <span style="font-size: 14px;font-weight: 400;"> 确定将书籍转为公有吗？</span>
                     <p></p>
-                    <p class="text error-message">转为公有后所有人都可以访问该项目。</p>
+                    <p class="text error-message">转为公有后所有人都可以访问该书籍。</p>
                     {{end}}
                 </div>
                 <div class="modal-footer">
@@ -273,10 +273,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">删除项目</h4>
+                    <h4 class="modal-title">删除书籍</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="help-block">当前文档项目标识为 <span class="text-danger">{{.Model.Identify}}</span> ；删除项目后将无法找回。</div>
+                    <div class="help-block">当前书籍标识为 <span class="text-danger">{{.Model.Identify}}</span> ；删除书籍后将无法找回。</div>
                     <div class="help-block">如确定删除，请输入当前文档标识和您的登录密码。</div>
                     <div class="input-group">
                         <span class="input-group-addon">文档标识</span>
@@ -305,7 +305,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">项目转让</h4>
+                    <h4 class="modal-title" id="myModalLabel">书籍转让</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -403,7 +403,7 @@
             beforeSubmit : function () {
                 var bookName = $.trim($("#bookName").val());
                 if (bookName === "") {
-                    return showError("项目名称不能为空");
+                    return showError("书籍名称不能为空");
                 }
                 $("#btnSaveBookInfo").button("loading");
             },

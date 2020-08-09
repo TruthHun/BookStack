@@ -28,7 +28,7 @@ type DocResult struct {
 	DocumentName string    `json:"doc_name"`
 	Identify     string    `json:"identify"` // Identify 文档唯一标识
 	Release      string    `json:"release"`  // Release 发布后的Html格式内容.
-	Vcnt         int       `json:"vcnt"`     //文档项目被浏览次数
+	Vcnt         int       `json:"vcnt"`     //书籍被浏览次数
 	CreateTime   time.Time `json:"create_time"`
 	BookId       int       `json:"book_id"`
 	BookIdentify string    `json:"book_identify"`
@@ -93,7 +93,7 @@ WHERE (book.privately_owned = 0 OR rel1.relationship_id > 0)  AND (doc.document_
 	return
 }
 
-//项目内搜索.
+//书籍内搜索.
 func (m *DocumentSearchResult) SearchDocument(keyword string, bookId int, page, size int) (docs []*DocumentSearchResult, cnt int, err error) {
 	o := orm.NewOrm()
 

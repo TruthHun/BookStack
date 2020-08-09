@@ -27,7 +27,7 @@
                 <ul class="menu">
                     <li><a href="{{urlfor "ManagerController.Index"}}" class="item"><i class="fa fa-dashboard" aria-hidden="true"></i> 仪表盘</a> </li>
                     <li><a href="{{urlfor "ManagerController.Users" }}" class="item"><i class="fa fa-users" aria-hidden="true"></i> 用户管理</a> </li>
-                    <li class="active"><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 项目管理</a> </li>
+                    <li class="active"><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 书籍管理</a> </li>
                     {{/*<li><a href="{{urlfor "ManagerController.Comments" }}" class="item"><i class="fa fa-comments-o" aria-hidden="true"></i> 评论管理</a> </li>*/}}
                     <li><a href="{{urlfor "ManagerController.Setting" }}" class="item"><i class="fa fa-cogs" aria-hidden="true"></i> 配置管理</a> </li>
                     <li><a href="{{urlfor "ManagerController.AttachList" }}" class="item"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 附件管理</a> </li>
@@ -36,14 +36,14 @@
             <div class="page-right">
                 <div class="m-box">
                     <div class="box-head">
-                        <strong class="box-title"> 项目设置</strong>
-                        <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让项目</button>
+                        <strong class="box-title"> 书籍设置</strong>
+                        <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#transferBookModal">转让书籍</button>
                         {{if eq .Model.PrivatelyOwned 1}}
                         <button type="button"  class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#changePrivatelyOwnedModal" style="margin-right: 5px;">转为公有</button>
                         {{else}}
                         <button type="button"  class="btn btn-danger btn-sm pull-right" data-toggle="modal" data-target="#changePrivatelyOwnedModal" style="margin-right: 5px;">转为私有</button>
                         {{end}}
-                        <button type="button"  class="btn btn-danger btn-sm pull-right btn-del-book" data-book="{{.Model.BookName}}" data-identify="{{.Model.Identify}}" style="margin-right: 5px;">删除项目</button>
+                        <button type="button"  class="btn btn-danger btn-sm pull-right btn-del-book" data-book="{{.Model.BookName}}" data-identify="{{.Model.Identify}}" style="margin-right: 5px;">删除书籍</button>
                     </div>
                 </div>
                 <div class="box-body" style="padding-right: 200px;">
@@ -52,31 +52,31 @@
                             <input type="hidden" name="identify" value="{{.Model.Identify}}">
                             <div class="form-group">
                                 <label>标题</label>
-                                <input type="text" class="form-control" name="book_name" id="bookName" placeholder="项目名称" value="{{.Model.BookName}}">
+                                <input type="text" class="form-control" name="book_name" id="bookName" placeholder="书籍名称" value="{{.Model.BookName}}">
                             </div>
                             <div class="form-group">
                                 <label>标识</label>
-                                <input type="text" class="form-control" value=" {{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" disabled placeholder="项目标识">
+                                <input type="text" class="form-control" value=" {{.BaseUrl}}{{urlfor "DocumentController.Index" ":key" .Model.Identify}}" disabled placeholder="书籍标识">
                             </div>
                             <div class="form-group">
                                 <label>排序/推荐</label>
-                                <input type="number" class="form-control" value="{{.Model.OrderIndex}}" name="order_index" placeholder="项目排序">
+                                <input type="number" class="form-control" value="{{.Model.OrderIndex}}" name="order_index" placeholder="书籍排序">
                                 <p class="text">数字，越大排序越靠前。(默认为0，大于0表示推荐，值越大推荐权重越高。小于0，表示将内容沉底处理，即不在列表进行显示，但是可以通过搜索等方式检索到)</p>
                             </div>
                             <div class="form-group">
                                 <label>钉子/Pin</label>
-                                <input type="number" min="0" class="form-control" value="{{.Model.Pin}}" name="pin" placeholder="项目排序">
+                                <input type="number" min="0" class="form-control" value="{{.Model.Pin}}" name="pin" placeholder="书籍排序">
                                 <p class="text">将书籍钉在发现页，值越大越靠前</p>
                             </div>
                             <div class="form-group">
                                 <label>描述</label>
-                                <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="项目描述">{{.Model.Description}}</textarea>
+                                <textarea rows="3" class="form-control" name="description" style="height: 90px" placeholder="书籍描述">{{.Model.Description}}</textarea>
                                 <p class="text">描述信息不超过500个字符</p>
                             </div>
 
                             <div class="form-group">
                                 <label>标签</label>
-                                <input type="text" class="form-control" name="label" placeholder="项目标签" value="{{.Model.Label}}">
+                                <input type="text" class="form-control" name="label" placeholder="书籍标签" value="{{.Model.Label}}">
                                 <p class="text">最多允许添加10个标签，多个标签请用“;”分割</p>
                             </div>
                             {{/*{*<div class="form-group">*}
@@ -147,13 +147,13 @@
                 </div>
                 <div class="modal-body">
                     {{if eq .Model.PrivatelyOwned 0}}
-                    <span style="font-size: 14px;font-weight: 400;">确定将项目转为私有吗？</span>
+                    <span style="font-size: 14px;font-weight: 400;">确定将书籍转为私有吗？</span>
                     <p></p>
-                    <p class="text error-message">转为私有后需要通过阅读令牌才能访问该项目。</p>
+                    <p class="text error-message">转为私有后需要通过阅读令牌才能访问该书籍。</p>
                     {{else}}
-                    <span style="font-size: 14px;font-weight: 400;"> 确定将项目转为公有吗？</span>
+                    <span style="font-size: 14px;font-weight: 400;"> 确定将书籍转为公有吗？</span>
                     <p></p>
-                    <p class="text error-message">转为公有后所有人都可以访问该项目。</p>
+                    <p class="text error-message">转为公有后所有人都可以访问该书籍。</p>
                     {{end}}
                 </div>
                 <div class="modal-footer">
@@ -174,10 +174,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">删除项目</h4>
+                    <h4 class="modal-title">删除书籍</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="help-block">当前文档项目名称为<span class="text-danger book-name"></span>，标识为 <span class="text-danger book-identify"></span> ；删除项目后将无法找回。</div>
+                    <div class="help-block">当前书籍名称为<span class="text-danger book-name"></span>，标识为 <span class="text-danger book-identify"></span> ；删除书籍后将无法找回。</div>
                     <div class="help-block">如确定删除，请输入当前文档标识和您的登录密码。</div>
                     <div class="input-group">
                         <span class="input-group-addon">文档标识</span>
@@ -205,7 +205,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">项目转让</h4>
+                    <h4 class="modal-title" id="myModalLabel">书籍转让</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -276,7 +276,7 @@
             beforeSubmit : function () {
                 var bookName = $.trim($("#bookName").val());
                 if (bookName === "") {
-                    return showError("项目名称不能为空");
+                    return showError("书籍名称不能为空");
                 }
                 $("#btnSaveBookInfo").button("loading");
             },

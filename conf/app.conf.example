@@ -105,7 +105,7 @@ chrome=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
 # 如果使用 puppeteer，则忽略chrome
 puppeteer = false
 
-#项目默认封面
+#书籍默认封面
 cover=/static/images/book.png
 
 #默认头像

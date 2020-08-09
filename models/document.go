@@ -45,7 +45,7 @@ type Document struct {
 	ModifyAt     int           `orm:"column(modify_at);type(int)" json:"-"`
 	Version      int64         `orm:"type(bigint);column(version)" json:"version"`
 	AttachList   []*Attachment `orm:"-" json:"attach"`
-	Vcnt         int           `orm:"column(vcnt);default(0)" json:"vcnt"` //文档项目被浏览次数
+	Vcnt         int           `orm:"column(vcnt);default(0)" json:"vcnt"` //书籍被浏览次数
 	Markdown     string        `orm:"-" json:"markdown"`
 }
 
@@ -529,7 +529,7 @@ func (m *Document) GenerateBook(book *Book, baseUrl string) {
 	}
 }
 
-//根据项目ID查询文档列表(含文档内容).
+//根据书籍ID查询文档列表(含文档内容).
 func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []*Document, err error) {
 	q := orm.NewOrm().QueryTable(m.TableNameWithPrefix()).Filter("book_id", bookId).OrderBy("order_sort")
 	if len(withoutContent) > 0 && withoutContent[0] {
@@ -542,7 +542,7 @@ func (m *Document) FindListByBookId(bookId int, withoutContent ...bool) (docs []
 	return
 }
 
-//根据项目ID查询文档一级目录.
+//根据书籍ID查询文档一级目录.
 func (m *Document) GetMenuTop(bookId int) (docs []*Document, err error) {
 	var docsAll []*Document
 	o := orm.NewOrm()

@@ -159,7 +159,7 @@ func (this *BaseController) Prepare() {
 		ShowCreateBookEntrance = true
 		if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
 			if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole {
-				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍项目的权限并且创建了书籍，则也给用户显示入口
+				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍书籍的权限并且创建了书籍，则也给用户显示入口
 				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(this.Member.MemberId)
 			}
 		}
@@ -572,7 +572,7 @@ func (this *BaseController) SignToday() {
 }
 
 func (this *BaseController) forbidGeneralRole() bool {
-	// 如果只有作者和管理员才能写作的话，那么已创建了项目的普通用户无法将项目转为公开或者是私密分享
+	// 如果只有作者和管理员才能写作的话，那么已创建了书籍的普通用户无法将书籍转为公开或者是私密分享
 	if this.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
 		return true
 	}

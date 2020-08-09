@@ -25,7 +25,7 @@
                 <ul class="menu">
                     <li><a href="{{urlfor "ManagerController.Index"}}" class="item"><i class="fa fa-dashboard" aria-hidden="true"></i> 仪表盘</a> </li>
                     <li><a href="{{urlfor "ManagerController.Users" }}" class="item"><i class="fa fa-users" aria-hidden="true"></i> 用户管理</a> </li>
-                    <li><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 项目管理</a> </li>
+                    <li><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 书籍管理</a> </li>
                     <li><a href="{{urlfor "ManagerController.Setting" }}" class="item"><i class="fa fa-cogs" aria-hidden="true"></i> 配置管理</a> </li>
                     <li class="active"><a href="{{urlfor "ManagerController.AttachList" }}" class="item"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 附件管理</a> </li>
                 </ul>
@@ -45,14 +45,14 @@
                     <div class="form-group">
                         <label>是否存在</label>
                             {{if .Model.IsExist }}
-                            <input type="text" value="存在" class="form-control input-readonly" readonly placeholder="项目名称">
+                            <input type="text" value="存在" class="form-control input-readonly" readonly placeholder="书籍名称">
                             {{else}}
-                            <input type="text" value="已删除" class="form-control input-readonly" readonly placeholder="项目名称">
+                            <input type="text" value="已删除" class="form-control input-readonly" readonly placeholder="书籍名称">
                             {{end}}
                     </div>
                     <div class="form-group">
-                        <label>项目名称</label>
-                        <input type="text" value="{{.Model.BookName}}" class="form-control input-readonly" readonly placeholder="项目名称">
+                        <label>书籍名称</label>
+                        <input type="text" value="{{.Model.BookName}}" class="form-control input-readonly" readonly placeholder="书籍名称">
                     </div>
                     <div class="form-group">
                         <label>文档名称</label>

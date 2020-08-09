@@ -22,7 +22,7 @@ type Category struct {
 	Title  string `orm:"size(30);unique" json:"title,omitempty"` //分类名称
 	Intro  string `json:"intro,omitempty"`                       //介绍
 	Icon   string `json:"icon,omitempty"`                        //分类icon
-	Cnt    int    `json:"cnt,omitempty"`                         //分类下的文档项目统计
+	Cnt    int    `json:"cnt,omitempty"`                         //分类下的书籍统计
 	Sort   int    `json:"sort,omitempty"`                        //排序
 	Status bool   `json:"status,omitempty"`                      //分类状态，true表示显示，否则表示隐藏
 	//PrintBookCount int    `orm:"default(0)" json:"print_book_count"`
@@ -57,13 +57,13 @@ func (this *Category) AddCates(pid int, cates string) (err error) {
 	return
 }
 
-//删除分类（如果分类下的文档项目不为0，则不允许删除）
+//删除分类（如果分类下的书籍不为0，则不允许删除）
 func (this *Category) Del(id int) (err error) {
 	var cate = Category{Id: id}
 
 	o := orm.NewOrm()
-	if err = o.Read(&cate); cate.Cnt > 0 { //当前分类下文档项目数量不为0，不允许删除
-		return errors.New("删除失败，当前分类下的问下项目不为0，不允许删除")
+	if err = o.Read(&cate); cate.Cnt > 0 { //当前分类下书籍数量不为0，不允许删除
+		return errors.New("删除失败，当前分类下的问下书籍不为0，不允许删除")
 	}
 
 	if _, err = o.Delete(&cate, "id"); err != nil {

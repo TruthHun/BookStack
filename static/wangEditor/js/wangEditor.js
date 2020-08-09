@@ -7001,7 +7001,7 @@ _e(function (E, $) {
                 errorfn: function (xhr) {
                     clearInput();
                     if (E.isOnWebsite) {
-                        alert('wangEditor官网暂时没有服务端，因此报错。实际项目中不会发生');
+                        alert('wangEditor官网暂时没有服务端，因此报错。实际书籍中不会发生');
                     }
                     // 执行配置中的方法
                     var editor = this;
@@ -7010,7 +7010,7 @@ _e(function (E, $) {
                 timeoutfn: function (xhr) {
                     clearInput();
                     if (E.isOnWebsite) {
-                        alert('wangEditor官网暂时没有服务端，因此超时。实际项目中不会发生');
+                        alert('wangEditor官网暂时没有服务端，因此超时。实际书籍中不会发生');
                     }
                     // 执行配置中的方法
                     var editor = this;

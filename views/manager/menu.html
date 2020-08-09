@@ -1,7 +1,7 @@
 <ul class="menu">
     <li  {{if .IsDashboard}}class="active"{{end}}><a href="{{urlfor "ManagerController.Index"}}" class="item"><i class="fa fa-dashboard" aria-hidden="true"></i> 仪表盘</a> </li>
     <li {{if .IsUsers}}class="active"{{end}}><a href="{{urlfor "ManagerController.Users" }}" class="item"><i class="fa fa-users" aria-hidden="true"></i> 用户管理</a> </li>
-    <li  {{if .IsBooks}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 项目管理</a> </li>
+    <li  {{if .IsBooks}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books" }}" class="item"><i class="fa fa-book" aria-hidden="true"></i> 书籍管理</a> </li>
     <li  {{if .IsComments}}class="active"{{end}}><a href="{{urlfor "ManagerController.Comments" }}" class="item"><i class="fa fa-comments-o" aria-hidden="true"></i> 评论管理</a> </li>
     <li  {{if .IsBanner}}class="active"{{end}}><a href="{{urlfor "ManagerController.Banners" }}" class="item"><i class="fa fa-image" aria-hidden="true"></i> 横幅管理</a> </li>
     <li {{if .IsSubmitBook}}class="active"{{end}}><a href="{{urlfor "ManagerController.SubmitBook" }}" class="item"><i class="fa fa-check-square-o" aria-hidden="true"></i> 收录管理</a> </li>

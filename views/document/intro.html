@@ -15,10 +15,10 @@
             <h1>{{.Book.BookName}}
                  {{if and (eq $.Member.MemberId $.Book.MemberId) (ne $.Book.RoleId 3)}}
                      <a href="{{urlfor "DocumentController.Edit" ":key" .Book.Identify ":id" ""}}" class="tooltips" title="编辑文档"> &nbsp;<small><i class="fa fa-edit"></i></small> </a>
-                     <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="项目设置"> &nbsp;<small><i class="fa fa-cog"></i></small> </a>
+                     <a href="{{urlfor "BookController.Setting" ":key" .Book.Identify}}" class="tooltips" title="书籍设置"> &nbsp;<small><i class="fa fa-cog"></i></small> </a>
                  {{end}}
                 {{if and (gt $.Member.MemberId 0) (lt $.Member.Role 2)}}
-                    <a href="{{urlfor "ManagerController.EditBook" ":key" .Book.Identify}}" class="tooltips" title="管理员项目设置"> &nbsp;<small><i class="fa fa-cogs"></i></small> </a>
+                    <a href="{{urlfor "ManagerController.EditBook" ":key" .Book.Identify}}" class="tooltips" title="管理员书籍设置"> &nbsp;<small><i class="fa fa-cogs"></i></small> </a>
                 {{end}}
             </h1>
             {{if (ads "intro-under-book-name" $.IsMobile)}}

@@ -369,7 +369,7 @@ func (this *ManagerController) DeleteMember() {
 	this.JsonResult(0, "ok")
 }
 
-//项目列表.
+//书籍列表.
 func (this *ManagerController) Books() {
 
 	pageIndex, _ := this.GetInt("page", 1)
@@ -389,15 +389,15 @@ func (this *ManagerController) Books() {
 	this.Data["Lists"] = books
 	this.Data["IsBooks"] = true
 	this.GetSeoByPage("manage_project_list", map[string]string{
-		"title":       "项目管理 - " + this.Sitename,
-		"keywords":    "项目管理",
+		"title":       "书籍管理 - " + this.Sitename,
+		"keywords":    "书籍管理",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	this.Data["Private"] = private
 	this.TplName = "manager/books.html"
 }
 
-//编辑项目.
+//编辑书籍.
 func (this *ManagerController) EditBook() {
 
 	identify := this.GetString(":key")
@@ -419,7 +419,7 @@ func (this *ManagerController) EditBook() {
 		pin, _ := this.GetInt("pin", 0)
 
 		if strings.Count(description, "") > 500 {
-			this.JsonResult(6004, "项目描述不能大于500字")
+			this.JsonResult(6004, "书籍描述不能大于500字")
 		}
 		if commentStatus != "open" && commentStatus != "closed" && commentStatus != "group_only" && commentStatus != "registered_only" {
 			commentStatus = "closed"
@@ -466,14 +466,14 @@ func (this *ManagerController) EditBook() {
 	this.Data["Model"] = book
 
 	this.GetSeoByPage("manage_project_edit", map[string]string{
-		"title":       "项目设置 - " + this.Sitename,
-		"keywords":    "项目设置",
+		"title":       "书籍设置 - " + this.Sitename,
+		"keywords":    "书籍设置",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
 	this.TplName = "manager/edit_book.html"
 }
 
-// 删除项目.
+// 删除书籍.
 func (this *ManagerController) DeleteBook() {
 
 	bookId, _ := this.GetInt("book_id", 0)
@@ -484,18 +484,18 @@ func (this *ManagerController) DeleteBook() {
 	//用户密码
 	pwd := this.GetString("password")
 	if m, err := models.NewMember().Login(this.Member.Account, pwd); err != nil || m.MemberId == 0 {
-		this.JsonResult(1, "项目删除失败，您的登录密码不正确")
+		this.JsonResult(1, "书籍删除失败，您的登录密码不正确")
 	}
 
 	book := models.NewBook()
 	b, _ := book.Find(bookId)
 	if b.Identify != this.GetString("identify") {
-		this.JsonResult(1, "项目删除失败，您输入的文档标识不正确")
+		this.JsonResult(1, "书籍删除失败，您输入的文档标识不正确")
 	}
 	err := book.ThoroughDeleteBook(bookId)
 
 	if err == orm.ErrNoRows {
-		this.JsonResult(6002, "项目不存在")
+		this.JsonResult(6002, "书籍不存在")
 	}
 	if err != nil {
 		logs.Error("DeleteBook => ", err)
@@ -509,7 +509,7 @@ func (this *ManagerController) DeleteBook() {
 		}
 	}()
 
-	this.JsonResult(0, "项目删除成功")
+	this.JsonResult(0, "书籍删除成功")
 }
 
 // CreateToken 创建访问来令牌.
@@ -524,12 +524,12 @@ func (this *ManagerController) CreateToken() {
 
 	book, err := models.NewBook().FindByFieldFirst("identify", identify)
 	if err != nil {
-		this.JsonResult(6001, "项目不存在")
+		this.JsonResult(6001, "书籍不存在")
 	}
 
 	if action == "create" {
 		if book.PrivatelyOwned == 0 {
-			this.JsonResult(6001, "公开项目不能创建阅读令牌")
+			this.JsonResult(6001, "公开书籍不能创建阅读令牌")
 		}
 
 		book.PrivateToken = string(utils.Krand(conf.GetTokenSize(), utils.KC_RAND_KIND_ALL))
@@ -583,7 +583,7 @@ func (this *ManagerController) Setting() {
 	this.TplName = "manager/setting.html"
 }
 
-// Transfer 转让项目.
+// Transfer 转让书籍.
 func (this *ManagerController) Transfer() {
 	account := this.GetString("account")
 	if account == "" {
@@ -614,7 +614,7 @@ func (this *ManagerController) Transfer() {
 	rel, err := models.NewRelationship().FindFounder(book.BookId)
 	if err != nil {
 		beego.Error("FindFounder => ", err)
-		this.JsonResult(6009, "查询项目创始人失败")
+		this.JsonResult(6009, "查询书籍创始人失败")
 	}
 
 	if member.MemberId == rel.MemberId {
@@ -679,7 +679,7 @@ func (this *ManagerController) SetCommentStatus() {
 	this.JsonResult(0, "设置成功")
 }
 
-//设置项目私有状态.
+//设置书籍私有状态.
 func (this *ManagerController) PrivatelyOwned() {
 	status := this.GetString("status")
 	identify := this.GetString("identify")
@@ -891,7 +891,7 @@ func (this *ManagerController) Ads() {
 	}
 }
 
-//更行书籍项目的排序
+//更行书籍书籍的排序
 func (this *ManagerController) UpdateBookSort() {
 	bookId, _ := this.GetInt("book_id")
 	orderIndex, _ := this.GetInt("value")

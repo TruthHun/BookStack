@@ -106,7 +106,7 @@ function upload(url, formData, callback){
 $(function () {
     $(".tooltips").tooltip();
 
-    //文档项目评分
+    //书籍评分
     if($("body").attr("id")=="bookstack-intro"){
         var stars=$(".cursor-pointer .fa")
         $(".cursor-pointer .fa").hover(function () {

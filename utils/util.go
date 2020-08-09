@@ -356,7 +356,7 @@ func CropImage(file string, width, height int) (err error) {
 //force:是否是强力采集
 //intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
 //diySelecter:自定义选择器
-//注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为文档项目的标识
+//注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为书籍的标识
 func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, links map[string]string, headers ...map[string]string) (cont string, err error) {
 	defer func() {
 		if r := recover(); r != nil {

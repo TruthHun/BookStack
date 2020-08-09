@@ -223,7 +223,7 @@ limit ? offset ?
 }
 
 //清空阅读记录
-//当删除文档项目时，直接删除该文档项目的所有记录
+//当删除书籍时，直接删除该书籍的所有记录
 func (this *ReadRecord) Clear(uid, bookId int) (err error) {
 	o := orm.NewOrm()
 	if bookId > 0 && uid > 0 {
@@ -243,7 +243,7 @@ func (this *ReadRecord) Clear(uid, bookId int) (err error) {
 //查询阅读记录
 func (this *ReadRecord) List(uid, bookId int) (lists []RecordList, cnt int64, err error) {
 	if uid*bookId == 0 {
-		err = errors.New("用户id和项目id不能为空")
+		err = errors.New("用户id和书籍id不能为空")
 		return
 	}
 	fields := "r.doc_id,r.create_at,d.document_name title,d.identify"

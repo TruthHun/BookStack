@@ -36,14 +36,14 @@ const (
 // Book struct .
 type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`
-	BookName          string    `orm:"column(book_name);size(500)" json:"book_name"`      // BookName 项目名称.
-	Identify          string    `orm:"column(identify);size(100);unique" json:"identify"` // Identify 项目唯一标识.
+	BookName          string    `orm:"column(book_name);size(500)" json:"book_name"`      // BookName 书籍名称.
+	Identify          string    `orm:"column(identify);size(100);unique" json:"identify"` // Identify 书籍唯一标识.
 	OrderIndex        int       `orm:"column(order_index);type(int);default(0)" json:"order_index"`
 	Pin               int       `orm:"column(pin);type(int);default(0)" json:"pin"`       // pin值，用于首页固定显示
-	Description       string    `orm:"column(description);size(2000)" json:"description"` // Description 项目描述.
+	Description       string    `orm:"column(description);size(2000)" json:"description"` // Description 书籍描述.
 	Label             string    `orm:"column(label);size(500)" json:"label"`
-	PrivatelyOwned    int       `orm:"column(privately_owned);type(int);default(0)" json:"privately_owned"` // PrivatelyOwned 项目私有： 0 公开/ 1 私有
-	PrivateToken      string    `orm:"column(private_token);size(500);null" json:"private_token"`           // 当项目是私有时的访问Token.
+	PrivatelyOwned    int       `orm:"column(privately_owned);type(int);default(0)" json:"privately_owned"` // PrivatelyOwned 书籍私有： 0 公开/ 1 私有
+	PrivateToken      string    `orm:"column(private_token);size(500);null" json:"private_token"`           // 当书籍是私有时的访问Token.
 	Status            int       `orm:"column(status);type(int);default(0)" json:"status"`                   //状态：0 正常/1 已删除
 	Editor            string    `orm:"column(editor);size(50)" json:"editor"`                               //默认的编辑器.
 	DocCount          int       `orm:"column(doc_count);type(int)" json:"doc_count"`                        // DocCount 包含文档数量.
@@ -54,13 +54,13 @@ type Book struct {
 	CreateTime        time.Time `orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` // CreateTime 创建时间 .
 	MemberId          int       `orm:"column(member_id);size(100)" json:"member_id"`
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now" json:"modify_time"`
-	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //项目发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
+	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
 	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //下载文档生成时间
 	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
-	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    // 文档项目被阅读次数
-	Star              int       `orm:"column(star);default(0)" json:"star"`    // 文档项目被收藏次数
-	Score             int       `orm:"column(score);default(40)" json:"score"` // 文档项目评分，默认40，即4.0星
+	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    // 书籍被阅读次数
+	Star              int       `orm:"column(star);default(0)" json:"star"`    // 书籍被收藏次数
+	Score             int       `orm:"column(score);default(40)" json:"score"` // 书籍评分，默认40，即4.0星
 	CntScore          int       // 评分人数
 	CntComment        int       // 评论人数
 	Author            string    `orm:"size(50)"`            //原作者，即来源
@@ -130,7 +130,7 @@ func (m *Book) Insert() (err error) {
 	relationship.MemberId = m.MemberId
 
 	if err = relationship.Insert(); err != nil {
-		logs.Error("插入项目与用户关联 => ", err)
+		logs.Error("插入书籍与用户关联 => ", err)
 		return err
 	}
 
@@ -199,7 +199,7 @@ func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err 
 	return
 }
 
-//分页查询指定用户的项目
+//分页查询指定用户的书籍
 //按照最新的进行排序
 func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
 
@@ -227,7 +227,7 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	}
 	_, err = o.Raw(sql2, memberId).QueryRows(&books)
 	if err != nil {
-		logs.Error("分页查询项目列表 => ", err)
+		logs.Error("分页查询书籍列表 => ", err)
 		return
 	}
 
@@ -259,7 +259,7 @@ func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...
 	return
 }
 
-// 彻底删除项目.
+// 彻底删除书籍.
 func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if id <= 0 {
 		return ErrInvalidParameter
@@ -324,7 +324,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	if err = o.Commit(); err != nil {
 		return err
 	}
-	//删除oss中项目对应的文件夹
+	//删除oss中书籍对应的文件夹
 	switch utils.StoreType {
 	case utils.StoreLocal: //删除本地存储，记得加上uploads
 		if m.Cover != beego.AppConfig.DefaultString("cover", "/static/images/book.png") {

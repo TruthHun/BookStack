@@ -17,7 +17,7 @@ import (
 type Comments struct {
 	Id         int
 	Uid        int       `orm:"index"` //用户id
-	BookId     int       `orm:"index"` //文档项目id
+	BookId     int       `orm:"index"` //书籍id
 	Content    string    //评论内容
 	TimeCreate time.Time //评论时间
 	Status     int8      //  审核状态; 0，待审核，1 通过，-1 不通过
@@ -200,7 +200,7 @@ func (this *Score) AddScore(uid, bookId, score int) (err error) {
 	scoreObj.Score = score
 	scoreObj.TimeCreate = time.Now()
 	o.Insert(&scoreObj)
-	if scoreObj.Id > 0 { //评分添加成功，更行当前书籍项目的评分
+	if scoreObj.Id > 0 { //评分添加成功，更行当前书籍书籍的评分
 		//评分人数+1
 		var book = Book{BookId: bookId}
 		o.Read(&book, "book_id")
@@ -245,7 +245,7 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 		err = errors.New("发表评论失败")
 		return
 	}
-	// 项目被评论数量量+1
+	// 书籍被评论数量量+1
 	SetIncreAndDecre("md_books", "cnt_comment", fmt.Sprintf("book_id=%v", bookId), true)
 	return
 }

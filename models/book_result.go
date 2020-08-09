@@ -55,7 +55,7 @@ func NewBookResult() *BookResult {
 	return &BookResult{}
 }
 
-// 根据项目标识查询项目以及指定用户权限的信息.
+// 根据书籍标识查询书籍以及指定用户权限的信息.
 func (m *BookResult) FindByIdentify(identify string, memberId int) (result *BookResult, err error) {
 	if identify == "" || memberId <= 0 {
 		return result, ErrInvalidParameter
@@ -80,7 +80,7 @@ func (m *BookResult) FindByIdentify(identify string, memberId int) (result *Book
 
 	err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", book.BookId).Filter("role_id", conf.BookFounder).One(&relationship2)
 	if err != nil {
-		logs.Error("根据项目标识查询项目以及指定用户权限的信息 => ", err)
+		logs.Error("根据书籍标识查询书籍以及指定用户权限的信息 => ", err)
 		return result, ErrPermissionDenied
 	}
 

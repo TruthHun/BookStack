@@ -19,8 +19,8 @@
     - [功能与亮点](#func)
 		- [书籍分类](#cate)
 		- [用户主页](#homepage)
-		- [一键导入markdown项目](#import)
-		- [一键拉取markdown项目](#pull)
+		- [一键导入markdown书籍](#import)
+		- [一键拉取markdown书籍](#pull)
 		- [生成和导出PDF、epub、mobi等离线文档](#generate)
 		- [文档排序和批量创建文档](#sort)
 		- [文档间的跳转](#redirect)
@@ -52,7 +52,7 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，为�
 
 后来学了Go语言，又在无意间遇到了[Mindoc](https://github.com/lifei6671/mindoc)，然后我们公司([掘金量化](https://www.myquant.cn) )也恰巧让我开发公司官网和文档系统，然后我就对[Mindoc](https://github.com/lifei6671/mindoc)做了二次开发。
 
-本来是不想开源的，因为自己写代码的时候，写着写着，代码改来改去，然后代码就乱七八糟了，怕开源出来丢人现眼。但是踏入IT行业三年多时间以来，自身也受益于各种开源项目和开源组件，所以最终还是决定将BookStack开源出来。
+本来是不想开源的，因为自己写代码的时候，写着写着，代码改来改去，然后代码就乱七八糟了，怕开源出来丢人现眼。但是踏入IT行业三年多时间以来，自身也受益于各种开源书籍和开源组件，所以最终还是决定将BookStack开源出来。
 
 其中肯定还是有不足的地方，大家在使用的过程中，遇到问题，欢迎反馈。
 
@@ -103,21 +103,21 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 在用户主页，展示用户分享的书籍、粉丝、关注和手册，增加用户间的互动
 
 <a name="import"></a>
-### 一键导入markdown项目
+### 一键导入markdown书籍
 这个功能，相信是很多人的最爱了。目前这个功能仅对管理员开放。
-> 经实测，目前已完美支持各种姿势写作的markdown项目的文档导入，能很好地处理文档间的链接以及文档中的图片链接
+> 经实测，目前已完美支持各种姿势写作的markdown书籍的文档导入，能很好地处理文档间的链接以及文档中的图片链接
 
-![一键导入项目](static/openstatic/import.png)
+![一键导入书籍](static/openstatic/import.png)
 
 <a name="pull"></a>
-### 一键拉取markdown项目
-看到GitHub、Gitee等有很多开源文档的项目，但是一个一个去拷贝粘贴里面的markdown内容不现实。于是，做了这个一键拉取的功能。
+### 一键拉取markdown书籍
+看到GitHub、Gitee等有很多开源文档的书籍，但是一个一个去拷贝粘贴里面的markdown内容不现实。于是，做了这个一键拉取的功能。
 目前只有管理员才有权限拉取，并没有对普通用户开放。要体验这个功能，请用管理员账号登录演示站点体验。
-用法很简单，比如我们拉取beego的文档项目，在创建项目后，直接点击"拉取项目"，粘贴如" https://github.com/beego/beedoc/archive/master.zip "，然后就会自动帮你拉取上面的所有markdown文档并录入数据库，同时图片也会自动帮你更新到OSS。
-![拉取项目](static/openstatic/pull.png)
-> 经实测，目前已完美支持各种姿势写作的markdown项目的拉取，能很好地处理文档间的链接以及文档中的图片链接
+用法很简单，比如我们拉取beego的书籍，在创建书籍后，直接点击"拉取书籍"，粘贴如" https://github.com/beego/beedoc/archive/master.zip "，然后就会自动帮你拉取上面的所有markdown文档并录入数据库，同时图片也会自动帮你更新到OSS。
+![拉取书籍](static/openstatic/pull.png)
+> 经实测，目前已完美支持各种姿势写作的markdown书籍的拉取，能很好地处理文档间的链接以及文档中的图片链接
 
-> 目前已支持Git Clone导入项目
+> 目前已支持Git Clone导入书籍
 
 <a name="generate"></a>
 ### 生成和导出PDF、epub、mobi等离线文档
@@ -127,9 +127,9 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 
 <a name="sort"></a>
 ### 文档排序和批量创建文档
-很多时候，我们在写作文档项目的时候，会习惯地先把文档项目的章节目录结构创建出来，然后再慢慢写内容。
-但是，文档项目中的文档少的时候，一个个去创建倒没什么，但是文档数量多了之后，简直就是虐待自己，排序的时候还要一个一个去拖拽进行排序，很麻烦。现在，这个问题已经解决了。如下：
-- 在文档项目中，创建一个文档标识为`summary.md`的文档(大小写不敏感)
+很多时候，我们在写作书籍的时候，会习惯地先把书籍的章节目录结构创建出来，然后再慢慢写内容。
+但是，书籍中的文档少的时候，一个个去创建倒没什么，但是文档数量多了之后，简直就是虐待自己，排序的时候还要一个一个去拖拽进行排序，很麻烦。现在，这个问题已经解决了。如下：
+- 在书籍中，创建一个文档标识为`summary.md`的文档(大小写不敏感)
 - 在文档中，填充无序列表的markdown内容，如：
 
 ```markdown
@@ -154,7 +154,7 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 
 <a name="redirect"></a>
 ### 文档间的跳转
-你在一个文档项目中会有很多文档，其中一个文档的文档标识叫`readme.md`,另外一个文档的文档标识叫`quickstart.md`，两个文档间如何跳转呢？
+你在一个书籍中会有很多文档，其中一个文档的文档标识叫`readme.md`,另外一个文档的文档标识叫`quickstart.md`，两个文档间如何跳转呢？
 如果你知道站点的路由规则，倒是可以轻松链过去，但是，每次都要这样写，真的很麻烦。自己也经常写文档，简直受够了，然后想到了一个办法。如下：
 我从`readme.md`跳转到`quickstart.md`，在`readme.md`中的内容这样写:
 ``` 
@@ -165,7 +165,7 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 [快速开始-步骤三]($quickstart.md#step3)
 ```
 好了，在发布文档的时候，文档就会根据路由规则以及你的文档标识去生成链接了(由于是后端去处理，所以在编辑文档的时候，前端展示的预览内容，暂时是无法跳转的)。
-那么，问题就来了，我文档项目里面的文档越来越多，我怎么知道我要链接的那个文档的文档标识呢？不用担心，在markdown编辑器的左侧，括号里面的红色文字显示的就是你的文档标识。
+那么，问题就来了，我书籍里面的文档越来越多，我怎么知道我要链接的那个文档的文档标识呢？不用担心，在markdown编辑器的左侧，括号里面的红色文字显示的就是你的文档标识。
 
 ![文档标识](static/openstatic/identify.png)
 
@@ -207,13 +207,13 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 
 ![内容阅读页](static/openstatic/page-read.png)
 
-> 个人项目页
+> 个人书籍页
 
-![个人项目页](static/openstatic/page-project.png)
+![个人书籍页](static/openstatic/page-project.png)
 
 > 手机端首页
 
-![个人项目页](static/openstatic/page-mobile.png)
+![个人书籍页](static/openstatic/page-mobile.png)
 
 
 <a name="todo"></a>

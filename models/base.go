@@ -81,7 +81,7 @@ type SitemapDocs struct {
 
 //站点地图数据
 func SitemapData(page, listRows int) (totalRows int64, sitemaps []SitemapDocs) {
-	//获取公开的项目
+	//获取公开的书籍
 	var (
 		books   []Book
 		docs    []Document
@@ -127,7 +127,7 @@ func SitemapUpdate(domain string) {
 	)
 	domain = strings.TrimSuffix(domain, "/")
 	os.Mkdir("sitemap", os.ModePerm)
-	//查询公开的项目
+	//查询公开的书籍
 	qsBooks := o.QueryTable("md_books").Filter("privately_owned", 0)
 	limit := 10000
 	for i := 0; i < 10; i++ {

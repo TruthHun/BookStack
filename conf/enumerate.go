@@ -31,7 +31,7 @@ const (
 	MemberAdminRole = 1
 	// 读者.
 	MemberGeneralRole = 2
-	// 作者（可以创建项目）
+	// 作者（可以创建书籍）
 	MemberEditorRole = 3
 )
 
