@@ -38,7 +38,7 @@ type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`
 	BookName          string    `orm:"column(book_name);size(500)" json:"book_name"`      // BookName 书籍名称.
 	Identify          string    `orm:"column(identify);size(100);unique" json:"identify"` // Identify 书籍唯一标识.
-	OrderIndex        int       `orm:"column(order_index);type(int);default(0)" json:"order_index"`
+	OrderIndex        int       `orm:"column(order_index);type(int);default(0);index" json:"order_index"`
 	Pin               int       `orm:"column(pin);type(int);default(0)" json:"pin"`       // pin值，用于首页固定显示
 	Description       string    `orm:"column(description);size(2000)" json:"description"` // Description 书籍描述.
 	Label             string    `orm:"column(label);size(500)" json:"label"`
