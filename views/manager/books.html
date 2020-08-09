@@ -16,6 +16,7 @@
                 <div class="m-box">
                     <div class="box-head">
                         <strong class="box-title">书籍列表</strong>
+                        <a href="javascript:void(0);" data-toggle="modal" data-target="#deleteBooksModal" class="btn btn-danger pull-right">批量删除</a>
                     </div>
                     <ul class="nav nav-tabs" style="margin-top: 15px;">
                         <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}">公开书籍</a></li>
@@ -43,7 +44,7 @@
                                         <a href="{{urlfor "DocumentController.Index" ":key" $item.Identify}}" title="查看文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看文档</a>
                                         <a href="{{urlfor "DocumentController.Edit" ":key" $item.Identify ":id" ""}}" title="编辑文档" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-edit" aria-hidden="true"></i> 编辑文档</a>
                                         <a href="{{urlfor "ManagerController.EditBook" ":key" $item.Identify}}" title="书籍设置" class="btn btn-default" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs" aria-hidden="true"></i> 书籍设置</a>
-                                        <a href="javascript:void(0);" data-identify="{{$item.Identify}}" data-book="{{$item.BookName}}" data-action="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除书籍" class="btn btn-danger btn-del-book" data-toggle="tooltip" target="_blank"><i class="fa fa-recycle" aria-hidden="true"></i> 删除书籍</a>
+                                        <a href="javascript:void(0);" data-identify="{{$item.Identify}}" data-book="{{$item.BookName}}" data-action="{{urlfor "ManagerController.DeleteBook"}}?book_id={{$item.BookId}}" title="删除书籍" class="btn btn-danger btn-del-book" data-toggle="tooltip"><i class="fa fa-recycle" aria-hidden="true"></i> 删除书籍</a>
                                     </div>
 
                                     <div class="clearfix"></div>
@@ -103,6 +104,40 @@
                         <input type="text" name="identify" autocomplete="off" class="form-control">
                     </div>
                     <br>
+                    <div class="input-group form-group">
+                        <span class="input-group-addon">登录密码</span>
+                        <input type="password" name="password" autocomplete="off" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span id="form-error-message2" class="error-message"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" id="btnDeleteBook" class="btn btn-danger" data-loading-text="删除中...">确定删除</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- 批量删除书籍 -->
+<div class="modal fade" id="deleteBooksModal" tabindex="-1" role="dialog" aria-labelledby="deleteBooksModalLabel">
+    <div class="modal-dialog" role="document">
+        <form method="post" id="deleteBooksForm" class="ajax-form" action="{{urlfor "ManagerController.DeleteBook"}}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">批量删除书籍</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group wait2del">
+                        <div><strong>请勾选需要批量删除的书籍</strong></div>
+                        <ul>
+                            {{range $index,$item := .Lists}}
+                            <li><label><input type="checkbox" name="book_id" value="{{$item.BookId}}"> {{$item.BookName}}</label></li>
+                            {{end}}
+                        </ul>
+                    </div>
                     <div class="input-group form-group">
                         <span class="input-group-addon">登录密码</span>
                         <input type="password" name="password" autocomplete="off" class="form-control">

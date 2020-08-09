@@ -997,3 +997,6 @@ a{color: #333}
     cursor: pointer;
 }
 .backtop:hover{background-color: #dddddd;color: #10af88;}
+.wait2del>div{margin-bottom: 15px;}
+.wait2del ul{padding-left: 15px;}
+.wait2del label{font-weight: normal;}

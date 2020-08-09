@@ -475,9 +475,16 @@ func (this *ManagerController) EditBook() {
 
 // 删除书籍.
 func (this *ManagerController) DeleteBook() {
-
-	bookId, _ := this.GetInt("book_id", 0)
-	if bookId <= 0 {
+	var bookIds []int
+	beego.Debug(this.Ctx.Request.Form)
+	if ids, ok := this.Ctx.Request.Form["book_id"]; ok {
+		for _, id := range ids {
+			if v, _ := strconv.Atoi(id); v > 0 {
+				bookIds = append(bookIds, v)
+			}
+		}
+	}
+	if len(bookIds) <= 0 {
 		this.JsonResult(6001, "参数错误")
 	}
 
@@ -486,28 +493,28 @@ func (this *ManagerController) DeleteBook() {
 	if m, err := models.NewMember().Login(this.Member.Account, pwd); err != nil || m.MemberId == 0 {
 		this.JsonResult(1, "书籍删除失败，您的登录密码不正确")
 	}
-
+	identify := strings.TrimSpace(this.GetString("identify"))
 	book := models.NewBook()
-	b, _ := book.Find(bookId)
-	if b.Identify != this.GetString("identify") {
-		this.JsonResult(1, "书籍删除失败，您输入的文档标识不正确")
-	}
-	err := book.ThoroughDeleteBook(bookId)
+	client := models.NewElasticSearchClient()
+	for _, bookID := range bookIds {
+		if identify != "" {
+			if b, _ := book.FindByIdentify(identify, "book_id"); b.BookId != bookID {
+				this.JsonResult(6002, "书籍标识输入不正确")
+			}
+		}
 
-	if err == orm.ErrNoRows {
-		this.JsonResult(6002, "书籍不存在")
-	}
-	if err != nil {
-		logs.Error("DeleteBook => ", err)
-		this.JsonResult(6003, "删除失败")
-	}
-
-	go func() {
-		client := models.NewElasticSearchClient()
-		if errDel := client.DeleteIndex(bookId, true); errDel != nil && client.On {
+		err := book.ThoroughDeleteBook(bookID)
+		if err == orm.ErrNoRows {
+			this.JsonResult(6002, "书籍不存在")
+		}
+		if err != nil {
+			logs.Error("DeleteBook => ", err)
+			this.JsonResult(6003, "删除失败")
+		}
+		if errDel := client.DeleteIndex(bookID, true); errDel != nil && client.On {
 			beego.Error(errDel.Error())
 		}
-	}()
+	}
 
 	this.JsonResult(0, "书籍删除成功")
 }
