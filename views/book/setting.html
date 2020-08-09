@@ -291,7 +291,7 @@
                 <div class="modal-footer">
                     <span id="form-error-message2" class="error-message"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="submit" id="btnDeleteBook" class="btn btn-danger" data-loading-text="删除中...">确定删除</button>
+                    <button type="submit" class="btn btn-danger btnDeleteBook" data-loading-text="删除中...">确定删除</button>
                 </div>
             </div>
         </form>
@@ -422,7 +422,7 @@
         });
         $("#deleteBookForm").ajaxForm({
             beforeSubmit : function () {
-                $("#btnDeleteBook").button("loading");
+                $(".btnDeleteBook").button("loading");
             },
             success : function (res) {
                 if(res.errcode === 0){
@@ -430,11 +430,11 @@
                 }else{
                     showError(res.message,"#form-error-message2");
                 }
-                $("#btnDeleteBook").button("reset");
+                $(".btnDeleteBook").button("reset");
             },
             error : function () {
                 showError("服务器异常","#form-error-message2");
-                $("#btnDeleteBook").button("reset");
+                $(".btnDeleteBook").button("reset");
             }
         });
         $("#transferBookForm").ajaxForm({
