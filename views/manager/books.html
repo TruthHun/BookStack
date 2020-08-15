@@ -22,6 +22,16 @@
                         <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}">公开书籍</a></li>
                         <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "ManagerController.Books"}}?private=1">私有书籍</a></li>
                     </ul>
+                    <br>
+                    <form class="bs-example bs-example-form" role="form">
+                        <div class="input-group">
+                            <input type="hidden" name="private" value="{{.Private}}">
+                            <input type="text" name="wd" value="{{.Wd}}" placeholder="搜索书籍" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit">搜索</button>
+                            </span>
+                        </div>
+                    </form>
                 </div>
                 <div class="box-body" id="bookList">
                     <div class="book-list">

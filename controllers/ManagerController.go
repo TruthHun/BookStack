@@ -374,19 +374,20 @@ func (this *ManagerController) Books() {
 
 	pageIndex, _ := this.GetInt("page", 1)
 	private, _ := this.GetInt("private")
+	wd := this.GetString("wd")
 
-	books, totalCount, err := models.NewBookResult().FindToPager(pageIndex, conf.PageSize, private)
-	if err != nil {
-		this.Abort("404")
-	}
+	size := conf.PageSize
+
+	books, totalCount, _ := models.NewBookResult().FindToPager(pageIndex, size, private, wd)
 
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("ManagerController.Books"), fmt.Sprintf("&private=%v", private))
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, size, pageIndex, beego.URLFor("ManagerController.Books"), fmt.Sprintf("&private=%v&wd=%v", private, wd))
 	} else {
 		this.Data["PageHtml"] = ""
 	}
 
 	this.Data["Lists"] = books
+	this.Data["Wd"] = wd
 	this.Data["IsBooks"] = true
 	this.GetSeoByPage("manage_project_list", map[string]string{
 		"title":       "书籍管理 - " + this.Sitename,
