@@ -66,13 +66,9 @@ func (this *BookController) Index() {
 	private, _ := this.GetInt("private", 1) //是否是私有文档
 	this.Data["Private"] = private
 	pageIndex, _ := this.GetInt("page", 1)
-	books, totalCount, err := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
-	if err != nil {
-		logs.Error("BookController.Index => ", err)
-		this.Abort("404")
-	}
+	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
+
 	if totalCount > 0 {
-		//this.Data["PageHtml"] = utils.GetPagerHtml(this.Ctx.Request.RequestURI, pageIndex, conf.PageSize, totalCount)
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
 	} else {
 		this.Data["PageHtml"] = ""
