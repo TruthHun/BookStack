@@ -380,95 +380,68 @@ func (m *Member) Valid(isHashPassword bool) error {
 
 //删除一个用户.
 
-func (m *Member) Delete(oldId int, newId int) error {
+func (m *Member) Delete(oldId int, adminId int) (err error) {
 	o := orm.NewOrm()
 
-	err := o.Begin()
-
+	err = o.Begin()
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err != nil {
+			o.Rollback()
+		} else {
+			o.Commit()
+		}
+	}()
 
 	_, err = o.Raw("DELETE FROM md_members WHERE member_id = ?", oldId).Exec()
 	if err != nil {
-		o.Rollback()
-		return err
-	}
-	_, err = o.Raw("UPDATE md_attachment SET `create_at` = ? WHERE `create_at` = ?", newId, oldId).Exec()
-
-	if err != nil {
-		o.Rollback()
-		return err
+		return
 	}
 
-	_, err = o.Raw("UPDATE md_books SET member_id = ? WHERE member_id = ?", newId, oldId).Exec()
+	_, err = o.Raw("UPDATE md_books SET member_id = ? WHERE member_id = ?", adminId, oldId).Exec()
 	if err != nil {
-		o.Rollback()
+		return
+	}
+	_, err = o.Raw("UPDATE md_document_history SET member_id=? WHERE member_id = ?", adminId, oldId).Exec()
+	if err != nil {
 		return err
 	}
-	_, err = o.Raw("UPDATE md_document_history SET member_id=? WHERE member_id = ?", newId, oldId).Exec()
+
+	_, err = o.Raw("UPDATE md_documents SET member_id = ? WHERE member_id = ?", adminId, oldId).Exec()
 	if err != nil {
-		o.Rollback()
 		return err
 	}
-	_, err = o.Raw("UPDATE md_document_history SET modify_at=? WHERE modify_at = ?", newId, oldId).Exec()
-	if err != nil {
-		o.Rollback()
-		return err
-	}
-	_, err = o.Raw("UPDATE md_documents SET member_id = ? WHERE member_id = ?;", newId, oldId).Exec()
-	if err != nil {
-		o.Rollback()
-		return err
-	}
-	_, err = o.Raw("UPDATE md_documents SET modify_at = ? WHERE modify_at = ?", newId, oldId).Exec()
-	if err != nil {
-		o.Rollback()
-		return err
-	}
-	//_,err = o.Raw("UPDATE md_relationship SET member_id = ? WHERE member_id = ?",newId,oldId).Exec()
-	//if err != nil {
-	//
-	//	if err != nil {
-	//		o.Rollback()
-	//		return err
-	//	}
-	//}
+
 	var relationshipList []*Relationship
 
 	_, err = o.QueryTable(NewRelationship().TableNameWithPrefix()).Filter("member_id", oldId).All(&relationshipList)
-
 	if err == nil {
 		for _, relationship := range relationshipList {
 			//如果存在创始人，则删除
 			if relationship.RoleId == 0 {
 				rel := NewRelationship()
-
-				err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", relationship.BookId).Filter("member_id", newId).One(rel)
+				err = o.QueryTable(relationship.TableNameWithPrefix()).Filter("book_id", relationship.BookId).Filter("member_id", adminId).One(rel)
 				if err == nil {
-					if _, err := o.Delete(relationship); err != nil {
+					if _, err = o.Delete(relationship); err != nil {
 						beego.Error(err)
 					}
 					relationship.RelationshipId = rel.RelationshipId
 				}
-				relationship.MemberId = newId
+				relationship.MemberId = adminId
 				relationship.RoleId = 0
-				if _, err := o.Update(relationship); err != nil {
+				if _, err = o.Update(relationship); err != nil {
 					beego.Error(err)
 				}
 			} else {
-				if _, err := o.Delete(relationship); err != nil {
+				if _, err = o.Delete(relationship); err != nil {
 					beego.Error(err)
 				}
 			}
 		}
 	}
-
-	if err = o.Commit(); err != nil {
-		o.Rollback()
-		return err
-	}
-	return nil
+	return
 }
 
 //获取用户名
