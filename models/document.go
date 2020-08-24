@@ -40,7 +40,7 @@ type Document struct {
 	OrderSort    int           `orm:"column(order_sort);default(0);type(int);index" json:"order_sort"`
 	Release      string        `orm:"column(release);type(text);null" json:"release"` // Release 发布后的Html格式内容.
 	CreateTime   time.Time     `orm:"column(create_time);type(datetime);auto_now_add" json:"create_time"`
-	MemberId     int           `orm:"column(member_id);type(int)" json:"member_id"`
+	MemberId     int           `orm:"column(member_id);type(int);index" json:"member_id"`
 	ModifyTime   time.Time     `orm:"column(modify_time);type(datetime);default(null)" json:"modify_time"`
 	ModifyAt     int           `orm:"column(modify_at);type(int)" json:"-"`
 	Version      int64         `orm:"type(bigint);column(version)" json:"version"`
