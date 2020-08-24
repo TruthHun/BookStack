@@ -52,7 +52,7 @@ type Book struct {
 	Cover             string    `orm:"column(cover);size(1000)" json:"cover"`                              //封面地址
 	Theme             string    `orm:"column(theme);size(255);default(default)" json:"theme"`              //主题风格
 	CreateTime        time.Time `orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` // CreateTime 创建时间 .
-	MemberId          int       `orm:"column(member_id);size(100)" json:"member_id"`
+	MemberId          int       `orm:"column(member_id);size(100);index" json:"member_id"`
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now" json:"modify_time"`
 	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
 	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //下载文档生成时间

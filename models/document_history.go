@@ -14,7 +14,7 @@ type DocumentHistory struct {
 	DocumentId   int       `orm:"column(document_id);type(int);index" json:"doc_id"`
 	DocumentName string    `orm:"column(document_name);size(500)" json:"doc_name"`
 	ParentId     int       `orm:"column(parent_id);type(int);index;default(0)" json:"parent_id"`
-	MemberId     int       `orm:"column(member_id);type(int)" json:"member_id"`
+	MemberId     int       `orm:"column(member_id);type(int);index" json:"member_id"`
 	ModifyTime   time.Time `orm:"column(modify_time);type(datetime);auto_now" json:"modify_time"`
 	ModifyAt     int       `orm:"column(modify_at);type(int)" json:"-"`
 	Version      int64     `orm:"type(bigint);column(version)" json:"version"`

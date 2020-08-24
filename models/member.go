@@ -382,7 +382,6 @@ func (m *Member) Valid(isHashPassword bool) error {
 
 func (m *Member) Delete(oldId int, adminId int) (err error) {
 	o := orm.NewOrm()
-
 	err = o.Begin()
 	if err != nil {
 		return err
@@ -400,18 +399,30 @@ func (m *Member) Delete(oldId int, adminId int) (err error) {
 		return
 	}
 
-	_, err = o.Raw("UPDATE md_books SET member_id = ? WHERE member_id = ?", adminId, oldId).Exec()
-	if err != nil {
-		return
-	}
-	_, err = o.Raw("UPDATE md_document_history SET member_id=? WHERE member_id = ?", adminId, oldId).Exec()
-	if err != nil {
-		return err
-	}
+	var books []Book
+	o.QueryTable("md_books").Filter("member_id", oldId).Limit(10000000).All(&books, "book_id")
 
-	_, err = o.Raw("UPDATE md_documents SET member_id = ? WHERE member_id = ?", adminId, oldId).Exec()
-	if err != nil {
-		return err
+	if len(books) > 0 {
+		var booksId []interface{}
+
+		for _, book := range books {
+			booksId = append(booksId, book.BookId)
+		}
+
+		_, err = o.Raw("UPDATE md_books SET member_id = ? WHERE member_id = ?", adminId, oldId).Exec()
+		if err != nil {
+			return
+		}
+
+		_, err = o.Raw("UPDATE md_document_history SET member_id=? WHERE member_id = ?", adminId, oldId).Exec()
+		if err != nil {
+			return err
+		}
+
+		_, err = o.QueryTable("md_documents").Filter("book_id__in", booksId...).Update(orm.Params{"member_id": adminId})
+		if err != nil {
+			return err
+		}
 	}
 
 	var relationshipList []*Relationship
