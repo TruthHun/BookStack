@@ -516,7 +516,7 @@ func (this *ManagerController) DeleteBook() {
 			beego.Error(errDel.Error())
 		}
 	}
-
+	go models.CountCategory()
 	this.JsonResult(0, "书籍删除成功")
 }
 

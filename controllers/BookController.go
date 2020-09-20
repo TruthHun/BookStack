@@ -185,7 +185,7 @@ func (this *BookController) Setting() {
 	this.TplName = "book/setting.html"
 }
 
-//保存书籍信息
+// SaveBook 保存书籍信息
 func (this *BookController) SaveBook() {
 
 	bookResult, err := this.IsPermission()
@@ -260,7 +260,7 @@ func (this *BookController) SaveBook() {
 			beego.Error(errSearch.Error())
 		}
 	}()
-
+	go models.CountCategory()
 	this.JsonResult(0, "ok", bookResult)
 }
 
@@ -687,7 +687,7 @@ func (this *BookController) Delete() {
 			beego.Error(errDel.Error())
 		}
 	}()
-
+	go models.CountCategory()
 	this.JsonResult(0, "ok")
 }
 
