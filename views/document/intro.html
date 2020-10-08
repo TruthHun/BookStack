@@ -130,8 +130,8 @@
     <div class="row">
         <div class="col-xs-12 bookstack-menu">
             <ul class="nav nav-tabs">
-                <li {{if eq .Tab "default"}}class="active"{{end}}><a href="{{urlfor "DocumentController.Index" ":key" $.Book.Identify}}"><span class="hidden-xs">文档</span>目录</a></li>
-                <li {{if eq .Tab "comment"}}class="active"{{end}}><a href="{{urlfor "DocumentController.Index" ":key" $.Book.Identify}}?tab=comment"><span class="hidden-xs">文档</span>评论 (<span class="text-muted">{{$.Book.CntComment}}</span>)</a></li>
+                <li {{if eq .Tab "default"}}class="active"{{end}}><a href="{{urlfor "DocumentController.Index" ":key" $.Book.Identify}}">书籍目录</a></li>
+                <li {{if eq .Tab "comment"}}class="active"{{end}}><a href="{{urlfor "DocumentController.Index" ":key" $.Book.Identify}}?tab=comment">书籍评论 (<span class="text-muted">{{$.Book.CntComment}}</span>)</a></li>
             </ul>
             <div class="help-block">
                 <ul class="none-listyle">
