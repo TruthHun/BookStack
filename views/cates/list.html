@@ -112,12 +112,23 @@
             var top = $(".category-index").offset().top
             var height = $(window).height() - 110 - 70
             var style = 'max-height:'+height+'px';
-            if($(window).scrollTop() -15>=top){
+            var scrollTop = $(window).scrollTop()
+            if(scrollTop -15>=top){
                 $(".category-index .panel-default").addClass("fixed")
                 $(".category-index .panel-body").attr("style",style)
             }else{
                 $(".category-index .panel-default").removeClass("fixed")
                 $(".category-index .panel-body").attr("style",'')
+            }
+            console.log(scrollTop)
+            var panels = $(".category-detail>.panel")
+            
+            for (var i = 0; i < panels.length; i++) {
+                if($(panels[i]).offset().top - scrollTop>=0){
+                    $(".category-index a").removeClass("active");
+                    $("[data-show="+$(panels[i]).attr("id")+"]").addClass("active");
+                    i=panels.length
+                }
             }
         }
         $(".cate-item").tooltip();
