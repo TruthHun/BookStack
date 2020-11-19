@@ -2,9 +2,10 @@
 package models
 
 import (
-	"github.com/astaxie/beego/orm"
 	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/orm"
 )
 
 type DownloadCounter struct {
@@ -24,11 +25,11 @@ func (m *DownloadCounter) Increase(uid int) (err error) {
 	o.QueryTable(m).Filter("uid", uid).Filter("date", now).One(m)
 	if m.Id == 0 {
 		m.Total = 1
-		m.Uid = 1
+		m.Uid = uid
 		m.Date = now
 		_, err = o.Insert(m)
 	} else {
-		m.Total += 1
+		m.Total = m.Total + 1
 		_, err = o.Update(m)
 	}
 	return
