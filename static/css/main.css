@@ -66,7 +66,7 @@ textarea{
     color: #333;
     max-width: 300px;
     white-space:nowrap;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 .manual-reader .slidebar {
     margin: 7px 10px 0 0;
@@ -74,7 +74,7 @@ textarea{
 .user-info{
     border: 0;
     background-color: #ffffff;
-    padding: 5px 10px !important;
+    padding: 9px 10px !important;
     cursor: pointer;
 }
 .user-info:hover{
@@ -397,7 +397,7 @@ textarea{
 }
 /**************用户搜索界面样式********************/
 .searchbar{
-    padding: 8px;
+    padding: 12px 8px;
 }
 .searchbar .search-btn {
     display: inline-block;
@@ -634,7 +634,7 @@ textarea{
 
 
 /* 以下是Bookstack的修正样式 */
-.navbar{min-height: 49px;}
+.navbar{min-height: 60px;}
 .navbar-brand{padding-left: 0px;}
 a{color: #333}
 .mgt-15px{margin-top: 15px;}
@@ -642,8 +642,11 @@ a{color: #333}
 .mgb-15px{margin-bottom: 15px;}
 .text-danger{color: red;}
 .none-listyle{list-style: none;padding: 0px;}
-.btn-group.dropdown-menu-right.pull-right.slidebar.visible-xs-inline-block.visible-sm-inline-block{margin-top: 7px;}
+.btn-group.dropdown-menu-right.pull-right.slidebar.visible-xs-inline-block.visible-sm-inline-block{margin-top: 12px;margin-right: 0;}
 .navbar-nav>li.active a{background-color: #EFEFEF;color: #06f;padding-bottom: 16px;}
+.navbar-nav>li>a{
+    font-size: 15px;line-height: 28px;
+}
 .manual-list .list-item .manual-item-standard .cover{box-shadow: none;}
 .manual-list{
     padding-top: 15px;
@@ -675,7 +678,7 @@ a{color: #333}
 
 .border{border: 1px solid #efefef;}
 .border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;}
-.navbar-brand>img.logo{height: 50px;margin-top: -15px;}
+.navbar-brand>img.logo{height: 55px;margin-top: -13px;}
 #bookstack-intro{padding-top: 70px;}
 #bookstack-intro ul,#bookstack-intro li{list-style: none;padding:0px;}
 #bookstack-intro h1{font-size: 22px;line-height: 150%;color: #555;margin-top: 10px;}
@@ -764,7 +767,7 @@ a{color: #333}
 .row-cate-sub a{display: inline-block;text-align: center;}
 .row-cate-sub a img{width: 60px;height: 60px;border-radius: 4px;}
 
-.cate-list{margin-top: 70px;}
+.cate-list{margin-top: 75px;}
 .cate-list .panel-recommend .pull-right{position: relative;top:3px;color: #06f;}
 .cate-list .panel-recommend .panel-body{padding: 15px 9px;}
 .cate-list .panel-recommend .panel-body a .help-block{
@@ -995,6 +998,7 @@ a{color: #333}
     line-height: 40px;
     border-radius: 4px;
     cursor: pointer;
+    background-color: #fff;
 }
 .backtop:hover{background-color: #dddddd;color: #10af88;}
 .wait2del>div{margin-bottom: 15px;}
