@@ -678,7 +678,7 @@ a{color: #333}
 
 .border{border: 1px solid #efefef;}
 .border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;}
-.navbar-brand>img.logo{height: 55px;margin-top: -13px;}
+.navbar-brand>img.logo{height: 45px;margin-top: -7px;}
 #bookstack-intro{padding-top: 70px;}
 #bookstack-intro ul,#bookstack-intro li{list-style: none;padding:0px;}
 #bookstack-intro h1{font-size: 22px;line-height: 150%;color: #555;margin-top: 10px;}
@@ -808,7 +808,7 @@ a{color: #333}
 .nopadding{padding: 0px !important;}
 
 /*用户主页*/
-.ucenter{margin-top: 65px;}
+.ucenter{margin-top: 75px;}
 .ucenter .panel{border-radius: 0;box-shadow: none !important;}
 .ucenter .well{border-radius: 0px;border: 0;box-shadow: none;padding: 15px 0;}
 .ucenter h3{font-size: 18px;font-weight: 400;}
