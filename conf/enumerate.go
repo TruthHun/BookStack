@@ -12,7 +12,7 @@ const LoginSessionName = "LoginSessionName"
 
 const CaptchaSessionName = "__captcha__"
 
-const RegexpEmail = `^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$`
+const RegexpEmail = `(?i)[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}`
 
 //允许用户名中出现点号
 
