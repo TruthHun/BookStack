@@ -48,7 +48,7 @@ func InitCreditRule() {
 	rules := []CreditRule{
 		{Identify: "sign", Title: "签到奖励", Intro: "用户每天签到的奖励", CycleType: cycleTypeDay, RewardTimes: 1, Score: 5},                      // 每天签到奖励， 0.005 元
 		{Identify: "reg", Title: "注册奖励", Intro: "新用户注册奖励", CycleType: cycleTypeOnce, RewardTimes: 1, Score: 8},                        // 注册奖励
-		{Identify: "read", Title: "阅读规则", Intro: "用户每天阅读时长超过5分钟的奖励", CycleType: cycleTypeDay, RewardTimes: 1, Score: 5},               // 重在参与，阅读有奖。 0.005 元
+		{Identify: "read", Title: "阅读奖励", Intro: "重在参与，学习有奖！用户每天阅读时长超过5分钟的奖励", CycleType: cycleTypeDay, RewardTimes: 1, Score: 5},     // 重在参与，阅读有奖。 0.005 元
 		{Identify: "invite", Title: "邀请注册", Intro: "邀请别人注册，获得奖励", CycleType: cycleTypeDay, RewardTimes: 1, Score: 8},                  // 0.008 元
 		{Identify: "rank_day", Title: "阅读日榜前五十奖励", Intro: "用户阅读日榜上榜(前50)奖励", CycleType: cycleTypeDay, RewardTimes: 1, Score: 32},      // 0.032 x 50 x 30 = 48 / 月
 		{Identify: "rank_week", Title: "阅读周榜前五十奖励", Intro: "用户阅读周榜上榜(前50)奖励", CycleType: cycleTypeWeek, RewardTimes: 1, Score: 64},    // 0.128 x 50 x 4 = 12.8 / 月
@@ -60,9 +60,9 @@ func InitCreditRule() {
 		{Identify: "exchange", Title: "积分兑换", Intro: "用户积分兑换奖品", CycleType: cycleTypeMonth, RewardTimes: 20, Score: -10240}, // score 为0，表示隐藏这条积分记录
 
 		{Identify: "submit", Title: "收录奖励", Intro: "提交未被收录的书籍获得的奖励", CycleType: cycleTypeDay, RewardTimes: 10, Score: 5}, // 收录奖励， 0.005 元
-		{Identify: "charge", Title: "充值奖励", Intro: "用户充值", CycleType: cycleTypeDay, RewardTimes: 0, Score: 0},            // 收录奖励， 0.005 元
+		{Identify: "charge", Title: "充值奖励", Intro: "用户充值", CycleType: cycleTypeDay, RewardTimes: 0, Score: 0},            // 手工充值 0.005 元
 
-		{Identify: "market_value", Title: "网站积分市值", Intro: "整站所产生的积分", CycleType: cycleTypeOnce, RewardTimes: 0, Score: 0}, // 收录奖励， 0.005 元
+		{Identify: "market_value", Title: "网站积分市值", Intro: "整站所产生的积分", CycleType: cycleTypeOnce, RewardTimes: 0, Score: 0}, // 网站积分总市值  0.005 元
 	}
 	o := orm.NewOrm()
 	for _, rule := range rules {
