@@ -3,6 +3,7 @@ package conf
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/astaxie/beego"
 )
@@ -66,6 +67,24 @@ var (
 	GO_VERSION string
 )
 
+var (
+	audioExt sync.Map
+	videoExt sync.Map
+)
+
+// 初始化支持的音视频格式
+func init() {
+	// 音频格式
+	for _, ext := range []string{".flac", ".wma", ".weba", ".aac", ".oga", ".ogg", ".mp3", ".webm", ".mid", ".wav", ".opus", ".m4a", ".amr", ".aiff", ".au"} {
+		audioExt.Store(ext, true)
+	}
+
+	// 视频格式
+	for _, ext := range []string{".ogm", ".wmv", ".asx", ".mpg", ".webm", ".mp4", ".ogv", ".mpeg", ".mov", ".m4v", ".avi"} {
+		videoExt.Store(ext, true)
+	}
+}
+
 // app_key
 func GetAppKey() string {
 	return beego.AppConfig.DefaultString("app_key", "godoc")
@@ -109,7 +128,17 @@ func GetUploadFileExt() []string {
 }
 
 //判断是否是允许商城的文件类型.
-func IsAllowUploadFileExt(ext string) bool {
+func IsAllowUploadFileExt(ext string, typ ...string) bool {
+	if len(typ) > 0 {
+		t := strings.ToLower(strings.TrimSpace(typ[0]))
+		if t == "audio" {
+			_, ok := audioExt.Load(ext)
+			return ok
+		} else if t == "video" {
+			_, ok := videoExt.Load(ext)
+			return ok
+		}
+	}
 
 	if strings.HasPrefix(ext, ".") {
 		ext = string(ext[1:])

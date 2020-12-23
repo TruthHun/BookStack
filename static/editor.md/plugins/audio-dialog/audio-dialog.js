@@ -1,21 +1,10 @@
-/*!
- * Image (upload) dialog plugin for Editor.md
- *
- * @file        image-dialog.js
- * @author      pandao
- * @version     1.3.4
- * @updateTime  2015-06-09
- * {@link       https://github.com/pandao/editor.md}
- * @license     MIT
- */
-
 (function() {
 
     var factory = function (exports) {
 
-		var pluginName   = "image-dialog";
+		var pluginName   = "audio-dialog";
 
-		exports.fn.imageDialog = function() {
+		exports.fn.audioDialog = function() {
 
             var _this       = this;
             var cm          = this.cm;
@@ -24,9 +13,9 @@
             var settings    = this.settings;
             var cursor      = cm.getCursor();
             var selection   = cm.getSelection();
-            var imageLang   = lang.dialog.image;
+            var audioLang   = lang.dialog.audio;
             var classPrefix = this.classPrefix;
-            var iframeName  = classPrefix + "image-iframe";
+            var iframeName  = classPrefix + "audio-iframe";
 			var dialogName  = classPrefix + pluginName, dialog;
 
 			cm.focus();
@@ -39,36 +28,36 @@
             if (editor.find("." + dialogName).length < 1)
             {
                 var guid   = (new Date).getTime();
-                var action = settings.imageUploadURL + (settings.imageUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid+"&type=image";
+                var action = settings.audioUploadURL + (settings.audioUploadURL.indexOf("?") >= 0 ? "&" : "?") + "guid=" + guid+"&type=audio";
 
                 if (settings.crossDomainUpload)
                 {
-                    action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
+                    action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-audio-dialog-" + guid;
                 }
 
-                var dialogContent = ( (settings.imageUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
-                                        ( (settings.imageUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
-                                        "<label>" + imageLang.url + "</label>" +
+                var dialogContent = ( (settings.audioUpload) ? "<form action=\"" + action +"\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
+                                        ( (settings.audioUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
+                                        "<label>" + audioLang.url + "</label>" +
                                         "<input type=\"text\" data-url />" + (function(){
-                                            return (settings.imageUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
-                                                                                "<input type=\"file\" name=\"" + classPrefix + "image-file\" accept=\"image/*\" />" +
-                                                                                "<input type=\"submit\" value=\"" + imageLang.uploadButton + "\" />" +
+                                            return (settings.audioUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
+                                                                                "<input type=\"file\" name=\"" + classPrefix + "audio-file\" accept=\"audio/*\" />" +
+                                                                                "<input type=\"submit\" value=\"" + audioLang.uploadButton + "\" />" +
                                                                             "</div>" : "";
                                         })() +
                                         "<br/>" +
-                                        "<label>" + imageLang.alt + "</label>" +
+                                        "<label>" + audioLang.alt + "</label>" +
                                         "<input type=\"text\" value=\"" + selection + "\" data-alt />" +
+                                        // "<br/>" +
+                                        // "<label>" + audioLang.link + "</label>" +
+                                        // "<input type=\"text\" value=\"http://\" data-link />" +
                                         "<br/>" +
-                                        "<label>" + imageLang.link + "</label>" +
-                                        "<input type=\"text\" value=\"http://\" data-link />" +
-                                        "<br/>" +
-                                    ( (settings.imageUpload) ? "</form>" : "</div>");
+                                    ( (settings.audioUpload) ? "</form>" : "</div>");
 
-                //var imageFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "image-manager-btn\" style=\"float:left;\">" + imageLang.managerButton + "</button>";
+                //var audioFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "audio-manager-btn\" style=\"float:left;\">" + audioLang.managerButton + "</button>";
 
                 dialog = this.createDialog({
-                    title      : imageLang.title,
-                    width      : (settings.imageUpload) ? 465 : 380,
+                    title      : audioLang.title,
+                    width      : (settings.audioUpload) ? 465 : 380,
                     height     : 254,
                     name       : dialogName,
                     content    : dialogContent,
@@ -85,22 +74,26 @@
                             var alt  = this.find("[data-alt]").val();
                             var link = this.find("[data-link]").val();
 
+                            // <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
+
                             if (url === "")
                             {
-                                alert(imageLang.imageURLEmpty);
+                                alert(audioLang.audioURLEmpty);
                                 return false;
                             }
 
-							var altAttr = (alt !== "") ? " \"" + alt + "\"" : "";
+                            cm.replaceSelection('<audio controls loop src="' + url + '">' + alt + '</audio>');
 
-                            if (link === "" || link === "http://")
-                            {
-                                cm.replaceSelection("![" + alt + "](" + url + altAttr + ")");
-                            }
-                            else
-                            {
-                                cm.replaceSelection("[![" + alt + "](" + url + altAttr + ")](" + link + altAttr + ")");
-                            }
+							// var altAttr = (alt !== "") ? " \"" + alt + "\"" : "";
+
+                            // if (link === "" || link === "http://")
+                            // {
+                            //     cm.replaceSelection("![" + alt + "](" + url + altAttr + ")");
+                            // }
+                            // else
+                            // {
+                            //     cm.replaceSelection("[![" + alt + "](" + url + altAttr + ")](" + link + altAttr + ")");
+                            // }
 
                             if (alt === "") {
                                 cm.setCursor(cursor.line, cursor.ch + 2);
@@ -118,28 +111,28 @@
                     }
                 });
 
-                dialog.attr("id", classPrefix + "image-dialog-" + guid);
+                dialog.attr("id", classPrefix + "audio-dialog-" + guid);
 
-				if (!settings.imageUpload) {
+				if (!settings.audioUpload) {
                     return ;
                 }
 
-				var fileInput  = dialog.find("[name=\"" + classPrefix + "image-file\"]");
+				var fileInput  = dialog.find("[name=\"" + classPrefix + "audio-file\"]");
 
 				fileInput.bind("change", function() {
 					var fileName  = fileInput.val();
-					var isImage   = new RegExp("(\\.(" + settings.imageFormats.join("|") + "))$"); // /(\.(webp|jpg|jpeg|gif|bmp|png))$/
+					var isaudio   = new RegExp("(\\.(" + settings.audioFormats.join("|") + "))$"); // /(\.(webp|jpg|jpeg|gif|bmp|png))$/
 
 					if (fileName === "")
 					{
-						alert(imageLang.uploadFileEmpty);
+						alert(audioLang.uploadFileEmpty);
                         
                         return false;
 					}
 					
-                    if (!isImage.test(fileName))
+                    if (!isaudio.test(fileName))
 					{
-						alert(imageLang.formatNotAllowed + settings.imageFormats.join(", "));
+						alert(audioLang.formatNotAllowed + settings.audioFormats.join(", "));
                         
                         return false;
 					}

@@ -625,6 +625,7 @@ func (this *DocumentController) Upload() {
 
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
+	fileType := this.GetString("type")
 	isAttach := true
 
 	if identify == "" {
@@ -632,6 +633,9 @@ func (this *DocumentController) Upload() {
 	}
 
 	name := "editormd-file-file"
+	if fileType != "" {
+		name = "editormd-" + fileType + "-file"
+	}
 
 	file, moreFile, err := this.GetFile(name)
 	if err == http.ErrMissingFile {
@@ -653,7 +657,7 @@ func (this *DocumentController) Upload() {
 		this.JsonResult(6003, "无法解析文件的格式")
 	}
 
-	if !conf.IsAllowUploadFileExt(ext) {
+	if !conf.IsAllowUploadFileExt(ext, fileType) {
 		this.JsonResult(6004, "不允许的文件类型")
 	}
 
