@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/araddon/dateparse"
 
 	"path/filepath"
@@ -790,16 +791,22 @@ func (this *ManagerController) AttachDelete() {
 		this.Abort("404")
 	}
 
-	attach, err := models.NewAttachment().Find(attachId)
-	if err != nil {
-		beego.Error("AttachDelete => ", err)
-		this.JsonResult(6001, err.Error())
+	attach, _ := models.NewAttachment().Find(attachId)
+	if attach.AttachmentId == 0 {
+		this.JsonResult(0, "ok")
 	}
 
-	if err := attach.Delete(); err != nil {
-		beego.Error("AttachDelete => ", err)
-		this.JsonResult(6002, err.Error())
+	obj := strings.TrimLeft(attach.FilePath, "./")
+	switch utils.StoreType {
+	case utils.StoreOss:
+		store.ModelStoreOss.DelFromOss(obj)
+		if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
+			bucket.SetObjectACL(obj, oss.ACLPrivate)
+		}
+	case utils.StoreLocal:
+		os.Remove(obj)
 	}
+	attach.Delete()
 	this.JsonResult(0, "ok")
 }
 

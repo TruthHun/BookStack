@@ -622,7 +622,6 @@ func (this *DocumentController) CreateMulti() {
 
 //上传附件或图片.
 func (this *DocumentController) Upload() {
-
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
 	fileType := this.GetString("type")
@@ -633,8 +632,10 @@ func (this *DocumentController) Upload() {
 	}
 
 	name := "editormd-file-file"
-	if fileType != "" {
+	if fileType != "" && !strings.Contains(fileType, "/") {
 		name = "editormd-" + fileType + "-file"
+	} else {
+		fileType = strings.Split(fileType, "/")[0]
 	}
 
 	file, moreFile, err := this.GetFile(name)
@@ -662,6 +663,7 @@ func (this *DocumentController) Upload() {
 	}
 
 	bookId := 0
+	bookIdentify := ""
 	//如果是超级管理员，则不判断权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -669,6 +671,7 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6006, "文档不存在或权限不足")
 		}
 		bookId = book.BookId
+		bookIdentify = book.Identify
 	} else {
 		book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 		if err != nil {
@@ -683,6 +686,7 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6006, "权限不足")
 		}
 		bookId = book.BookId
+		bookIdentify = book.Identify
 	}
 
 	if docId > 0 {
@@ -693,11 +697,18 @@ func (this *DocumentController) Upload() {
 		if doc.BookId != bookId {
 			this.JsonResult(6008, "文档不属于指定的书籍")
 		}
+	} else {
+		identify := filepath.Base(this.Ctx.Request.Header.Get("referer"))
+		doc, err := models.NewDocument().FindByBookIdAndDocIdentify(bookId, identify)
+		if err != nil {
+			this.JsonResult(6007, "文档不存在")
+		}
+		docId = doc.DocumentId
 	}
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("200601"), fileName+ext)
+	filePath := filepath.Join("uploads/projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
 
 	path := filepath.Dir(filePath)
 
@@ -784,6 +795,8 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6005, "保存文件失败")
 		}
 	}
+
+	attachment.HttpPath = "/" + attachment.FilePath
 
 	result := map[string]interface{}{
 		"errcode":   0,
