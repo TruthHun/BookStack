@@ -47,9 +47,9 @@
                                         "<br/>" +
                                         "<label>" + audioLang.alt + "</label>" +
                                         "<input type=\"text\" value=\"" + selection + "\" data-alt />" +
-                                        // "<br/>" +
-                                        // "<label>" + audioLang.link + "</label>" +
-                                        // "<input type=\"text\" value=\"http://\" data-link />" +
+                                        "<br/>" +
+                                        "<label>" + audioLang.link + "</label>" +
+                                        "<input type=\"text\" value=\"\" data-link />" +
                                         "<br/>" +
                                     ( (settings.audioUpload) ? "</form>" : "</div>");
 
@@ -82,7 +82,7 @@
                                 return false;
                             }
 
-                            cm.replaceSelection('<audio controls loop src="' + url + '">' + alt + '</audio>');
+                            cm.replaceSelection('<audio controls poster="' + link + '" src="' + url + '">' + alt + '</audio>');
 
 							// var altAttr = (alt !== "") ? " \"" + alt + "\"" : "";
 
@@ -173,7 +173,7 @@
 			dialog = editor.find("." + dialogName);
 			dialog.find("[type=\"text\"]").val("");
 			dialog.find("[type=\"file\"]").val("");
-			dialog.find("[data-link]").val("http://");
+			dialog.find("[data-link]").val("");
 
 			this.dialogShowMask(dialog);
 			this.dialogLockScreen();

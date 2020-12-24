@@ -1,14 +1,3 @@
-/*!
- * video (upload) dialog plugin for Editor.md
- *
- * @file        video-dialog.js
- * @author      pandao
- * @version     1.3.4
- * @updateTime  2015-06-09
- * {@link       https://github.com/pandao/editor.md}
- * @license     MIT
- */
-
 (function() {
 
     var factory = function (exports) {
@@ -58,9 +47,9 @@
                                         "<br/>" +
                                         "<label>" + videoLang.alt + "</label>" +
                                         "<input type=\"text\" value=\"" + selection + "\" data-alt />" +
-                                        // "<br/>" +
-                                        // "<label>" + videoLang.link + "</label>" +
-                                        // "<input type=\"text\" value=\"http://\" data-link />" +
+                                        "<br/>" +
+                                        "<label>" + videoLang.link + "</label>" +
+                                        "<input type=\"text\" value=\"\" data-link />" +
                                         "<br/>" +
                                     ( (settings.videoUpload) ? "</form>" : "</div>");
 
@@ -83,14 +72,14 @@
                         enter : [lang.buttons.enter, function() {
                             var url  = this.find("[data-url]").val();
                             var alt  = this.find("[data-alt]").val();
-                            // var link = this.find("[data-link]").val();
+                            var link = this.find("[data-link]").val();
 
                             if (url === "")
                             {
                                 alert(videoLang.videoURLEmpty);
                                 return false;
                             }
-                            cm.replaceSelection('<video controls src="' + url + '">' + alt + '</video>');
+                            cm.replaceSelection('<video controls poster="'+ link +'" src="' + url + '">' + alt + '</video>');
                             // <video controls src=""></video>
 
 							// var altAttr = (alt !== "") ? " \"" + alt + "\"" : "";
@@ -182,7 +171,7 @@
 			dialog = editor.find("." + dialogName);
 			dialog.find("[type=\"text\"]").val("");
 			dialog.find("[type=\"file\"]").val("");
-			// dialog.find("[data-link]").val("http://");
+			dialog.find("[data-link]").val("");
 
 			this.dialogShowMask(dialog);
 			this.dialogLockScreen();

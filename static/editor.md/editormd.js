@@ -318,7 +318,7 @@
                 audio : {
                     title    : "添加音频",
                     url      : "音频地址",
-                    link     : "音频链接",
+                    link     : "海报链接",
                     alt      : "音频描述",
                     uploadButton     : "本地上传",
                     videoURLEmpty    : "错误：音频地址不能为空。",
@@ -328,7 +328,7 @@
                 video : {
                     title    : "添加视频",
                     url      : "视频地址",
-                    link     : "视频链接",
+                    link     : "海报链接",
                     alt      : "视频描述",
                     uploadButton     : "本地上传",
                     videoURLEmpty    : "错误：视频地址不能为空。",
