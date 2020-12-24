@@ -11,7 +11,9 @@ type AttachmentResult struct {
 	Attachment
 	IsExist       bool
 	BookName      string
+	BookIdentify  string
 	DocumentName  string
+	DocIdentify   string
 	FileShortSize string
 	Account       string
 	LocalHttpPath string

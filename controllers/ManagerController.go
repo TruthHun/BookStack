@@ -753,11 +753,6 @@ func (this *ManagerController) AttachList() {
 		this.Data["PageHtml"] = ""
 	}
 
-	for _, item := range attachList {
-		p := filepath.Join(commands.WorkingDirectory, item.FilePath)
-		item.IsExist = utils.FileExists(p)
-	}
-
 	this.Data["Lists"] = attachList
 	this.Data["IsAttach"] = true
 	this.TplName = "manager/attach_list.html"

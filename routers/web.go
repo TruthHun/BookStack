@@ -46,7 +46,7 @@ func webRouter() {
 	beego.Router("/manager/books/open", &controllers.ManagerController{}, "post:PrivatelyOwned")
 	beego.Router("/manager/attach/list", &controllers.ManagerController{}, "*:AttachList")
 	beego.Router("/manager/attach/detailed/:id", &controllers.ManagerController{}, "*:AttachDetailed")
-	beego.Router("/manager/attach/delete", &controllers.ManagerController{}, "post:AttachDelete")
+	beego.Router("/manager/attach/delete", &controllers.ManagerController{}, "*:AttachDelete")
 	beego.Router("/manager/seo", &controllers.ManagerController{}, "post,get:Seo")
 	beego.Router("/manager/ads", &controllers.ManagerController{}, "post,get:Ads")
 	beego.Router("/manager/update-ads", &controllers.ManagerController{}, "post,get:UpdateAds")
