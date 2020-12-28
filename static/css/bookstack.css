@@ -1171,8 +1171,13 @@ table>tbody>tr:hover{
 .markdown-body table th{font-weight: normal;}
 li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .markdown-body img{margin: 8px 0;cursor: zoom-in}
+
 .markdown-body audio, .markdown-body video{
-    display: block;margin: 15px 0; max-width: 100%;
+    max-width: 100%;
+}
+
+.video-js{
+    margin: 15px 0;
 }
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
     display: block;
