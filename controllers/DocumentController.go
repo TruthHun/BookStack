@@ -813,8 +813,6 @@ func (this *DocumentController) Upload() {
 
 //DownloadAttachment 下载附件.
 func (this *DocumentController) DownloadAttachment() {
-	this.Prepare()
-
 	identify := this.Ctx.Input.Param(":key")
 	attachId, _ := strconv.Atoi(this.Ctx.Input.Param(":attach_id"))
 	token := this.GetString("token")

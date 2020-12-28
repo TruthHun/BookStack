@@ -763,6 +763,7 @@ func (this *CommonController) Read() {
 	identify := this.GetString("identify")
 	slice := strings.Split(identify, "/")
 	fromAPP, _ := this.GetBool("from-app") // 是否来自app
+	enhanceRichtext, _ := this.GetBool("enhance-richtext")
 	if len(slice) != 2 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -830,7 +831,9 @@ func (this *CommonController) Read() {
 	)
 	// 图片链接地址补全
 	if doc.Release != "" {
-		if fromAPP { // 兼容 app
+		if enhanceRichtext {
+			nodes = this.handleReleaseV3(doc.Release, bookIdentify)
+		} else if fromAPP { // 兼容 app
 			nodes = this.handleReleaseV2(doc.Release, bookIdentify)
 		} else {
 			// 兼容微信小程序
@@ -838,7 +841,7 @@ func (this *CommonController) Read() {
 		}
 	}
 
-	if fromAPP {
+	if fromAPP || enhanceRichtext {
 		utils.CopyObject(doc, &apiDocV2)
 		apiDocV2.Release = nodes
 		apiDocV2.Bookmark = isMark
@@ -913,6 +916,25 @@ func (this *CommonController) handleReleaseV2(release, bookIdentify string) inte
 	query.Find(".header-link").Remove()
 
 	nodes, err := html2json.NewDefault().Parse(release, models.GetAPIStaticDomain())
+	if err != nil {
+		beego.Error(err)
+		return release
+	}
+	return nodes
+}
+
+func (this *CommonController) handleReleaseV3(release, bookIdentify string) interface{} {
+	query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(release))
+	if err != nil {
+		beego.Error(err)
+		return release
+	}
+	// 处理svg
+	utils.HandleSVG(query, bookIdentify)
+	query.Find(".reference-link").Remove()
+	query.Find(".header-link").Remove()
+
+	nodes, err := html2json.NewDefault().ParseByByteV2([]byte(release), models.GetAPIStaticDomain())
 	if err != nil {
 		beego.Error(err)
 		return release

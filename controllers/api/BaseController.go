@@ -241,7 +241,7 @@ func (this *BaseController) completeLink(path string) string {
 	if path == "" {
 		return ""
 	}
-	return utils.JoinURL(models.GetAPIStaticDomain(), path)
+	return utils.JoinURL(models.GetAPIStaticDomain(), strings.ReplaceAll(path, "\\", "/"))
 }
 
 // 根据标识查询书籍id，标识可以是数字也可以是字符串
