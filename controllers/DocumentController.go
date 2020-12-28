@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/models/store"
@@ -632,10 +631,12 @@ func (this *DocumentController) Upload() {
 	}
 
 	name := "editormd-file-file"
-	if fileType != "" && !strings.Contains(fileType, "/") {
-		name = "editormd-" + fileType + "-file"
-	} else {
-		fileType = strings.Split(fileType, "/")[0]
+	if docId == 0 {
+		if fileType != "" && !strings.Contains(fileType, "/") {
+			name = "editormd-" + fileType + "-file"
+		} else {
+			fileType = strings.Split(fileType, "/")[0]
+		}
 	}
 
 	file, moreFile, err := this.GetFile(name)
@@ -725,19 +726,21 @@ func (this *DocumentController) Upload() {
 	attachment.FileName = moreFile.Filename
 	attachment.CreateAt = this.Member.MemberId
 	attachment.FileExt = ext
-	attachment.FilePath = strings.TrimPrefix(filePath, commands.WorkingDirectory)
+	attachment.FilePath = filePath
 	attachment.DocumentId = docId
+
+	// 非附件
+	if name != "editormd-file-file" {
+		attachment.DocumentId = 0
+	}
 
 	if fileInfo, err := os.Stat(filePath); err == nil {
 		attachment.FileSize = float64(fileInfo.Size())
 	}
-	if docId > 0 {
-		attachment.DocumentId = docId
-	}
 
 	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
 
-		attachment.HttpPath = "/" + strings.Replace(strings.TrimPrefix(filePath, commands.WorkingDirectory), "\\", "/", -1)
+		attachment.HttpPath = "/" + strings.Replace(filePath, "\\", "/", -1)
 		if strings.HasPrefix(attachment.HttpPath, "//") {
 			attachment.HttpPath = string(attachment.HttpPath[1:])
 		}
@@ -783,7 +786,7 @@ func (this *DocumentController) Upload() {
 				beego.Error(err.Error())
 			}
 			attachment.HttpPath = "/" + osspath
-			attachment.FilePath = filepath.Join(commands.WorkingDirectory, osspath)
+			attachment.FilePath = attachment.HttpPath
 		} else {
 			if err := store.ModelStoreLocal.MoveToStore(filePath, osspath); err != nil {
 				beego.Error(err.Error())
@@ -796,7 +799,7 @@ func (this *DocumentController) Upload() {
 		}
 	}
 
-	attachment.HttpPath = "/" + attachment.FilePath
+	attachment.HttpPath = "/" + strings.TrimLeft(attachment.FilePath, "./")
 
 	result := map[string]interface{}{
 		"errcode":   0,
@@ -859,7 +862,7 @@ func (this *DocumentController) DownloadAttachment() {
 	if attachment.BookId != bookId {
 		this.Abort("404")
 	}
-	this.Ctx.Output.Download(filepath.Join(commands.WorkingDirectory, attachment.FilePath), attachment.FileName)
+	this.Ctx.Output.Download(strings.TrimLeft(attachment.FilePath, "./"), attachment.FileName)
 
 	this.StopRun()
 }
@@ -899,7 +902,7 @@ func (this *DocumentController) RemoveAttachment() {
 		this.JsonResult(6005, "删除失败")
 	}
 
-	os.Remove(filepath.Join(commands.WorkingDirectory, attach.FilePath))
+	os.Remove(strings.TrimLeft(attach.FilePath, "./"))
 	this.JsonResult(0, "ok", attach)
 }
 

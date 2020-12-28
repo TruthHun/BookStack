@@ -19,7 +19,6 @@ import (
 
 	"os"
 
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/models/store"
@@ -776,7 +775,6 @@ func (this *ManagerController) AttachDetailed() {
 		this.Abort("404")
 	}
 
-	attach.FilePath = filepath.Join(commands.WorkingDirectory, attach.FilePath)
 	attach.HttpPath = this.BaseUrl() + attach.HttpPath
 	attach.IsExist = utils.FileExists(attach.FilePath)
 	this.Data["Model"] = attach

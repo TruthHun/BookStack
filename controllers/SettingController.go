@@ -12,7 +12,6 @@ import (
 
 	"fmt"
 
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
@@ -256,7 +255,7 @@ func (this *SettingController) Upload() {
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("2006/01"), fileName+ext)
+	filePath := filepath.Join("uploads", time.Now().Format("2006/01"), fileName+ext)
 
 	path := filepath.Dir(filePath)
 
@@ -278,7 +277,7 @@ func (this *SettingController) Upload() {
 	}
 	os.Remove(filePath)
 
-	filePath = filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("200601"), fileName+ext)
+	filePath = filepath.Join("uploads", time.Now().Format("200601"), fileName+ext)
 
 	err = graphics.ImageResizeSaveFile(subImg, 120, 120, filePath)
 	err = graphics.SaveImage(filePath, subImg)
@@ -288,7 +287,7 @@ func (this *SettingController) Upload() {
 		this.JsonResult(500, "保存文件失败")
 	}
 
-	url := "/" + strings.Replace(strings.TrimPrefix(filePath, commands.WorkingDirectory), "\\", "/", -1)
+	url := "/" + strings.Replace(filePath, "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])
 	}
@@ -300,8 +299,9 @@ func (this *SettingController) Upload() {
 		if err != nil {
 			this.JsonResult(60001, "保存头像失败")
 		}
-		if strings.HasPrefix(avatar, "/uploads/") {
-			os.Remove(filepath.Join(commands.WorkingDirectory, avatar))
+		avatar = strings.TrimLeft(avatar, "./")
+		if strings.HasPrefix(avatar, "uploads/") {
+			os.Remove(avatar)
 		}
 		this.SetMember(*member)
 	}
