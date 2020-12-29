@@ -147,7 +147,14 @@ function pre_and_next_link(){
     }
 }
 
+function disableRightClick(){
+    $('body').on('contextmenu','audio,video', function(e) {
+        e.preventDefault();
+    });
+}
+
 $(function () {
+    disableRightClick();
     $(".article-menu-detail>ul>li a").tooltip({placement: 'bottom'})
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);

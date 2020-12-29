@@ -270,6 +270,14 @@ func (this *DocumentController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
+			medias := []string{"video", "audio"}
+			for _, item := range medias {
+				query.Find(item).Each(func(idx int, sel *goquery.Selection) {
+					sel.SetAttr("controlslist", "nodownload")
+					sel.SetAttr("preload", "true")
+				})
+			}
+
 			html, err := query.Find("body").Html()
 			if err != nil {
 				beego.Error(err)

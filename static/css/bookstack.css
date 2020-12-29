@@ -1172,13 +1172,16 @@ table>tbody>tr:hover{
 li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 .markdown-body img{margin: 8px 0;cursor: zoom-in}
 
-.markdown-body audio, .markdown-body video{
+.markdown-body audio,.markdown-body video{
     max-width: 100%;
-}
-
-.video-js{
+    width: 480px;
+    display: block;
     margin: 15px 0;
+    cursor: pointer;
 }
+.markdown-body video{border-radius: 5px;}
+
+
 .editormd-preview-container ol.linenums li code, .editormd-html-preview ol.linenums li code{
     display: block;
     white-space: pre;
