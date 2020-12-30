@@ -291,6 +291,15 @@ func (this *DocumentController) Read() {
 	attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
 	if err == nil {
 		doc.AttachList = attach
+		if len(attach) > 0 {
+			content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
+			for _, item := range attach {
+				li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", item.HttpPath, item.FileName, item.FileName)
+				content.WriteString(li)
+			}
+			content.WriteString("</ul></div>")
+			doc.Release += content.String()
+		}
 	}
 
 	//文档阅读人次+1
@@ -632,7 +641,6 @@ func (this *DocumentController) Upload() {
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
 	fileType := this.GetString("type")
-	isAttach := true
 
 	if identify == "" {
 		this.JsonResult(6001, "参数错误")
@@ -717,24 +725,27 @@ func (this *DocumentController) Upload() {
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join("uploads/projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
+	prefix := "uploads"
+	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
+	if utils.StoreType != utils.StoreOss {
+		savePath = filepath.Join(prefix, savePath)
+	}
+	savePath = strings.ReplaceAll(savePath, "\\", "/")
+	os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
 
-	path := filepath.Dir(filePath)
-
-	os.MkdirAll(path, os.ModePerm)
-
-	err = this.SaveToFile(name, filePath)
-
+	err = this.SaveToFile(name, savePath)
 	if err != nil {
 		beego.Error("SaveToFile => ", err)
 		this.JsonResult(6005, "保存文件失败")
 	}
+
 	attachment := models.NewAttachment()
 	attachment.BookId = bookId
 	attachment.FileName = moreFile.Filename
 	attachment.CreateAt = this.Member.MemberId
 	attachment.FileExt = ext
-	attachment.FilePath = filePath
+	attachment.FilePath = "/" + savePath
+	attachment.HttpPath = attachment.FilePath
 	attachment.DocumentId = docId
 
 	// 非附件
@@ -742,72 +753,22 @@ func (this *DocumentController) Upload() {
 		attachment.DocumentId = 0
 	}
 
-	if fileInfo, err := os.Stat(filePath); err == nil {
+	if fileInfo, err := os.Stat(savePath); err == nil {
 		attachment.FileSize = float64(fileInfo.Size())
 	}
 
-	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-
-		attachment.HttpPath = "/" + strings.Replace(filePath, "\\", "/", -1)
-		if strings.HasPrefix(attachment.HttpPath, "//") {
-			attachment.HttpPath = string(attachment.HttpPath[1:])
-		}
-		isAttach = false
-	}
-
-	err = attachment.Insert()
-
-	if err != nil {
-		os.Remove(filePath)
+	// 数据入库
+	if err = attachment.Insert(); err != nil {
+		os.Remove(savePath)
 		beego.Error("Attachment Insert => ", err)
 		this.JsonResult(6006, "文件保存失败")
 	}
-	if attachment.HttpPath == "" {
-		attachment.HttpPath = beego.URLFor("DocumentController.DownloadAttachment", ":key", identify, ":attach_id", attachment.AttachmentId)
 
-		if err := attachment.Update(); err != nil {
-			beego.Error("SaveToFile => ", err)
-			this.JsonResult(6005, "保存文件失败")
-		}
-	}
-
-	//文件和图片分开放在书籍文件夹内
-	var osspath = ""
-	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-		osspath = fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
-	} else {
-		osspath = strings.Replace(filepath.Join("projects", identify, "files", fileName+ext), "\\", "/", -1)
-	}
-
-	switch utils.StoreType {
-	case utils.StoreOss:
-		if err := store.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
+	if utils.StoreType == utils.StoreOss {
+		if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
 		}
-		//attachment.HttpPath = this.OssDomain + "/" + osspath
-		attachment.HttpPath = "/" + osspath
-	case utils.StoreLocal:
-		osspath = "uploads/" + osspath
-		//图片是正确的，先不修改
-		if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-			if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
-				beego.Error(err.Error())
-			}
-			attachment.HttpPath = "/" + osspath
-			attachment.FilePath = attachment.HttpPath
-		} else {
-			if err := store.ModelStoreLocal.MoveToStore(filePath, osspath); err != nil {
-				beego.Error(err.Error())
-			}
-			attachment.FilePath = osspath
-		}
-		if err := attachment.Update(); err != nil {
-			beego.Error("SaveToFile => ", err)
-			this.JsonResult(6005, "保存文件失败")
-		}
 	}
-
-	attachment.HttpPath = "/" + strings.TrimLeft(attachment.FilePath, "./")
 
 	result := map[string]interface{}{
 		"errcode":   0,
@@ -815,7 +776,7 @@ func (this *DocumentController) Upload() {
 		"message":   "ok",
 		"url":       attachment.HttpPath,
 		"alt":       attachment.FileName,
-		"is_attach": isAttach,
+		"is_attach": attachment.DocumentId > 0,
 		"attach":    attachment,
 	}
 	this.Ctx.Output.JSON(result, true, false)
@@ -973,7 +934,7 @@ func (this *DocumentController) Delete() {
 	this.JsonResult(0, "ok")
 }
 
-//获取或更新文档内容.
+// 获取或更新文档内容.
 func (this *DocumentController) Content() {
 	identify := this.Ctx.Input.Param(":key")
 	docId, err := this.GetInt("doc_id")

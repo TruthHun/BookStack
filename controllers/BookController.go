@@ -690,9 +690,8 @@ func (this *BookController) Delete() {
 	this.JsonResult(0, "ok")
 }
 
-//发布书籍.
+// 发布书籍.
 func (this *BookController) Release() {
-
 	identify := this.GetString("identify")
 	bookId := 0
 	if this.Member.IsAdministrator() {

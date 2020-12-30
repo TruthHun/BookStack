@@ -1,21 +1,24 @@
 package controllers
 
 import (
-	"io/ioutil"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/TruthHun/BookStack/models"
 
-	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 )
 
 type StaticController struct {
 	beego.Controller
+	OssDomain string
+}
+
+func (this *StaticController) Prepare() {
+	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
 }
 
 func (this *StaticController) APP() {
@@ -24,6 +27,16 @@ func (this *StaticController) APP() {
 		this.Redirect(link, 302)
 	}
 	this.Abort("404")
+}
+
+// Uploads 查询上传的静态资源。
+// 如果是音频和视频文件，需要根据后台设置而判断是否加密处理
+// 如果使用了OSS存储，则需要将文件处理好
+func (this *StaticController) Uploads() {
+	file := strings.TrimLeft(this.GetString(":splat"), "./")
+	path := strings.ReplaceAll(filepath.Join("uploads", file), "\\", "/")
+	fmt.Println("===========", path)
+	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
 //静态文件，这个加在路由的最后
@@ -40,41 +53,9 @@ func (this *StaticController) StaticFile() {
 
 // 书籍静态文件
 func (this *StaticController) ProjectsFile() {
-	prefix := "projects/"
-	object := prefix + strings.TrimLeft(this.GetString(":splat"), "./")
-
-	//这里的时间只是起到缓存的作用
-	t, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
-	date := t.Format(http.TimeFormat)
-	since := this.Ctx.Request.Header.Get("If-Modified-Since")
-	if since == date {
-		this.Ctx.ResponseWriter.WriteHeader(http.StatusNotModified)
-		return
-	}
-
+	object := filepath.Join("projects/", strings.TrimLeft(this.GetString(":splat"), "./"))
 	if utils.StoreType == utils.StoreOss { //oss
-		staticDomain := strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
-		if staticDomain == "" {
-			reader, err := store.NewOss().GetFileReader(object)
-			if err != nil {
-				beego.Error(err.Error())
-				this.Abort("404")
-			}
-			defer reader.Close()
-
-			b, err := ioutil.ReadAll(reader)
-			if err != nil {
-				beego.Error(err.Error())
-				this.Abort("404")
-			}
-			this.Ctx.ResponseWriter.Header().Set("Last-Modified", date)
-			if strings.HasSuffix(object, ".svg") {
-				this.Ctx.ResponseWriter.Header().Set("Content-Type", "image/svg+xml")
-			}
-			this.Ctx.ResponseWriter.Write(b)
-			return
-		}
-		this.Redirect(staticDomain+"/"+object, 302)
+		this.Redirect(this.OssDomain+"/"+object, 302)
 	} else { //local
 		this.Abort("404")
 	}

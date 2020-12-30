@@ -250,7 +250,7 @@ func ResolveCommand(args []string) {
 	os.MkdirAll(uploads, 0666)
 
 	beego.BConfig.WebConfig.StaticDir["/static"] = filepath.Join("static")
-	beego.BConfig.WebConfig.StaticDir["/uploads"] = uploads
+	// beego.BConfig.WebConfig.StaticDir["/uploads"] = uploads
 	beego.BConfig.WebConfig.ViewsPath = filepath.Join("views")
 
 	fonts := filepath.Join("static", "fonts")
