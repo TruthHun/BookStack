@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -1042,5 +1043,33 @@ func SplitMarkdown(segSharp, markdown string) (markdowns []string) {
 	if len(markdowns) == 0 {
 		markdowns = []string{markdown}
 	}
+	return
+}
+
+// ExecCommand 执行cmd命令操作
+func ExecCommand(name string, args []string, timeout ...time.Duration) (out string, err error) {
+	var (
+		stderr, stdout bytes.Buffer
+		expire         = 30 * time.Minute
+	)
+
+	if len(timeout) > 0 {
+		expire = timeout[0]
+	}
+
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	time.AfterFunc(expire, func() {
+		if cmd.Process != nil && cmd.Process.Pid != 0 {
+			out = out + fmt.Sprintf("\nexecute timeout: %v seconds.", expire.Seconds())
+			cmd.Process.Kill()
+		}
+	})
+	err = cmd.Run()
+	if err != nil {
+		err = fmt.Errorf("%v\n%v", err.Error(), stderr.String())
+	}
+	out = stdout.String()
 	return
 }

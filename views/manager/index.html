@@ -2,6 +2,11 @@
 <html lang="zh-CN">
 <head>
     {{template "widgets/head.html" .}}
+    <style>
+        .min-width{
+            min-width: 80px;
+        }
+    </style>
 </head>
 <body>
 <div class="manual-reader">
@@ -79,6 +84,51 @@
 {{/*                        <span class="fa-class">附件数量</span>*/}}
 {{/*                        <span class="fa-class">{{.Model.AttachmentNumber}}</span>*/}}
 {{/*                    </a>*/}}
+                </div>
+                <div>
+                    <table class="table table-bordered table-hover ">
+                        <caption>依赖检测</caption>
+                        <thead>
+                            <tr>
+                                <th class="min-width">名称</th>
+                                <th class="min-width">安装</th>
+                                <th>作用</th>
+                                <th>错误</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>supervisor <br>------<br> pm2 </td>
+                                <td>
+                                    <span class="text-danger">不检测</span>
+                                </td>
+                                <td>用于将程序加入系统守护进行。Linux可用supervisor，Windows可用pm2</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>elasticsearch</td>
+                                <td>
+                                    <span class="text-danger">不检测</span>
+                                </td>
+                                <td>内容全文搜索引擎。docker镜像：https://hub.docker.com/r/truthhun/elasticsearch</td>
+                                <td>-</td>
+                            </tr>
+                            {{range .Installed}}
+                            <tr>
+                                <td>{{.Name}}</td>
+                                <td>
+                                    {{if .IsInstalled}}
+                                        <span class="text-success">已安装</span>
+                                    {{else}}
+                                        <span class="text-danger">未安装</span>
+                                    {{end}}
+                                </td>
+                                <td>{{str2html .Message}}</td>
+                                <td>{{.Error}}</td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
