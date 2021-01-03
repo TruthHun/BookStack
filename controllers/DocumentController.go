@@ -299,8 +299,11 @@ func (this *DocumentController) Read() {
 					src, _ := sel.Attr("src")
 					if item == "video" {
 						sel.BeforeHtml(fmt.Sprintf(videoBoxFmt, title, poster, src, title))
+						sel.Remove()
+					} else {
+						sel.SetAttr("preload", "true")
+						sel.SetAttr("controlslist", "nodownload")
 					}
-					sel.Remove()
 				})
 			}
 
