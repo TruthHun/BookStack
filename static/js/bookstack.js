@@ -473,7 +473,6 @@ $(function () {
                 break;
             case 39:
                 var href=$(".hung-next a").attr("href");
-                console.log("right",href);
                 if(!$(".hung-next").hasClass("hidden") && href!="#"){
                     load_doc(href,"");
                 }
@@ -487,4 +486,9 @@ $(function () {
             load_doc(location.pathname,"",true);
         }
     }
+
+    $("body").on("change", ".video-playbackrate select", function(e){
+        var _this =$(this),val = _this.val(),video = _this.parents(".video-main").find("video");
+        if (video.length>0) video[0].playbackRate = val
+    })
 });

@@ -31,6 +31,27 @@ import (
 	"github.com/boombuler/barcode/qr"
 )
 
+var (
+	videoBoxFmt = `<div class="video-box">
+	<div class="video-main">
+	  <div class="video-heading">
+		<div class="video-title">%v</div>
+		<div class="video-playbackrate">
+		  <select>
+			<option value="0.7">0.7 倍</option>
+			<option value="1.0" selected>1.0 倍</option>
+			<option value="1.2">1.2 倍</option>
+			<option value="1.5">1.5 倍</option>
+			<option value="2.0">2.0 倍</option>
+		  </select>
+		</div>
+	  </div>
+	  <video controls poster="%v" src="%v" controlslist="nodownload" preload="true">%v</video>
+	</div>
+  </div>
+  `
+)
+
 //DocumentController struct.
 type DocumentController struct {
 	BaseController
@@ -273,8 +294,13 @@ func (this *DocumentController) Read() {
 			medias := []string{"video", "audio"}
 			for _, item := range medias {
 				query.Find(item).Each(func(idx int, sel *goquery.Selection) {
-					sel.SetAttr("controlslist", "nodownload")
-					sel.SetAttr("preload", "true")
+					title := strings.TrimSpace(sel.Text())
+					poster, _ := sel.Attr("poster")
+					src, _ := sel.Attr("src")
+					if item == "video" {
+						sel.BeforeHtml(fmt.Sprintf(videoBoxFmt, title, poster, src, title))
+					}
+					sel.Remove()
 				})
 			}
 
