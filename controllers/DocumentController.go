@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 
 	"image/png"
 
@@ -796,6 +797,12 @@ func (this *DocumentController) Upload() {
 	if utils.StoreType == utils.StoreOss {
 		if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
+		} else {
+			if fileType == "video" || fileType == "audio" {
+				if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
+					bucket.SetObjectACL(savePath, oss.ACLPrivate)
+				}
+			}
 		}
 	}
 
