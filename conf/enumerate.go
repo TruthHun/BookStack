@@ -68,20 +68,20 @@ var (
 )
 
 var (
-	audioExt sync.Map
-	videoExt sync.Map
+	AudioExt sync.Map
+	VideoExt sync.Map
 )
 
 // 初始化支持的音视频格式
 func init() {
 	// 音频格式
 	for _, ext := range []string{".flac", ".wma", ".weba", ".aac", ".oga", ".ogg", ".mp3", ".webm", ".mid", ".wav", ".opus", ".m4a", ".amr", ".aiff", ".au"} {
-		audioExt.Store(ext, true)
+		AudioExt.Store(ext, true)
 	}
 
 	// 视频格式
 	for _, ext := range []string{".ogm", ".wmv", ".asx", ".mpg", ".webm", ".mp4", ".ogv", ".mpeg", ".mov", ".m4v", ".avi"} {
-		videoExt.Store(ext, true)
+		VideoExt.Store(ext, true)
 	}
 }
 
@@ -132,10 +132,10 @@ func IsAllowUploadFileExt(ext string, typ ...string) bool {
 	if len(typ) > 0 {
 		t := strings.ToLower(strings.TrimSpace(typ[0]))
 		if t == "audio" {
-			_, ok := audioExt.Load(ext)
+			_, ok := AudioExt.Load(ext)
 			return ok
 		} else if t == "video" {
-			_, ok := videoExt.Load(ext)
+			_, ok := VideoExt.Load(ext)
 			return ok
 		}
 	}

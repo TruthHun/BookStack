@@ -3,10 +3,13 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"strings"
 
+	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
+	"github.com/TruthHun/BookStack/models/store"
 
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
@@ -39,7 +42,7 @@ func (this *StaticController) Uploads() {
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
-//静态文件，这个加在路由的最后
+// 静态文件，这个加在路由的最后
 func (this *StaticController) StaticFile() {
 	file := this.GetString(":splat")
 	if strings.HasPrefix(file, ".well-known") || file == "sitemap.xml" {
@@ -51,12 +54,104 @@ func (this *StaticController) StaticFile() {
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
-// 书籍静态文件
+// ProjectsFile 书籍静态文件
 func (this *StaticController) ProjectsFile() {
-	object := filepath.Join("projects/", strings.TrimLeft(this.GetString(":splat"), "./"))
-	if utils.StoreType == utils.StoreOss { //oss
-		this.Redirect(this.OssDomain+"/"+object, 302)
-	} else { //local
+	if utils.StoreType != utils.StoreOss {
 		this.Abort("404")
 	}
+
+	object := filepath.Join("projects/", strings.TrimLeft(this.GetString(":splat"), "./"))
+	object = strings.ReplaceAll(object, "\\", "/")
+	// 不是音频和视频，直接跳转
+	if !this.isMedia(object) {
+		this.Redirect(this.OssDomain+"/"+object, 302)
+		return
+	}
+
+	// query := this.Ctx.Request.URL.Query()
+	// 签名验证
+	sign := this.GetString("sign")
+	if !this.isValidSign(sign) {
+		// 签名验证不通过，需要再次验证书籍是否是用户的（针对编辑状态）
+		if !this.isBookOwner() {
+			this.Abort("404")
+			return
+		}
+	}
+
+	var expireInSec int64 = 2
+	if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
+		object, _ = bucket.SignURL(object, http.MethodGet, expireInSec)
+		if slice := strings.Split(object, "/"); len(slice) > 2 {
+			object = strings.Join(slice[3:], "/")
+		}
+	}
+	this.Redirect(this.OssDomain+"/"+object, 302)
+}
+
+// 是否是音视频
+func (this *StaticController) isMedia(path string) (yes bool) {
+	var videoOK, audioOK bool
+	ext := strings.ToLower(filepath.Ext(path))
+	_, videoOK = conf.VideoExt.Load(ext)
+	_, audioOK = conf.VideoExt.Load(ext)
+	return audioOK || videoOK
+}
+
+// 是否是书籍项目所有人（书籍项目所有人，可以直链播放音视频）
+func (this *StaticController) isBookOwner() (yes bool) {
+	memberID := 0
+	// 从session中获取用户信息
+	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok {
+		memberID = member.MemberId
+	}
+
+	if memberID <= 0 {
+		// 如果Cookie中存在登录信息，从cookie中获取用户信息
+		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
+			var remember CookieRemember
+			if err := utils.Decode(cookie, &remember); err == nil {
+				memberID = remember.MemberId
+			}
+		}
+	}
+	if memberID <= 0 {
+		return
+	}
+
+	referer := this.Ctx.Request.Referer()
+	if referer == "" {
+		return
+	}
+
+	bookIdentify := ""
+	if u, err := url.Parse(referer); err == nil {
+		fmt.Println(u.Path)
+		if slice := strings.Split(u.Path, "/"); len(slice) >= 3 && slice[1] == "api" {
+			bookIdentify = slice[2]
+		}
+	}
+
+	if bookIdentify == "" {
+		return
+	}
+
+	bookID := 0
+	if book, err := models.NewBook().FindByIdentify(bookIdentify, "book_id"); err == nil {
+		bookID = book.BookId
+	}
+	if bookID <= 0 {
+		return
+	}
+
+	if r, err := models.NewRelationship().FindByBookIdAndMemberId(bookID, memberID); err == nil && r.RelationshipId > 0 {
+		return true
+	}
+
+	return false
+}
+
+// 是否是合法的签名（针对音频和视频，签名不可用的时候再验证用户有没有登录，用户登录了再验证用户是不是书籍所有人）
+func (this *StaticController) isValidSign(sign string) bool {
+	return false
 }
