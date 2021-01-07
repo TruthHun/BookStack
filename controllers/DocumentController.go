@@ -299,8 +299,10 @@ func (this *DocumentController) Read() {
 					title := strings.TrimSpace(sel.Text())
 					poster, _ := sel.Attr("poster")
 					src, _ := sel.Attr("src")
-					sign, _ := utils.GenerateSign(src, time.Duration(utils.MediaDuration)*time.Second)
-					src = src + "?sign=" + sign
+					if !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
+						sign, _ := utils.GenerateSign(src, time.Duration(utils.MediaDuration)*time.Second)
+						src = src + "?sign=" + sign
+					}
 					if item == "video" {
 						sel.BeforeHtml(fmt.Sprintf(videoBoxFmt, title, poster, src, title))
 						sel.Remove()
