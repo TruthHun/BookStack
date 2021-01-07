@@ -16,13 +16,15 @@ var (
 )
 
 func initAPI() {
-	staticDomain = beego.AppConfig.DefaultString("static_domain", "")
-	if staticDomain != "" {
-		staticDomain = strings.TrimRight(staticDomain, "/") + "/"
-	}
 	if strings.ToLower(utils.StoreType) == utils.StoreOss {
-		staticDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/"
+		staticDomain = strings.TrimSpace(beego.AppConfig.String("oss::Domain"))
 	}
+
+	if strings.TrimRight(staticDomain, "/") == "" {
+		staticDomain = beego.AppConfig.DefaultString("static_domain", "")
+	}
+
+	staticDomain = strings.TrimRight(staticDomain, "/") + "/"
 }
 
 func GetAPIStaticDomain() string {
