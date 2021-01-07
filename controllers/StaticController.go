@@ -38,7 +38,21 @@ func (this *StaticController) APP() {
 func (this *StaticController) Uploads() {
 	file := strings.TrimLeft(this.GetString(":splat"), "./")
 	path := strings.ReplaceAll(filepath.Join("uploads", file), "\\", "/")
-	fmt.Println("===========", path)
+
+	// 签名验证
+	sign := this.GetString("sign")
+	if !this.isValidSign(sign, path) {
+		// 签名验证不通过，需要再次验证书籍是否是用户的（针对编辑状态）
+		if !this.isBookOwner() {
+			this.Abort("404")
+			return
+		}
+	}
+
+	if utils.IsSignUsed(sign) {
+		this.Abort("404")
+	}
+
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
@@ -62,16 +76,16 @@ func (this *StaticController) ProjectsFile() {
 
 	object := filepath.Join("projects/", strings.TrimLeft(this.GetString(":splat"), "./"))
 	object = strings.ReplaceAll(object, "\\", "/")
+
 	// 不是音频和视频，直接跳转
 	if !this.isMedia(object) {
 		this.Redirect(this.OssDomain+"/"+object, 302)
 		return
 	}
 
-	// query := this.Ctx.Request.URL.Query()
 	// 签名验证
 	sign := this.GetString("sign")
-	if !this.isValidSign(sign) {
+	if !this.isValidSign(sign, object) {
 		// 签名验证不通过，需要再次验证书籍是否是用户的（针对编辑状态）
 		if !this.isBookOwner() {
 			this.Abort("404")
@@ -79,9 +93,12 @@ func (this *StaticController) ProjectsFile() {
 		}
 	}
 
-	var expireInSec int64 = 2
+	if utils.IsSignUsed(sign) {
+		this.Abort("404")
+	}
+
 	if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
-		object, _ = bucket.SignURL(object, http.MethodGet, expireInSec)
+		object, _ = bucket.SignURL(object, http.MethodGet, utils.MediaDuration)
 		if slice := strings.Split(object, "/"); len(slice) > 2 {
 			object = strings.Join(slice[3:], "/")
 		}
@@ -152,6 +169,10 @@ func (this *StaticController) isBookOwner() (yes bool) {
 }
 
 // 是否是合法的签名（针对音频和视频，签名不可用的时候再验证用户有没有登录，用户登录了再验证用户是不是书籍所有人）
-func (this *StaticController) isValidSign(sign string) bool {
-	return false
+func (this *StaticController) isValidSign(sign, path string) bool {
+	signPath, err := utils.ParseSign(sign)
+	if err != nil {
+		return false
+	}
+	return signPath == path
 }

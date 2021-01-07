@@ -292,18 +292,22 @@ func (this *DocumentController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
+
 			medias := []string{"video", "audio"}
 			for _, item := range medias {
 				query.Find(item).Each(func(idx int, sel *goquery.Selection) {
 					title := strings.TrimSpace(sel.Text())
 					poster, _ := sel.Attr("poster")
 					src, _ := sel.Attr("src")
+					sign, _ := utils.GenerateSign(src, time.Duration(utils.MediaDuration)*time.Second)
+					src = src + "?sign=" + sign
 					if item == "video" {
 						sel.BeforeHtml(fmt.Sprintf(videoBoxFmt, title, poster, src, title))
 						sel.Remove()
 					} else {
 						sel.SetAttr("preload", "true")
 						sel.SetAttr("controlslist", "nodownload")
+						sel.SetAttr("src", src)
 					}
 				})
 			}
