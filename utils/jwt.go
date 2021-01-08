@@ -12,7 +12,8 @@ import (
 
 // MediaClaims Media Claims
 type MediaClaims struct {
-	Path string
+	Path     string
+	UnixNano int64
 	jwt.StandardClaims
 }
 
@@ -52,7 +53,7 @@ func IsSignUsed(sign string) bool {
 }
 
 // GenerateSign 生成token
-func GenerateMediaSign(path string, expire ...time.Duration) (sign string, err error) {
+func GenerateMediaSign(path string, unixNano int64, expire ...time.Duration) (sign string, err error) {
 	path = strings.TrimLeft(path, "/")
 	// 默认过期时间为一个月
 	expireDuration := time.Now().Add(30 * 24 * time.Hour)
@@ -62,6 +63,7 @@ func GenerateMediaSign(path string, expire ...time.Duration) (sign string, err e
 
 	customClaims := &MediaClaims{
 		path,
+		unixNano,
 		jwt.StandardClaims{
 			ExpiresAt: expireDuration.Unix(),
 		},

@@ -949,7 +949,7 @@ func (this *CommonController) handleReleaseV3(release, bookIdentify string) inte
 						}
 					}
 				} else {
-					if sign, err := utils.GenerateMediaSign(src, time.Duration(utils.MediaDuration)); err == nil {
+					if sign, err := utils.GenerateMediaSign(src, time.Now().UnixNano(), time.Duration(utils.MediaDuration)); err == nil {
 						if strings.Contains(src, "?") {
 							src = src + "&sign=" + sign
 						} else {
