@@ -170,7 +170,7 @@ func (this *StaticController) isBookOwner() (yes bool) {
 
 // 是否是合法的签名（针对音频和视频，签名不可用的时候再验证用户有没有登录，用户登录了再验证用户是不是书籍所有人）
 func (this *StaticController) isValidSign(sign, path string) bool {
-	signPath, err := utils.ParseSign(sign)
+	signPath, err := utils.ParseMediaSign(sign)
 	if err != nil {
 		return false
 	}

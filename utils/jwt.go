@@ -10,16 +10,16 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// CustomClaims CustomClaims
-type CustomClaims struct {
+// MediaClaims Media Claims
+type MediaClaims struct {
 	Path string
 	jwt.StandardClaims
 }
 
 var (
-	jwtSecret     = beego.AppConfig.DefaultString("jwt_secret", "bookstack.cn")
-	usedSign      sync.Map
-	MediaDuration int64 = beego.AppConfig.DefaultInt64("media_duration", 3600*5)
+	mediaJwtSecret = beego.AppConfig.DefaultString("jwt_secret", "bookstack.cn")
+	usedSign       sync.Map
+	MediaDuration  int64 = beego.AppConfig.DefaultInt64("media_duration", 3600*5)
 )
 
 func init() {
@@ -52,7 +52,7 @@ func IsSignUsed(sign string) bool {
 }
 
 // GenerateSign 生成token
-func GenerateSign(path string, expire ...time.Duration) (sign string, err error) {
+func GenerateMediaSign(path string, expire ...time.Duration) (sign string, err error) {
 	path = strings.TrimLeft(path, "/")
 	// 默认过期时间为一个月
 	expireDuration := time.Now().Add(30 * 24 * time.Hour)
@@ -60,7 +60,7 @@ func GenerateSign(path string, expire ...time.Duration) (sign string, err error)
 		expireDuration = time.Now().Add(expire[0])
 	}
 
-	customClaims := &CustomClaims{
+	customClaims := &MediaClaims{
 		path,
 		jwt.StandardClaims{
 			ExpiresAt: expireDuration.Unix(),
@@ -71,24 +71,24 @@ func GenerateSign(path string, expire ...time.Duration) (sign string, err error)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaims)
 
 	// secret 用于对用户数据进行签名，不能暴露
-	return jwtToken.SignedString([]byte(jwtSecret))
+	return jwtToken.SignedString([]byte(mediaJwtSecret))
 }
 
 // ParseSign 解析jwt token
-func ParseSign(sign string) (path string, err error) {
+func ParseMediaSign(sign string) (path string, err error) {
 	var token = &jwt.Token{}
-	token, err = jwt.ParseWithClaims(sign, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err = jwt.ParseWithClaims(sign, &MediaClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(jwtSecret), nil
+		return []byte(mediaJwtSecret), nil
 	})
 
 	if err != nil {
 		return
 	}
 
-	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*MediaClaims); ok && token.Valid {
 		return strings.TrimLeft(claims.Path, "/"), nil
 	}
 	return "", err

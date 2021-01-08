@@ -300,7 +300,7 @@ func (this *DocumentController) Read() {
 					poster, _ := sel.Attr("poster")
 					src, _ := sel.Attr("src")
 					if !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
-						sign, _ := utils.GenerateSign(src, time.Duration(utils.MediaDuration)*time.Second)
+						sign, _ := utils.GenerateMediaSign(src, time.Duration(utils.MediaDuration)*time.Second)
 						if strings.Contains(src, "?") {
 							src = src + "&sign=" + sign
 						} else {
