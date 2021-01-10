@@ -26,7 +26,6 @@
                                 <th>附件名称</th>
                                 <th>书籍名称</th>
                                 <th>文件大小</th>
-                                <th>是否存在</th>
                                 <th>操作</th>
                             </tr>
                             </thead>
@@ -34,14 +33,24 @@
                             {{range $index,$item := .Lists}}
                             <tr>
                                 <td>{{$item.AttachmentId}}</td>
-                                <td>{{$item.FileName}}</td>
-                                <td>{{$item.BookName}}</td>
-                                <td>{{$item.FileShortSize}}</td>
-                                <td>{{ if $item.IsExist }} 是{{else}}否{{end}}</td>
                                 <td>
-                                    <button type="button" data-method="delete" class="btn btn-danger btn-sm" data-id="{{$item.AttachmentId}}" data-loading-text="删除中...">删除</button>
+                                    {{if and (ne $item.BookIdentify "") (ne $item.DocIdentify "") }}
+                                        <a href="{{urlfor "DocumentController.Read" ":key" $item.BookIdentify ":id" $item.DocIdentify}}" class="text-primary" target="_blank">{{$item.FileName}}</a>
+                                    {{else}}
+                                        {{$item.FileName}}
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{if ne $item.BookIdentify ""}}
+                                        <a class="text-primary" href="{{urlfor "DocumentController.Index" ":key" $item.BookIdentify}}" target="_blank">{{$item.BookName}}</a>
+                                    {{else}}
+                                        {{$item.BookName}}
+                                    {{end}}
+                                </td>
+                                <td>{{$item.FileShortSize}}</td>
+                                <td>
+                                    <a href="{{urlfor "ManagerController.AttachDelete"}}?attach_id={{$item.AttachmentId}}" class="btn btn-danger btn-sm ajax-get confirm">删除</a>
                                     <a href="{{urlfor "ManagerController.AttachDetailed" ":id" $item.AttachmentId}}" class="btn btn-success btn-sm">详情</a>
-
                                 </td>
                             </tr>
                             {{else}}
@@ -64,9 +73,10 @@
 <script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 {{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
 <script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/layer/layer.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
+<script src="/static/js/main.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
         $("#attachList").on("click","button[data-method='delete']",function () {

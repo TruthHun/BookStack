@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/araddon/dateparse"
 
 	"path/filepath"
@@ -18,7 +19,6 @@ import (
 
 	"os"
 
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/models/store"
@@ -39,6 +39,15 @@ func (this *ManagerController) Prepare() {
 	}
 }
 
+var installed []installedDependency
+
+type installedDependency struct {
+	Name        string // 依赖名称
+	IsInstalled bool   // 是否已安装
+	Message     string // 相关信息
+	Error       string
+}
+
 func (this *ManagerController) Index() {
 	this.TplName = "manager/index.html"
 	this.Data["Model"] = models.NewDashboard().Query()
@@ -47,6 +56,55 @@ func (this *ManagerController) Index() {
 		"keywords":    "仪表盘",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
+	if len(installed) == 0 {
+		var err error
+
+		errCalibre := "-"
+		if err = utils.IsInstalledCalibre("ebook-convert"); err != nil {
+			errCalibre = err.Error()
+		}
+		installed = append(installed, installedDependency{
+			Name:        "calibre",
+			IsInstalled: err == nil,
+			Error:       errCalibre,
+			Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
+		})
+
+		errGit := "-"
+		if err = utils.IsInstalledGit(); err != nil {
+			errGit = err.Error()
+		}
+		installed = append(installed, installedDependency{
+			Name:        "git",
+			IsInstalled: err == nil,
+			Error:       errGit,
+			Message:     "git，用于克隆项目",
+		})
+
+		errChrome := "-"
+		if err = utils.IsInstalledChrome(beego.AppConfig.DefaultString("chrome", "chrome")); err != nil {
+			errChrome = err.Error()
+		}
+		installed = append(installed, installedDependency{
+			Name:        "chrome",
+			IsInstalled: err == nil,
+			Error:       errChrome,
+			Message:     "chrome浏览器，即谷歌浏览器，或者chromium-browser，用于渲染markdown内容为HTML。",
+		})
+
+		errPuppeteer := "-"
+		if err = utils.IsInstalledPuppetter(beego.AppConfig.DefaultInt("httpport", 8181)); err != nil {
+			errPuppeteer = err.Error()
+		}
+		installed = append(installed, installedDependency{
+			Name:        "puppeteer",
+			IsInstalled: err == nil,
+			Error:       errPuppeteer,
+			Message:     "puppeteer, node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
+		})
+	}
+
+	this.Data["Installed"] = installed
 	this.Data["IsDashboard"] = true
 }
 
@@ -753,11 +811,6 @@ func (this *ManagerController) AttachList() {
 		this.Data["PageHtml"] = ""
 	}
 
-	for _, item := range attachList {
-		p := filepath.Join(commands.WorkingDirectory, item.FilePath)
-		item.IsExist = utils.FileExists(p)
-	}
-
 	this.Data["Lists"] = attachList
 	this.Data["IsAttach"] = true
 	this.TplName = "manager/attach_list.html"
@@ -780,7 +833,6 @@ func (this *ManagerController) AttachDetailed() {
 		this.Abort("404")
 	}
 
-	attach.FilePath = filepath.Join(commands.WorkingDirectory, attach.FilePath)
 	attach.HttpPath = this.BaseUrl() + attach.HttpPath
 	attach.IsExist = utils.FileExists(attach.FilePath)
 	this.Data["Model"] = attach
@@ -795,16 +847,22 @@ func (this *ManagerController) AttachDelete() {
 		this.Abort("404")
 	}
 
-	attach, err := models.NewAttachment().Find(attachId)
-	if err != nil {
-		beego.Error("AttachDelete => ", err)
-		this.JsonResult(6001, err.Error())
+	attach, _ := models.NewAttachment().Find(attachId)
+	if attach.AttachmentId == 0 {
+		this.JsonResult(0, "ok")
 	}
 
-	if err := attach.Delete(); err != nil {
-		beego.Error("AttachDelete => ", err)
-		this.JsonResult(6002, err.Error())
+	obj := strings.TrimLeft(attach.FilePath, "./")
+	switch utils.StoreType {
+	case utils.StoreOss:
+		store.ModelStoreOss.DelFromOss(obj)
+		if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
+			bucket.SetObjectACL(obj, oss.ACLPrivate)
+		}
+	case utils.StoreLocal:
+		os.Remove(obj)
 	}
+	attach.Delete()
 	this.JsonResult(0, "ok")
 }
 

@@ -103,15 +103,17 @@ func (m *Attachment) FindToPager(pageIndex, pageSize int) (attachList []*Attachm
 		attach.FileShortSize = utils.FormatBytes(int64(attach.FileSize))
 
 		book := NewBook()
-		if e := o.QueryTable(book.TableNameWithPrefix()).Filter("book_id", item.BookId).One(book, "book_name"); e == nil {
+		if e := o.QueryTable(book.TableNameWithPrefix()).Filter("book_id", item.BookId).One(book, "book_name", "identify"); e == nil {
 			attach.BookName = book.BookName
+			attach.BookIdentify = book.Identify
 		} else {
 			attach.BookName = "[不存在]"
 		}
 
 		doc := NewDocument()
-		if e := o.QueryTable(doc.TableNameWithPrefix()).Filter("document_id", item.DocumentId).One(doc, "document_name"); e == nil {
+		if e := o.QueryTable(doc.TableNameWithPrefix()).Filter("document_id", item.DocumentId).One(doc, "document_name", "identify"); e == nil {
 			attach.DocumentName = doc.DocumentName
+			attach.DocIdentify = doc.Identify
 		} else {
 			attach.DocumentName = "[不存在]"
 		}

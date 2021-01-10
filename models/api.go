@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/TruthHun/BookStack/utils"
 	"strings"
+
+	"github.com/TruthHun/BookStack/utils"
 
 	"github.com/astaxie/beego"
 
@@ -15,10 +16,15 @@ var (
 )
 
 func initAPI() {
-	staticDomain = strings.TrimRight(beego.AppConfig.DefaultString("static_domain", "https://static.bookstack.cn/"), "/") + "/"
 	if strings.ToLower(utils.StoreType) == utils.StoreOss {
-		staticDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ") + "/"
+		staticDomain = strings.TrimSpace(beego.AppConfig.String("oss::Domain"))
 	}
+
+	if strings.TrimRight(staticDomain, "/") == "" {
+		staticDomain = beego.AppConfig.DefaultString("static_domain", "")
+	}
+
+	staticDomain = strings.TrimRight(staticDomain, "/") + "/"
 }
 
 func GetAPIStaticDomain() string {

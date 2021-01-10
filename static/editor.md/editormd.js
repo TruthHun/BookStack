@@ -69,7 +69,7 @@
             "bold", "del", "italic", "quote", "ucwords", "uppercase", "lowercase", "|", 
             "h1", "h2", "h3", "h4", "h5", "h6", "|", 
             "list-ul", "list-ol", "hr", "|",
-            "link", "reference-link", "image", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
+            "link", "reference-link", "image", "audio", "video", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|",
             "goto-line", "watch", "preview", "fullscreen", "clear", "search", "|",
             "help", "info"
         ],
@@ -150,6 +150,15 @@
         imageUploadURL       : "",
         crossDomainUpload    : false,
         uploadCallbackURL    : "",
+
+        videoUpload          : false,
+        videoFormats         : ["ogm", "wmv", "asx", "mpg", "webm", "mp4", "ogv", "mpeg", "mov", "m4v", "avi"],
+        videoUploadURL       : "",
+
+        audioUpload          : false,
+        audioFormats         : ["flac", "wma", "weba", "aac", "oga", "ogg", "mp3", "webm", "mid", "wav", "opus", "m4a", "amr", "aiff", "au"],
+        audioUploadURL       : "",
+
         
         toc                  : true,           // Table of contents
         tocm                 : false,           // Using [TOCM], auto create ToC dropdown menu
@@ -206,6 +215,8 @@
             link             : "fa-link",
             "reference-link" : "fa-anchor",
             image            : "fa-picture-o",
+            audio            : "fa-file-audio-o",
+            video            : "fa-video-camera",
             code             : "fa-code",
             "preformatted-text" : "fa-file-code-o",
             "code-block"     : "fa-file-code-o",
@@ -252,6 +263,8 @@
                 link             : "链接",
                 "reference-link" : "引用链接",
                 image            : "添加图片",
+                audio            : "添加音频",
+                video            : "添加视频",
                 code             : "行内代码",
                 "preformatted-text" : "预格式文本 / 代码块（缩进风格）",
                 "code-block"     : "代码块（多语言风格）",
@@ -301,6 +314,26 @@
                     imageURLEmpty    : "错误：图片地址不能为空。",
                     uploadFileEmpty  : "错误：上传的图片不能为空。",
                     formatNotAllowed : "错误：只允许上传图片文件，允许上传的图片文件格式有："
+                },
+                audio : {
+                    title    : "添加音频",
+                    url      : "音频地址",
+                    link     : "海报链接",
+                    alt      : "音频描述",
+                    uploadButton     : "本地上传",
+                    videoURLEmpty    : "错误：音频地址不能为空。",
+                    uploadFileEmpty  : "错误：上传的音频不能为空。",
+                    formatNotAllowed : "错误：只允许上传音频文件，允许上传的音频文件格式有："
+                },
+                video : {
+                    title    : "添加视频",
+                    url      : "视频地址",
+                    link     : "海报链接",
+                    alt      : "视频描述",
+                    uploadButton     : "本地上传",
+                    videoURLEmpty    : "错误：视频地址不能为空。",
+                    uploadFileEmpty  : "错误：上传的视频不能为空。",
+                    formatNotAllowed : "错误：只允许上传视频文件，允许上传的视频文件格式有："
                 },
                 preformattedText : {
                     title             : "添加预格式文本或代码块", 
@@ -1272,7 +1305,7 @@
                     }
                 }
                 
-                if (name !== "link" && name !== "reference-link" && name !== "image" && name !== "code-block" && 
+                if (name !== "link" && name !== "reference-link" && name !== "image" && name !== "audio" && name !== "video" && name !== "code-block" && 
                     name !== "preformatted-text" && name !== "watch" && name !== "preview" && name !== "search" && name !== "fullscreen" && name !== "info") 
                 {
                     cm.focus();
@@ -3115,6 +3148,12 @@
         image : function() {
             this.executePlugin("imageDialog", "image-dialog/image-dialog");
         },
+        audio : function() {
+            this.executePlugin("audioDialog", "audio-dialog/audio-dialog");
+        },
+        video : function() {
+            this.executePlugin("videoDialog", "video-dialog/video-dialog");
+        },
         
         code : function() {
             var cm        = this.cm;
@@ -3297,6 +3336,8 @@
         },
         
         "Shift-Ctrl-Alt-I" : "image",
+        "Shift-Ctrl-Alt-A" : "audio",
+        "Shift-Ctrl-Alt-V" : "video",
         "Shift-Ctrl-L"     : "link",
         "Shift-Ctrl-O"     : "list-ol",
         "Shift-Ctrl-P"     : "preformatted-text",

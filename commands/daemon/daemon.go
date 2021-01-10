@@ -20,11 +20,10 @@ type Daemon struct {
 func NewDaemon() *Daemon {
 
 	config := &service.Config{
-		Name:             "BookStackd",                            //服务显示名称
-		DisplayName:      "BookStack Service",                     //服务名称
-		Description:      "A document online management program.", //服务描述
-		WorkingDirectory: commands.WorkingDirectory,
-		Arguments:        os.Args[1:],
+		Name:        "BookStackd",                            //服务显示名称
+		DisplayName: "BookStack Service",                     //服务名称
+		Description: "A document online management program.", //服务描述
+		Arguments:   os.Args[1:],
 	}
 
 	return &Daemon{

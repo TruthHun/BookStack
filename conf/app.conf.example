@@ -11,6 +11,9 @@ appId=""
 # 微信小程序appSecret
 appSecret=""
 
+# 是否允许跨域(针对小程序或者APP开发)
+allowCors = true
+
 # 是否限制API请求，也就是如果不是上述配置的微信小程序的appId请求的接口，则直接拒绝
 limitReferer=false
 

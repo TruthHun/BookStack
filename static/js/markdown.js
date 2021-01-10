@@ -12,7 +12,18 @@ $(function () {
         placeholder: "本编辑器支持Markdown编辑，左边编写，右边预览",
         imageUpload: true,
         imageFormats: ["jpg", "jpeg", "gif", "png", "JPG", "JPEG", "GIF", "PNG"],
-        imageUploadURL: window.imageUploadURL ,
+        imageUploadURL: window.imageUploadURL,
+        
+        // 添加音频
+        audioUpload: true,
+        audioFormats: ["mp3"],
+        audioUploadURL: window.fileUploadURL,
+        
+        // 添加视频
+        videoUpload: true,
+        videoFormats: ["mp4"],
+        videoUploadURL: window.fileUploadURL,
+
         toolbarModes : "full",
         fileUpload: true,
         fileUploadURL : window.fileUploadURL,

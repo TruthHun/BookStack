@@ -213,7 +213,7 @@
                         dnd : true,
                         swf: '/static/webuploader/Uploader.swf',
                         server: '{{urlfor "DocumentController.Upload"}}',
-                        formData : { "identify" : {{.Model.Identify}},"doc_id" :  window.selectNode.id },
+                        formData : { "identify" : {{.Model.Identify}}, "doc_id" :  window.selectNode.id },
                         pick: "#filePicker",
                         fileVal : "editormd-file-file",
                         fileNumLimit : 1,

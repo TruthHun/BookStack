@@ -19,7 +19,6 @@ import (
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/russross/blackfriday"
 
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/utils"
@@ -414,7 +413,7 @@ func (this *BookController) UploadCover() {
 		this.JsonResult(500, "图片剪切")
 	}
 
-	filePath = filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("200601"), fileName+ext)
+	filePath = filepath.Join("uploads", time.Now().Format("200601"), fileName+ext)
 
 	//生成缩略图并保存到磁盘
 	err = graphics.ImageResizeSaveFile(subImg, 175, 230, filePath)
@@ -423,7 +422,7 @@ func (this *BookController) UploadCover() {
 		this.JsonResult(500, "保存图片失败")
 	}
 
-	url := "/" + strings.Replace(strings.TrimPrefix(filePath, commands.WorkingDirectory), "\\", "/", -1)
+	url := "/" + strings.Replace(filePath, "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])
 	}
@@ -691,9 +690,8 @@ func (this *BookController) Delete() {
 	this.JsonResult(0, "ok")
 }
 
-//发布书籍.
+// 发布书籍.
 func (this *BookController) Release() {
-
 	identify := this.GetString("identify")
 	bookId := 0
 	if this.Member.IsAdministrator() {

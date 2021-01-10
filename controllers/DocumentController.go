@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 
 	"image/png"
 
@@ -21,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/TruthHun/BookStack/commands"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
 	"github.com/TruthHun/BookStack/models/store"
@@ -30,6 +30,27 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
+)
+
+var (
+	videoBoxFmt = `<div class="video-box">
+	<div class="video-main">
+	  <div class="video-heading">
+		<div class="video-title">%v</div>
+		<div class="video-playbackrate">
+		  <select>
+			<option value="0.7">0.7 倍</option>
+			<option value="1.0" selected>1.0 倍</option>
+			<option value="1.2">1.2 倍</option>
+			<option value="1.5">1.5 倍</option>
+			<option value="2.0">2.0 倍</option>
+		  </select>
+		</div>
+	  </div>
+	  <video controls poster="%v" src="%v" controlslist="nodownload" preload="true">%v</video>
+	</div>
+  </div>
+  `
 )
 
 //DocumentController struct.
@@ -271,6 +292,32 @@ func (this *DocumentController) Read() {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
 			})
+
+			medias := []string{"video", "audio"}
+			for _, item := range medias {
+				query.Find(item).Each(func(idx int, sel *goquery.Selection) {
+					title := strings.TrimSpace(sel.Text())
+					poster, _ := sel.Attr("poster")
+					src, _ := sel.Attr("src")
+					if !(strings.HasPrefix(src, "https://") || strings.HasPrefix(src, "http://")) {
+						sign, _ := utils.GenerateMediaSign(src, time.Now().UnixNano(), time.Duration(utils.MediaDuration)*time.Second)
+						if strings.Contains(src, "?") {
+							src = src + "&sign=" + sign
+						} else {
+							src = src + "?sign=" + sign
+						}
+					}
+					if item == "video" {
+						sel.BeforeHtml(fmt.Sprintf(videoBoxFmt, title, poster, src, title))
+						sel.Remove()
+					} else {
+						sel.SetAttr("preload", "true")
+						sel.SetAttr("controlslist", "nodownload")
+						sel.SetAttr("src", src)
+					}
+				})
+			}
+
 			html, err := query.Find("body").Html()
 			if err != nil {
 				beego.Error(err)
@@ -284,6 +331,15 @@ func (this *DocumentController) Read() {
 	attach, err := models.NewAttachment().FindListByDocumentId(doc.DocumentId)
 	if err == nil {
 		doc.AttachList = attach
+		if len(attach) > 0 {
+			content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
+			for _, item := range attach {
+				li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", item.HttpPath, item.FileName, item.FileName)
+				content.WriteString(li)
+			}
+			content.WriteString("</ul></div>")
+			doc.Release += content.String()
+		}
 	}
 
 	//文档阅读人次+1
@@ -622,16 +678,22 @@ func (this *DocumentController) CreateMulti() {
 
 //上传附件或图片.
 func (this *DocumentController) Upload() {
-
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
-	isAttach := true
+	fileType := this.GetString("type")
 
 	if identify == "" {
 		this.JsonResult(6001, "参数错误")
 	}
 
 	name := "editormd-file-file"
+	if docId == 0 {
+		if fileType != "" && !strings.Contains(fileType, "/") {
+			name = "editormd-" + fileType + "-file"
+		} else {
+			fileType = strings.Split(fileType, "/")[0]
+		}
+	}
 
 	file, moreFile, err := this.GetFile(name)
 	if err == http.ErrMissingFile {
@@ -653,11 +715,12 @@ func (this *DocumentController) Upload() {
 		this.JsonResult(6003, "无法解析文件的格式")
 	}
 
-	if !conf.IsAllowUploadFileExt(ext) {
+	if !conf.IsAllowUploadFileExt(ext, fileType) {
 		this.JsonResult(6004, "不允许的文件类型")
 	}
 
 	bookId := 0
+	bookIdentify := ""
 	//如果是超级管理员，则不判断权限
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -665,6 +728,7 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6006, "文档不存在或权限不足")
 		}
 		bookId = book.BookId
+		bookIdentify = book.Identify
 	} else {
 		book, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId)
 		if err != nil {
@@ -679,6 +743,7 @@ func (this *DocumentController) Upload() {
 			this.JsonResult(6006, "权限不足")
 		}
 		bookId = book.BookId
+		bookIdentify = book.Identify
 	}
 
 	if docId > 0 {
@@ -689,95 +754,65 @@ func (this *DocumentController) Upload() {
 		if doc.BookId != bookId {
 			this.JsonResult(6008, "文档不属于指定的书籍")
 		}
+	} else {
+		identify := filepath.Base(this.Ctx.Request.Header.Get("referer"))
+		doc, err := models.NewDocument().FindByBookIdAndDocIdentify(bookId, identify)
+		if err != nil {
+			this.JsonResult(6007, "文档不存在")
+		}
+		docId = doc.DocumentId
 	}
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join(commands.WorkingDirectory, "uploads", time.Now().Format("200601"), fileName+ext)
+	prefix := "uploads"
+	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
+	if utils.StoreType != utils.StoreOss {
+		savePath = filepath.Join(prefix, savePath)
+	}
+	savePath = strings.ReplaceAll(savePath, "\\", "/")
+	os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
 
-	path := filepath.Dir(filePath)
-
-	os.MkdirAll(path, os.ModePerm)
-
-	err = this.SaveToFile(name, filePath)
-
+	err = this.SaveToFile(name, savePath)
 	if err != nil {
 		beego.Error("SaveToFile => ", err)
 		this.JsonResult(6005, "保存文件失败")
 	}
+
 	attachment := models.NewAttachment()
 	attachment.BookId = bookId
 	attachment.FileName = moreFile.Filename
 	attachment.CreateAt = this.Member.MemberId
 	attachment.FileExt = ext
-	attachment.FilePath = strings.TrimPrefix(filePath, commands.WorkingDirectory)
+	attachment.FilePath = "/" + savePath
+	attachment.HttpPath = attachment.FilePath
 	attachment.DocumentId = docId
 
-	if fileInfo, err := os.Stat(filePath); err == nil {
+	// 非附件
+	if name != "editormd-file-file" {
+		attachment.DocumentId = 0
+	}
+
+	if fileInfo, err := os.Stat(savePath); err == nil {
 		attachment.FileSize = float64(fileInfo.Size())
 	}
-	if docId > 0 {
-		attachment.DocumentId = docId
-	}
 
-	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-
-		attachment.HttpPath = "/" + strings.Replace(strings.TrimPrefix(filePath, commands.WorkingDirectory), "\\", "/", -1)
-		if strings.HasPrefix(attachment.HttpPath, "//") {
-			attachment.HttpPath = string(attachment.HttpPath[1:])
-		}
-		isAttach = false
-	}
-
-	err = attachment.Insert()
-
-	if err != nil {
-		os.Remove(filePath)
+	// 数据入库
+	if err = attachment.Insert(); err != nil {
+		os.Remove(savePath)
 		beego.Error("Attachment Insert => ", err)
 		this.JsonResult(6006, "文件保存失败")
 	}
-	if attachment.HttpPath == "" {
-		attachment.HttpPath = beego.URLFor("DocumentController.DownloadAttachment", ":key", identify, ":attach_id", attachment.AttachmentId)
 
-		if err := attachment.Update(); err != nil {
-			beego.Error("SaveToFile => ", err)
-			this.JsonResult(6005, "保存文件失败")
-		}
-	}
-
-	//文件和图片分开放在书籍文件夹内
-	var osspath = ""
-	if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-		osspath = fmt.Sprintf("projects/%v/%v", identify, fileName+filepath.Ext(attachment.HttpPath))
-	} else {
-		osspath = strings.Replace(filepath.Join("projects", identify, "files", fileName+ext), "\\", "/", -1)
-	}
-
-	switch utils.StoreType {
-	case utils.StoreOss:
-		if err := store.ModelStoreOss.MoveToOss("."+attachment.HttpPath, osspath, true, false); err != nil {
+	if utils.StoreType == utils.StoreOss {
+		if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
-		}
-		//attachment.HttpPath = this.OssDomain + "/" + osspath
-		attachment.HttpPath = "/" + osspath
-	case utils.StoreLocal:
-		osspath = "uploads/" + osspath
-		//图片是正确的，先不修改
-		if strings.EqualFold(ext, ".jpg") || strings.EqualFold(ext, ".jpeg") || strings.EqualFold(ext, ".png") || strings.EqualFold(ext, ".gif") {
-			if err := store.ModelStoreLocal.MoveToStore("."+attachment.HttpPath, osspath); err != nil {
-				beego.Error(err.Error())
-			}
-			attachment.HttpPath = "/" + osspath
-			attachment.FilePath = filepath.Join(commands.WorkingDirectory, osspath)
 		} else {
-			if err := store.ModelStoreLocal.MoveToStore(filePath, osspath); err != nil {
-				beego.Error(err.Error())
+			if fileType == "video" || fileType == "audio" {
+				if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
+					bucket.SetObjectACL(savePath, oss.ACLPrivate)
+				}
 			}
-			attachment.FilePath = osspath
-		}
-		if err := attachment.Update(); err != nil {
-			beego.Error("SaveToFile => ", err)
-			this.JsonResult(6005, "保存文件失败")
 		}
 	}
 
@@ -787,7 +822,7 @@ func (this *DocumentController) Upload() {
 		"message":   "ok",
 		"url":       attachment.HttpPath,
 		"alt":       attachment.FileName,
-		"is_attach": isAttach,
+		"is_attach": attachment.DocumentId > 0,
 		"attach":    attachment,
 	}
 	this.Ctx.Output.JSON(result, true, false)
@@ -796,8 +831,6 @@ func (this *DocumentController) Upload() {
 
 //DownloadAttachment 下载附件.
 func (this *DocumentController) DownloadAttachment() {
-	this.Prepare()
-
 	identify := this.Ctx.Input.Param(":key")
 	attachId, _ := strconv.Atoi(this.Ctx.Input.Param(":attach_id"))
 	token := this.GetString("token")
@@ -844,7 +877,7 @@ func (this *DocumentController) DownloadAttachment() {
 	if attachment.BookId != bookId {
 		this.Abort("404")
 	}
-	this.Ctx.Output.Download(filepath.Join(commands.WorkingDirectory, attachment.FilePath), attachment.FileName)
+	this.Ctx.Output.Download(strings.TrimLeft(attachment.FilePath, "./"), attachment.FileName)
 
 	this.StopRun()
 }
@@ -884,7 +917,7 @@ func (this *DocumentController) RemoveAttachment() {
 		this.JsonResult(6005, "删除失败")
 	}
 
-	os.Remove(filepath.Join(commands.WorkingDirectory, attach.FilePath))
+	os.Remove(strings.TrimLeft(attach.FilePath, "./"))
 	this.JsonResult(0, "ok", attach)
 }
 
@@ -947,7 +980,7 @@ func (this *DocumentController) Delete() {
 	this.JsonResult(0, "ok")
 }
 
-//获取或更新文档内容.
+// 获取或更新文档内容.
 func (this *DocumentController) Content() {
 	identify := this.Ctx.Input.Param(":key")
 	docId, err := this.GetInt("doc_id")
