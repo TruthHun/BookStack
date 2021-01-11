@@ -862,8 +862,11 @@ func (this *CommonController) handleReleaseV1(release string, bookIdentify strin
 	} else {
 		// 处理svg
 		query = utils.HandleSVG(query, bookIdentify)
+		query.Find(".reference-link").Remove()
+		query.Find(".header-link").Remove()
+
 		allTags := make(map[string]bool)
-		query.Find("*").Each(func(i int, selection *goquery.Selection) {
+		query.Find("body").Find("*").Each(func(i int, selection *goquery.Selection) {
 			if len(selection.Nodes) > 0 {
 				allTags[strings.ToLower(selection.Nodes[0].Data)] = true
 			}
@@ -882,9 +885,6 @@ func (this *CommonController) handleReleaseV1(release string, bookIdentify strin
 			}
 		}
 
-		query.Find(".reference-link").Remove()
-		query.Find(".header-link").Remove()
-
 		weixinTagsMap.Range(func(tag, value interface{}) bool {
 			t := tag.(string)
 			query.Find(t).AddClass("-" + t).RemoveAttr("id")
@@ -897,7 +897,7 @@ func (this *CommonController) handleReleaseV1(release string, bookIdentify strin
 			}
 		})
 
-		htmlStr, err = query.Html()
+		htmlStr, err = query.Find("body").Html()
 		if err != nil {
 			beego.Error(err)
 		}
