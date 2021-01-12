@@ -111,7 +111,7 @@ func (this *StaticController) isMedia(path string) (yes bool) {
 	var videoOK, audioOK bool
 	ext := strings.ToLower(filepath.Ext(path))
 	_, videoOK = conf.VideoExt.Load(ext)
-	_, audioOK = conf.VideoExt.Load(ext)
+	_, audioOK = conf.AudioExt.Load(ext)
 	return audioOK || videoOK
 }
 
