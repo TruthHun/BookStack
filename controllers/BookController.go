@@ -413,7 +413,7 @@ func (this *BookController) UploadCover() {
 		this.JsonResult(500, "图片剪切")
 	}
 
-	filePath = filepath.Join("uploads", time.Now().Format("200601"), fileName+ext)
+	filePath = strings.ReplaceAll(filepath.Join("uploads", time.Now().Format("200601"), fileName+ext), "\\", "/")
 
 	//生成缩略图并保存到磁盘
 	err = graphics.ImageResizeSaveFile(subImg, 175, 230, filePath)

@@ -64,7 +64,7 @@ func (this *StaticController) StaticFile() {
 		http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, file)
 		return
 	}
-	fmt.Println(file, "===============")
+
 	file = strings.ReplaceAll(strings.TrimLeft(file, "./"), "\\", "/")
 	path := filepath.Join(utils.VirtualRoot, file)
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
