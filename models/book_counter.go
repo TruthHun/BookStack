@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -129,7 +130,7 @@ func (*BookCounter) _sort(prd period, limit int, orderField string, withCache ..
 			books = append(books, SortedBook{
 				BookId:   book.BookId,
 				Identify: book.Identify,
-				Cover:    book.Cover,
+				Cover:    strings.ReplaceAll(book.Cover, "\\", "/"),
 				BookName: book.BookName,
 				Cnt:      cnt,
 			})

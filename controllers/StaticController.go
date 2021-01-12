@@ -39,18 +39,19 @@ func (this *StaticController) Uploads() {
 	file := strings.TrimLeft(this.GetString(":splat"), "./")
 	path := strings.ReplaceAll(filepath.Join("uploads", file), "\\", "/")
 
-	// 签名验证
-	sign := this.GetString("sign")
-	if !this.isValidSign(sign, path) {
-		// 签名验证不通过，需要再次验证书籍是否是用户的（针对编辑状态）
-		if !this.isBookOwner() {
-			this.Abort("404")
-			return
+	if this.isMedia(path) { // 签名验证
+		sign := this.GetString("sign")
+		if !this.isValidSign(sign, path) {
+			// 签名验证不通过，需要再次验证书籍是否是用户的（针对编辑状态）
+			if !this.isBookOwner() {
+				this.Abort("404")
+				return
+			}
 		}
-	}
 
-	if utils.IsSignUsed(sign) {
-		this.Abort("404")
+		if utils.IsSignUsed(sign) {
+			this.Abort("404")
+		}
 	}
 
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
@@ -63,7 +64,8 @@ func (this *StaticController) StaticFile() {
 		http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, file)
 		return
 	}
-	file = strings.TrimLeft(file, "./")
+	fmt.Println(file, "===============")
+	file = strings.ReplaceAll(strings.TrimLeft(file, "./"), "\\", "/")
 	path := filepath.Join(utils.VirtualRoot, file)
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }

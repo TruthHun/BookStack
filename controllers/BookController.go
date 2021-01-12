@@ -427,7 +427,7 @@ func (this *BookController) UploadCover() {
 		url = string(url[1:])
 	}
 
-	oldCover := book.Cover
+	oldCover := strings.ReplaceAll(book.Cover, "\\", "/")
 	osspath := fmt.Sprintf("projects/%v/%v", book.Identify, strings.TrimLeft(url, "./"))
 	book.Cover = "/" + osspath
 	if utils.StoreType == utils.StoreLocal {

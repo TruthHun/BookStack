@@ -327,6 +327,7 @@ func (m *Book) ThoroughDeleteBook(id int) (err error) {
 	//删除oss中书籍对应的文件夹
 	switch utils.StoreType {
 	case utils.StoreLocal: //删除本地存储，记得加上uploads
+		m.Cover = strings.ReplaceAll(m.Cover, "\\", "/")
 		if m.Cover != beego.AppConfig.DefaultString("cover", "/static/images/book.png") {
 			os.Remove(strings.TrimLeft(m.Cover, "/ ")) //删除封面
 		}
@@ -557,7 +558,7 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.CommentCount = book.CommentCount
 	m.CreateTime = book.CreateTime
 	m.ModifyTime = book.ModifyTime
-	m.Cover = book.Cover
+	m.Cover = strings.ReplaceAll(book.Cover, "\\", "/")
 	m.MemberId = book.MemberId
 	m.Label = book.Label
 	m.Status = book.Status

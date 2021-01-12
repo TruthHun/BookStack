@@ -570,6 +570,7 @@ func HandleSVG(doc *goquery.Document, project string) *goquery.Document {
 //操作图片显示
 //如果用的是oss存储，这style是avatar、cover可选项
 func ShowImg(img string, style ...string) (url string) {
+	img = strings.ReplaceAll(img, "\\", "/")
 	if strings.HasPrefix(img, "https://") || strings.HasPrefix(img, "http://") {
 		return img
 	}
