@@ -765,19 +765,24 @@ func (this *DocumentController) Upload() {
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	prefix := "uploads"
-	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
-	if utils.StoreType != utils.StoreOss {
-		savePath = filepath.Join(prefix, savePath)
-	}
-	savePath = strings.ReplaceAll(savePath, "\\", "/")
-	os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
-
-	err = this.SaveToFile(name, savePath)
+	tmpPath := fmt.Sprintf("cache/%v-%v-%v", bookIdentify, time.Now().Format("200601"), fileName+ext)
+	err = this.SaveToFile(name, tmpPath)
 	if err != nil {
 		beego.Error("SaveToFile => ", err)
 		this.JsonResult(6005, "保存文件失败")
 	}
+
+	defer func() { os.Remove(tmpPath) }()
+
+	prefix := "uploads"
+	savePath := filepath.Join("projects", bookIdentify, time.Now().Format("200601"), fileName+ext)
+	if utils.StoreType != utils.StoreOss {
+		savePath = filepath.Join(prefix, savePath)
+		os.MkdirAll(filepath.Dir(savePath), os.ModePerm)
+		os.Rename(tmpPath, savePath)
+	}
+
+	savePath = strings.ReplaceAll(savePath, "\\", "/")
 
 	attachment := models.NewAttachment()
 	attachment.BookId = bookId
@@ -805,7 +810,7 @@ func (this *DocumentController) Upload() {
 	}
 
 	if utils.StoreType == utils.StoreOss {
-		if err := store.ModelStoreOss.MoveToOss(savePath, savePath, true, false); err != nil {
+		if err := store.ModelStoreOss.MoveToOss(tmpPath, savePath, true, false); err != nil {
 			beego.Error(err.Error())
 		} else {
 			if fileType == "video" || fileType == "audio" {
