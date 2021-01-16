@@ -49,7 +49,7 @@ func (this *StaticController) Uploads() {
 			}
 		}
 
-		if utils.IsSignUsed(sign) {
+		if sign != "" && utils.IsSignUsed(sign) {
 			this.Abort("404")
 		}
 	}
