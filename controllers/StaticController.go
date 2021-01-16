@@ -49,9 +49,9 @@ func (this *StaticController) Uploads() {
 			}
 		}
 
-		if sign != "" && utils.IsSignUsed(sign) {
-			this.Abort("404")
-		}
+		// if sign != "" && utils.IsSignUsed(sign) {
+		// 	this.Abort("404")
+		// }
 	}
 
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
@@ -95,9 +95,9 @@ func (this *StaticController) ProjectsFile() {
 		}
 	}
 
-	if utils.IsSignUsed(sign) {
-		this.Abort("404")
-	}
+	// if utils.IsSignUsed(sign) {
+	// 	this.Abort("404")
+	// }
 
 	if bucket, err := store.ModelStoreOss.GetBucket(); err == nil {
 		object, _ = bucket.SignURL(object, http.MethodGet, utils.MediaDuration)
