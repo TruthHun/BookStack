@@ -9,7 +9,7 @@
 <body>
 <div class="manual-reader">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row">
             <div class="page-left">
                 {{template "manager/menu.html" .}}
@@ -140,6 +140,18 @@
                                 </label>
                                 <label class="radio-inline">
                                     <input type="radio" {{if eq .HIDE_TAG.OptionValue "false"}}checked{{end}} name="HIDE_TAG" value="false">否<span class="text"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>是否启用宽屏 ( <span class="text-muted">启用宽屏，网站页面将占满浏览器屏幕</span>)</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .WIDESCREEN.OptionValue "true"}}checked{{end}} name="WIDESCREEN" value="true">是<span class="text"></span>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" {{if eq .WIDESCREEN.OptionValue "false"}}checked{{end}} name="WIDESCREEN" value="false">否<span class="text"></span>
                                 </label>
                             </div>
                         </div>

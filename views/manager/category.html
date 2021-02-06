@@ -18,7 +18,7 @@
 <body>
 <div class="manual-reader">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body category-manager">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body category-manager">
         <div class="row">
             <div class="page-left">
                 {{template "manager/menu.html" .}}

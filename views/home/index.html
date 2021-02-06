@@ -6,7 +6,7 @@
 <body>
 <div class="manual-reader manual-container">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row visible-xs" style="margin:30px 0px 15px 0px;">
             <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
                 <div class="input-group input-group-lg">
@@ -15,7 +15,7 @@
                 </div>
             </form>
         </div>
-        <div class="row">
+        <div class="row cates-filter">
             <div class="col-xs-12 mgt-15px" style="line-height: 200%;">
                 {{if (ads "explore-under-nav" $.IsMobile)}}
                     <div class="ap ap-explore-under-nav mgb-15px">

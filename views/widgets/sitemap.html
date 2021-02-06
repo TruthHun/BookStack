@@ -10,7 +10,7 @@
 <body>
 <div class="manual-reader manual-container">
 {{template "widgets/header.html" .}}
-    <div class="container" style="margin-top: 75px;">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}" style="margin-top: 75px;">
         <div class="row">
             <ul>
                 {{range .Docs}}

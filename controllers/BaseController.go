@@ -150,6 +150,10 @@ func (this *BaseController) Prepare() {
 		this.Data["CloseSubmitEnter"] = v == "true"
 	}
 
+	if v, ok := this.Option["WIDESCREEN"]; ok {
+		this.Data["IsWideScreen"] = v == "true"
+	}
+
 	this.Data["SiteName"] = this.Sitename
 
 	// 默认显示创建书籍的入口

@@ -887,7 +887,7 @@ a{color: #333}
 }
 
 .lang-explore .text-muted{color: #999;}
-.lang-explore a{margin-left: 5px;margin-right: 3px;}
+.lang-explore a{margin: 0 5px;}
 .lang-explore a.active{color: #06f}
 .submit-book{margin-top: 90px;}
 .submit-book p{margin-bottom: 0;}
@@ -1004,3 +1004,31 @@ a{color: #333}
 .wait2del>div{margin-bottom: 15px;}
 .wait2del ul{padding-left: 15px;}
 .wait2del label{font-weight: normal;}
+
+.lang-explore{font-size: 15px;line-height: 220%;}
+
+/* --------------------- 宽屏样式 ------------------- */
+@media(min-width: 1200px){
+    .container-widescreen .manual-list .col-md-2{
+        width: 12.5%;
+    }
+    .container-widescreen .manual-list .border-cover-img{
+        margin: 0 auto;
+    }
+    /* 标题宽度，要跟封面最大宽度一致 */
+    .manual-list .manual-item-standard dd a{max-width: 175px;margin:15px auto 30px;}
+
+    .container-widescreen .book-list .list-item a{
+        font-size: 20px;line-height: 200%;
+    }
+
+    .container-widescreen .book-list .list-item .info{
+        font-size: 14px;
+    }
+
+    .container-widescreen .book-list .list-item .desc-text{
+        font-size: 16px;
+    }
+    .container-widescreen .book-list .list-item a.btn{font-size: unset;line-height: 178%;}
+    .container-widescreen .result-list .clearfix a{display: inline-block;margin-bottom: 13px;}
+}

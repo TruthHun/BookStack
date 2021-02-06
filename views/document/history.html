@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-<div class="container">
+<div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>

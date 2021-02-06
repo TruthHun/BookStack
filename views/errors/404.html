@@ -28,7 +28,7 @@
 </head>
 <body>
     {{if .BookName}}
-        <div class="container">
+        <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
             <div class="header">
                 <h3>章节不存在</h3>
             </div>
@@ -39,7 +39,7 @@
             </div>
         </div>
     {{else}}
-        <div class="container">
+        <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
             <div class="header">
                 <h3>Page Not Foud</h3>
             </div>

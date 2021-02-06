@@ -15,7 +15,7 @@
 <body id="page-rank">
 <div class="manual-container">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row">
             <div class="col-xs-12">
                 <div class="rank-head">

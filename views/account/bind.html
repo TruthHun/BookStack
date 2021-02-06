@@ -9,7 +9,7 @@
 </head>
 <body class="manual-container">
 <header class="navbar navbar-static-top smart-nav navbar-fixed-top manual-header" role="banner">
-    <div class="container">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
         <div class="navbar-header col-sm-12 col-md-6 col-lg-5">
             <a href="/" class="navbar-brand" title="{{.SITE_NAME}}">
                 <img class="logo" src="/static/images/logo.png" alt="{{.SITE_NAME}}">
@@ -17,7 +17,7 @@
         </div>
     </div>
 </header>
-<div class="container manual-body">
+<div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
     <div class="row login">
         <div class="col-xs-12">
                 <div class="login-body">

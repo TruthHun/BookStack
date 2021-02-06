@@ -9,7 +9,7 @@
 </head>
 <body id="bookstack-intro">
 {{template "widgets/header.html" .}}
-<div class="container">
+<div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
     <div class="row bookstack-info">
         <div class="col-xs-12">
             <h1>{{.Book.BookName}}
@@ -27,12 +27,12 @@
                 </div>
             {{end}}
         </div>
-        <div class="col-sm-3 col-xs-6 col-md-3">
+        <div class="col-sm-3 col-xs-6 col-md-3 {{if $.IsWideScreen}}col-lg-2{{end}}">
             <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}} mgt-15px">
                 <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
             </div>
         </div>
-        <div class="{{if $.Wxacode}}col-sm-6 col-md-7{{else}}col-sm-9{{end}} col-xs-6">
+        <div class="{{if $.Wxacode}}col-sm-6 col-md-7 {{if $.IsWideScreen}}col-lg-9{{end}}{{else}}col-sm-9 {{if $.IsWideScreen}}col-lg-10{{end}}{{end}} col-xs-6">
             <ul class="none-listyle">
                 <li class="bookstack-score"><span>文档评分：</span>
                     <i class="bookstack-star star-{{.Book.Score}}"></i>
@@ -76,7 +76,7 @@
             </ul>
         </div>
         {{if $.Wxacode}}
-            <div class="col-sm-3 col-md-2 hidden-xs">
+            <div class="col-sm-3 col-md-2 col-lg-1 hidden-xs">
                 <img class="img-responsive" src="{{showImg $.Wxacode}}" alt="{{.Book.BookName}} - BookChat 微信小程序阅读码">
                 <div class="help-block text-center">微信扫一扫，知识掌上学</div>
             </div>
@@ -155,7 +155,7 @@
                                 </div>
                                 <form action="{{urlfor "BookController.Comment" ":id" $.Book.BookId}}" method="post" class="ajax-form">
                                     <div class="form-group">
-                                        <textarea class="form-control" name="content" rows="3" placeholder="在这里，您可以给当前小编提意见和建议，以及对文档内容进行纠偏纠错提醒。"></textarea>
+                                        <textarea class="form-control" name="content" rows="5" placeholder="在这里，您可以给当前小编提意见和建议，以及对文档内容进行纠偏纠错提醒。"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <span class="pull-left text-muted">文明评论，理性发言</span>

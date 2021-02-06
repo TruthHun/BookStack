@@ -306,6 +306,11 @@ func (m *Option) Init() error {
 			OptionName:  "DOWNLOAD_INTERVAL",
 			OptionTitle: "每阅读多少秒可以下载一个电子书",
 		},
+		{
+			OptionValue: "false",
+			OptionName:  "WIDESCREEN",
+			OptionTitle: "是否宽屏",
+		},
 	}
 
 	for _, op := range options {

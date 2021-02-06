@@ -22,7 +22,7 @@
 <body>
 <div class="manual-reader">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row">
             <div class="page-left">
                 <ul class="menu">
