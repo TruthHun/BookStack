@@ -677,7 +677,7 @@ a{color: #333}
 
 
 .border{border: 1px solid #efefef;}
-.border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;}
+.border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.2);border-radius: 4px;}
 .navbar-brand>img.logo{height: 45px;margin-top: -7px;}
 #bookstack-intro{padding-top: 70px;}
 #bookstack-intro ul,#bookstack-intro li{list-style: none;padding:0px;}
@@ -847,6 +847,12 @@ a{color: #333}
     content: url("../images/recommend-red.png");
     position: absolute;top:5px;left: 22px;
 }
+
+@media(min-width: 1200px){
+    .manual-list .recommend-book:before{left: 35px;}
+    .manual-list .pin-book:after{left: 35px;}
+}
+
 .bookstack-info .recommend-book:before{
     top:22px;
 }
@@ -1031,4 +1037,9 @@ a{color: #333}
     }
     .container-widescreen .book-list .list-item a.btn{font-size: unset;line-height: 178%;}
     .container-widescreen .result-list .clearfix a{display: inline-block;margin-bottom: 13px;}
+}
+
+.related-source dl.manual-item-standard{
+    max-width: 175px;
+    margin: 0 auto 15px;
 }
