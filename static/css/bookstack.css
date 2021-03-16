@@ -1414,7 +1414,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     max-width: 95%;
     background-color: #ffffff;
 }
-.markdown-body a{display: inline-block;position: relative;}
+.markdown-body a{position: relative;}
 .markdown-body a .btn-ilink{display: none;}
 .markdown-body a:hover .btn-ilink{display: block;
     color: #008cff;
