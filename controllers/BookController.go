@@ -890,7 +890,7 @@ func (this *BookController) GitPull() {
 		folder := "store/" + identify
 		err := utils.GitClone(link, folder)
 		if err != nil {
-			this.JsonResult(1, err.Error())
+			beego.Error(err.Error())
 		}
 		this.loadByFolder(book.BookId, identify, folder)
 	}()
