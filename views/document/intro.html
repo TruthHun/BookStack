@@ -32,7 +32,7 @@
                 <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
             </div>
         </div>
-        <div class="{{if $.Wxacode}}col-sm-6 col-md-7 {{if $.IsWideScreen}}col-lg-9{{end}}{{else}}col-sm-9 {{if $.IsWideScreen}}col-lg-10{{end}}{{end}} col-xs-6">
+        <div class="{{if $.Wxacode}}col-sm-6 col-md-7 {{if $.IsWideScreen}}col-lg-8{{end}}{{else}}col-sm-9 {{if $.IsWideScreen}}col-lg-10{{end}}{{end}} col-xs-6">
             <ul class="none-listyle">
                 <li class="bookstack-score"><span>文档评分：</span>
                     <i class="bookstack-star star-{{.Book.Score}}"></i>
@@ -76,7 +76,7 @@
             </ul>
         </div>
         {{if $.Wxacode}}
-            <div class="col-sm-3 col-md-2 col-lg-1 hidden-xs">
+            <div class="col-sm-3 col-md-2 col-lg-2 hidden-xs">
                 <img class="img-responsive" src="{{showImg $.Wxacode}}" alt="{{.Book.BookName}} - BookChat 微信小程序阅读码">
                 <div class="help-block text-center">微信扫一扫，知识掌上学</div>
             </div>
