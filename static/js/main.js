@@ -216,7 +216,7 @@ $(function () {
     });
 
     //ajax-form
-    $(".ajax-form [type=submit]").click(function(e){
+    $("body").on("click", ".ajax-form [type=submit]", function(e){
         e.preventDefault();
         var _this=$(this),form=$(this).parents("form"),method=form.attr("method"),action=form.attr("action"),data=form.serialize(),_url=form.attr("data-url");
         var require=form.find("[required=required]"),l=require.length;
@@ -370,5 +370,13 @@ $(function () {
         })
     })
 
+    $("#bookstack-intro .repley").click(function(){
+        var _this = $(this),pid = _this.attr("data-pid"),ele = _this.parent().parent();
+        if (ele.find("form").length==0){
+            $(".comments-list").find("form").remove();
+            ele.find(".comments-content").after($(".comment-form")[0].outerHTML)
+            ele.find("[name=pid]").val(pid)
+        }
+    })
 
 });

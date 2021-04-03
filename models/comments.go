@@ -16,10 +16,12 @@ import (
 //评论表
 type Comments struct {
 	Id         int
-	Uid        int       `orm:"index"` //用户id
-	BookId     int       `orm:"index"` //书籍id
-	Content    string    //评论内容
-	TimeCreate time.Time //评论时间
+	Pid        int       `orm:"index;default(0)"` // 上一个评论的ID
+	Uid        int       `orm:"index"`            // 用户id
+	BookId     int       `orm:"index"`            // 书籍id
+	DocId      int       `orm:"index;default(0)"` // 文档ID
+	Content    string    // 评论内容
+	TimeCreate time.Time // 评论时间
 	Status     int8      //  审核状态; 0，待审核，1 通过，-1 不通过
 }
 
@@ -35,7 +37,7 @@ type Score struct {
 // 多字段唯一键
 func (this *Score) TableUnique() [][]string {
 	return [][]string{
-		[]string{"Uid", "BookId"},
+		{"Uid", "BookId"},
 	}
 }
 
@@ -221,7 +223,7 @@ func (this *Score) AddScore(uid, bookId, score int) (err error) {
 }
 
 //添加评论
-func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
+func (this *Comments) AddComments(uid, bookId, pid, docId int, content string) (err error) {
 	var comment Comments
 
 	//查询该用户现有的评论
@@ -238,6 +240,8 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 		BookId:     bookId,
 		Content:    content,
 		TimeCreate: now,
+		DocId:      docId,
+		Pid:        pid,
 	}
 
 	if _, err = o.Insert(&comments); err != nil {

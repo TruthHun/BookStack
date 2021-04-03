@@ -697,17 +697,21 @@ a{color: #333}
 #bookstack-intro .comments-form .fa{font-size: 18px;}
 #bookstack-intro .comments-form .fa-star{color: #ff6600}
 #bookstack-intro .comments-form .cursor-pointer{cursor: pointer;}
-#bookstack-intro .comments-list li{padding: 30px 0px;border-bottom: 1px solid #EFEFEF;}
+#bookstack-intro .comments-list li{padding: 15px 0px 5px;border-bottom: 1px solid #EFEFEF;}
 #bookstack-intro .comments-list li>.col-xs-12{padding: 0px;}
 #bookstack-intro .comments-list .username{color: #333333;}
 #bookstack-intro .comments-list span{color: #b6b6b6;margin-left: 5px;}
 #bookstack-intro .comments-list img{display: inline-block;height: 50px;width: 50px;}
-#bookstack-intro .comments-list .comments-content{font-size: 13px;color: #999999;text-indent: 2em;line-height: 170%;margin-top:10px;}
+#bookstack-intro .comments-list .comments-content{
+    font-size: 13px;color: #666;text-indent: 2em;line-height: 170%;margin-top:10px;margin-bottom: 15px;
+}
 #bookstack-intro .comments-left{padding-left: 0px;}
 #bookstack-intro .comments-right{padding:  0px;}
 #bookstack-intro .comments-right .userinfo{font-size: 16px;position: relative;top:-7px;}
 #bookstack-intro .comments-right .userinfo span{font-size: 14px;color: #999999;}
 #bookstack-intro .comments-content{color: #999999;}
+#bookstack-intro .repley:hover{cursor: pointer;}
+#bookstack-intro .comments-list form{margin-left: 2em;padding-top: 15px;}
 
 
 .friend-links a{margin-right: 8px;}

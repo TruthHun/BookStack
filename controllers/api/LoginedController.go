@@ -149,8 +149,10 @@ func (this *LoginedController) ChangeAvatar() {
 
 func (this *LoginedController) PostComment() {
 	content := this.GetString("content")
-	if l := len(content); l < 5 || l > 256 {
-		this.Response(http.StatusBadRequest, "点评内容限定 5 - 256 个字符")
+	pid, _ := this.GetInt("pid")
+	docId, _ := this.GetInt("doc_id")
+	if l := len(content); l < 5 || l > 255 {
+		this.Response(http.StatusBadRequest, "点评内容限定 5 - 255 个字符")
 	}
 	bookId := this.getBookIdByIdentify(this.GetString("identify"))
 
@@ -158,7 +160,7 @@ func (this *LoginedController) PostComment() {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
 
-	err := new(models.Comments).AddComments(this.isLogin(), bookId, content)
+	err := new(models.Comments).AddComments(this.isLogin(), bookId, pid, docId, content)
 	if err != nil {
 		this.Response(http.StatusBadRequest, err.Error())
 	}

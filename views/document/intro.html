@@ -153,12 +153,12 @@
                                     {{end}}
 
                                 </div>
-                                <form action="{{urlfor "BookController.Comment" ":id" $.Book.BookId}}" method="post" class="ajax-form">
+                                <form action="{{urlfor "BookController.Comment" ":id" $.Book.BookId}}" method="post" class="ajax-form comment-form">
+                                    <input type="hidden" name="pid" value="0">
                                     <div class="form-group">
-                                        <textarea class="form-control" name="content" rows="5" placeholder="在这里，您可以给当前小编提意见和建议，以及对文档内容进行纠偏纠错提醒。"></textarea>
+                                        <textarea class="form-control" name="content" rows="5" placeholder="文明评论，理性发言"></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <span class="pull-left text-muted">文明评论，理性发言</span>
                                         <input type="submit" class="btn btn-success pull-right" value="发表点评">
                                     </div>
                                 </form>
@@ -171,9 +171,17 @@
                                             <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="{{.Nickname}}">
                                             <span class="username">{{.Nickname}}</span>
                                             <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
-                                            <span class="text-muted hidden-xs pull-right">{{date .TimeCreate "Y-m-d H:i:s"}}</span>
                                         </div>
                                         <div class="col-xs-12 comments-content">{{.Content}}</div>
+                                        <div class="mgt-15px">
+                                            <span class="text-muted">
+                                                <i class="fa fa-clock-o"></i>
+                                                {{date .TimeCreate "Y-m-d H:i:s"}}
+                                            </span>
+                                            <span class="repley" data-pid="{{.Id}}">
+                                                <i class="fa fa-comments-o"></i> 回复
+                                            </span>
+                                        </div>
                                     </li>
                                     {{end}}
 

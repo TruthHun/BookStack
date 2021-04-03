@@ -1235,12 +1235,14 @@ func (this *BookController) Comment() {
 		this.JsonResult(1, "请先登录在评论")
 	}
 	content := this.GetString("content")
-	if l := len(content); l < 5 || l > 256 {
-		this.JsonResult(1, "评论内容限 5 - 256 个字符")
+	if l := len(content); l < 5 || l > 255 {
+		this.JsonResult(1, "评论内容限 5 - 255 个字符")
 	}
 	bookId, _ := this.GetInt(":id")
+	pid, _ := this.GetInt("pid")
+	docId, _ := this.GetInt("doc_id")
 	if bookId > 0 {
-		if err := new(models.Comments).AddComments(this.Member.MemberId, bookId, content); err != nil {
+		if err := new(models.Comments).AddComments(this.Member.MemberId, bookId, pid, docId, content); err != nil {
 			this.JsonResult(1, err.Error())
 		}
 		this.JsonResult(0, "评论成功")
