@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/yanyiwu/gojieba"
 
 	"github.com/mssola/user_agent"
 
@@ -68,6 +69,7 @@ var (
 	langs       sync.Map
 	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
 	transfer    = strings.TrimRight(strings.TrimSpace(beego.AppConfig.String("http_transfer")), "/") + "/"
+	jieba       *gojieba.Jieba
 )
 
 func init() {
@@ -1072,5 +1074,23 @@ func ExecCommand(name string, args []string, timeout ...time.Duration) (out stri
 		err = fmt.Errorf("%v\n%v", err.Error(), stderr.String())
 	}
 	out = stdout.String()
+	return
+}
+
+// SegWords 分词
+func SegWords(sentence string, length ...int) (words []string) {
+	topk := 5
+	if len(length) > 0 && length[0] > 0 {
+		topk = length[0]
+	}
+	if jieba == nil {
+		jieba = gojieba.NewJieba()
+	}
+	keywords := jieba.ExtractWithWeight(sentence, topk)
+	for _, kw := range keywords {
+		if _, err := strconv.ParseFloat(kw.Word, 64); err != nil { // 非数字
+			words = append(words, kw.Word)
+		}
+	}
 	return
 }

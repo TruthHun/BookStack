@@ -564,7 +564,7 @@ func (this *BookController) Create() {
 		this.JsonResult(6006, "书籍标识已存在")
 	}
 
-	book.Label = ""
+	book.Label = strings.Join(utils.SegWords(bookName+"。"+description, 5), ",")
 	book.BookName = bookName
 	book.Author = author
 	book.AuthorURL = authorURL
