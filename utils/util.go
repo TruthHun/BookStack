@@ -14,7 +14,8 @@ import (
 	"sync"
 
 	"github.com/TruthHun/BookStack/utils/html2md"
-	"github.com/yanyiwu/gojieba"
+	"github.com/go-ego/gse"
+	"github.com/go-ego/gse/hmm/idf"
 
 	"github.com/mssola/user_agent"
 
@@ -61,6 +62,11 @@ const (
 
 //分词器
 var (
+	seg gse.Segmenter
+	te  idf.TagExtracter
+)
+
+var (
 	Version     string = "unknown"
 	GitHash     string = "unknown"
 	BuildAt     string = "unknown"
@@ -69,13 +75,28 @@ var (
 	langs       sync.Map
 	httpTimeout = time.Duration(beego.AppConfig.DefaultInt("http_timeout", 30)) * time.Second
 	transfer    = strings.TrimRight(strings.TrimSpace(beego.AppConfig.String("http_transfer")), "/") + "/"
-	jieba       *gojieba.Jieba
 )
 
 func init() {
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
+
+	beego.Info("加载分词词典...")
+	dict := "dictionary/dictionary.txt"
+	err := seg.LoadDict(dict)
+	if err != nil {
+		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
+		os.Exit(0)
+	}
+	seg.LoadStop("dictionary/stop_tokens.txt, dictionary/stop_word.txt")
+	te.WithGse(seg)
+	err = te.LoadIdf("dictionary/idf.txt")
+	if err != nil {
+		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
+		os.Exit(0)
+	}
+	beego.Info("加载分词词典完成！")
 }
 
 func PrintInfo() {
@@ -1083,14 +1104,9 @@ func SegWords(sentence string, length ...int) (words []string) {
 	if len(length) > 0 && length[0] > 0 {
 		topk = length[0]
 	}
-	if jieba == nil {
-		jieba = gojieba.NewJieba()
-	}
-	keywords := jieba.ExtractWithWeight(sentence, topk)
-	for _, kw := range keywords {
-		if _, err := strconv.ParseFloat(kw.Word, 64); err != nil { // 非数字
-			words = append(words, kw.Word)
-		}
+	tags := te.ExtractTags(sentence, topk)
+	for _, tag := range tags {
+		words = append(words, tag.Text())
 	}
 	return
 }
