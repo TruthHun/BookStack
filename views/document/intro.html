@@ -173,6 +173,9 @@
                                             <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
                                         </div>
                                         <div class="col-xs-12 comments-content">
+                                            {{if gt .Pid 0}}
+                                            <div class="reply-to"><span class="text-info">{{.ReplyToUser}}</span> : {{.ReplyToContent}}</div>
+                                            {{end}}
                                             <div>{{.Content}}</div>
                                         </div>
                                         <div class="mgt-15px">

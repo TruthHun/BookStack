@@ -192,8 +192,21 @@ func (this *DocumentController) Index() {
 		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
 	}
 
-	//当前默认展示100条评论
-	this.Data["Comments"], _ = new(models.Comments).Comments(1, 100, bookResult.BookId, 1)
+	//当前默认展示1000条评论(暂时先默认1000条)
+	comments, _ := new(models.Comments).Comments(1, 1000, bookResult.BookId, 1)
+	commentMap := make(map[int]models.BookCommentsResult)
+	for _, comment := range comments {
+		commentMap[comment.Id] = comment
+	}
+	for idx, comment := range comments {
+		if val, ok := commentMap[comment.Pid]; ok {
+			comment.ReplyToUser = val.Nickname
+			comment.ReplyToContent = val.Content
+		}
+		comments[idx] = comment
+	}
+
+	this.Data["Comments"] = comments
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
 	title := "《" + bookResult.BookName + "》"
 	if tab == "comment" {
