@@ -214,7 +214,31 @@ $(function () {
             }
         })
     });
-
+    $(".down-tab").click(function(){
+        var _this = $(this),target = _this.attr("data-target");
+        _this.addClass("active").siblings().removeClass("active");
+        $(".down-tab-cont").hide();
+        $("."+target).show();
+    })
+    $("body").on("click", ".ajax-form-down [type=submit]", function(e){
+        e.preventDefault();
+        var form=$(this).parents("form"),action=form.attr("action"),data=form.serialize();
+        var wecode = form.find("[name=wecode]").val();
+        if (wecode == ""){
+            form.find("[name=wecode]").focus();
+            alertTips("danger", "请输入下载码", 3000,"");
+        }else{
+            $.get(action, data, function(res){
+                var obj=parseJson(res);
+               if (obj.errcode==0){
+                   location.href=obj.data.url;
+                   $(".modal").modal("hide");
+               }else{
+                    alertTips("danger",obj.message,3000,"");
+               }
+            });
+        }
+    })
     //ajax-form
     $("body").on("click", ".ajax-form [type=submit]", function(e){
         e.preventDefault();

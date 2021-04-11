@@ -182,6 +182,7 @@ func (this *DocumentController) Index() {
 	default:
 		tab = "default"
 	}
+	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
 	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(bookResult.MemberId)
 	this.Data["MyScore"] = new(models.Score).BookScoreByUid(this.Member.MemberId, bookResult.BookId)
 	this.Data["Tab"] = tab
@@ -465,6 +466,7 @@ func (this *DocumentController) Read() {
 	this.Data["Content"] = template.HTML(doc.Release)
 	this.Data["View"] = doc.Vcnt
 	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
+	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
 }
 
 //编辑文档.
@@ -1192,7 +1194,8 @@ func (this *DocumentController) Content() {
 
 //导出文件
 func (this *DocumentController) Export() {
-	if this.Member == nil || this.Member.MemberId == 0 {
+	wecode := strings.TrimSpace(this.GetString("wecode"))
+	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
 		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
 			tips = strings.TrimSpace(tips)
 			if len(tips) > 0 {
@@ -1201,7 +1204,6 @@ func (this *DocumentController) Export() {
 		}
 	}
 
-	this.TplName = "document/export.html"
 	identify := this.Ctx.Input.Param(":key")
 	ext := strings.ToLower(this.GetString("output"))
 	switch ext {
@@ -1242,11 +1244,13 @@ func (this *DocumentController) Export() {
 	if link != "" {
 		// 查询是否可以下载
 		counter := models.NewDownloadCounter()
-		times, min := counter.DoesICanDownload(this.Member.MemberId)
-		if times == 0 {
-			this.JsonResult(1, fmt.Sprintf("下载失败。每天每阅读学习 %v 分钟可下载1个离线文档。请您再阅读学习 %v 分钟", min, min))
+		_, err := counter.DoesICanDownload(this.Member.MemberId, wecode)
+		if err != nil {
+			this.JsonResult(1, err.Error())
 		}
-		counter.Increase(this.Member.MemberId)
+		if wecode == "" {
+			counter.Increase(this.Member.MemberId)
+		}
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
 	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")

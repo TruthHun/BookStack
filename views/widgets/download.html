@@ -7,7 +7,14 @@
             </div>
             <div class="modal-body clearfix">
                 <div class="help-block">
-                    {{if .APP_QRCODE}}
+                    {{if .ExistWeCode}}
+                    <ul class="nav nav-tabs mgb-15px">
+                        <li class="active down-tab" data-target="down-common"><a href="javascript:void(0);">普通下载</a></li>
+                        <li class="down-tab" data-target="down-wecode"><a href="javascript:void(0);">下载码下载(免登录无限下载)</a></li>
+                    </ul>
+                    {{end}}
+                    <div class="down-tab-cont down-common">
+                        {{if .APP_QRCODE}}
                         <div class="row">
                             <div class="col-sm-6 col-xs-6 text-center">
                                 <div class="help-block">
@@ -22,11 +29,32 @@
                                 <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown btn-block"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
                             </div>
                         </div>
-                    {{else}}
-                        <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
-                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> PDF<span class="hidden-xs">文档</span></a>
-                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> EPUB<span class="hidden-xs">文档</span></a>
-                        <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
+                        {{else}}
+                            <div class="help-block">请下载您需要的格式的文档，随时随地，享受汲取知识的乐趣！</div>
+                            <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=pdf" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> PDF<span class="hidden-xs">文档</span></a>
+                            <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=epub" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> EPUB<span class="hidden-xs">文档</span></a>
+                            <a href="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}?output=mobi" class="btn btn-default btn-filedown"> <i class="fa fa-cloud-download"></i> MOBI<span class="hidden-xs">文档</span></a>
+                        {{end}}
+                    </div>
+                    {{if .ExistWeCode}}
+                        <div class="down-tab-cont down-wecode" style="display: none;">
+                            <div class="help-block mgb-15px">下载码方式下载：免费、免登录、无限制。<a href="/read/help/get-down-code.md" target="_blank"><i class="fa fa-hand-o-right"></i> 免费获取下载码</a></div>
+                            <form class="form-inline ajax-form-down" role="form" method="get" action="{{urlfor "DocumentController.Export" ":key" $.Book.Identify}}">
+                                <div class="form-group">
+                                <label for="wecode">下载码</label>
+                                <input type="text" name="wecode" class="form-control" id="wecode" placeholder="请输入下载码">
+                                </div>
+                                <div class="form-group">
+                                    <label for="format">&nbsp;&nbsp;文档格式</label>
+                                    <select name="output" id="format" class="form-control">
+                                        <option value="pdf">PDF</option>
+                                        <option value="epub">EPUB</option>
+                                        <option value="mobi">MOBI</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-default"><i class="fa fa-cloud-download"></i> 码上下载</button>
+                            </form>
+                        </div>
                     {{end}}
                 </div>
             </div>

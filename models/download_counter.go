@@ -2,7 +2,10 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -35,31 +38,45 @@ func (m *DownloadCounter) Increase(uid int) (err error) {
 	return
 }
 
-// 大于0，表示还可以下载多少个文档
-// 小于0，表示没有限制
-func (m *DownloadCounter) DoesICanDownload(uid int) (times int, min int) {
-	if uid == 0 {
+// DoesICanDownload 用户是否可以下载电子书
+// availableTimes 表示剩余可下载次数。负数表示不限制，否则表示限制可下载的次数
+func (m *DownloadCounter) DoesICanDownload(uid int, wecode string) (availableTimes int, err error) {
+	// 未登录，且没有下载码的情况，不允许下载
+	if uid == 0 && wecode == "" {
+		err = errors.New("请先登录或者输入下载码")
 		return
 	}
 
-	min, _ = strconv.Atoi(GetOptionValue("DOWNLOAD_INTERVAL", "0"))
-	if min <= 0 { // 不限制下载
-		return -1, min
+	availableTimes = -1
+	downCode := GetOptionValue("DOWNLOAD_WECODE", "")
+	if wecode != "" {
+		if strings.TrimSpace(wecode) == strings.TrimSpace(downCode) {
+			return
+		}
+		err = errors.New("下载码不正确：请重新输入或重新获取下载码")
+		return
+	}
+
+	minute, _ := strconv.Atoi(strings.TrimSpace(GetOptionValue("DOWNLOAD_INTERVAL", "0")))
+	if minute <= 0 { // 不限制下载
+		return
 	}
 
 	// 查询用户今日阅读时长
 	seconds := NewReadingTime().GetReadingTime(uid, PeriodDay)
-	times = seconds / (min * 60) // 可下载次数
-
-	if times == 0 {
+	availableTimes = seconds / (minute * 60) // 可下载次数
+	if availableTimes == 0 {
+		err = fmt.Errorf("每天每阅读学习 %v 分钟可下载1个离线文档。您今日阅读时长不足，无法再下载。请输入【下载码】进行下载或者继续阅读以增加阅读时长。", minute)
 		return
 	}
 
 	orm.NewOrm().QueryTable(m).Filter("uid", uid).Filter("date", time.Now().Format("20060102")).One(m)
 
-	if times > m.Total {
-		return times - m.Total, min
+	if availableTimes > m.Total {
+		availableTimes = availableTimes - m.Total
+		return
 	}
 
-	return 0, min
+	err = fmt.Errorf("每天每阅读学习 %v 分钟可下载1个离线文档。您今日阅读时长不足，无法再下载。请输入【下载码】进行下载或者继续阅读以增加阅读时长。", minute)
+	return
 }

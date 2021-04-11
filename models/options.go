@@ -311,6 +311,11 @@ func (m *Option) Init() error {
 			OptionName:  "WIDESCREEN",
 			OptionTitle: "是否宽屏",
 		},
+		{
+			OptionValue: "",
+			OptionName:  "DOWNLOAD_WECODE",
+			OptionTitle: "下载码",
+		},
 	}
 
 	for _, op := range options {
