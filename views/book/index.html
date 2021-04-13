@@ -46,12 +46,12 @@
                             <div class="text-center">暂无数据</div>
                         </template>
                         <template v-else>
-                            <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadZip">
-                            <input type="file" name="zipfile" accept="application/zip">
-                            <input type="text" name="identify" value="">
+                            <form style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadZip">
+                                <input type="file" name="zipfile" accept="application/zip">
+                                <input type="text" name="identify" value="">
                             </form>
 
-                            <form target="notarget" style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadEpub">
+                            <form style="display: none;" action="{{urlfor "BookController.UploadProject"}}" enctype="multipart/form-data" method="post" id="uploadEpub">
                                 <input type="file" name="zipfile" accept=".epub">
                                 <input type="text" name="identify" value="">
                             </form>
@@ -234,8 +234,16 @@
 
 {{template "widgets/pull.html" .}}
 
-<!--避免表单跳转其它页面-->
-<iframe src="" style="display: none;" name="notarget" id="notarget" frameborder="0"></iframe>
+<div class="loading">
+    <div class="loading-box">
+        <div class="loading-icon">
+            <img src="/static/images/loading.gif" alt="">
+        </div>
+        <div class="loading-content">玩命上传中，请耐心等待...</div> 
+        <a class="loading-cancel" href="javascript:location.reload();">取消上传</a>
+    </div>
+</div>
+
 {{/*<script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>*/}}
 <script src="/static/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
 {{/*<script src="/static/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>*/}}
@@ -320,7 +328,11 @@
                 var identify = _this.parents("form").find("[name=identify]").val()
                 formData.append('zipfile', _this.get(0).files[0])
                 formData.append('identify', identify)
+                $(".loading").addClass("show");
                 upload(action, formData, function(res){
+                    setTimeout(function(){
+                        $(".loading").removeClass("show");
+                    }, 500);
                     if(res.errcode==0){ // 成功
                         alertTips('success', res.message, 3000, "");
                         setTimeout(() => {
@@ -329,6 +341,7 @@
                     }else{ // 失败
                         alertTips('error', res.message, 3000, "")
                     }
+                    
                     _this.val('')
                 })
             }

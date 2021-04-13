@@ -1054,3 +1054,20 @@ a{color: #333}
     max-width: 175px;
     margin: 0 auto 15px;
 }
+
+.loading{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.63);
+    z-index: 9999;
+    top: 0;
+    display: none;
+}
+.loading.show{display: block;}
+
+.loading-box{width: 360px;padding: 30px;background-color: #fff;text-align: center;max-width: 100%;box-sizing: border-box;margin: 300px auto;
+    border-radius: 5px;
+}
+.loading-icon img{margin-bottom: 20px;}
+.loading-cancel{margin-top: 10px;color: red;display: inline-block;}
