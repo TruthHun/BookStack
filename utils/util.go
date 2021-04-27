@@ -81,20 +81,21 @@ func init() {
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
+	go loadDict()
+}
 
+func loadDict() {
 	beego.Info("加载分词词典...")
 	dict := "dictionary/dictionary.txt"
 	err := seg.LoadDict(dict)
 	if err != nil {
 		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
-		os.Exit(0)
 	}
 	seg.LoadStop("dictionary/stop_tokens.txt, dictionary/stop_word.txt")
 	te.WithGse(seg)
 	err = te.LoadIdf("dictionary/idf.txt")
 	if err != nil {
 		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
-		os.Exit(0)
 	}
 	beego.Info("加载分词词典完成！")
 }
