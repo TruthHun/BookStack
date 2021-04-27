@@ -618,68 +618,64 @@
         window.uploader = null;
 
         $("#uploadAttachModal").on("shown.bs.modal",function () {
-            if(window.uploader === null){
-                try {
-                    window.uploader = WebUploader.create({
-                        auto: true,
-                        dnd : true,
-                        swf: '/static/webuploader/Uploader.swf',
-                        server: '{{urlfor "DocumentController.Upload"}}',
-                        formData : { "identify" : {{.Model.Identify}},"doc_id" :  window.selectNode.id },
-                        pick: "#filePicker",
-                        fileVal : "editormd-file-file",
-                        fileNumLimit : 1,
-                        compress : false
-                    }).on("beforeFileQueued",function (file) {
-                        uploader.reset();
-                    }).on( 'fileQueued', function( file ) {
-                        var item = {
-                            state : "wait",
-                            attachment_id : file.id,
-                            file_size : file.size,
-                            file_name : file.name,
-                            message : "正在上传"
-                        };
-                        window.vueApp.lists.splice(0,0,item);
+            try {
+                window.uploader = WebUploader.create({
+                    auto: true,
+                    dnd : true,
+                    swf: '/static/webuploader/Uploader.swf',
+                    server: '{{urlfor "DocumentController.Upload"}}',
+                    formData : { "identify" : {{.Model.Identify}}, "doc_id" :  window.selectNode.id },
+                    pick: "#filePicker",
+                    fileVal : "editormd-file-file",
+                    fileNumLimit : 1,
+                    compress : false
+                }).on("beforeFileQueued",function (file) {
+                    uploader.reset();
+                }).on( 'fileQueued', function( file ) {
+                    var item = {
+                        state : "wait",
+                        attachment_id : file.id,
+                        file_size : file.size,
+                        file_name : file.name,
+                        message : "正在上传"
+                    };
+                    window.vueApp.lists.splice(0,0,item);
+                }).on("uploadError",function (file,reason) {
+                    for(var i in window.vueApp.lists){
+                        var item = window.vueApp.lists[i];
+                        if(item.attachment_id == file.id){
+                            item.state = "error";
+                            item.message = "上传失败";
+                            break;
+                        }
+                    }
+                }).on("uploadSuccess",function (file, res) {
+                    for(var index in window.vueApp.lists){
+                        var item = window.vueApp.lists[index];
+                        if(item.attachment_id === file.id){
+                            if(res.errcode === 0) {
+                                window.vueApp.lists.splice(index, 1, res.attach);
 
-                    }).on("uploadError",function (file,reason) {
-                        for(var i in window.vueApp.lists){
-                            var item = window.vueApp.lists[i];
-                            if(item.attachment_id == file.id){
+                            }else{
+                                item.message = res.message;
                                 item.state = "error";
-                                item.message = "上传失败";
-                                break;
                             }
+                            break;
                         }
+                    }
 
-                    }).on("uploadSuccess",function (file, res) {
-                        for(var index in window.vueApp.lists){
-                            var item = window.vueApp.lists[index];
-                            if(item.attachment_id === file.id){
-                                if(res.errcode === 0) {
-                                    window.vueApp.lists.splice(index, 1, res.attach);
+                }).on("beforeFileQueued",function (file) {
 
-                                }else{
-                                    item.message = res.message;
-                                    item.state = "error";
-                                }
-                                break;
-                            }
-                        }
+                }).on("uploadComplete",function () {
 
-                    }).on("beforeFileQueued",function (file) {
+                }).on("uploadProgress",function (file, percentage) {
+                    var $li = $( '#'+file.id ),
+                        $percent = $li.find('.progress .progress-bar');
 
-                    }).on("uploadComplete",function () {
-
-                    }).on("uploadProgress",function (file, percentage) {
-                        var $li = $( '#'+file.id ),
-                            $percent = $li.find('.progress .progress-bar');
-
-                        $percent.css( 'width', percentage * 100 + '%' );
-                    });
-                }catch(e){
-                    console.log(e);
-                }
+                    $percent.css( 'width', percentage * 100 + '%' );
+                });
+            }catch(e){
+                console.log(e);
             }
         });
     });
