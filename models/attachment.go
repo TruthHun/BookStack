@@ -61,7 +61,7 @@ func (m *Attachment) Delete() (err error) {
 		return err
 	}
 
-	return os.Remove(m.FilePath)
+	return os.Remove(strings.TrimLeft(m.FilePath, "./"))
 }
 
 func (m *Attachment) Find(id int) (*Attachment, error) {
