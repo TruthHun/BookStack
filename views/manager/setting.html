@@ -120,6 +120,11 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label>默认首页( <span class="text-muted"> <span class="text-danger">/</span> 表示不设置；<span class="text-danger">/cate</span> 表示设置【分类】页为首页；<span class="text-danger">/explore</span> 表示设置【发现】页为首页；以此类推，想要设置哪个页面为首页，只需要在此次填写对应的访问路径。 </span> )</label>
+                            <input type="text" name="DEFAULT_HOME_PAGE" class="form-control" value="{{.DEFAULT_HOME_PAGE.OptionValue}}">
+                        </div>
+
 
                         <div class="form-group">
                             <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>

@@ -5,7 +5,7 @@
                 <button class="btn btn-default dropdown-toggle hidden-lg" type="button" data-toggle="dropdown"><i class="fa fa-align-justify"></i></button>
                 <ul class="dropdown-menu" role="menu">
                     <li>
-                        <a href="{{urlfor "CateController.Index"}}" class="visible-xs" title="首页"><i class="fa fa-home"></i> 首页</a>
+                        <a href="/cate" class="visible-xs" title="分类"><i class="fa fa-th-list"></i> 分类</a>
                     </li>
                     <li>
                         <a href="{{urlfor "HomeController.Index"}}" class="visible-xs" title="发现"><i class="fa fa-globe"></i> 发现</a>
@@ -61,7 +61,7 @@
 
                 <ul class="nav navbar-nav">
                     <li class="{{if .IsCate}}active{{end}}">
-                        <a href="{{urlfor "CateController.Index" }}" title="首页"><i class="fa fa-home"></i> 首页</a>
+                        <a href="/cate" title="分类"><i class="fa fa-th-list"></i> 分类</a>
                     </li>
                     <li {{if .IsHome}}class="active"{{end}}>
                         <a href="{{urlfor "HomeController.Index" }}" title="发现"><i class="fa fa-globe"></i> 发现</a>

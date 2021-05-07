@@ -316,6 +316,11 @@ func (m *Option) Init() error {
 			OptionName:  "DOWNLOAD_WECODE",
 			OptionTitle: "下载码",
 		},
+		{
+			OptionValue: "/", // 默认为分类页
+			OptionName:  "DEFAULT_HOME_PAGE",
+			OptionTitle: "默认首页",
+		},
 	}
 
 	for _, op := range options {

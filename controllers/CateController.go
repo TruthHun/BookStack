@@ -13,6 +13,12 @@ func (this *CateController) Index() {
 	cid, _ := this.GetInt("cid")
 	if cid > 0 {
 		this.Redirect(beego.URLFor("HomeController.Index")+this.Ctx.Request.RequestURI, 302)
+		return
+	}
+	defaultHomePage := models.GetOptionValue("DEFAULT_HOME_PAGE", "/")
+	if !(defaultHomePage == "" || defaultHomePage == "/") {
+		this.Redirect(defaultHomePage, 302)
+		return
 	}
 	this.List()
 }
