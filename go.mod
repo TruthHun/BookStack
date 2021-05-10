@@ -14,7 +14,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.0+incompatible
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
-	github.com/astaxie/beego v1.12.3
+	github.com/astaxie/beego v1.12.0
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/boombuler/barcode v1.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
