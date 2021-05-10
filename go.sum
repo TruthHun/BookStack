@@ -11,6 +11,8 @@ github.com/TruthHun/converter v0.0.0-20180618131031-80268d67d7a8 h1:E+006K+eHyJk
 github.com/TruthHun/converter v0.0.0-20180618131031-80268d67d7a8/go.mod h1:bW/ArSdu0OB6XR3NcPdPBIEeGdQ1GLW9fQavW3Auy2A=
 github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45 h1:o+hC+QvRJlpj6meIX4AC/LKi7UxdEWFs+6zOsLzGoBs=
 github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45/go.mod h1:0V5BlPJa24R0PzuXVURUfjaQ8Z7cmqsVSW7ftuhesN0=
+github.com/TruthHun/gotil v0.0.0-20210509080330-2470bb9be7cd h1:WHNNuPS7Pc4rYhlN2mAPT4lXgGYNwX4tws8+DbfYSJY=
+github.com/TruthHun/gotil v0.0.0-20210509080330-2470bb9be7cd/go.mod h1:0V5BlPJa24R0PzuXVURUfjaQ8Z7cmqsVSW7ftuhesN0=
 github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b h1:JXD7vWKiJGRqkRuitwA8BxJVGr1yp2hQULQII7RaAXo=
 github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b/go.mod h1:fG1YIVgbJZLR41X/jfUjShbO0uxMnA5J4Mv01ys/Mbk=
 github.com/TruthHun/html2json v0.0.0-20201228115506-dee0570dffa8 h1:ALJMA2bVcsGE1bYwYnglACvQfpI3M0aGoRvrq9rv+yM=
