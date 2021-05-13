@@ -20,6 +20,19 @@ function RenderByMarkdown($content) {
     });
 }
 
+function ilazyload(){
+    $("img.lazy").lazyload({
+        effect: "fadeIn", // 载入使用何种效果
+        threshold: 200, // 提前开始加载
+        container: $(".manual-right"),  // 对某容器中的图片实现效果
+        failurelimit : 0, // 图片排序混乱时
+        skip_invisible: false,
+        appear:function(ele,settings) {
+            $(this).attr("src",  $(this).attr("data-original"))
+        },
+    });
+}
+
 function show_copy_btn() {
     var btn="<button class='btn btn-danger btn-sm btn-copy'><i class='fa fa-copy'></i> 复制代码</button>";
     if(!$(".article-body pre").hasClass("btn-copy")){
@@ -78,6 +91,7 @@ function load_doc(url,wd,without_history) {
             $(".read-count").text(res.data.view);
             $(".updated-at").text(res.data.updated_at);
             initLinkWithImage()
+            ilazyload()
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
@@ -155,6 +169,7 @@ function disableRightClick(){
 
 $(function () {
     disableRightClick();
+    ilazyload()
     $(".article-menu-detail>ul>li a").tooltip({placement: 'bottom'})
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);

@@ -301,7 +301,7 @@ func (this *DocumentController) Read() {
 						src = "https://" + strings.Join(srcArr[1:], "://")
 					}
 				}
-				contentSelection.SetAttr("src", src)
+				contentSelection.SetAttr("data-original", src).SetAttr("src", "/static/images/loading.gif").AddClass("lazy")
 				if alt, _ := contentSelection.Attr("alt"); alt == "" {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
