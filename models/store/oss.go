@@ -222,3 +222,8 @@ func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
 	reader, err = bucket.GetObject(objKey)
 	return
 }
+
+// CopyDir 拷贝文件夹
+func (o *Oss) CopyDir(sourceDir, targetDir string) (err error) {
+	return
+}
