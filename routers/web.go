@@ -94,6 +94,7 @@ func webRouter() {
 	beego.Router("/book/:key/replace", &controllers.BookController{}, "get,post:Replace")
 
 	beego.Router("/book/create", &controllers.BookController{}, "post:Create")
+	beego.Router("/book/copy", &controllers.BookController{}, "post:Copy")
 	beego.Router("/book/users/create", &controllers.BookMemberController{}, "post:AddMember")
 	beego.Router("/book/users/change", &controllers.BookMemberController{}, "post:ChangeRole")
 	beego.Router("/book/users/delete", &controllers.BookMemberController{}, "post:RemoveMember")

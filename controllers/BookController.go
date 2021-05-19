@@ -601,6 +601,46 @@ func (this *BookController) Create() {
 	this.JsonResult(0, "ok", bookResult)
 }
 
+// Create 创建书籍.
+func (this *BookController) Copy() {
+	if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建书籍
+			this.JsonResult(1, "普通读者无法创建书籍，如需创建书籍，请向管理员申请成为作者")
+		}
+	}
+	identify := strings.TrimSpace(this.GetString("identify", ""))
+	sourceIdentify := strings.TrimSpace(this.GetString("source_identify", ""))
+	sourceBook, err := models.NewBook().FindByIdentify(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	existBook, _ := models.NewBook().FindByIdentify(identify, "book_id")
+	if existBook != nil && existBook.BookId > 0 {
+		this.JsonResult(1, "请更换新的书籍标识")
+	}
+
+	// 如果是私有书籍，且不是团队的人，不允许拷贝该项目
+	if sourceBook.PrivatelyOwned == 1 {
+		rel, err := models.NewRelationship().FindByBookIdAndMemberId(sourceBook.BookId, this.Member.MemberId)
+		if err != nil || rel == nil || rel.RelationshipId == 0 {
+			this.JsonResult(1, "无拷贝书籍权限")
+		}
+	}
+	sourceBook.BookId = 0
+	sourceBook.BookName = strings.TrimSpace(this.GetString("book_name", ""))
+	sourceBook.Identify = identify
+	sourceBook.Description = strings.TrimSpace(this.GetString("description", ""))
+	sourceBook.Author = strings.TrimSpace(this.GetString("author", ""))
+	sourceBook.AuthorURL = strings.TrimSpace(this.GetString("author_url", ""))
+	sourceBook.PrivatelyOwned, _ = strconv.Atoi(this.GetString("privately_owned"))
+	err = sourceBook.Copy(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, "拷贝书籍失败："+err.Error())
+	}
+
+	this.JsonResult(0, "拷贝书籍成功")
+}
+
 // CreateToken 创建访问来令牌.
 func (this *BookController) CreateToken() {
 	if this.forbidGeneralRole() {
