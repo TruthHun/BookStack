@@ -99,7 +99,7 @@
                                         <a :href="'{{urlfor "DocumentController.Index" ":key" ""}}' + item.identify" title="查看文档" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-eye"></i> 查看<span class="hidden-xs">文档</span></a>
                                         <a v-if="item.role_id < 2" :href="'/book/' + item.identify + '/setting'" title="书籍设置" class="btn btn-default btn-sm" data-toggle="tooltip" target="_blank"><i class="fa fa-cogs"></i> <span class="hidden-xs">书籍</span>设置</a>
                                         <a v-if="item.role_id < 2" :href="'/book/'+ item.identify +'/generate'" class="btn btn-default btn-sm ajax-get confirm" :data-identify="item.identify">
-                                            <i class="fa fa-book"></i> 生成下载文档
+                                            <i class="fa fa-book"></i> 生成电子书
                                         </a>
 
                                         <template v-if="item.role_id != 3">
