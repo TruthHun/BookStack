@@ -798,8 +798,16 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		}
 	}
 
-	// TODO: 迁移相关图片文件
+	sourceDir := "projects/" + sourceBookIdentify
+	targetDir := "projects/" + m.Identify
 
+	if utils.StoreType == utils.StoreOss {
+		err = store.ModelStoreOss.CopyDir(sourceDir, targetDir)
+	} else {
+		sourceDir = "uploads/" + sourceDir
+		targetDir = "uploads/" + targetDir
+		err = store.ModelStoreLocal.CopyDir(sourceDir, targetDir)
+	}
 	return
 }
 

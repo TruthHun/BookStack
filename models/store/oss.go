@@ -2,6 +2,7 @@ package store
 
 import (
 	"io"
+	"path/filepath"
 	"strings"
 
 	"os"
@@ -223,7 +224,54 @@ func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
 	return
 }
 
+// 根据文件夹列表OSS文件
+func (o *Oss) ListObjects(folder string) (objects []string, err error) {
+	var (
+		lists  oss.ListObjectsResult
+		bucket *oss.Bucket
+	)
+	bucket, err = o.GetBucket()
+	if err != nil {
+		return
+	}
+	folder = strings.Trim(folder, "./") + "/"
+
+	// 列举所有文件。
+	marker := ""
+	for {
+		lists, err = bucket.ListObjects(oss.Marker(marker), oss.Prefix(folder), oss.MaxKeys(1000))
+		for _, obj := range lists.Objects {
+			if obj.Size > 0 { // size 为0的，视为文件夹
+				objects = append(objects, obj.Key)
+			}
+		}
+		if lists.IsTruncated {
+			marker = lists.NextMarker
+		} else {
+			break
+		}
+	}
+	return
+}
+
 // CopyDir 拷贝文件夹
 func (o *Oss) CopyDir(sourceDir, targetDir string) (err error) {
+	var (
+		objects   []string
+		bucket, _ = o.GetBucket()
+	)
+
+	sourceDir = strings.TrimLeft(sourceDir, "./")
+	targetDir = strings.TrimLeft(targetDir, "./")
+	objects, err = o.ListObjects(sourceDir)
+	if err != nil {
+		return
+	}
+	for _, obj := range objects {
+		targetFile := strings.ReplaceAll(filepath.Join(targetDir, strings.TrimPrefix(obj, sourceDir)), "\\", "/")
+		if _, err = bucket.CopyObject(obj, targetFile); err != nil {
+			beego.Error("copy", obj, "==>", targetFile, err.Error())
+		}
+	}
 	return
 }

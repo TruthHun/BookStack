@@ -163,5 +163,6 @@ func webRouter() {
 	beego.Router("/local-render-cover", &controllers.LocalhostController{}, "get:RenderCover")
 	beego.Router("/projects/*", &controllers.StaticController{}, "get:ProjectsFile")
 	beego.Router("/uploads/*", &controllers.StaticController{}, "get:Uploads")
+	beego.Router("/test", &controllers.StaticController{}, "get:Test")
 	beego.Router("/*", &controllers.StaticController{}, "get:StaticFile")
 }

@@ -63,21 +63,36 @@ func (this *Local) DelFromFolder(folder string) (err error) {
 // 拷贝文件夹
 func (this *Local) CopyDir(sourceDir, targetDir string) (err error) {
 	var fl []filetil.FileList
+
+	sourceDir = strings.TrimLeft(sourceDir, "./")
+	targetDir = strings.TrimLeft(targetDir, "./")
+
 	if fl, err = filetil.ScanFiles(sourceDir); err != nil {
 		return
 	}
+	if len(fl) == 0 {
+		return
+	}
+
 	for _, f := range fl {
+		if f.IsDir {
+			continue
+		}
+
 		// 不能用defer，因为在文件多的时候，会打开跟多文件句柄
-		targetFile := filepath.Join(targetDir, strings.TrimPrefix(f.Path, sourceDir))
+		targetFile := strings.ReplaceAll(filepath.Join(targetDir, strings.TrimPrefix(f.Path, sourceDir)), "\\", "/")
 		src, errOpen := os.Open(f.Path)
 		if errOpen != nil {
 			return errOpen
 		}
+
+		os.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
 		target, errOpen := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, 0644)
 		if errOpen != nil {
 			src.Close()
 			return errOpen
 		}
+
 		if _, err = io.Copy(target, src); err != nil {
 			target.Close()
 			src.Close()
