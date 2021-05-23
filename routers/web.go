@@ -131,6 +131,7 @@ func webRouter() {
 	beego.Router("/read/:key/search", &controllers.DocumentController{}, "post:Search")
 
 	beego.Router("/export/:key", &controllers.DocumentController{}, "*:Export")
+	beego.Router("/export2markdown", &controllers.BookController{}, "get:Export2Markdown")
 	beego.Router("/qrcode/:key.png", &controllers.DocumentController{}, "get:QrCode")
 
 	beego.Router("/attach_files/:key/:attach_id", &controllers.DocumentController{}, "get:DownloadAttachment")

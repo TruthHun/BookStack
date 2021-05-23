@@ -149,6 +149,7 @@
                                                 <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=pdf'">导出 PDF</a></li>
                                                 <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=mobi'">导出 MOBI</a></li>
                                                 <li><a :href="'{{urlfor "DocumentController.Export" ":key" ""}}' + item.identify+'?output=epub'">导出 EPUB</a></li>
+                                                <li><a :href="'{{urlfor "BookController.Export2Markdown"}}?identify=' + item.identify" class="export2markdown">导出 Markdown</a></li>
                                             </ul>
                                         </div>
 
@@ -421,15 +422,18 @@
         $(".btn-group-download a").click(function (e) {
             e.preventDefault();
             var href=$(this).attr("href");
-            $.get(href,function (res) {
+            if($(this).hasClass("export2markdown")){
+                location.href = href
+            }else{
+                $.get(href,function (res) {
                 if(res.errcode==1){
                     alertTips("error",res.message,3000);
                 }else{
                     location.href=res.data.url;
                 }
             });
+            }
         });
-
     });
 </script>
 <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>

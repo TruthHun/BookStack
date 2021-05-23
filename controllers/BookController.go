@@ -1289,3 +1289,29 @@ func (this *BookController) Comment() {
 	}
 	this.JsonResult(1, "书籍不存在")
 }
+
+// ExportMarkdown 将书籍导出为markdown
+// 注意：系统管理员和书籍参与者有权限导出
+func (this *BookController) Export2Markdown() {
+	identify := this.GetString("identify")
+	if this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+	if !this.Member.IsAdministrator() {
+		if _, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId); err != nil {
+			this.JsonResult(1, "无操作权限")
+		}
+	}
+	path, err := models.NewBook().Export2Markdown(identify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	defer func() {
+		os.Remove(path)
+	}()
+	attchmentName := filepath.Base(path)
+	if book, _ := models.NewBook().FindByIdentify(identify, "book_name", "book_id"); book != nil && book.BookId > 0 {
+		attchmentName = book.BookName + ".zip"
+	}
+	this.Ctx.Output.Download(strings.TrimLeft(path, "./"), attchmentName)
+}

@@ -275,3 +275,26 @@ func (o *Oss) CopyDir(sourceDir, targetDir string) (err error) {
 	}
 	return
 }
+
+// Down2local 下载文件夹下的文件到本地
+func (o *Oss) Down2local(sourceDir, targetDir string) (err error) {
+	var (
+		objects   []string
+		bucket, _ = o.GetBucket()
+	)
+
+	sourceDir = strings.TrimLeft(sourceDir, "./")
+	targetDir = strings.TrimLeft(targetDir, "./")
+	objects, err = o.ListObjects(sourceDir)
+	if err != nil {
+		return
+	}
+	for _, obj := range objects {
+		targetFile := strings.ReplaceAll(filepath.Join(targetDir, strings.TrimPrefix(obj, sourceDir)), "\\", "/")
+		os.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
+		if err = bucket.GetObjectToFile(obj, targetFile); err != nil {
+			beego.Error("download:", obj, "==>", targetFile, err.Error())
+		}
+	}
+	return
+}

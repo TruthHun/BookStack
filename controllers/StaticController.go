@@ -33,7 +33,7 @@ func (this *StaticController) APP() {
 }
 
 func (this *StaticController) Test() {
-	beego.Error(store.ModelStoreLocal.CopyDir("/uploads/projects/0b92b4bc102f4644a6192c7e5f9d5953", "/uploads/projects/0b92b4bc102f4644a6192c7e5f9d595366666--"))
+	// fmt.Println(models.NewBook().Export2Markdown("4b98937398e612778711608a3d09a9c4"))
 	this.Ctx.WriteString("this is a test")
 }
 

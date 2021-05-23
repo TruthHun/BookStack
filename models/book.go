@@ -20,6 +20,7 @@ import (
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
 	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/TruthHun/gotil/filetil"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -814,181 +815,151 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 // Export2Markdown 将书籍导出markdown
 func (m *Book) Export2Markdown(identify string) (path string, err error) {
 	var (
-		book    *Book
-		baseDir = "uploads/export"
-		files   []string
-		dirMap  = make(map[string]bool)
+		book               *Book
+		exportDir          = fmt.Sprintf("uploads/export/%v", identify)
+		attachPrefix       string
+		exportAttachPrefix = "../attachments/"
+		docs               []Document
+		ds                 []DocumentStore
+		docIds             []interface{}
+		docMap             = make(map[int]Document)
+		o                  = orm.NewOrm()
+		isOSSProject       = utils.StoreType == utils.StoreOss
+		cover              = ""
+		replaces           []string
 	)
 
+	path = fmt.Sprintf("uploads/export/%v.zip", identify)
 	if book, err = m.FindByIdentify(identify); err != nil {
 		beego.Error(err)
 		return
 	}
 
-	path = fmt.Sprintf(baseDir+"/%v.zip", identify)
+	os.MkdirAll(filepath.Join(exportDir, "docs"), os.ModePerm)
+	// 最后删除导出目录
+	defer func() {
+		os.RemoveAll(exportDir)
+	}()
 
-	// one := NewDocument()
-	// orm.NewOrm().QueryTable("md_documents").Filter("book_id", book.BookId).OrderBy("-ModifyTime").One(one, "ModifyTime")
-	// if info, errInfo := os.Stat(path); errInfo == nil {
-	// 	if info.ModTime().Unix() > one.ModifyTime.Unix() { //没有更新，则直接下载缓存文档
-	// 		return
-	// 	}
-	// }
-
-	dir := fmt.Sprintf(baseDir+"/%v", identify)
-	os.MkdirAll(dir, os.ModePerm)
-
-	// cover
-	if book.Cover != "" {
-		file := filepath.Join(dir, "cover"+filepath.Ext(book.Cover))
-		utils.CopyFile(file, strings.TrimLeft(book.Cover, "./"))
-		files = append(files, file)
+	attachPrefix = fmt.Sprintf("/uploads/projects/%s/", identify)
+	if isOSSProject {
+		attachPrefix = fmt.Sprintf("/projects/%s/", identify)
 	}
 
-	// chapter，并修正章节链接
-	var (
-		docs     []Document
-		links    = make(map[string]string)
-		replaces []string
-		linkFmt  = "/docs/%v/%v"
-	)
-	orm.NewOrm().QueryTable(NewDocument()).Filter("book_id", book.BookId).Limit(10000).All(&docs)
+	o.QueryTable(NewDocument()).Filter("book_id", book.BookId).Limit(100000).All(&docs, "document_id", "document_name", "identify")
+	if len(docs) == 0 {
+		err = errors.New("找不到书籍章节")
+		return
+	}
 
-	// 查找需要替换的链接
-	for _, item := range docs {
-		filename := strconv.Itoa(item.DocumentId) + ".md"
-		links[strconv.Itoa(item.DocumentId)] = filename
-		links[fmt.Sprintf(linkFmt, identify, item.DocumentId)] = filename
-		if item.Identify != "" {
-			filename = strings.TrimSuffix(item.Identify, ".md") + ".md"
-			links[fmt.Sprintf(linkFmt, identify, item.Identify)] = filename
-			links[item.Identify] = filename
+	ext := ".md"
+	replaces = append(replaces, attachPrefix, exportAttachPrefix)
+	for _, doc := range docs {
+		docIds = append(docIds, doc.DocumentId)
+		identify := doc.Identify
+		id := strconv.Itoa(doc.DocumentId)
+		if filepath.Ext(doc.Identify) == "" {
+			doc.Identify = doc.Identify + ext
 		}
+		docMap[doc.DocumentId] = doc
+		replaces = append(replaces,
+			"]($"+identify, "]("+doc.Identify,
+			"href=\"$"+identify, "href=\""+doc.Identify,
+			"]($"+id, "]("+doc.Identify,
+			"href=\"$"+id, "href=\""+doc.Identify,
+		)
 	}
 
-	linkMDPrefix := "]("
-	for old, new := range links {
-		replaces = append(replaces, linkMDPrefix+old, linkMDPrefix+new)
-	}
+	replaces = append(replaces, "]($", "](", "href=\"$", "href=\"")
 
-	replaces = append(replaces, "[TOC]", "") // 从markdown中移除TOC
-
+	// 图片等文件附件链接、URL链接等替换
 	replacer := strings.NewReplacer(replaces...)
-	gitbookReplacer := strings.NewReplacer(" ", "-", "_", "", "&", "", ".", "")
 
-	for _, item := range docs {
-		filename := strconv.Itoa(item.DocumentId) + ".md"
-		if item.Identify != "" {
-			filename = strings.TrimSuffix(item.Identify, ".md") + ".md"
-		}
-
-		if strings.ToLower(filename) == "summary.md" {
+	o.QueryTable(NewDocumentStore()).Filter("document_id__in", docIds...).Limit(100000).All(&ds)
+	for _, item := range ds {
+		doc, ok := docMap[item.DocumentId]
+		if !ok {
 			continue
 		}
 
 		// 基本的链接替换
 		md := replacer.Replace(item.Markdown)
-
-		file := filepath.Join(dir, filename)
-		isDir := false
-		// 基础图片链接替换
-		if doc, _ := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); doc != nil {
-			txt := strings.TrimSpace(doc.Find("body").Text())
-			if txt == "" || txt == "[TOC]" {
-				isDir = true
-			} else {
-				doc.Find("img").Each(func(idx int, sel *goquery.Selection) {
-					if src, ok := sel.Attr("src"); ok {
-						srcName := strings.TrimLeft(src, "./")
-						imgFile := filepath.Join(dir, srcName)
-						utils.CopyFile(imgFile, srcName)
-						md = strings.ReplaceAll(md, linkMDPrefix+src, linkMDPrefix+srcName)
-						files = append(files, imgFile)
-					}
-				})
-				doc.Find("a").Each(func(idx int, sel *goquery.Selection) {
-					if href, ok := sel.Attr("href"); ok {
-						newHref := href
-						if !strings.Contains(href, ".md") {
-							if strings.Contains(href, "#") {
-								newHref = strings.ReplaceAll(href, "#", ".html#")
-							} else {
-								newHref = href + ".html"
-							}
-						}
-						if slice := strings.Split(newHref, "#"); len(slice) > 1 {
-							newHref = slice[0] + "#" + gitbookReplacer.Replace(strings.Join(slice[1:], "#"))
-						}
-						md = strings.ReplaceAll(md, "]("+href, "]("+newHref)
-					}
-				})
-			}
-		}
-
-		md = strings.ReplaceAll(md, "](/docs/", "](../")
-
-		if isDir {
-			dirMap[filename] = true
-			dirMap[strconv.Itoa(item.DocumentId)+".md"] = true
-		} else {
-			ioutil.WriteFile(file, []byte(md), os.ModePerm)
-			files = append(files, file)
-		}
+		file := filepath.Join(exportDir, "docs", doc.Identify)
+		ioutil.WriteFile(file, []byte(md), os.ModePerm)
 	}
 
-	// 生成新的 SUMMARY 文档
+	// SUMMARY 文档内容
 	docModel := NewDocument()
 	cont, _ := docModel.CreateDocumentTreeForHtml(book.BookId, 0)
-	prefix := "/docs/" + book.Identify + "/"
-	if doc, _ := goquery.NewDocumentFromReader(strings.NewReader(cont)); doc != nil {
-		doc.Find("a").Each(func(idx int, sel *goquery.Selection) {
+	// 把最后没有 .md 结尾的链接替换为 .md 结尾
+	if gq, _ := goquery.NewDocumentFromReader(strings.NewReader(cont)); gq != nil {
+		gq.Find("a").Each(func(i int, sel *goquery.Selection) {
 			if href, ok := sel.Attr("href"); ok {
-				href = strings.TrimPrefix(href, prefix)
-				if !strings.Contains(href, ".md") {
-					if strings.Contains(href, "#") {
-						href = strings.Replace(href, "#", ".md#", 1)
-					} else {
-						href = href + ".md"
-					}
-				}
-				title := strings.ToLower(strings.TrimSpace(sel.Text()))
-				if slice := strings.Split(href, "#"); len(slice) > 0 {
-					href = slice[0] + "#" + gitbookReplacer.Replace(title)
-				}
-				sel.SetAttr("href", href)
-				if _, ok := dirMap[strings.Split(href, "#")[0]]; ok {
-					sel.BeforeHtml(title)
-					sel.Remove()
+				if strings.ToLower(filepath.Ext(href)) != ".md" {
+					href = href + ".md"
+					sel.SetAttr("href", href)
 				}
 			}
 		})
-		cont, _ = doc.Html()
+		cont, _ = gq.Html()
 	}
-
 	md := html2md.Convert(cont)
+	md = strings.ReplaceAll(md, fmt.Sprintf("](/read/%s/", identify), "](docs/")
 	md = fmt.Sprintf("- [%v](README.md)\n", book.BookName) + md
-
-	// 删除和覆盖已存在的summary文件
-	os.Remove(filepath.Join(dir, "summary.md"))
-	summaryFile := filepath.Join(dir, "SUMMARY.md")
+	summaryFile := filepath.Join(exportDir, "SUMMARY.md")
 	ioutil.WriteFile(summaryFile, []byte(md), os.ModePerm)
 
+	// 书籍封面处理
+	if book.Cover != "" {
+		cover = fmt.Sprintf("![封面](attachments/%s)", strings.TrimPrefix(strings.TrimLeft(strings.ReplaceAll(book.Cover, "\\", "/"), "./"), strings.TrimLeft(attachPrefix, "./")))
+	}
+
 	// README
-	md = fmt.Sprintf("# %+v\n\n", book.BookName) + md
-	readmeFile := filepath.Join(dir, "README.md")
+	md = fmt.Sprintf("# %s\n\n%s\n\n%s\n\n\n\n## 目录\n\n%s", book.BookName, cover, book.Description, md)
+	readmeFile := filepath.Join(exportDir, "README.md")
 	ioutil.WriteFile(readmeFile, []byte(md), os.ModePerm)
 
-	files = append(files, summaryFile, readmeFile)
+	dst := filepath.Join(exportDir, "attachments")
+	src := fmt.Sprintf("projects/%s", identify)
+	if !isOSSProject {
+		src = "uploads/" + src
+	}
 
+	if errDown := m.down2local(src, dst); errDown != nil {
+		beego.Error("down2local error:", errDown.Error())
+	}
+
+	err = m.zip(exportDir, path)
+	if err != nil {
+		beego.Error("压缩失败：", err.Error())
+	}
+	return
+}
+
+// 把书籍相关附件下载到本地
+func (m *Book) down2local(srcDir, desDir string) (err error) {
+	if utils.StoreType == utils.StoreLocal {
+		return store.ModelStoreLocal.CopyDir(srcDir, desDir)
+	}
+	return store.ModelStoreOss.Down2local(srcDir, desDir)
+}
+
+func (m *Book) zip(dir, zipFile string) (err error) {
 	// zip 压缩
 
 	var (
 		d     *os.File
 		fw    io.Writer
 		fcont []byte
+		fl    []filetil.FileList
 	)
-	os.Remove(path)
-	d, err = os.Create(path)
+
+	if fl, err = filetil.ScanFiles(dir); err != nil {
+		return
+	}
+
+	os.Remove(zipFile)
+	d, err = os.Create(zipFile)
 	if err != nil {
 		beego.Error(err)
 		return
@@ -996,8 +967,13 @@ func (m *Book) Export2Markdown(identify string) (path string, err error) {
 	defer d.Close()
 	zipWriter := zip.NewWriter(d)
 	defer zipWriter.Close()
-	for _, file := range files {
-		info, errInfo := os.Stat(file)
+
+	for _, file := range fl {
+		if file.IsDir {
+			continue
+		}
+
+		info, errInfo := os.Stat(file.Path)
 		if errInfo != nil {
 			beego.Error(errInfo)
 			continue
@@ -1010,7 +986,7 @@ func (m *Book) Export2Markdown(identify string) (path string, err error) {
 		}
 
 		header.Method = zip.Deflate
-		header.Name = strings.TrimLeft(strings.TrimPrefix(strings.ReplaceAll(file, "\\", "/"), dir), "./")
+		header.Name = strings.TrimLeft(strings.TrimPrefix(strings.ReplaceAll(file.Path, "\\", "/"), dir), "./")
 
 		fw, err = zipWriter.CreateHeader(header)
 		if err != nil {
@@ -1018,7 +994,7 @@ func (m *Book) Export2Markdown(identify string) (path string, err error) {
 			return
 		}
 
-		fcont, err = ioutil.ReadFile(file)
+		fcont, err = ioutil.ReadFile(file.Path)
 		if err != nil {
 			return
 		}
@@ -1027,6 +1003,5 @@ func (m *Book) Export2Markdown(identify string) (path string, err error) {
 			return
 		}
 	}
-	os.RemoveAll(dir)
 	return
 }
