@@ -147,6 +147,7 @@
                                             <th>颜色</th>
                                             <th>名称</th>
                                             <th>链接</th>
+                                            <th class="sort">打开方式</th>
                                             <th>
                                                 <div class="text-center">
                                                     <a href="javascript:;" class="add-tr tooltips" title="添加书籍导航链接"><i class="fa fa-plus"></i></a>
@@ -172,6 +173,12 @@
                                                 <td>
                                                     <input type="text" class="form-control" value="{{.URL}}" name="url" placeholder="链接地址，如：https://www.bookstack.cn/">
                                                 </td>
+                                                <td class="sort">
+                                                    <select name="target" class="form-control">
+                                                        <option value="" {{if .Target}}{{else}}selected{{end}}>当前窗口</option>
+                                                        <option value="_blank" {{if .Target}}selected{{end}}>新窗口</option>
+                                                    </select>
+                                                </td>
                                                 <td>
                                                     <div class="text-center">
                                                         <a href="javascript:;" class="btn btn-danger rm-tr tooltips" title="移除当前链接"><i class="fa fa-remove"></i></a>
@@ -194,6 +201,12 @@
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control" name="url" placeholder="链接地址，如：https://www.bookstack.cn/">
+                                            </td>
+                                            <td class="sort">
+                                                <select name="target" class="form-control">
+                                                    <option value="" >当前窗口</option>
+                                                    <option value="_blank">新窗口</option>
+                                                </select>
                                             </td>
                                             <td>
                                                 <div class="text-center">
@@ -633,6 +646,12 @@
                 tr += "      placeholder=\"链接地址，如：https://www.bookstack.cn/\"\n";
                 tr += "    />\n";
                 tr += "  <\/td>\n";
+                tr += "        <td class=\"sort\">";
+                tr += "            <select class=\"form-control\" name=\"target\">";
+                tr += "                <option value=\"\">当前窗口</option>";
+                tr += "                <option value=\"_blank\">新窗口</option>";
+                tr += "            </select>";
+                tr += "        </td>";
                 tr += "  <td>\n";
                 tr += "    <div class=\"text-center\">\n";
                 tr += "      <a\n";

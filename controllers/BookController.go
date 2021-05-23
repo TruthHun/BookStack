@@ -266,16 +266,17 @@ func (this *BookController) SaveBook() {
 
 func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string) {
 	var data struct {
-		Name  []string `json:"name"`
-		URL   []string `json:"url"`
-		Sort  []string `json:"sort"`
-		Icon  []string `json:"icon"`
-		Color []string `json:"color"`
+		Name   []string `json:"name"`
+		URL    []string `json:"url"`
+		Sort   []string `json:"sort"`
+		Icon   []string `json:"icon"`
+		Color  []string `json:"color"`
+		Target []string `json:"target"`
 	}
 	b, _ := json.Marshal(this.Ctx.Request.PostForm)
 	json.Unmarshal(b, &data)
 	lenName := len(data.Name)
-	if lenName == 0 || lenName != len(data.URL) || lenName != len(data.Sort) || lenName != len(data.Icon) || lenName != len(data.Color) {
+	if lenName == 0 || lenName != len(data.URL) || lenName != len(data.Sort) || lenName != len(data.Icon) || lenName != len(data.Color) || lenName != len(data.Target) {
 		return
 	}
 
@@ -286,10 +287,11 @@ func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string)
 			continue
 		}
 		nav := models.BookNav{
-			Name:  name,
-			URL:   url,
-			Color: strings.TrimSpace(data.Color[idx]),
-			Icon:  strings.TrimSpace(data.Icon[idx]),
+			Name:   name,
+			URL:    url,
+			Color:  strings.TrimSpace(data.Color[idx]),
+			Icon:   strings.TrimSpace(data.Icon[idx]),
+			Target: strings.TrimSpace(data.Target[idx]),
 		}
 		nav.Sort, _ = strconv.Atoi(strings.TrimSpace(data.Sort[idx]))
 		navs = append(navs, nav)

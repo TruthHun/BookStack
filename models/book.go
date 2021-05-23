@@ -43,11 +43,12 @@ const (
 )
 
 type BookNav struct {
-	Sort  int    `json:"sort"`
-	Icon  string `json:"icon"`
-	Color string `json:"color"`
-	Name  string `json:"name"`
-	URL   string `json:"url"`
+	Sort   int    `json:"sort"`
+	Icon   string `json:"icon"`
+	Color  string `json:"color"`
+	Name   string `json:"name"`
+	URL    string `json:"url"`
+	Target string `json:"target"`
 }
 
 // Book struct .
