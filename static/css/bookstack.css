@@ -139,7 +139,7 @@ table>tbody>tr:hover{
     bottom: 0;
     width: 300px;
     border-right: 1px solid #ddd;
-    background-color: #fafafa;
+    background-color: #fff;
 }
 .m-manual .manual-tab .tab-navg {
     zoom:1;border-bottom: 1px solid #ddd
