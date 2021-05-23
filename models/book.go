@@ -2,6 +2,7 @@ package models
 
 import (
 	"archive/zip"
+	"encoding/json"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -41,6 +42,14 @@ const (
 	OrderLatestRecommend BookOrder = "latest-recommend" //最新推荐
 )
 
+type BookNav struct {
+	Sort  int    `json:"sort"`
+	Icon  string `json:"icon"`
+	Color string `json:"color"`
+	Name  string `json:"name"`
+	URL   string `json:"url"`
+}
+
 // Book struct .
 type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`
@@ -77,7 +86,17 @@ type Book struct {
 	AdTitle           string    `orm:"default()"`           // 文字广告标题
 	AdLink            string    `orm:"default();size(512)"` // 文字广告链接
 	Lang              string    `orm:"size(10);index;default(zh)"`
+	NavJSON           string    `orm:"size(8192);default();column(nav_json)"` // 导航栏扩展
+	Navs              []BookNav `orm:"-" json:"navs"`
 }
+
+type BookNavs []BookNav
+
+func (s BookNavs) Len() int { return len(s) }
+
+func (s BookNavs) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+func (s BookNavs) Less(i, j int) bool { return s[i].Sort < s[j].Sort }
 
 // TableName 获取对应数据库表名.
 func (m *Book) TableName() string {
@@ -584,6 +603,8 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.AdTitle = book.AdTitle
 	m.AdLink = book.AdLink
 	m.Lang = book.Lang
+
+	json.Unmarshal([]byte(book.NavJSON), &m.Navs)
 
 	if book.Theme == "" {
 		m.Theme = "default"

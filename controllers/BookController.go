@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -186,7 +187,6 @@ func (this *BookController) Setting() {
 
 // SaveBook 保存书籍信息
 func (this *BookController) SaveBook() {
-
 	bookResult, err := this.IsPermission()
 	if err != nil {
 		this.JsonResult(6001, err.Error())
@@ -230,6 +230,7 @@ func (this *BookController) SaveBook() {
 	book.Lang = this.GetString("lang")
 	book.AdTitle = this.GetString("ad_title")
 	book.AdLink = this.GetString("ad_link")
+	_, book.NavJSON = this.parseBookNav()
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")
@@ -261,6 +262,45 @@ func (this *BookController) SaveBook() {
 	}()
 	go models.CountCategory()
 	this.JsonResult(0, "ok", bookResult)
+}
+
+func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string) {
+	var data struct {
+		Name  []string `json:"name"`
+		URL   []string `json:"url"`
+		Sort  []string `json:"sort"`
+		Icon  []string `json:"icon"`
+		Color []string `json:"color"`
+	}
+	b, _ := json.Marshal(this.Ctx.Request.PostForm)
+	json.Unmarshal(b, &data)
+	lenName := len(data.Name)
+	if lenName == 0 || lenName != len(data.URL) || lenName != len(data.Sort) || lenName != len(data.Icon) || lenName != len(data.Color) {
+		return
+	}
+
+	for idx, name := range data.Name {
+		name = strings.TrimSpace(name)
+		url := strings.TrimSpace(data.URL[idx])
+		if url == "" || name == "" {
+			continue
+		}
+		nav := models.BookNav{
+			Name:  name,
+			URL:   url,
+			Color: strings.TrimSpace(data.Color[idx]),
+			Icon:  strings.TrimSpace(data.Icon[idx]),
+		}
+		nav.Sort, _ = strconv.Atoi(strings.TrimSpace(data.Sort[idx]))
+		navs = append(navs, nav)
+	}
+	if len(navs) > 0 {
+		// 排序
+		sort.Sort(navs)
+		b, _ := json.Marshal(navs)
+		navStr = string(b)
+	}
+	return
 }
 
 //设置书籍私有状态.

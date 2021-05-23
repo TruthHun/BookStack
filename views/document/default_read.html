@@ -28,6 +28,7 @@
         body{-webkit-overflow-scrolling:touch;}
         .alink,.alink a{color: #888 !important;}
         .alink:hover,.alink a:hover{color: red !important;}
+        img.icon-img { width: 16px;  height: 16px; position: relative; top: -2px; }
     </style>
 </head>
 <body>
@@ -63,6 +64,12 @@
                 <div class="bookstack-item">
                     {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
                     <a title="首页" href="/" class="btn btn-link"><i class="fa fa-home"></i> 首页</a>
+                    {{range .Model.Navs}}
+                        <a title="{{.Name}}" href="{{.URL}}" class="btn btn-link" style="{{if .Color}}color:{{.Color}} !important;{{end}}">
+                            {{str2html (parseICON .Icon)}}
+                             {{.Name}}</a>
+                    {{end}}
+
                     {{if $.Wxacode}}
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalBookChat" class="btn btn-light">
                         <img src="/static/images/wxacode.png" style="position: relative;top:-2px;" alt="BookChat 小程序"> <span>小程序</span></a>
