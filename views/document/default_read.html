@@ -121,6 +121,7 @@
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
+                        <span><a href="javascript:;"title="打印当前页面内容为PDF" class="tooltips printPDF"><i class="fa fa-print"></i> 打印</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
                     {{if (ads "content-top" $.IsMobile)}}
@@ -280,6 +281,7 @@
 <script src="{{$.StaticDomain}}/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/mind-map/mindmap.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/jquery.lazyload.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/printThis.js" type="text/javascript"></script>
 <script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
 
@@ -326,7 +328,15 @@ $(function () {
 
     show_copy_btn();
     initLinkWithImage();
-
+    $(".printPDF").click(function(){
+        // 由于懒加载的存在，需要处理下页面图片
+        $("img.lazy").each(function(){
+            $(this).attr("src",$(this).attr("data-original"))
+        });
+        $(".manual-article").printThis({
+            printDelay:500, // 延时500ms，页面样式渲染也要一定的时间
+        });
+    })
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);
 

@@ -1461,3 +1461,34 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     background: rgba(0,0,0,0.3);
     color: #fff;
 }
+
+/* 页面打印的样式设置 */
+@media print {
+    h1, h2, h3, h4, h5, h6, strong, input, select, textarea, button, body, code {
+        font-family: Helvetica Neue,NotoSansHans-Regular,AvenirNext-Regular,arial,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,Arial,Helvetica,sans-serif;
+    }
+    code{color:#c7254e!important}
+    .str{color:#060!important}
+    .kwd{color:#006!important}
+    .com{color:#600!important}
+    .typ{color:#404!important}
+    .lit{color:#044!important}
+    .clo,.opn,.pun{color:#440!important}
+    .tag{color:#006!important}
+    .atn{color:#404!important}
+    .atv{color:#060!important}
+    .hung-read-link,header{display:none}
+    .m-manual .manual-left{display:none}
+    .article-toggle{display:none}
+    .m-manual .manual-right{position:relative;left:0;top:0}
+    .bookstack-bars{display:none}
+    .article-info{display:none}
+    code,pre{white-space:pre-wrap!important;word-wrap:break-word!important}
+    a:link,a:visited{color:#008cff!important;text-decoration:underline!important}
+    a[href]:after{content:none!important}
+    .m-manual .manual-progress{display:none}
+    .editormd-preview-container blockquote{border:1px solid #eee;border-left:5px solid #ddd;color:#777 !important}
+    .editormd-html-preview pre.prettyprint,.editormd-preview-container pre.prettyprint{padding:10px;border:1px solid #ddd;white-space:pre-wrap;word-wrap:break-word}
+    .editormd-html-preview code,.editormd-preview-container code{border:1px solid #ddd;padding:3px;border-radius:3px;font-size:14px}
+
+}
