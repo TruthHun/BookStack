@@ -880,7 +880,8 @@ func (m *Book) Export2Markdown(identify string) (path string, err error) {
 		docIds = append(docIds, doc.DocumentId)
 		identify := doc.Identify
 		id := strconv.Itoa(doc.DocumentId)
-		if filepath.Ext(doc.Identify) == "" {
+
+		if docExt := strings.ToLower(strings.TrimSpace(filepath.Ext(doc.Identify))); docExt != ".md" {
 			doc.Identify = doc.Identify + ext
 		}
 		docMap[doc.DocumentId] = doc
