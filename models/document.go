@@ -203,8 +203,7 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 
 		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
 			// 如果markdown内容为空，则查询下一级目录内容来填充
-			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
-			ds.Markdown = "[TOC]\n\n" + ds.Markdown
+			_, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
 		} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
 			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
