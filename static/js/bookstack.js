@@ -66,6 +66,7 @@ function load_doc(url,wd,without_history) {
                 change_url_state(url,title);
             }
             active_readed_menu(url);
+            toggleToc();
             NProgress.done();
             pre_and_next_link();
             //重新生成脑图
@@ -121,6 +122,14 @@ function change_url_state(url,title){
     history.pushState({},title,url);
 }
 
+function toggleToc(){
+    if ($("article").find(".markdown-toc-list li").length ==0 ) {
+        $(".article-toggle").addClass("hidden");
+    }else{
+        $(".article-toggle").removeClass("hidden");
+    }
+}
+
 function active_readed_menu(url){
     var links=$(".article-menu-detail a");
     var href ="";
@@ -170,6 +179,7 @@ function disableRightClick(){
 $(function () {
     disableRightClick();
     ilazyload()
+    toggleToc()
     $(".article-menu-detail>ul>li a").tooltip({placement: 'bottom'})
     $(".view-backtop").on("click", function () {
         $('.manual-right').animate({ scrollTop: '0px' }, 200);

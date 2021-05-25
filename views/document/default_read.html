@@ -32,26 +32,6 @@
     </style>
 </head>
 <body>
-
-<!-- Modal -->
-<!-- 这个Modal主要用于显示思维导图的备注信息。 -->
-<div class="modal fade" id="ModalNote" tabindex="-1" role="dialog" aria-labelledby="ModalReplaceLabel">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span></button>
-				<h1 class="modal-title" id="ModalReplaceLabel" style="align:center;">思维导图备注</h1></div>
-			<div class="modal-body" style="overflow-y:auto; height:400px;"></div>
-			<div class="modal-footer">
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
-			</div>
-		</div>
-	</div>
-</div>
-
-
 <div class="m-manual manual-mode-view manual-reader">
     <header class="navbar navbar-static-top manual-head" role="banner">
         <div class="container-fluid">
@@ -247,12 +227,30 @@
     </div>
     <div class="manual-mask"></div>
 </div>
-<span class="article-toggle tooltips" title="展开/收起文章目录"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
+<span class="article-toggle tooltips hidden" title="展开/收起文章目录"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
 <div id="menu-hidden" style="display: none;">
     <!--站点统计代码-->
     {{str2html $.TONGJI}}
 </div>
 
+
+<!-- Modal -->
+<!-- 这个Modal主要用于显示思维导图的备注信息。 -->
+<div class="modal fade" id="ModalNote" tabindex="-1" role="dialog" aria-labelledby="ModalReplaceLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+				<h1 class="modal-title" id="ModalReplaceLabel" style="align:center;">思维导图备注</h1></div>
+			<div class="modal-body" style="overflow-y:auto; height:400px;"></div>
+			<div class="modal-footer">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
+			</div>
+		</div>
+	</div>
+</div>
 
 {{template "widgets/share.html" .}}
 {{template "widgets/qrcode.html" .}}
