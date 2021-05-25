@@ -558,6 +558,7 @@ func (this *DocumentController) Create() {
 	parentId, _ := this.GetInt("parent_id", 0)
 	docId, _ := this.GetInt("doc_id", 0)
 	bookIdentify := strings.TrimSpace(this.GetString(":key"))
+
 	o := orm.NewOrm()
 
 	if identify == "" {
@@ -567,7 +568,6 @@ func (this *DocumentController) Create() {
 		this.JsonResult(6004, "文档名称不能为空")
 	}
 	if docIdentify != "" {
-
 		if ok, err := regexp.MatchString(`^[a-zA-Z0-9_\-\.]*$`, docIdentify); !ok || err != nil {
 			this.JsonResult(6003, "文档标识只能是数字、字母，以及“-”、“_”和“.”等字符，并且不能是纯数字")
 		}
@@ -590,7 +590,7 @@ func (this *DocumentController) Create() {
 			this.JsonResult(6006, "文档标识已被使用")
 		}
 	} else {
-		docIdentify = fmt.Sprintf("date-%v", time.Now().Format("2006.01.02.15.04.05"))
+		docIdentify = fmt.Sprintf("date%v", time.Now().Format("20060102150405.md"))
 	}
 
 	bookId := 0
@@ -623,6 +623,7 @@ func (this *DocumentController) Create() {
 
 	document.MemberId = this.Member.MemberId
 	document.BookId = bookId
+	oldIdentify := document.Identify
 	if docIdentify != "" {
 		document.Identify = docIdentify
 	}
@@ -642,6 +643,9 @@ func (this *DocumentController) Create() {
 		if err := ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(docIdInt64), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 			beego.Error(err)
 		}
+	}
+	if docId > 0 && oldIdentify != docIdentify {
+		go document.ReplaceIdentify(bookId, oldIdentify, docIdentify)
 	}
 	this.JsonResult(0, "ok", document)
 }
