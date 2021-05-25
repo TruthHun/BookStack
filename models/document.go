@@ -201,10 +201,6 @@ func (m *Document) RecursiveDocument(docId int) error {
 
 //发布文档内容为HTML
 func (m *Document) ReleaseContent(bookId int, baseUrl string) {
-	// 加锁
-	utils.BooksRelease.Set(bookId)
-	defer utils.BooksRelease.Delete(bookId)
-
 	var (
 		o           = orm.NewOrm()
 		docs        []*Document
@@ -245,18 +241,8 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 		}
 
 		item.Release = ds.Content
-		// attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
-		// if err == nil && len(attachList) > 0 {
-		// 	content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
-		// 	for _, attach := range attachList {
-		// 		li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
-		// 		content.WriteString(li)
-		// 	}
-		// 	content.WriteString("</ul></div>")
-		// 	item.Release += content.String()
-		// }
 
-		// 采集图片与稳定内容连接替换
+		// 采集图片与文档内容链接替换
 		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
 			images := gq.Find("img")
 			if images.Length() > 0 {

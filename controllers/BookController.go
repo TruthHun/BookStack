@@ -800,13 +800,7 @@ func (this *BookController) Release() {
 		bookId = book.BookId
 	}
 
-	if exist := utils.BooksRelease.Exist(bookId); exist {
-		this.JsonResult(1, "上次内容发布正在执行中，请稍后再操作")
-	}
-
-	go func(identify string) {
-		models.NewDocument().ReleaseContent(bookId, this.BaseUrl())
-	}(identify)
+	go models.NewDocument().ReleaseContent(bookId, this.BaseUrl())
 
 	this.JsonResult(0, "发布任务已推送到任务队列，稍后将在后台执行。")
 }
