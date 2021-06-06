@@ -983,9 +983,11 @@ func (this *CommonController) handleReleaseV3(release, bookIdentify string) (htm
 		}
 	})
 
+	prefix := "/read/"
 	query.Find("a").Each(func(idx int, sel *goquery.Selection) {
-		if href, ok := sel.Attr("href"); ok && strings.HasPrefix(href, "/read/") {
+		if href, ok := sel.Attr("href"); ok && strings.HasPrefix(href, prefix) {
 			if text := strings.TrimSpace(sel.Text()); text != "" {
+				href = strings.Split(strings.Split(strings.TrimPrefix(href, prefix), "?")[0], "#")[0]
 				links = append(links, map[string]string{"title": text, "href": href})
 			}
 		}
