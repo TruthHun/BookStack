@@ -106,20 +106,23 @@ type UserMoreInfo struct {
 }
 
 type APIDocV2 struct {
-	DocumentId   int         `json:"id"`
-	ParentId     int         `json:"pid"`
-	DocumentName string      `json:"title"`
-	Identify     string      `json:"identify"`
-	BookId       int         `json:"book_id"`
-	BookName     string      `json:"book_name"`
-	OrderSort    int         `json:"sort"`
-	Release      interface{} `json:"content,omitempty"`
-	CreateTime   time.Time   `json:"created_at,omitempty"`
-	MemberId     int         `json:"uid"`
-	ModifyTime   time.Time   `json:"updated_at,omitempty"`
-	Vcnt         int         `json:"vcnt"`
-	Readed       bool        `json:"readed"`
-	Bookmark     bool        `json:"bookmark"`
+	DocumentId   int                 `json:"id"`
+	ParentId     int                 `json:"pid"`
+	DocumentName string              `json:"title"`
+	Identify     string              `json:"identify"`
+	BookId       int                 `json:"book_id"`
+	BookName     string              `json:"book_name"`
+	OrderSort    int                 `json:"sort"`
+	Release      interface{}         `json:"content,omitempty"`
+	CreateTime   time.Time           `json:"created_at,omitempty"`
+	MemberId     int                 `json:"uid"`
+	ModifyTime   time.Time           `json:"updated_at,omitempty"`
+	Vcnt         int                 `json:"vcnt"`
+	Readed       bool                `json:"readed"`
+	Bookmark     bool                `json:"bookmark"`
+	Links        []map[string]string `json:"links"`
+	Images       []string            `json:"images"`
+	Domain       string              `json:"domain"`
 }
 
 type WechatForm struct {

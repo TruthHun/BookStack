@@ -765,6 +765,8 @@ func (this *CommonController) Read() {
 	slice := strings.Split(identify, "/")
 	fromAPP, _ := this.GetBool("from-app") // 是否来自app
 	enhanceRichtext, _ := this.GetBool("enhance-richtext")
+	filterLinks, _ := this.GetBool("links")
+	filterImages, _ := this.GetBool("images")
 	if len(slice) != 2 {
 		this.Response(http.StatusBadRequest, messageBadRequest)
 	}
@@ -829,11 +831,13 @@ func (this *CommonController) Read() {
 		apiDoc   APIDoc
 		apiDocV2 APIDocV2
 		isMark   = models.NewBookmark().Exist(this.isLogin(), doc.DocumentId)
+		images   []string
+		links    []map[string]string
 	)
 	// 图片链接地址补全
 	if doc.Release != "" {
 		if enhanceRichtext {
-			nodes = this.handleReleaseV3(doc.Release, bookIdentify)
+			nodes, images, links = this.handleReleaseV3(doc.Release, bookIdentify)
 		} else if fromAPP { // 兼容 app
 			nodes = this.handleReleaseV2(doc.Release, bookIdentify)
 		} else {
@@ -846,6 +850,16 @@ func (this *CommonController) Read() {
 		utils.CopyObject(doc, &apiDocV2)
 		apiDocV2.Release = nodes
 		apiDocV2.Bookmark = isMark
+		apiDocV2.Links = []map[string]string{}
+		apiDocV2.Images = []string{}
+
+		if filterLinks {
+			apiDocV2.Links = links
+		}
+		if filterImages {
+			apiDocV2.Images = images
+			apiDocV2.Domain = strings.TrimRight(models.GetAPIStaticDomain(), "/ ")
+		}
 		this.Response(http.StatusOK, messageSuccess, map[string]interface{}{"article": apiDocV2})
 	} else {
 		utils.CopyObject(doc, &apiDoc)
@@ -925,11 +939,12 @@ func (this *CommonController) handleReleaseV2(release, bookIdentify string) inte
 	return nodes
 }
 
-func (this *CommonController) handleReleaseV3(release, bookIdentify string) interface{} {
+func (this *CommonController) handleReleaseV3(release, bookIdentify string) (htmlNodes interface{}, images []string, links []map[string]string) {
 	query, err := goquery.NewDocumentFromReader(bytes.NewBufferString(release))
 	if err != nil {
 		beego.Error(err)
-		return release
+		htmlNodes = release
+		return
 	}
 	// 处理svg
 	utils.HandleSVG(query, bookIdentify)
@@ -962,13 +977,29 @@ func (this *CommonController) handleReleaseV3(release, bookIdentify string) inte
 		})
 	}
 
+	query.Find("img").Each(func(idx int, sel *goquery.Selection) {
+		if src, ok := sel.Attr("src"); ok {
+			images = append(images, src)
+		}
+	})
+
+	query.Find("a").Each(func(idx int, sel *goquery.Selection) {
+		if href, ok := sel.Attr("href"); ok && strings.HasPrefix(href, "/read/") {
+			if text := strings.TrimSpace(sel.Text()); text != "" {
+				links = append(links, map[string]string{"title": text, "href": href})
+			}
+		}
+	})
+
 	release, _ = query.Html()
 	nodes, err := html2json.NewDefault().ParseByByteV2([]byte(release), models.GetAPIStaticDomain())
 	if err != nil {
 		beego.Error(err)
-		return release
+		htmlNodes = release
+		return
 	}
-	return nodes
+	htmlNodes = nodes
+	return
 }
 
 // 【OK】
