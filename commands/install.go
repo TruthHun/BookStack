@@ -25,9 +25,31 @@ func Install() {
 		os.Exit(1)
 	}
 	initSeo()
+	resetCategoryUniqueIndex()
 	fmt.Println("Install Successfully!")
 	os.Exit(0)
 
+}
+
+// 删除分类中的title的唯一索引（兼容旧版本）
+func resetCategoryUniqueIndex() {
+	var indexs []struct {
+		Table      string `orm:"column(Table)"`
+		NonUnique  int    `orm:"column(Non_unique)"`
+		KeyName    string `orm:"column(Key_name)"`
+		ColumnName string `orm:"column(Column_name)"`
+	}
+	showIndex := "SHOW INDEX FROM md_category"
+	dropIndex := "ALTER TABLE `md_category` DROP INDEX `%s`;"
+	addUniqueIndex := "ALTER TABLE `md_category` ADD UNIQUE( `pid`, `title`);"
+	o := orm.NewOrm()
+	o.Raw(showIndex).QueryRows(&indexs)
+	for _, index := range indexs {
+		if index.ColumnName == "title" {
+			o.Raw(fmt.Sprintf(dropIndex, index.KeyName)).Exec()
+		}
+	}
+	o.Raw(addUniqueIndex).Exec()
 }
 
 func Version() {

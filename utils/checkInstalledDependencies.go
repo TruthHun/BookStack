@@ -20,7 +20,7 @@ test();`
 
 // IsInstalledPuppetter 是否安装了puppeteer
 func IsInstalledPuppetter(listenPort int) (err error) {
-	testFile := "test.js"
+	testFile := "cache/test.js"
 	defer func() {
 		os.Remove(testFile)
 	}()
