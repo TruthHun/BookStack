@@ -829,7 +829,9 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 	} else {
 		sourceDir = "uploads/" + sourceDir
 		targetDir = "uploads/" + targetDir
-		err = store.ModelStoreLocal.CopyDir(sourceDir, targetDir)
+		if _, e := os.Stat(sourceDir); e == nil { // 存在文件夹
+			err = store.ModelStoreLocal.CopyDir(sourceDir, targetDir)
+		}
 	}
 	return
 }
