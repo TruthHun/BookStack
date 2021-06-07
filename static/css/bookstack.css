@@ -1502,5 +1502,5 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     .editormd-preview-container blockquote{border:1px solid #eee;border-left:5px solid #ddd;color:#777 !important}
     .editormd-html-preview pre.prettyprint,.editormd-preview-container pre.prettyprint{padding:10px;border:1px solid #ddd;white-space:pre-wrap;word-wrap:break-word}
     .editormd-html-preview code,.editormd-preview-container code{border:1px solid #ddd;padding:3px;border-radius:3px;font-size:14px}
-
+    .markdown-toc{display: none !important;}
 }
