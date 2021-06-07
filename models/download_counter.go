@@ -41,12 +41,6 @@ func (m *DownloadCounter) Increase(uid int) (err error) {
 // DoesICanDownload 用户是否可以下载电子书
 // availableTimes 表示剩余可下载次数。负数表示不限制，否则表示限制可下载的次数
 func (m *DownloadCounter) DoesICanDownload(uid int, wecode string) (availableTimes int, err error) {
-	// 未登录，且没有下载码的情况，不允许下载
-	if uid == 0 && wecode == "" {
-		err = errors.New("请先登录或者输入下载码")
-		return
-	}
-
 	availableTimes = -1
 	downCode := GetOptionValue("DOWNLOAD_WECODE", "")
 	if wecode != "" {
