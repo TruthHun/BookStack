@@ -61,6 +61,16 @@ func (m *Ebook) GetEBookByBookID(bookID int) (books []Ebook) {
 	return
 }
 
+func (m *Ebook) Get2Download(bookId int, ext string) (ebook Ebook) {
+	o := orm.NewOrm()
+	o.QueryTable(m).Filter("book_id", bookId).Filter("ext", ext).OrderBy("-id").One(&ebook)
+	if ebook.Id > 0 {
+		ebook.DownloadCount = ebook.DownloadCount + 1
+		o.Update(&ebook)
+	}
+	return
+}
+
 func (m *Ebook) GetEBook(id int) (book Ebook) {
 	if id <= 0 {
 		return
@@ -131,8 +141,7 @@ func (m *Ebook) IsFinish(bookID int) (ok bool) {
 	return count == 0
 }
 
-// 生成电子书
-func (m *Ebook) convert2ebook() {
+func (m *Ebook) CheckAndGenerateEbook() {
 	if convert2ebookRunning {
 		return
 	}
@@ -144,13 +153,16 @@ func (m *Ebook) convert2ebook() {
 		o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusPending).OrderBy("id").One(&ebook)
 		if ebook.Id > 0 {
 			// 根据电子书的ID，查找现有的电子书的队列
+			ebook.Status = EBookStatusProccessing
+			o.Update(&ebook)
+			m.generate(ebook.BookID)
 		}
 		time.Sleep(5 * time.Second)
 	}
 }
 
 //离线文档生成
-func (m *Ebook) Generate(bookID int) {
+func (m *Ebook) generate(bookID int) {
 	book, err := NewBook().Find(bookID)
 	if err != nil {
 		beego.Error(err)
@@ -177,7 +189,7 @@ func (m *Ebook) Generate(bookID int) {
 		Description: book.Description,
 		Header:      beego.AppConfig.String("exportHeader"),
 		Footer:      beego.AppConfig.String("exportFooter"),
-		Identifier:  "",
+		Identifier:  book.Identify,
 		Language:    "zh-CN",
 		Publisher:   beego.AppConfig.String("exportCreator"),
 		Title:       book.BookName,
@@ -351,7 +363,7 @@ func (m *Ebook) callback(identify, ebookPath string) {
 	}
 	ext := filepath.Ext(ebookPath)
 	o := orm.NewOrm()
-	if err = o.QueryTable(m).Filter("book_id", book.BookId).Filter("ext", ext).One(&ebook); err != nil {
+	if err = o.QueryTable(m).Filter("book_id", book.BookId).Filter("ext", ext).OrderBy("-id").One(&ebook); err != nil {
 		beego.Error(err)
 		return
 	}
@@ -370,9 +382,6 @@ func (m *Ebook) callback(identify, ebookPath string) {
 	newEbookPath := fmt.Sprintf("projects/%v/books/%v%v", book.Identify, time.Now().Unix(), ext)
 	switch utils.StoreType {
 	case utils.StoreOss:
-		if err = store.ModelStoreOss.DelFromOss(ebook.Path); err != nil { //删除旧版
-			beego.Error(err)
-		}
 		//不要开启gzip压缩，否则会出现文件损坏的情况
 		if err := store.ModelStoreOss.MoveToOss(ebookPath, newEbookPath, true, false); err != nil {
 			beego.Error(err)
@@ -381,9 +390,6 @@ func (m *Ebook) callback(identify, ebookPath string) {
 		}
 	case utils.StoreLocal: //本地存储
 		newEbookPath = "uploads/" + newEbookPath
-		if err = os.RemoveAll(fmt.Sprintf("uploads/projects/%v/books/", book.Identify)); err != nil {
-			beego.Error(err)
-		}
 		if err = store.ModelStoreLocal.MoveToStore(ebookPath, newEbookPath); err != nil {
 			beego.Error(err)
 		}

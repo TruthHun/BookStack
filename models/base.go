@@ -50,6 +50,7 @@ func Init() {
 			time.Sleep(time.Second * 30)
 		}
 	}()
+	go NewEbook().CheckAndGenerateEbook()
 }
 
 //设置增减
