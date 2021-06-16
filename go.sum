@@ -9,6 +9,8 @@ github.com/PuerkitoBio/goquery v1.6.0 h1:j7taAbelrdcsOlGeMenZxc2AWXD5fieT1/znArd
 github.com/PuerkitoBio/goquery v1.6.0/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/TruthHun/converter v0.0.0-20180618131031-80268d67d7a8 h1:E+006K+eHyJkdvR1IPv8jFGA9zvuK47OxlNKoDxMvWM=
 github.com/TruthHun/converter v0.0.0-20180618131031-80268d67d7a8/go.mod h1:bW/ArSdu0OB6XR3NcPdPBIEeGdQ1GLW9fQavW3Auy2A=
+github.com/TruthHun/converter v0.0.0-20210616133600-fb06ddba4a35 h1:g1zMxNHQVGA6LqlJ0r923Xft+GO6TXU399k/HBILpHM=
+github.com/TruthHun/converter v0.0.0-20210616133600-fb06ddba4a35/go.mod h1:n0OITYsMcCW3XbBVOBn3jMiXRuCmDwDXPsumL7D/JBY=
 github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45 h1:o+hC+QvRJlpj6meIX4AC/LKi7UxdEWFs+6zOsLzGoBs=
 github.com/TruthHun/gotil v0.0.0-20191003091818-17b80aad8a45/go.mod h1:0V5BlPJa24R0PzuXVURUfjaQ8Z7cmqsVSW7ftuhesN0=
 github.com/TruthHun/gotil v0.0.0-20210509080330-2470bb9be7cd h1:WHNNuPS7Pc4rYhlN2mAPT4lXgGYNwX4tws8+DbfYSJY=
