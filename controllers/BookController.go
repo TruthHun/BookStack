@@ -66,7 +66,13 @@ func (this *BookController) Index() {
 	this.Data["Private"] = private
 	pageIndex, _ := this.GetInt("page", 1)
 	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
-
+	ebookStats := make(map[int]map[string]models.Ebook)
+	modelEbook := models.NewEbook()
+	for _, book := range books {
+		ebookStats[book.BookId] = modelEbook.GetStats(book.BookId)
+	}
+	ebookJSON, _ := json.Marshal(ebookStats)
+	this.Data["EbookStats"] = template.JS(string(ebookJSON))
 	if totalCount > 0 {
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
 	} else {

@@ -1071,3 +1071,8 @@ a{color: #333}
 }
 .loading-icon img{margin-bottom: 20px;}
 .loading-cancel{margin-top: 10px;color: red;display: inline-block;}
+
+.book-list .progress{height: 10px;border-radius: 10px;margin-bottom: 5px;}
+.book-list .progress-bar{font-size: 0.2em;line-height: 10px;}
+.book-list .progress-bar-primary{background-color: #cccccc;}
+.book-list .progress-bar-disabled{background-color: #efefef;color: #888;}

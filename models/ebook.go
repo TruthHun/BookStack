@@ -23,18 +23,18 @@ import (
 )
 
 type Ebook struct {
-	Id            int
-	Title         string    // 电子书名称
-	Keywords      string    // 关键字
-	Description   string    // 摘要
-	Path          string    // 文件路径。如果是网站生成的电子书，则为电子书的路径，否则为URL地址
-	BookID        int       `orm:"default(0);column(book_id);index"` // 所属书籍ID
-	Ext           string    `orm:"size(8);index"`                    // 文件扩展名
-	Status        int       `orm:"default(0);index"`                 // 0：待处理； 1: 转换中；2: 转换完成
-	Size          int64     `orm:"default(0)"`                       // 电子书大小
-	DownloadCount int       `orm:"default(0)"`                       // 电子书被下载次数
-	CreatedAt     time.Time `orm:"auto_now_add;type(datetime)"`
-	UpdatedAt     time.Time `orm:"auto_now;type(datetime)"`
+	Id            int       `json:"id"`
+	Title         string    `json:"title"`                                          // 电子书名称
+	Keywords      string    `json:"keywords"`                                       // 关键字
+	Description   string    `json:"description"`                                    // 摘要
+	Path          string    `json:"path"`                                           // 文件路径。如果是网站生成的电子书，则为电子书的路径，否则为URL地址
+	BookID        int       `json:"book_id" orm:"default(0);column(book_id);index"` // 所属书籍ID
+	Ext           string    `json:"ext" orm:"size(8);index"`                        // 文件扩展名
+	Status        int       `json:"status" orm:"default(0);index"`                  // 0：待处理； 1: 转换中；2: 转换完成
+	Size          int64     `json:"size" orm:"default(0)"`                          // 电子书大小
+	DownloadCount int       `json:"download_count" orm:"default(0)"`                // 电子书被下载次数
+	CreatedAt     time.Time `json:"created_at" orm:"auto_now_add;type(datetime)"`
+	UpdatedAt     time.Time `json:"updated_at" orm:"auto_now;type(datetime)"`
 }
 
 var convert2ebookRunning = false
@@ -111,7 +111,7 @@ func (m *Ebook) AddToGenerate(bookID int) (err error) {
 }
 
 // 电子书状态（最新的状态）
-func (m *Ebook) Stats(bookID int) (stats map[string]Ebook) {
+func (m *Ebook) GetStats(bookID int) (stats map[string]Ebook) {
 	var (
 		ebooks []Ebook
 		limit  = 4 // 先默认为4，即四个扩展名：.pdf,.epub,.mobi,.docx
@@ -120,12 +120,18 @@ func (m *Ebook) Stats(bookID int) (stats map[string]Ebook) {
 	o := orm.NewOrm()
 	o.QueryTable(m).Filter("book_id", bookID).OrderBy("-id").Limit(limit).All(&ebooks)
 	if len(ebooks) == 0 {
+		stats = map[string]Ebook{
+			"PDF":  {Status: -1},
+			"EPUB": {Status: -1},
+			"MOBI": {Status: -1},
+		}
 		return
 	}
 
 	for _, ebook := range ebooks {
-		if _, ok := stats[ebook.Ext]; !ok {
-			stats[ebook.Ext] = ebook
+		ext := strings.TrimLeft(strings.ToUpper(ebook.Ext), ".")
+		if _, ok := stats[ext]; !ok {
+			stats[ext] = ebook
 		}
 	}
 	return
