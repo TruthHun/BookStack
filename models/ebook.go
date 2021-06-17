@@ -99,7 +99,7 @@ func (m *Ebook) AddToGenerate(bookID int) (err error) {
 		ebooks = append(ebooks, Ebook{
 			Title:       b.BookName,
 			Keywords:    b.Label,
-			Description: b.Description,
+			Description: beego.Substr(b.Description, 0, 255),
 			BookID:      bookID,
 			Ext:         ext,
 			Status:      EBookStatusPending,
@@ -170,6 +170,9 @@ func (m *Ebook) CheckAndGenerateEbook() {
 					m.generate(bookId)
 					wg.Done()
 				}(ebook.BookID)
+			} else {
+				time.Sleep(5 * time.Second)
+				i--
 			}
 		}
 
