@@ -369,17 +369,30 @@ func (m *Ebook) generate(bookID int) {
 	}
 }
 
+func (m *Ebook) deleteBook(bookId int) {
+	orm.NewOrm().QueryTable(m).Filter("book_id", bookId).Delete()
+}
+
+func (m *Ebook) setEbookStatus(bookId int, ext string, status int) {
+	if bookId <= 0 {
+		return
+	}
+	orm.NewOrm().QueryTable(m).Filter("book_id", bookId).Filter("ext", ext).Update(orm.Params{"status": status})
+}
+
 func (m *Ebook) callback(identify, ebookPath string) {
 	var ebook Ebook
+	o := orm.NewOrm()
 
 	ebookPath = strings.TrimLeft(ebookPath, "./")
 	book, err := NewBook().FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err)
+		m.deleteBook(book.BookId)
 		return
 	}
+
 	ext := filepath.Ext(ebookPath)
-	o := orm.NewOrm()
 	if err = o.QueryTable(m).Filter("book_id", book.BookId).Filter("ext", ext).OrderBy("-id").One(&ebook); err != nil {
 		beego.Error(err)
 		return
