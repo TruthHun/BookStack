@@ -157,6 +157,9 @@ func (m *Ebook) CheckAndGenerateEbook() {
 	o := orm.NewOrm()
 	o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusProccessing).Update(orm.Params{"status": EBookStatusPending})
 	cpuNum := runtime.NumCPU()/2 + 1
+	if cpuNum > 1 && runtime.NumCPU() == cpuNum { // 比如双核服务器，不能直接占用双核，以避免服务器无法正常提供服务
+		cpuNum = cpuNum - 1
+	}
 	for {
 		wg := &sync.WaitGroup{}
 		for i := 0; i < cpuNum; i++ {
