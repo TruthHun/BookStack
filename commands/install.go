@@ -8,6 +8,7 @@ import (
 
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
+	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
@@ -26,9 +27,9 @@ func Install() {
 	}
 	initSeo()
 	resetCategoryUniqueIndex()
+	migrateEbook()
 	fmt.Println("Install Successfully!")
 	os.Exit(0)
-
 }
 
 // 删除分类中的title的唯一索引（兼容旧版本）
@@ -154,4 +155,44 @@ func initSeo() {
 	for _, item := range items {
 		orm.NewOrm().Update(&item, "statement")
 	}
+}
+
+// 电子书数据迁移
+func migrateEbook() {
+	// 1. 查找 md_ebook 表中不存在的书籍的电子书
+	var (
+		books    []models.Book
+		sqlQuery = "SELECT book_id,generate_time,book_name,identify,label,description FROM `md_books` WHERE `generate_time`>'2010' and book_id not in (select book_id from md_ebook where book_id>0 group by book_id)"
+	)
+	o := orm.NewOrm()
+	o.Raw(sqlQuery).QueryRows(&books)
+	if len(books) == 0 {
+		beego.Info("不存在需要同步的电子书数据")
+		return
+	}
+	exts := []string{".pdf", ".epub", ".mobi"}
+	for _, book := range books {
+		beego.Info("迁移书籍电子书：", book.BookName)
+		var ebooks []models.Ebook
+		bookPrefix := fmt.Sprintf("/projects/%v/books/%v", book.Identify, book.GenerateTime.Unix())
+		if utils.StoreType == utils.StoreLocal {
+			bookPrefix = "/uploads" + bookPrefix
+		}
+		ebook := models.Ebook{
+			Title:       book.BookName,
+			Keywords:    book.Label,
+			Description: beego.Substr(book.Description, 0, 255),
+			BookID:      book.BookId,
+			Status:      models.EBookStatusSuccess,
+		}
+		for _, ext := range exts {
+			ebook.Ext = ext
+			ebook.Path = bookPrefix + ext
+			ebooks = append(ebooks, ebook)
+		}
+		if _, err := o.InsertMulti(len(ebooks), &ebooks); err != nil {
+			beego.Error(err)
+		}
+	}
+	beego.Info("电子书数据同步中...")
 }

@@ -585,7 +585,7 @@ func (this *BookController) Create() {
 	//设置默认时间，因为beego的orm好像无法设置datetime的默认值
 	defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
 	book.LastClickGenerate = defaultTime
-	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") //默认生成文档的时间
+	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") // 电子书生成的默认时间
 	book.ReleaseTime = defaultTime
 
 	if err := book.Insert(); err != nil {
