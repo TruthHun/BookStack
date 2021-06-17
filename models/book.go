@@ -73,9 +73,9 @@ type Book struct {
 	CreateTime        time.Time `orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` // CreateTime 创建时间 .
 	MemberId          int       `orm:"column(member_id);size(100);index" json:"member_id"`
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now" json:"modify_time"`
-	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   // 书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
-	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` // 下载文档生成时间
-	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        // 上次点击生成文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
+	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
+	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //电子书生成时间
+	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击生成电子书的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
 	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    // 书籍被阅读次数
 	Star              int       `orm:"column(star);default(0)" json:"star"`    // 书籍被收藏次数

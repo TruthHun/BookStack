@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -1210,7 +1211,7 @@ func (this *DocumentController) Content() {
 }
 
 //导出文件
-func (this *DocumentController) Export() {
+func (this *DocumentController) ExportOld() {
 	wecode := strings.TrimSpace(this.GetString("wecode"))
 	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
 		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
@@ -1271,6 +1272,74 @@ func (this *DocumentController) Export() {
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
 	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
+}
+
+//导出文件
+func (this *DocumentController) Export() {
+	wecode := strings.TrimSpace(this.GetString("wecode"))
+	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
+		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
+			tips = strings.TrimSpace(tips)
+			if len(tips) > 0 {
+				this.JsonResult(1, tips)
+			}
+		}
+	}
+
+	identify := this.Ctx.Input.Param(":key")
+	ext := strings.ToLower(this.GetString("output"))
+	switch ext {
+	case "pdf", "epub", "mobi":
+		ext = "." + ext
+	default:
+		ext = ".pdf"
+	}
+	if identify == "" {
+		this.JsonResult(1, "下载失败，无法识别您要下载的电子书")
+	}
+	book, err := new(models.Book).FindByIdentify(identify)
+	if err != nil {
+		beego.Error(err.Error())
+		this.JsonResult(1, "下载失败，无法识别您要下载的电子书")
+	}
+	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
+		this.JsonResult(1, "私有书籍，只有书籍创建人可导出电子书")
+	}
+	ebook := models.NewEbook().Get2Download(book.BookId, ext)
+	if ebook.Id == 0 || ebook.Status != models.EBookStatusSuccess || ebook.Path == "" {
+		this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+	}
+
+	//查询文档是否存在
+	obj := strings.TrimLeft(ebook.Path, "./")
+	link := ""
+	switch utils.StoreType {
+	case utils.StoreOss:
+		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+		}
+		link = this.OssDomain + "/" + obj
+	case utils.StoreLocal:
+		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+		}
+		link = "/" + obj + fmt.Sprintf("?attachment=%s%s", url.QueryEscape(ebook.Title), ebook.Ext)
+	}
+	if link != "" {
+		// 查询是否可以下载
+		counter := models.NewDownloadCounter()
+		_, err := counter.DoesICanDownload(this.Member.MemberId, wecode)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+		if wecode == "" {
+			counter.Increase(this.Member.MemberId)
+		}
+		this.JsonResult(0, "获取电子书下载链接成功", map[string]interface{}{"url": link})
+	}
+	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
 }
 
 //生成书籍访问的二维码.

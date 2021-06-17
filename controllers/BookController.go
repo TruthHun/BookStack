@@ -67,7 +67,13 @@ func (this *BookController) Index() {
 	this.Data["Private"] = private
 	pageIndex, _ := this.GetInt("page", 1)
 	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
-
+	ebookStats := make(map[int]map[string]models.Ebook)
+	modelEbook := models.NewEbook()
+	for _, book := range books {
+		ebookStats[book.BookId] = modelEbook.GetStats(book.BookId)
+	}
+	ebookJSON, _ := json.Marshal(ebookStats)
+	this.Data["EbookStats"] = template.JS(string(ebookJSON))
 	if totalCount > 0 {
 		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
 	} else {
@@ -627,7 +633,7 @@ func (this *BookController) Create() {
 	//设置默认时间，因为beego的orm好像无法设置datetime的默认值
 	defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
 	book.LastClickGenerate = defaultTime
-	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") //默认生成文档的时间
+	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") // 电子书生成的默认时间
 	book.ReleaseTime = defaultTime
 
 	if err := book.Insert(); err != nil {
@@ -805,8 +811,7 @@ func (this *BookController) Release() {
 	this.JsonResult(0, "发布任务已推送到任务队列，稍后将在后台执行。")
 }
 
-//生成下载文档
-//加锁，防止用户不停地点击生成下载文档造成服务器资源开销.
+// 生成电子书
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 
@@ -819,15 +824,20 @@ func (this *BookController) Generate() {
 		beego.Error(err)
 		this.JsonResult(1, "书籍不存在")
 	}
-	//书籍正在生成离线文档
-	if isGenerating := utils.BooksGenerate.Exist(book.BookId); isGenerating {
-		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
+
+	ebookModel := models.NewEbook()
+
+	// 电子书不是处于完成状态，不允许再添加到电子书生成队列中
+	if ok := ebookModel.IsFinish(book.BookId); !ok {
+		this.JsonResult(1, "电子书生成任务已在处理中，如需再次生成，请您稍后再试。")
 	}
 
-	baseUrl := "http://localhost:" + beego.AppConfig.String("httpport")
-	go new(models.Document).GenerateBook(book, baseUrl)
+	// 添加到电子书生成队列
+	if err = ebookModel.AddToGenerate(book.BookId); err != nil {
+		this.JsonResult(1, err.Error())
+	}
 
-	this.JsonResult(0, "下载文档生成任务已交由后台执行，请您耐心等待。")
+	this.JsonResult(0, "电子书生成任务已交由后台执行，请您耐心等待。")
 }
 
 //文档排序.

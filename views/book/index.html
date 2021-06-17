@@ -76,6 +76,29 @@
                                         </div>
 
                                         <div class="clearfix"></div>
+                                        <div class="row ebook-stats">
+                                            <div class="col-xs-6 col-sm-3" v-for="(stats,ext) in stats[item.book_id]">
+                                                <div class="progress">
+                                                    <div :class="['progress-bar', 
+                                                        stats.status==1 ? 'progress-bar-info': '',
+                                                        stats.status==2 ? 'progress-bar-success': '',
+                                                        stats.status==3 ? 'progress-bar-danger': '',
+                                                        stats.status==0 ? 'progress-bar-primary': '',
+                                                        stats.status==-1 ? 'progress-bar-disabled': '',
+                                                    ]" role="progressbar"
+                                                         aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+                                                         style="width: 100%;">
+                                                        <span>${ext}: 
+                                                            <span v-if="stats.status==1">生成中...</span>
+                                                            <span v-else-if="stats.status==2">生成成功^.^</span>
+                                                            <span v-else-if="stats.status==3">生成失败！</span>
+                                                            <span v-else-if="stats.status==0">等待生成</span>
+                                                            <span v-else>未生成电子书</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="info hidden-xs">
                                         <span title="创建者" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-user"></i> ${item.create_name}</span>
@@ -367,12 +390,14 @@
         window.app = new Vue({
             el : "#bookList",
             data : {
-                lists : {{.Result}}
+                lists : {{.Result}},
+                stats: {{.EbookStats}},
             },
             delimiters : ['${','}'],
-            methods : {
-            }
-        });
+                methods : {
+
+                }
+            });
         Vue.nextTick(function () {
             $("[data-toggle='tooltip']").tooltip();
         });

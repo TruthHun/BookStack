@@ -43,6 +43,7 @@ func (this *StaticController) Test() {
 func (this *StaticController) Uploads() {
 	file := strings.TrimLeft(this.GetString(":splat"), "./")
 	path := strings.ReplaceAll(filepath.Join("uploads", file), "\\", "/")
+	attachment := this.GetString("attachment")
 
 	if this.isMedia(path) { // 签名验证
 		sign := this.GetString("sign")
@@ -53,12 +54,11 @@ func (this *StaticController) Uploads() {
 				return
 			}
 		}
-
-		// if sign != "" && utils.IsSignUsed(sign) {
-		// 	this.Abort("404")
-		// }
 	}
-
+	if attachment != "" {
+		this.Ctx.Output.Download(path, attachment)
+		return
+	}
 	http.ServeFile(this.Ctx.ResponseWriter, this.Ctx.Request, path)
 }
 
