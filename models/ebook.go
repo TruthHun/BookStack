@@ -7,8 +7,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -154,15 +156,24 @@ func (m *Ebook) CheckAndGenerateEbook() {
 	convert2ebookRunning = true
 	o := orm.NewOrm()
 	o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusProccessing).Update(orm.Params{"status": EBookStatusPending})
+	cpuNum := runtime.NumCPU()/2 + 1
 	for {
-		var ebook Ebook
-		o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusPending).OrderBy("id").One(&ebook)
-		if ebook.Id > 0 {
-			// 根据电子书的ID，查找现有的电子书的队列
-			ebook.Status = EBookStatusProccessing
-			o.Update(&ebook)
-			m.generate(ebook.BookID)
+		wg := &sync.WaitGroup{}
+		for i := 0; i < cpuNum; i++ {
+			var ebook Ebook
+			o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusPending).OrderBy("id").One(&ebook)
+			if ebook.Id > 0 {
+				// 将相应书籍的状态，设置为处理中
+				o.QueryTable(m).Filter("book_id", ebook.BookID).Filter("status", EBookStatusPending).Update(orm.Params{"status": EBookStatusProccessing})
+				wg.Add(1)
+				go func(bookId int) {
+					m.generate(bookId)
+					wg.Done()
+				}(ebook.BookID)
+			}
 		}
+
+		wg.Wait()
 		time.Sleep(5 * time.Second)
 	}
 }
