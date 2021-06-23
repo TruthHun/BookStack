@@ -60,6 +60,11 @@ func (this *Local) DelFromFolder(folder string) (err error) {
 	return os.RemoveAll(folder)
 }
 
+func (this *Local) CopyFile(sourceFile, targetFile string) (err error) {
+
+	return
+}
+
 // 拷贝文件夹
 func (this *Local) CopyDir(sourceDir, targetDir string) (err error) {
 	var fl []filetil.FileList

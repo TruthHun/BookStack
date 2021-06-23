@@ -276,6 +276,17 @@ func (o *Oss) CopyDir(sourceDir, targetDir string) (err error) {
 	return
 }
 
+// CopyDir 拷贝文件夹
+func (o *Oss) CopyFile(sourceFile, targetFile string) (err error) {
+	var bucket, _ = o.GetBucket()
+	sourceFile = strings.TrimLeft(sourceFile, "./")
+	targetFile = strings.TrimLeft(targetFile, "./")
+	if _, err = bucket.CopyObject(sourceFile, targetFile); err != nil {
+		beego.Error("copy", sourceFile, "==>", targetFile, err.Error())
+	}
+	return
+}
+
 // Down2local 下载文件夹下的文件到本地
 func (o *Oss) Down2local(sourceDir, targetDir string) (err error) {
 	var (

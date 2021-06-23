@@ -761,6 +761,16 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		return errors.New("已存在相同标识的书籍，请更换书籍标识")
 	}
 
+	if m.Cover != "" {
+		newCover := strings.ReplaceAll(filepath.Join(filepath.Dir(m.Cover), fmt.Sprintf("cover-%v%v", m.Identify, filepath.Ext(m.Cover))), "\\", "/")
+		if utils.StoreType == utils.StoreOss {
+			store.ModelStoreOss.CopyFile(m.Cover, newCover)
+		} else {
+			utils.CopyFile(newCover, m.Cover)
+		}
+		m.Cover = newCover
+	}
+
 	m.ParentId = sourceBook.BookId
 	if _, err = o.Insert(m); err != nil {
 		beego.Error(err)

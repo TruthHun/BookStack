@@ -41,6 +41,8 @@ func FileExists(name string) bool {
 }
 
 func CopyFile(dstName, srcName string) (written int64, err error) {
+	dstName = strings.TrimLeft(dstName, "./")
+	srcName = strings.TrimLeft(srcName, "./")
 	src, err := os.Open(srcName)
 	if err != nil {
 		return
