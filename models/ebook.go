@@ -390,7 +390,6 @@ func (m *Ebook) callback(identify, ebookPath string) {
 	var ebook Ebook
 	o := orm.NewOrm()
 
-	ebookPath = strings.TrimLeft(ebookPath, "./")
 	book, err := NewBook().FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err)
