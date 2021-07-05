@@ -681,6 +681,7 @@ func (this *BookController) Copy() {
 	sourceBook.Author = strings.TrimSpace(this.GetString("author", ""))
 	sourceBook.AuthorURL = strings.TrimSpace(this.GetString("author_url", ""))
 	sourceBook.PrivatelyOwned, _ = strconv.Atoi(this.GetString("privately_owned"))
+	sourceBook.MemberId = this.Member.MemberId
 	err = sourceBook.Copy(sourceIdentify)
 	if err != nil {
 		this.JsonResult(1, "拷贝书籍失败："+err.Error())
