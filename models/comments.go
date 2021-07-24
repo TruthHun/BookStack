@@ -20,7 +20,7 @@ type Comments struct {
 	Uid        int       `orm:"index"`            // 用户id
 	BookId     int       `orm:"index"`            // 书籍id
 	DocId      int       `orm:"index;default(0)"` // 文档ID
-	Content    string    // 评论内容
+	Content    string    `orm:"type(text)"`       // 评论内容
 	TimeCreate time.Time // 评论时间
 	Status     int8      //  审核状态; 0，待审核，1 通过，-1 不通过
 }
