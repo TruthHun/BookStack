@@ -93,6 +93,7 @@ function load_doc(url,wd,without_history) {
             $(".updated-at").text(res.data.updated_at);
             initLinkWithImage()
             ilazyload()
+            initComments(res.data.comments)
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
@@ -166,6 +167,27 @@ function disableRightClick(){
     $('body').on('contextmenu','audio,video', function(e) {
         e.preventDefault();
     });
+}
+
+function initComments(comments){
+    // 
+    var arr = []
+    console.log(comments)
+    try {
+        for (var index = 0; index < comments.length; index++) {
+            const element = comments[index];
+            console.log(element)
+            var html='<div class="row"><div class="col-xs-12"><img src="'+element.avatar+'" class="img-thumbnail img-circle img-responsive" alt="'+element.nickname+'"/><span class="username">'+element.nickname+'</span></div><div class="col-xs-12 comments-content">';
+            if(element.pid>0){
+                html+='<div class="reply-to"><span class="text-info">'+element.reply_to_user+'</span>: '+element.reply_to_content+'</div>';
+            }
+            html+='<div>'+element.content+'</div></div><div class="col-xs-12"><span class="text-muted"><i class="fa fa-clock-o"></i> '+element.created_at+'</span><span class="reply" data-pid="'+element.id+'"><i class="fa fa-comments-o"></i> 回复</span></div></div>';
+            arr.push(html)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+    $(".comments-list").html(arr.join(''))
 }
 
 $(function () {

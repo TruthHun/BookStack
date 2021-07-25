@@ -1480,7 +1480,7 @@ form .btn-row .col-md-10{padding-left: 0;}
 .comments-right .userinfo{font-size: 16px;position: relative;top:-7px;}
 .comments-right .userinfo span{font-size: 14px;color: #999999;}
 .comments-content{color: #999999;}
-.repley:hover{cursor: pointer;}
+.reply:hover{cursor: pointer;}
 .comments-list form{margin-left: 2em;padding-top: 15px;}
 .comments-list .reply-to{
     background-color: #efefef;

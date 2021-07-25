@@ -119,6 +119,9 @@ func (this *Comments) Comments(p, listRows int, opt CommentOpt) (comments []Book
 			comment.ReplyToUser = val.Nickname
 			comment.ReplyToContent = val.Content
 		}
+		if comment.Nickname == "" {
+			comment.Nickname = "匿名"
+		}
 		comments[idx] = comment
 	}
 	return

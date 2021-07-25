@@ -711,7 +711,7 @@ a{color: #333}
 #bookstack-intro .comments-right .userinfo{font-size: 16px;position: relative;top:-7px;}
 #bookstack-intro .comments-right .userinfo span{font-size: 14px;color: #999999;}
 #bookstack-intro .comments-content{color: #999999;}
-#bookstack-intro .repley:hover{cursor: pointer;}
+#bookstack-intro .reply:hover{cursor: pointer;}
 #bookstack-intro .comments-list form{margin-left: 2em;padding-top: 15px;}
 #bookstack-intro .comments-list .reply-to{
     background-color: #efefef;
