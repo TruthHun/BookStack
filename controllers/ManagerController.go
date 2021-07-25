@@ -725,10 +725,12 @@ func (this *ManagerController) Comments() {
 	p, _ := this.GetInt("page", 1)
 	size, _ := this.GetInt("size", 10)
 	m := models.NewComments()
+	opt := models.CommentOpt{}
 	if status == "" {
-		this.Data["Comments"], _ = m.Comments(p, size, 0)
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	} else {
-		this.Data["Comments"], _ = m.Comments(p, size, 0, statusNum)
+		opt.Status = []int{statusNum}
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	}
 	this.Data["IsComments"] = true
 	this.Data["Status"] = status

@@ -389,7 +389,7 @@ table>tbody>tr:hover{
 }
 .m-manual .manual-right {
     position: absolute;
-    left: 280px;
+    left: 300px;
     top: 55px;
     z-index: 300;
     overflow-y: auto;
@@ -1185,7 +1185,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     display: inline-block !important;
 }
 
-.hung-read-link{margin: 30px 0px 180px;line-height: 200%;}
+.hung-read-link{margin: 30px 0;line-height: 200%;}
 .hung-read-link .col-xs-12{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 0px;}
 .hung-read-link .col-xs-12 a{margin-left: 5px;}
 .bookstack-bars{position: fixed;right: 50px;bottom: 50px;border:1px solid rgba(0,0,0,.1);
@@ -1460,4 +1460,41 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
     top: -1px;
     background: rgba(0,0,0,0.3);
     color: #fff;
+}
+
+.comments-form{box-sizing: border-box;padding: 0 15px;border-radius: 4px;}
+form .btn-row .col-md-2{padding-right: 0;}
+form .btn-row .col-md-10{padding-left: 0;}
+.comments-box textarea{resize: vertical;border: 1px solid #e1e1e1;outline:none;width: 100%;padding: 15px;border-radius: 3px;line-height: 160%;}
+.comments-list{margin: 30px 0 300px;clear: both;padding: 15px;}
+.comments-list .img-thumbnail{width: 50px;height: 50px;}
+.comments-list .username{color: #333333;}
+.comments-list span{color: #b6b6b6;margin-left: 5px;}
+.comments-list img{display: inline-block;height: 50px;width: 50px;}
+.comments-list .comments-content{
+    font-size: 13px;color: #666;line-height: 170%;margin-top:10px;margin-bottom: 15px;
+    padding-left: 15px !important;
+}
+.comments-left{padding-left: 0px;}
+.comments-right{padding:  0px;}
+.comments-right .userinfo{font-size: 16px;position: relative;top:-7px;}
+.comments-right .userinfo span{font-size: 14px;color: #999999;}
+.comments-content{color: #999999;}
+.repley:hover{cursor: pointer;}
+.comments-list form{margin-left: 2em;padding-top: 15px;}
+.comments-list .reply-to{
+    background-color: #efefef;
+    border-radius: 5px;line-height: 160%;
+    padding: 10px;margin-bottom: 10px;
+    box-sizing: border-box;
+    color: #888;
+}
+.comments-list>.row{margin-bottom: 15px;padding-bottom: 15px;border-bottom: 1px solid #efefef;}
+.comments-list .reply-to::before{
+    content: "“";
+    font-size: 34px;
+    color: #999;
+    left: 18px;
+    top: 6px;
+    position: absolute;
 }

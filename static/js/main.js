@@ -394,7 +394,7 @@ $(function () {
         })
     })
 
-    $("#bookstack-intro .repley").click(function(){
+    $(".repley").click(function(){
         var _this = $(this),pid = _this.attr("data-pid"),ele = _this.parent().parent();
         if (ele.find("form").length==0){
             $(".comments-list").find("form").remove();

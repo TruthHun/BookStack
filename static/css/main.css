@@ -718,8 +718,8 @@ a{color: #333}
     border-radius: 5px;line-height: 160%;
     padding: 10px;margin-bottom: 10px;
     box-sizing: border-box;
+    color: #888;
 }
-
 
 .friend-links a{margin-right: 8px;}
 .book-title{line-height: 200%;}

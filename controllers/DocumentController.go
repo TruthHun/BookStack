@@ -194,18 +194,7 @@ func (this *DocumentController) Index() {
 	}
 
 	//当前默认展示1000条评论(暂时先默认1000条)
-	comments, _ := new(models.Comments).Comments(1, 1000, bookResult.BookId, 1)
-	commentMap := make(map[int]models.BookCommentsResult)
-	for _, comment := range comments {
-		commentMap[comment.Id] = comment
-	}
-	for idx, comment := range comments {
-		if val, ok := commentMap[comment.Pid]; ok {
-			comment.ReplyToUser = val.Nickname
-			comment.ReplyToContent = val.Content
-		}
-		comments[idx] = comment
-	}
+	comments, _ := new(models.Comments).Comments(1, 1000, models.CommentOpt{BookId: bookResult.BookId, Status: []int{1}, WithoutDocComment: true})
 
 	this.Data["Comments"] = comments
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
@@ -396,16 +385,18 @@ func (this *DocumentController) Read() {
 	doc.Vcnt = doc.Vcnt + 1
 
 	models.NewBookCounter().Increase(bookResult.BookId, true)
+	comments, _ := models.NewComments().Comments(1, 1000, models.CommentOpt{DocId: doc.DocumentId, Status: []int{1}})
 
 	if this.IsAjax() {
 		var data struct {
-			Id        int    `json:"doc_id"`
-			DocTitle  string `json:"doc_title"`
-			Body      string `json:"body"`
-			Title     string `json:"title"`
-			Bookmark  bool   `json:"bookmark"` //是否已经添加了书签
-			View      int    `json:"view"`
-			UpdatedAt string `json:"updated_at"`
+			Id        int                         `json:"doc_id"`
+			DocTitle  string                      `json:"doc_title"`
+			Body      string                      `json:"body"`
+			Title     string                      `json:"title"`
+			Bookmark  bool                        `json:"bookmark"` //是否已经添加了书签
+			View      int                         `json:"view"`
+			UpdatedAt string                      `json:"updated_at"`
+			Comments  []models.BookCommentsResult `json:"comments"`
 		}
 		data.DocTitle = doc.DocumentName
 		data.Body = doc.Release
@@ -415,6 +406,7 @@ func (this *DocumentController) Read() {
 		data.View = doc.Vcnt
 		data.UpdatedAt = doc.ModifyTime.Format("2006-01-02 15:04:05")
 		//data.Body = doc.Markdown
+		data.Comments = comments
 
 		this.JsonResult(0, "ok", data)
 	}
@@ -481,6 +473,7 @@ func (this *DocumentController) Read() {
 	this.Data["View"] = doc.Vcnt
 	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
 	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
+	this.Data["Comments"] = comments
 }
 
 //编辑文档.
