@@ -104,6 +104,26 @@ function load_doc(url,wd,without_history) {
     })
 }
 
+function dateFormat(fmt, date) {
+    var ret;
+    const opt = {
+        "Y+": date.getFullYear().toString(),        // 年
+        "m+": (date.getMonth() + 1).toString(),     // 月
+        "d+": date.getDate().toString(),            // 日
+        "H+": date.getHours().toString(),           // 时
+        "M+": date.getMinutes().toString(),         // 分
+        "S+": date.getSeconds().toString()          // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+        };
+    };
+    return fmt;
+}
+
 function initHighlighting() {
     $('pre code').each(function (i, block) {
         hljs.highlightBlock(block);
@@ -170,9 +190,7 @@ function disableRightClick(){
 }
 
 function initComments(comments){
-    // 
     var arr = []
-    console.log(comments)
     try {
         for (var index = 0; index < comments.length; index++) {
             const element = comments[index];
@@ -181,7 +199,7 @@ function initComments(comments){
             if(element.pid>0){
                 html+='<div class="reply-to"><span class="text-info">'+element.reply_to_user+'</span>: '+element.reply_to_content+'</div>';
             }
-            html+='<div>'+element.content+'</div></div><div class="col-xs-12"><span class="text-muted"><i class="fa fa-clock-o"></i> '+element.created_at+'</span><span class="reply" data-pid="'+element.id+'"><i class="fa fa-comments-o"></i> 回复</span></div></div>';
+            html+='<div>'+element.content+'</div></div><div class="col-xs-12"><span class="text-muted"><i class="fa fa-clock-o"></i> '+dateFormat('YYYY-mm-dd HH:MM:SS', new Date(element.created_at))+'</span><span class="reply" data-pid="'+element.id+'"><i class="fa fa-comments-o"></i> 回复</span></div></div>';
             arr.push(html)
         }
     } catch (error) {
@@ -499,8 +517,13 @@ $(function () {
     });
 
 
-    // 左右方向键，切换上下章节
+    // 左右方向键，切换上下章节。
     $(document).keydown(function (event) {
+        // 如果焦点在文本框，则不切换上下章节
+        if($("textarea").is(":focus")){
+            return
+        }
+        
         switch (event.keyCode) {
             case 37:
                 var href=$(".hung-pre a").attr("href");
