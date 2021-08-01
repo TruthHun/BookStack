@@ -133,20 +133,64 @@
                         </div>
                     </div>
 
-                    <!-- <div class="row comments-box">
-                        <div class="comments-form col-xs-12">
-                            <form action="" method="post">
-                                <textarea name="content" class="form-control" rows="5" placeholder="文明评论，理性发言"></textarea>
+                    <div class="row comments-box">
+                        <div class="comments-form col-md-12">
+                            <form action="{{urlfor "BookController.Comment" ":id" $.Model.BookId}}" method="post" class="ajax-form comment-form">
+                                <div class="form-group">
+                                    <textarea name="content" rows="5" placeholder="文明评论，理性发言."></textarea>
+                                    <input type="hidden" name="pid" value="0">
+                                    <input type="hidden" name="doc_id" value="{{.DocId}}">
+                                  </div>
+                                  <div class="form-group btn-row">
+                                    <div class="col-xs-8 col-sm-9 col-md-10">
+                                        <!-- <div class="help-block">
+                                            支持简单的 Markdown 语法
+                                        </div> -->
+                                    </div>
+                                    <div class="col-xs-4 col-sm-3 col-md-2">
+                                      <button type="submit" class="btn btn-success btn-block"><i class="fa fa-paper-plane-o"></i> 发布点评</button>
+                                    </div>
+                                  </div>
                             </form>
                         </div>
-                        <div class="comments-list col-xs-12">
-                            ass
-                        </div>
-                    </div> -->
 
-                    {{/*<div class="jump-top">*/}}
-                        {{/*<a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>*/}}
-                    {{/*</div>*/}}
+                        <div class="comments-list col-md-12">
+                            {{range .Comments}}
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        {{if gt .Uid 0}}
+                                            <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="{{.Nickname}}"/>
+                                            <span class="username">{{.Nickname}}</span>
+                                        {{else}}
+                                            <img src="/static/images/avatar.png" class="img-thumbnail img-circle img-responsive" alt="匿名">
+                                            <span class="username">匿名</span>
+                                        {{end}}
+                                    </div>
+                                    
+                                    <div class="col-xs-12 comments-content">
+                                        {{if gt .Pid 0}}
+                                            <div class="reply-to"><span class="text-info">
+                                                {{if eq .ReplyToUser ""}}匿名{{else}}{{.ReplyToUser}}{{end}}
+                                            </span> : {{.ReplyToContent}}</div>
+                                        {{end}}
+                                        <div>{{.Content}}</div>
+                                    </div>
+                                    
+                                    <div class="col-xs-12">
+                                        <span class="text-muted">
+                                            <i class="fa fa-clock-o"></i>
+                                            {{date .TimeCreate "Y-m-d H:i:s"}}
+                                        </span>
+                                        <span class="reply" data-pid="{{.Id}}">
+                                            <i class="fa fa-comments-o"></i> 回复
+                                        </span>
+                                    </div>
+                                </div>
+                            {{end}}
+                                
+                        </div>
+                    </div>
+
                     <div class="bookstack-bars">
                         <ul>
 

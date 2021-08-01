@@ -54,6 +54,7 @@ function load_doc(url,wd,without_history) {
             $("#article-title").text(doc_title);
 
             $(".bookmark-action").attr("data-docid",res.data.doc_id);
+            $("input[name=doc_id]").val(res.data.doc_id)
             $(".btn-edit").attr("href",$(".btn-edit").attr("data-url")+res.data.doc_id);
             if (res.data.bookmark){//已添加书签
                 $(".bookmark-action .bookmark-add").addClass("hide");
@@ -93,6 +94,7 @@ function load_doc(url,wd,without_history) {
             $(".updated-at").text(res.data.updated_at);
             initLinkWithImage()
             ilazyload()
+            initComments(res.data.comments)
         }else{
             // location.href=$url;
             //可能是存在缓存导致的加载失败，如果加载失败，直接刷新需要打开的链接【注意layer.js的引入】
@@ -101,6 +103,26 @@ function load_doc(url,wd,without_history) {
         }
         show_copy_btn();
     })
+}
+
+function dateFormat(fmt, date) {
+    var ret;
+    const opt = {
+        "Y+": date.getFullYear().toString(),        // 年
+        "m+": (date.getMonth() + 1).toString(),     // 月
+        "d+": date.getDate().toString(),            // 日
+        "H+": date.getHours().toString(),           // 时
+        "M+": date.getMinutes().toString(),         // 分
+        "S+": date.getSeconds().toString()          // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+    };
+    for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+            fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+        };
+    };
+    return fmt;
 }
 
 function initHighlighting() {
@@ -174,6 +196,25 @@ function disableRightClick(){
     $('body').on('contextmenu','audio,video', function(e) {
         e.preventDefault();
     });
+}
+
+function initComments(comments){
+    var arr = []
+    try {
+        for (var index = 0; index < comments.length; index++) {
+            const element = comments[index];
+            console.log(element)
+            var html='<div class="row"><div class="col-xs-12"><img src="'+element.avatar+'" class="img-thumbnail img-circle img-responsive" alt="'+element.nickname+'"/><span class="username">'+element.nickname+'</span></div><div class="col-xs-12 comments-content">';
+            if(element.pid>0){
+                html+='<div class="reply-to"><span class="text-info">'+element.reply_to_user+'</span>: '+element.reply_to_content+'</div>';
+            }
+            html+='<div>'+element.content+'</div></div><div class="col-xs-12"><span class="text-muted"><i class="fa fa-clock-o"></i> '+dateFormat('YYYY-mm-dd HH:MM:SS', new Date(element.created_at))+'</span><span class="reply" data-pid="'+element.id+'"><i class="fa fa-comments-o"></i> 回复</span></div></div>';
+            arr.push(html)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+    $(".comments-list").html(arr.join(''))
 }
 
 $(function () {
@@ -486,8 +527,13 @@ $(function () {
     });
 
 
-    // 左右方向键，切换上下章节
+    // 左右方向键，切换上下章节。
     $(document).keydown(function (event) {
+        // 如果焦点在文本框，则不切换上下章节
+        if($("textarea").is(":focus")){
+            return
+        }
+        
         switch (event.keyCode) {
             case 37:
                 var href=$(".hung-pre a").attr("href");

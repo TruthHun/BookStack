@@ -216,9 +216,10 @@ func CountCategory() {
 
 	sql := "select count(bc.id) cnt, bc.category_id from md_book_category bc left join md_books b on b.book_id=bc.book_id where b.privately_owned=0 and bc.category_id>0  group by bc.category_id"
 	o.Raw(sql).QueryRows(&count)
-	if len(count) == 0 {
-		_, err = o.QueryTable(tableCate).Filter("id__gt", 0).Update(orm.Params{"cnt": 0})
-		return
+
+	// 重置为0
+	if _, err = o.QueryTable(tableCate).Filter("id__gt", 0).Update(orm.Params{"cnt": 0}); err != nil {
+		beego.Error(err)
 	}
 
 	for _, item := range count {

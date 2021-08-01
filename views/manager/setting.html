@@ -4,6 +4,7 @@
     {{template "widgets/head.html" .}}
     <style>
         .checkbox, .radio{margin-top: 0px;}
+        #gloablEditForm .form-group{margin-bottom: 20px;}
     </style>
 </head>
 <body>
@@ -21,352 +22,422 @@
                         <a href="{{urlfor "ManagerController.RebuildAllIndex"}}" class="ajax-get pull-right btn btn-success">更新全量索引</a>
                     </div>
                 </div>
+                <ul class="nav nav-tabs mgt-15px">
+                    <li {{if eq .Tab "basic"}}class="active"{{end}}><a href="?tab=basic">基础</a></li>
+                    <li {{if eq .Tab "ui"}}class="active"{{end}}><a href="?tab=ui">界面</a></li>
+                    <li {{if eq .Tab "user"}}class="active"{{end}}><a href="?tab=user">用户</a></li>
+                    <li {{if eq .Tab "search"}}class="active"{{end}}><a href="?tab=search">搜索</a></li>
+                    <li {{if eq .Tab "content"}}class="active"{{end}}><a href="?tab=content">内容</a></li>
+                    <li {{if eq .Tab "operation"}}class="active"{{end}}><a href="?tab=operation">运营</a></li>
+                    <li {{if eq .Tab "app"}}class="active"{{end}}><a href="?tab=app">APP/小程序</a></li>
+                  </ul>
                 <div class="box-body" style="padding-bottom: 200px;">
                     <form method="post" id="gloablEditForm" action="{{urlfor "ManagerController.Setting"}}">
+
+                        {{if eq .Tab "basic"}}
+                            <!-- 基础配置 -->
                             <div class="form-group">
                                 <label>网站名称</label>
                                 <input type="text" class="form-control" name="SITE_NAME" id="siteName" placeholder="网站标题" value="{{.SITE_NAME.OptionValue}}">
+                                <div class="help-block">请输入您的网站名称，如：书栈网</div>
                             </div>
                             <div class="form-group">
                                 <label>网站备案</label>
                                 <input type="text" class="form-control" name="ICP" id="ICP" placeholder="网站备案" value="{{.ICP.OptionValue}}">
+                                <div class="help-block">如果您的网站部署在大陆，需要进行ICP备案，请在此处填写您的备案号，如：粤ICP备 XXXX-1 号</div>
                             </div>
-                        <div class="form-group">
-                            <label>版本控制</label>
-                            <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">
-                            <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>是否显示分类索引 ( <span class="text-muted">首页一级分类太多的时候，建议显示，以便用户快速定位分类位置</span>)</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "true"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="true">显示<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "false"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="false">不显示<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>默认首页</label>
+                                <input type="text" name="DEFAULT_HOME_PAGE" class="form-control" value="{{.DEFAULT_HOME_PAGE.OptionValue}}">
+                                <div class="help-block">
+                                    请填写您的网站默认首页的链接地址。留空或者设置为 <span class="text-danger">/</span> 表示采用默认的首页；<span class="text-danger">/cate</span> 表示设置【分类】页为首页；<span class="text-danger">/explore</span> 表示设置【发现】页为首页；以此类推，想要设置哪个页面为首页，只需要在此次填写对应的访问路径。同时支持填写外部链接地址为首页，如： https://www.baidu.com 等。</span>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>是否允许游客访问 ( <span class="text-muted">禁止游客访问之后，用户必须先登录才能访问内容</span>)</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "true"}}checked{{end}} name="ENABLE_ANONYMOUS" value="true">允许<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "false"}}checked{{end}} name="ENABLE_ANONYMOUS" value="false">禁止<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>站点统计</label>
+                                <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="4">{{.TONGJI.OptionValue}}</textarea>
+                                <div class="help-block">请填写您的站点统计代码，用以统计站点访客信息等</div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label>是否开放注册</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "true"}}checked{{end}} name="ENABLED_REGISTER" value="true">开放注册<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "false"}}checked{{end}} name="ENABLED_REGISTER" value="false">关闭注册<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>禁止的Referer</label>
+                                <textarea name="FORBIDDEN_REFERER" PLACEHOLDER=""  class="form-control" rows="4">{{.FORBIDDEN_REFERER.OptionValue}}</textarea>
+                                <div class="help-block">
+                                    多个请换行，每行输入referer的关键字。此配置项的作用是为了一定程序限制恶意的referer出现在站点统计数据中。比如您填写关键字“路人假”，则凡是所有来源链接（即referer）中带有该关键字的，都会被重置referer。
+                                </div>
                             </div>
-                        </div>
+                        {{end}}
 
-                        <div class="form-group">
-                            <label>目录默认状态</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "true"}}checked{{end}} name="COLLAPSE_HIDE" value="true">收起<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "false"}}checked{{end}} name="COLLAPSE_HIDE" value="false">展开<span class="text"></span>
-                                </label>
+
+                        {{if eq .Tab "ui"}}
+                        <!-- 界面配置 -->
+                            <div class="form-group">
+                                <label>是否显示分类索引</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "true"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="true">显示<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .SHOW_CATEGORY_INDEX.OptionValue "false"}}checked{{end}} name="SHOW_CATEGORY_INDEX" value="false">不显示<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    分类页中的一级分类太多的时候，建议在页面左侧显示分类索引，以便用户快速定位分类位置
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>启用验证码</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_CAPTCHA.OptionValue "true"}}checked{{end}} name="ENABLED_CAPTCHA" value="true">开启<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ENABLED_CAPTCHA.OptionValue "false"}}checked{{end}} name="ENABLED_CAPTCHA" value="false">关闭<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>是否隐藏导航栏收录入口</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "true"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="true">隐藏<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "false"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="false">显示<span class="text"></span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>是否隐藏导航栏收录入口</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "true"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="true">隐藏<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_SUBMIT_ENTER.OptionValue "false"}}checked{{end}} name="CLOSE_SUBMIT_ENTER" value="false">显示<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>是否隐藏导航栏开源入口</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .CLOSE_OPEN_SOURCE_LINK.OptionValue "true"}}checked{{end}} name="CLOSE_OPEN_SOURCE_LINK" value="true">隐藏<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .CLOSE_OPEN_SOURCE_LINK.OptionValue "false"}}checked{{end}} name="CLOSE_OPEN_SOURCE_LINK" value="false">显示<span class="text"></span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label>是否隐藏导航栏开源入口</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_OPEN_SOURCE_LINK.OptionValue "true"}}checked{{end}} name="CLOSE_OPEN_SOURCE_LINK" value="true">隐藏<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .CLOSE_OPEN_SOURCE_LINK.OptionValue "false"}}checked{{end}} name="CLOSE_OPEN_SOURCE_LINK" value="false">显示<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>是否隐藏导航栏"标签"</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .HIDE_TAG.OptionValue "true"}}checked{{end}} name="HIDE_TAG" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .HIDE_TAG.OptionValue "false"}}checked{{end}} name="HIDE_TAG" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>默认首页( <span class="text-muted"> <span class="text-danger">/</span> 表示不设置；<span class="text-danger">/cate</span> 表示设置【分类】页为首页；<span class="text-danger">/explore</span> 表示设置【发现】页为首页；以此类推，想要设置哪个页面为首页，只需要在此次填写对应的访问路径。 </span> )</label>
-                            <input type="text" name="DEFAULT_HOME_PAGE" class="form-control" value="{{.DEFAULT_HOME_PAGE.OptionValue}}">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "true"}}checked{{end}} name="AUTO_HTTPS" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "false"}}checked{{end}} name="AUTO_HTTPS" value="false">否<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>是否启用宽屏</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .WIDESCREEN.OptionValue "true"}}checked{{end}} name="WIDESCREEN" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .WIDESCREEN.OptionValue "false"}}checked{{end}} name="WIDESCREEN" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    启用宽屏，网站页面将占满浏览器屏幕
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label>是否隐藏导航栏"标签"</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .HIDE_TAG.OptionValue "true"}}checked{{end}} name="HIDE_TAG" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .HIDE_TAG.OptionValue "false"}}checked{{end}} name="HIDE_TAG" value="false">否<span class="text"></span>
-                                </label>
+
+                            <div class="form-group">
+                                <label>目录默认状态</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "true"}}checked{{end}} name="COLLAPSE_HIDE" value="true">收起<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .COLLAPSE_HIDE.OptionValue "false"}}checked{{end}} name="COLLAPSE_HIDE" value="false">展开<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    内容阅读页面，左侧章节目录默认展开还是收起
+                                </div>
                             </div>
-                        </div>
+                        {{end}}
 
-                        <div class="form-group">
-                            <label>是否启用宽屏 ( <span class="text-muted">启用宽屏，网站页面将占满浏览器屏幕</span>)</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .WIDESCREEN.OptionValue "true"}}checked{{end}} name="WIDESCREEN" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .WIDESCREEN.OptionValue "false"}}checked{{end}} name="WIDESCREEN" value="false">否<span class="text"></span>
-                                </label>
+
+                        {{if eq .Tab "user"}}
+                            <div class="form-group">
+                                <label>是否允许游客访问</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "true"}}checked{{end}} name="ENABLE_ANONYMOUS" value="true">允许<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLE_ANONYMOUS.OptionValue "false"}}checked{{end}} name="ENABLE_ANONYMOUS" value="false">禁止<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    禁止游客访问之后，用户必须先登录才能访问内容
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>开启QQ登录</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "true"}}checked{{end}} name="LOGIN_QQ" value="true">开启<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_QQ.OptionValue "false"}}checked{{end}} name="LOGIN_QQ" value="false">关闭<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>是否开放注册</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "true"}}checked{{end}} name="ENABLED_REGISTER" value="true">开放注册<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLED_REGISTER.OptionValue "false"}}checked{{end}} name="ENABLED_REGISTER" value="false">关闭注册<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">如果不开放注册，则注册入口和功能将被屏蔽</div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>开启GitHub登录</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_GITHUB.OptionValue "true"}}checked{{end}} name="LOGIN_GITHUB" value="true">开启<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_GITHUB.OptionValue "false"}}checked{{end}} name="LOGIN_GITHUB" value="false">关闭<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>启用验证码</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLED_CAPTCHA.OptionValue "true"}}checked{{end}} name="ENABLED_CAPTCHA" value="true">开启<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ENABLED_CAPTCHA.OptionValue "false"}}checked{{end}} name="ENABLED_CAPTCHA" value="false">关闭<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    启用验证码，可以在一定程序上防止暴力注册和登录
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label>开启码云登录</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_GITEE.OptionValue "true"}}checked{{end}} name="LOGIN_GITEE" value="true">开启<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .LOGIN_GITEE.OptionValue "false"}}checked{{end}} name="LOGIN_GITEE" value="false">关闭<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>开启QQ登录</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_QQ.OptionValue "true"}}checked{{end}} name="LOGIN_QQ" value="true">开启<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_QQ.OptionValue "false"}}checked{{end}} name="LOGIN_QQ" value="false">关闭<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">需要在配置文件中预先配置 QQ 登录的相关配置项</div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>一键采集器，是否仅对管理员开放</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .SPIDER.OptionValue "true"}}checked{{end}} name="SPIDER" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .SPIDER.OptionValue "false"}}checked{{end}} name="SPIDER" value="false">否<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>开启GitHub登录</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_GITHUB.OptionValue "true"}}checked{{end}} name="LOGIN_GITHUB" value="true">开启<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_GITHUB.OptionValue "false"}}checked{{end}} name="LOGIN_GITHUB" value="false">关闭<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">需要在配置文件中预先配置 Github 登录的相关配置项</div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label>是否都可以创建书籍( <span class="text-muted"> 选择是，<span class="text-danger">所有人</span>都可以创建书籍书籍；选择否，只有 <span class="text-danger">作者</span> 和 <span class="text-danger">管理员</span> 才能创建书籍</span> )</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ALL_CAN_WRITE_BOOK.OptionValue "true"}}checked{{end}} name="ALL_CAN_WRITE_BOOK" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ALL_CAN_WRITE_BOOK.OptionValue "false"}}checked{{end}} name="ALL_CAN_WRITE_BOOK" value="false">否<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>开启码云登录</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_GITEE.OptionValue "true"}}checked{{end}} name="LOGIN_GITEE" value="true">开启<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .LOGIN_GITEE.OptionValue "false"}}checked{{end}} name="LOGIN_GITEE" value="false">关闭<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">需要在配置文件中预先配置 Gitee（码云） 登录的相关配置项</div>
                             </div>
-                        </div>
 
-
-                        <div class="form-group">
-                            <label>获取访客真实IP的request header字段</label>
-                            <input type="text" name="REAL_IP_FIELD" class="form-control" value="{{.REAL_IP_FIELD.OptionValue}}">
-                            <small class="help-block">
-                                常见的字段有：X-Real-Ip、X-Forwarded-For、Remote-Host，如果您的网站使用了CDN，则您的request header字段可能不一样。
-                                您可以通过GET的方式访问： <span class="text-danger">http://您的域名/bookchat/api/v1/register</span> 的方式来查看获取真实IP的字段。
-                            </small>
-                        </div>
-
-                        <div class="form-group">
-                            <label>同一IP每小时允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
-                            <input type="number" name="HOUR_REG_NUM" class="form-control" value="{{.HOUR_REG_NUM.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>同一IP每天允许注册人数( <span class="text-muted">针对APP和小程序接口请求注册的用户。0 表示不限制</span> )</label>
-                            <input type="number" name="DAILY_REG_NUM" class="form-control" value="{{.DAILY_REG_NUM.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>移动端横幅宽高比( <span class="text-muted">填写横幅宽高比例数字，如长300，宽100，则填3或3.0。【针对 <a href="/manager/banners" target="_blank">横幅管理</a> 中的移动端横幅比例】</span> )</label>
-                            <input type="number" name="MOBILE_BANNER_SIZE" class="form-control" value="{{.MOBILE_BANNER_SIZE.OptionValue}}">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label>手机APP版本号( <span class="text-muted">应用版本号，必须是整数，用于提示用户升级APP</span> )</label>
-                            <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>App Store审核中的版本( <span class="text-muted">如v1.5.0。iOS APP审核通过后，请务必置空，避免屏蔽的内容无法在APP端显示</span> )</label>
-                            <input type="text" name="CheckingAppVersion" class="form-control" value="{{.CheckingAppVersion.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>App Store审核时屏蔽的关键字( <span class="text-muted">多个关键字用英文逗号分隔</span> )</label>
-                            <input type="text" name="CheckingForbidWords" class="form-control" value="{{.CheckingForbidWords.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>手机APP下载单页( <span class="text-muted">如果单页链接不为空，则会在导航栏显示APP下载页面</span> )</label>
-                            <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>是否展示APP下载二维码( <span class="text-muted">请填写二维码图片链接。如果不为空，则用户在下载电子书的时候展示APP下载二维码</span> )</label>
-                            <input type="text" name="APP_QRCODE" class="form-control" value="{{.APP_QRCODE.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>是否需要登录才能下载电子书( <span class="text-muted">如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载</span> )</label>
-                            <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>每天每次阅读学习多少分钟可以下载一本电子书( <span class="text-muted">默认每阅读学习1分钟可以下载一本电子书，0表示不限制</span> )</label>
-                            <input type="text" name="DOWNLOAD_INTERVAL" class="form-control" value="{{.DOWNLOAD_INTERVAL.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>电子书下载码( <span class="text-muted">适合推广微信公众号：用户关注公众号 -> 用户发送相关指令 -> 公众号回复下载码 -> 用户在网站输入下载码下载电子书。置空则表示不启用该功能。</span> )</label>
-                            <input type="text" name="DOWNLOAD_WECODE" class="form-control" value="{{.DOWNLOAD_WECODE.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>签到基础奖励阅读时长(秒)</label>
-                            <input type="number" name="SIGN_BASIC_REWARD" class="form-control" value="{{.SIGN_BASIC_REWARD.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>APP签到额外奖励阅读时长(秒)</label>
-                            <input type="number" name="SIGN_APP_REWARD" class="form-control" value="{{.SIGN_APP_REWARD.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>用户连续签到奖励阅读时长(秒)</label>
-                            <input type="number" name="SIGN_CONTINUOUS_REWARD" class="form-control" value="{{.SIGN_CONTINUOUS_REWARD.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>连续签到奖励阅读时长上限(秒)</label>
-                            <input type="number" name="SIGN_CONTINUOUS_MAX_REWARD" class="form-control" value="{{.SIGN_CONTINUOUS_MAX_REWARD.OptionValue}}">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label>内容最小阅读计时间隔(秒)</label>
-                            <input type="number" name="READING_MIN_INTERVAL" class="form-control" value="{{.READING_MIN_INTERVAL.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>内容最大阅读计时间隔(秒)</label>
-                            <input type="number" name="READING_MAX_INTERVAL" class="form-control" value="{{.READING_MAX_INTERVAL.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>内容阅读计时间隔最大奖励(秒)</label>
-                            <input type="number" name="READING_INTERVAL_MAX_REWARD" class="form-control" value="{{.READING_INTERVAL_MAX_REWARD.OptionValue}}">
-                        </div>
-                        <div class="form-group">
-                            <label>内容阅读无效计时间隔(秒)</label>
-                            <input type="number" name="READING_INVALID_INTERVAL" class="form-control" value="{{.READING_INVALID_INTERVAL.OptionValue}}">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label>是否开启全文搜索( <span class="text-muted">每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果 </span> )</label>
-                            <div class="radio">
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "true"}}checked{{end}} name="ELASTICSEARCH_ON" value="true">是<span class="text"></span>
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "false"}}checked{{end}} name="ELASTICSEARCH_ON" value="false">否<span class="text"></span>
-                                </label>
+                            <div class="form-group">
+                                <label>获取访客真实IP的request header字段</label>
+                                <input type="text" name="REAL_IP_FIELD" class="form-control" value="{{.REAL_IP_FIELD.OptionValue}}">
+                                <div class="help-block">
+                                    常见的字段有：X-Real-Ip、X-Forwarded-For、Remote-Host，如果您的网站使用了CDN，则您的request header字段可能不一样。
+                                    您可以通过GET的方式访问： <span class="text-danger">http://您的域名/bookchat/api/v1/register</span> 的方式来查看获取真实IP的字段。
+                                </div>
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label>同一IP每小时允许注册人数</label>
+                                <input type="number" name="HOUR_REG_NUM" class="form-control" value="{{.HOUR_REG_NUM.OptionValue}}">
+                                <div class="help-block">针对APP和小程序接口请求注册的用户。0 表示不限制</div>
+                            </div>
+                            <div class="form-group">
+                                <label>同一IP每天允许注册人数</label>
+                                <input type="number" name="DAILY_REG_NUM" class="form-control" value="{{.DAILY_REG_NUM.OptionValue}}">
+                                <div class="help-block">
+                                    针对APP和小程序接口请求注册的用户。0 表示不限制
+                                </div>
+                            </div>
+                        {{end}}
 
-                        <div class="form-group">
-                            <label>ElasticSearch全文搜索地址</label>
-                            <input type="text" name="ELASTICSEARCH_HOST" class="form-control" value="{{.ELASTICSEARCH_HOST.OptionValue}}">
-                        </div>
+                        {{if eq .Tab "search"}}
+                            <div class="form-group">
+                                <label>是否开启全文搜索</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "true"}}checked{{end}} name="ELASTICSEARCH_ON" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ELASTICSEARCH_ON.OptionValue "false"}}checked{{end}} name="ELASTICSEARCH_ON" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    每次重新启用全文搜索，请务必点击右上角的 <strong>更新全量索引</strong> 按钮，以免用户搜索不到结果
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>ElasticSearch全文搜索地址</label>
+                                <input type="text" name="ELASTICSEARCH_HOST" class="form-control" value="{{.ELASTICSEARCH_HOST.OptionValue}}">
+                                <div class="help-block"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>默认搜索</label>
+                                <select name="DEFAULT_SEARCH" class="form-control">
+                                    <option {{if eq .DEFAULT_SEARCH.OptionValue "book"}}selected{{end}} value="book">搜索书籍</option>
+                                    <option {{if eq .DEFAULT_SEARCH.OptionValue "doc"}}selected{{end}} value="doc">搜索文档</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>搜索结果精度( <span class="text-muted">可选值：0 ~ 100，值越大，精度越大</span> )</label>
+                                <input type="number" min="0" class="form-control" max="100" name="SEARCH_ACCURACY" value="{{.SEARCH_ACCURACY.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>是否开启关联书籍功能( <span class="text-muted">数值，大于0表示开启并把关联结果缓存xx天，其他值表示不开启。<strong class="text-danger">需开启全文搜索!!!</strong></span> )</label>
+                                <input type="number" min="0" max="365" class="form-control" name="RELATE_BOOK" value="{{.RELATE_BOOK.OptionValue}}">
+                            </div>
+                        {{end}}
 
-                        <div class="form-group">
-                            <label>默认搜索</label>
-                            <select name="DEFAULT_SEARCH" class="form-control">
-                                <option {{if eq .DEFAULT_SEARCH.OptionValue "book"}}selected{{end}} value="book">搜索书籍</option>
-                                <option {{if eq .DEFAULT_SEARCH.OptionValue "doc"}}selected{{end}} value="doc">搜索文档</option>
-                            </select>
-                        </div>
+                        {{if eq .Tab "content"}}
+                        
+                            <div class="form-group">
+                                <label>版本控制</label>
+                                <input type="number" name="ENABLE_DOCUMENT_HISTORY" class="form-control" value="{{.ENABLE_DOCUMENT_HISTORY.OptionValue}}">
+                                <div class="help-block">如果启用版本控制，请填写大于0的数字，表示每个文档的最大版本数。</div>
+                            </div>
 
-                        <div class="form-group">
-                            <label>搜索结果精度( <span class="text-muted">可选值：0 ~ 100，值越大，精度越大</span> )</label>
-                            <input type="number" min="0" class="form-control" max="100" name="SEARCH_ACCURACY" value="{{.SEARCH_ACCURACY.OptionValue}}">
-                        </div>
+                            <div class="form-group">
+                                <label>{{.AUTO_HTTPS.OptionTitle}} ( <span class="text-muted">将图片链接由 http:// 自动替换为 https:// </span>)</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "true"}}checked{{end}} name="AUTO_HTTPS" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .AUTO_HTTPS.OptionValue "false"}}checked{{end}} name="AUTO_HTTPS" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>一键采集器，是否仅对管理员开放</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .SPIDER.OptionValue "true"}}checked{{end}} name="SPIDER" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .SPIDER.OptionValue "false"}}checked{{end}} name="SPIDER" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>是否都可以创建书籍</label>
+                                <div class="radio">
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ALL_CAN_WRITE_BOOK.OptionValue "true"}}checked{{end}} name="ALL_CAN_WRITE_BOOK" value="true">是<span class="text"></span>
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" {{if eq .ALL_CAN_WRITE_BOOK.OptionValue "false"}}checked{{end}} name="ALL_CAN_WRITE_BOOK" value="false">否<span class="text"></span>
+                                    </label>
+                                </div>
+                                <div class="help-block">
+                                    <span class="text-muted"> 选择是，<span class="text-danger">所有人</span>都可以创建书籍书籍；选择否，只有 <span class="text-danger">作者</span> 和 <span class="text-danger">管理员</span> 才能创建书籍</span>
+                                </div>
+                            </div>
+                        {{end}}
+                       
+                        {{if eq .Tab "app"}}
+                            <div class="form-group">
+                                <label>移动端横幅宽高比</label>
+                                <input type="number" name="MOBILE_BANNER_SIZE" class="form-control" value="{{.MOBILE_BANNER_SIZE.OptionValue}}">
+                                <div class="help-block">
+                                    填写横幅宽高比例数字，如长300，宽100，则填3或3.0。【针对 <a href="/manager/banners" target="_blank">横幅管理</a> 中的移动端横幅比例】
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>手机APP版本号</label>
+                                <input type="number" name="APP_VERSION" class="form-control" value="{{.APP_VERSION.OptionValue}}">
+                                <div class="help-block">
+                                    应用版本号，必须是整数，用于提示用户升级APP
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>App Store审核中的版本</label>
+                                <input type="text" name="CheckingAppVersion" class="form-control" value="{{.CheckingAppVersion.OptionValue}}">
+                                <div class="help-block">
+                                    如v1.5.0。iOS APP审核通过后，请务必置空，避免屏蔽的内容无法在APP端显示
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>App Store审核时屏蔽的关键字</label>
+                                <input type="text" name="CheckingForbidWords" class="form-control" value="{{.CheckingForbidWords.OptionValue}}">
+                                <div class="help-block">
+                                    多个关键字用英文逗号分隔。如屏蔽关键字“Android”，以避免APP上架App Store审核时不通过...（真实遭遇）
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>手机APP下载单页</label>
+                                <input type="text" name="APP_PAGE" class="form-control" value="{{.M_APP_PAGE.OptionValue}}">
+                                <div class="help-block">
+                                    如果单页链接不为空，则会在导航栏显示APP下载页面
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>是否展示APP下载二维码</label>
+                                <input type="text" name="APP_QRCODE" class="form-control" value="{{.APP_QRCODE.OptionValue}}">
+                                <div class="help-block">
+                                    请填写二维码图片链接。如果不为空，则用户在下载电子书的时候展示APP下载二维码
+                                </div>
+                            </div>
+                        {{end}}
 
-                        <div class="form-group">
-                            <label>是否开启关联书籍功能( <span class="text-muted">数值，大于0表示开启并把关联结果缓存xx天，其他值表示不开启。<strong class="text-danger">需开启全文搜索!!!</strong></span> )</label>
-                            <input type="number" min="0" max="365" class="form-control" name="RELATE_BOOK" value="{{.RELATE_BOOK.OptionValue}}">
-                        </div>
-
-                        <div class="form-group">
-                            <label>站点统计</label>
-                            <textarea name="TONGJI" PLACEHOLDER="站点统计代码"  class="form-control" rows="4">{{.TONGJI.OptionValue}}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>禁止的Referer (<small class="text-muted">多个请换行，每行输入referer的关键字</small>)</label>
-                            <textarea name="FORBIDDEN_REFERER" PLACEHOLDER=""  class="form-control" rows="4">{{.FORBIDDEN_REFERER.OptionValue}}</textarea>
-                        </div>
-
-
-                        <div class="form-group">
-                            <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
-                            <span id="form-error-message" class="error-message"></span>
-                        </div>
+                        {{if eq .Tab "operation"}}
+                            <div class="form-group">
+                                <label>是否需要登录才能下载电子书</label>
+                                <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
+                                <div class="help-block">
+                                    如果需要登录才能下载电子书，请输入相关登录下载提示；置空则表示允许免登录下载
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>每天每次阅读学习多少分钟可以下载一本电子书</label>
+                                <input type="text" name="DOWNLOAD_INTERVAL" class="form-control" value="{{.DOWNLOAD_INTERVAL.OptionValue}}">
+                                <div class="help-block">
+                                    默认每阅读学习1分钟可以下载一本电子书，0表示不限制
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>电子书下载码</label>
+                                <input type="text" name="DOWNLOAD_WECODE" class="form-control" value="{{.DOWNLOAD_WECODE.OptionValue}}">
+                                <div class="help-block">适合推广微信公众号：用户关注公众号 -> 用户发送相关指令 -> 公众号回复下载码 -> 用户在网站输入下载码下载电子书。置空则表示不启用该功能。</div>
+                            </div>
+                            <div class="form-group">
+                                <label>签到基础奖励阅读时长(秒)</label>
+                                <input type="number" name="SIGN_BASIC_REWARD" class="form-control" value="{{.SIGN_BASIC_REWARD.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>APP签到额外奖励阅读时长(秒)</label>
+                                <input type="number" name="SIGN_APP_REWARD" class="form-control" value="{{.SIGN_APP_REWARD.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>用户连续签到奖励阅读时长(秒)</label>
+                                <input type="number" name="SIGN_CONTINUOUS_REWARD" class="form-control" value="{{.SIGN_CONTINUOUS_REWARD.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>连续签到奖励阅读时长上限(秒)</label>
+                                <input type="number" name="SIGN_CONTINUOUS_MAX_REWARD" class="form-control" value="{{.SIGN_CONTINUOUS_MAX_REWARD.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>内容最小阅读计时间隔(秒)</label>
+                                <input type="number" name="READING_MIN_INTERVAL" class="form-control" value="{{.READING_MIN_INTERVAL.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>内容最大阅读计时间隔(秒)</label>
+                                <input type="number" name="READING_MAX_INTERVAL" class="form-control" value="{{.READING_MAX_INTERVAL.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>内容阅读计时间隔最大奖励(秒)</label>
+                                <input type="number" name="READING_INTERVAL_MAX_REWARD" class="form-control" value="{{.READING_INTERVAL_MAX_REWARD.OptionValue}}">
+                            </div>
+                            <div class="form-group">
+                                <label>内容阅读无效计时间隔(秒)</label>
+                                <input type="number" name="READING_INVALID_INTERVAL" class="form-control" value="{{.READING_INVALID_INTERVAL.OptionValue}}">
+                            </div>
+                        {{end}}
+                        
+                        
+                            <div class="form-group">
+                                <button type="submit" id="btnSaveBookInfo" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
+                                <span id="form-error-message" class="error-message"></span>
+                            </div>
                         </form>
 
                     <div class="clearfix"></div>
@@ -389,11 +460,6 @@
     $(function () {
         $("#gloablEditForm").ajaxForm({
             beforeSubmit : function () {
-                var title = $.trim($("#siteName").val());
-
-                if (title === ""){
-                    return showError("网站标题不能为空");
-                }
                 $("#btnSaveBookInfo").button("loading");
             },success : function (res) {
                 if(res.errcode === 0) {

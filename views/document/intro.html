@@ -170,7 +170,9 @@
                                         <div class="col-xs-12">
                                             <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="{{.Nickname}}">
                                             <span class="username">{{.Nickname}}</span>
-                                            <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
+                                            {{if gt .Score 0}}
+                                                <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
+                                            {{end}}
                                         </div>
                                         <div class="col-xs-12 comments-content">
                                             {{if gt .Pid 0}}
@@ -183,7 +185,7 @@
                                                 <i class="fa fa-clock-o"></i>
                                                 {{date .TimeCreate "Y-m-d H:i:s"}}
                                             </span>
-                                            <span class="repley" data-pid="{{.Id}}">
+                                            <span class="reply" data-pid="{{.Id}}">
                                                 <i class="fa fa-comments-o"></i> 回复
                                             </span>
                                         </div>

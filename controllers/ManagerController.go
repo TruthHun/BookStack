@@ -639,7 +639,7 @@ func (this *ManagerController) CreateToken() {
 }
 
 func (this *ManagerController) Setting() {
-
+	tab := this.GetString("tab", "basic")
 	options, err := models.NewOption().All()
 	if err != nil {
 		this.Abort("404")
@@ -647,12 +647,16 @@ func (this *ManagerController) Setting() {
 
 	if this.Ctx.Input.IsPost() {
 		for _, item := range options {
-			item.OptionValue = this.GetString(item.OptionName)
-			item.InsertOrUpdate()
+			if _, ok := this.Ctx.Request.PostForm[item.OptionName]; ok {
+				item.OptionValue = this.GetString(item.OptionName)
+				item.InsertOrUpdate()
+			}
 		}
+
 		if err := models.NewElasticSearchClient().Init(); err != nil {
 			this.JsonResult(1, err.Error())
 		}
+
 		models.NewSign().UpdateSignRule()
 		models.NewReadRecord().UpdateReadingRule()
 		this.JsonResult(0, "ok")
@@ -667,7 +671,7 @@ func (this *ManagerController) Setting() {
 		}
 	}
 	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
-
+	this.Data["Tab"] = tab
 	this.Data["IsSetting"] = true
 	this.Data["SeoTitle"] = "配置管理"
 	this.TplName = "manager/setting.html"
@@ -725,10 +729,12 @@ func (this *ManagerController) Comments() {
 	p, _ := this.GetInt("page", 1)
 	size, _ := this.GetInt("size", 10)
 	m := models.NewComments()
+	opt := models.CommentOpt{}
 	if status == "" {
-		this.Data["Comments"], _ = m.Comments(p, size, 0)
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	} else {
-		this.Data["Comments"], _ = m.Comments(p, size, 0, statusNum)
+		opt.Status = []int{statusNum}
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	}
 	this.Data["IsComments"] = true
 	this.Data["Status"] = status
