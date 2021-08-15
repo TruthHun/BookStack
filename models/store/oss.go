@@ -213,6 +213,11 @@ func (o *Oss) DelOssFolder(folder string) (err error) {
 	return
 }
 
+func (o *Oss) DelOssFile(file string) (err error) {
+	err = o.DelFromOss(strings.TrimLeft(file, "./"))
+	return
+}
+
 func (o *Oss) GetFileReader(objKey string) (reader io.ReadCloser, err error) {
 	var bucket *oss.Bucket
 	bucket, err = o.GetBucket()
