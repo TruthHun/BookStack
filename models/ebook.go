@@ -271,13 +271,14 @@ func (m *Ebook) generate(bookID int) {
 		}
 	}
 
+	o := orm.NewOrm()
 	docStore := NewDocumentStore()
 	baseUrl := "http://localhost:" + strconv.Itoa(beego.AppConfig.DefaultInt("httport", 8181))
 	for _, doc := range docs {
 		content := strings.TrimSpace(docStore.GetFiledById(doc.DocumentId, "content"))
 		if utils.GetTextFromHtml(content) == "" { //内容为空，渲染文档内容，并再重新获取文档内容
 			utils.RenderDocumentById(doc.DocumentId)
-			orm.NewOrm().Read(doc, "document_id")
+			o.Read(doc, "document_id")
 		}
 
 		//将图片链接更换成绝对链接
@@ -363,6 +364,8 @@ func (m *Ebook) generate(bookID int) {
 	if err = Convert.Convert(); err != nil && err.Error() != "" {
 		beego.Error(err.Error())
 	}
+	// 转换已经结束，还处在转换状态的电子书为失败的电子书
+	o.QueryTable(m).Filter("book_id", book.BookId).Filter("status", EBookStatusPending).Update(orm.Params{"status": EBookStatusFailure})
 }
 
 func (m *Ebook) deleteBook(bookId int) {
