@@ -365,7 +365,7 @@ func (m *Ebook) generate(bookID int) {
 		beego.Error(err.Error())
 	}
 	// 转换已经结束，还处在转换状态的电子书为失败的电子书
-	o.QueryTable(m).Filter("book_id", book.BookId).Filter("status", EBookStatusPending).Update(orm.Params{"status": EBookStatusFailure})
+	o.QueryTable(m).Filter("book_id", book.BookId).Filter("status", EBookStatusProccessing).Update(orm.Params{"status": EBookStatusFailure})
 }
 
 func (m *Ebook) deleteBook(bookId int) {
