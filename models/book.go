@@ -794,8 +794,10 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		return errors.New("克隆的书籍项目章节不存在")
 	}
 
-	oldIdentify := fmt.Sprintf("/%s/", sourceBookIdentify)
-	newIdentify := fmt.Sprintf("/%s/", m.Identify)
+	replacer := strings.NewReplacer(
+		fmt.Sprintf("/read/%s/", sourceBookIdentify), fmt.Sprintf("/read/%s/", m.Identify), // 内容中的阅读链接
+		fmt.Sprintf("/projects/%s/", sourceBookIdentify), fmt.Sprintf("/projects/%s/", m.Identify), // 内容中的相关附件
+	)
 
 	for _, doc := range sourceDocs {
 		oldDocId := doc.DocumentId
@@ -804,7 +806,7 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		doc.MemberId = m.MemberId
 
 		// 替换相关链接等
-		doc.Release = strings.ReplaceAll(doc.Release, oldIdentify, newIdentify)
+		doc.Release = replacer.Replace(doc.Release)
 		if _, err = o.Insert(&doc); err != nil {
 			return errors.New("新建章节失败：" + err.Error())
 		}
@@ -817,8 +819,8 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 	for _, ds := range sourceDocStores {
 		if newId, ok := docMap[ds.DocumentId]; ok {
 			ds.DocumentId = newId
-			ds.Markdown = strings.ReplaceAll(ds.Markdown, oldIdentify, newIdentify)
-			ds.Content = strings.ReplaceAll(ds.Markdown, oldIdentify, newIdentify)
+			ds.Markdown = replacer.Replace(ds.Markdown)
+			ds.Content = replacer.Replace(ds.Content)
 			o.Insert(&ds)
 		}
 	}
