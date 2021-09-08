@@ -804,9 +804,10 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		doc.DocumentId = 0
 		doc.BookId = m.BookId
 		doc.MemberId = m.MemberId
+		doc.Vcnt = 0
 
 		// 替换相关链接等
-		doc.Release = replacer.Replace(doc.Release)
+		doc.Release = ""
 		if _, err = o.Insert(&doc); err != nil {
 			return errors.New("新建章节失败：" + err.Error())
 		}
@@ -820,7 +821,7 @@ func (m *Book) Copy(sourceBookIdentify string) (err error) {
 		if newId, ok := docMap[ds.DocumentId]; ok {
 			ds.DocumentId = newId
 			ds.Markdown = replacer.Replace(ds.Markdown)
-			ds.Content = replacer.Replace(ds.Content)
+			ds.Content = ""
 			o.Insert(&ds)
 		}
 	}

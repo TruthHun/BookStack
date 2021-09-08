@@ -782,6 +782,7 @@ func (this *BookController) Delete() {
 // 发布书籍.
 func (this *BookController) Release() {
 	identify := this.GetString("identify")
+	force, _ := this.GetBool("force")
 	bookId := 0
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -807,7 +808,7 @@ func (this *BookController) Release() {
 		bookId = book.BookId
 	}
 
-	go models.NewDocument().ReleaseContent(bookId, this.BaseUrl())
+	go models.NewDocument().ReleaseContent(bookId, this.BaseUrl(), force)
 
 	this.JsonResult(0, "发布任务已推送到任务队列，稍后将在后台执行。")
 }

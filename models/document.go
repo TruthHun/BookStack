@@ -200,7 +200,7 @@ func (m *Document) RecursiveDocument(docId int) error {
 }
 
 //发布文档内容为HTML
-func (m *Document) ReleaseContent(bookId int, baseUrl string) {
+func (m *Document) ReleaseContent(bookId int, baseUrl string, force ...bool) {
 	var (
 		o           = orm.NewOrm()
 		docs        []*Document
@@ -231,13 +231,19 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			continue
 		}
 
-		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
-			// 如果markdown内容为空，则查询下一级目录内容来填充
-			_, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
-		} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
+		if len(force) > 0 && force[0] {
 			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
 			ds, _ = ModelStore.GetById(item.DocumentId)
+		} else {
+			if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
+				// 如果markdown内容为空，则查询下一级目录内容来填充
+				_, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
+			} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
+				//内容为空，渲染一下文档，然后再重新获取
+				utils.RenderDocumentById(item.DocumentId)
+				ds, _ = ModelStore.GetById(item.DocumentId)
+			}
 		}
 
 		item.Release = ds.Content

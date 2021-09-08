@@ -115,7 +115,7 @@ $(function () {
                 }
                 window.editor.resize();
             });
-       }else if(name === "release"){
+       }else if(name === "release" || name === "force-release"){
             if(Object.prototype.toString.call(window.documentCategory) === '[object Array]' && window.documentCategory.length > 0){
                 if($("#markdown-save").hasClass('change')) {
                     var comfirm_result = confirm("编辑内容未保存，需要保存吗？")
@@ -125,7 +125,7 @@ $(function () {
                 }
                 $.ajax({
                     url : window.releaseURL,
-                    data :{"identify" : window.book.identify },
+                    data :{"identify" : window.book.identify, "force": name === "force-release"},
                     type : "post",
                     dataType : "json",
                     success : function (res) {
