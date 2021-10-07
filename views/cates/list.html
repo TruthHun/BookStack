@@ -15,6 +15,7 @@
                 </div>
             </form>
         </div>
+        
         {{if .Recommends}}
             <div class="panel panel-default panel-recommend">
                 <div class="panel-heading">
@@ -22,7 +23,6 @@
                         <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"><i class="fa fa-thumbs-o-up"></i> 最新推荐</a>
                         <span style="color: #ddd;"> &nbsp;|&nbsp; </span>
                         <a href="{{urlfor "SettingController.Star"}}" style="color: #f44336" title="我的收藏"><i class="fa fa-heart"></i> 我的收藏</a>
-                        <span class="text-muted hidden-xs hidden-sm" style="margin-left: 30px;">猿生不能只有 <span class="text-red">Ctrl + C</span> 和 <span class="text-red">Ctrl + V</span>，还要有 <span class="text-red">Ctrl + D</span></span>
                         <small class="pull-right">
                             <a href="{{urlfor "HomeController.Index"}}?tab=recommend" title="更多推荐"> 更多 <i class="fa fa-angle-right"></i><i class="fa fa-angle-right"></i></a>
                         </small>
@@ -80,8 +80,8 @@
                                         <div class="col-xs-12 col-sm-6 col-md-4">
                                             <div class="cate-item clearfix" data-placement="bottom" title="{{$children.Intro}}">
                                                 <div>
-                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
-                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=popular" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
+                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=latest" title="{{$children.Title}}" class="pull-left"><img onerror="this.src='/static/images/cate.png'" src="{{showImg $children.Icon}}" alt="{{$children.Title}}"></a>
+                                                    <a href="{{urlfor "HomeController.Index"}}?cid={{$children.Id}}&tab=latest" title="{{$children.Title}}" >{{$children.Title}} （{{$children.Cnt}}）</a>
                                                     <div class="help-block">{{$children.Intro}}</div>
                                                 </div>
                                             </div>
