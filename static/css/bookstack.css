@@ -1466,7 +1466,7 @@ li.L1, li.L3, li.L5, li.L7, li.L9{background-color: transparent;}
 form .btn-row .col-md-2{padding-right: 0;}
 form .btn-row .col-md-10{padding-left: 0;}
 .comments-box textarea{resize: vertical;border: 1px solid #e1e1e1;outline:none;width: 100%;padding: 15px;border-radius: 3px;line-height: 160%;}
-.comments-list{margin: 30px 0 300px;clear: both;padding: 15px;}
+.comments-list{margin: 0 0 300px;clear: both;padding: 15px;}
 .comments-list .img-thumbnail{width: 50px;height: 50px;}
 .comments-list .username{color: #333333;}
 .comments-list span{color: #b6b6b6;margin-left: 5px;}
