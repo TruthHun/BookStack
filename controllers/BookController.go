@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -64,9 +65,11 @@ func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
 	private, _ := this.GetInt("private", 1) //是否是私有文档
+	wd := this.GetString("wd", "")
 	this.Data["Private"] = private
+	this.Data["Wd"] = wd
 	pageIndex, _ := this.GetInt("page", 1)
-	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
+	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, wd, private)
 	ebookStats := make(map[int]map[string]models.Ebook)
 	modelEbook := models.NewEbook()
 	for _, book := range books {
@@ -75,7 +78,7 @@ func (this *BookController) Index() {
 	ebookJSON, _ := json.Marshal(ebookStats)
 	this.Data["EbookStats"] = template.JS(string(ebookJSON))
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v&wd=%s", private, url.QueryEscape(wd)))
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -1059,7 +1062,8 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 	//读取文件，把图片文档录入oss
 	if files, err := filetil.ScanFiles(unzipPath); err == nil {
 		projectRoot = this.getProjectRoot(files)
-		this.replaceToAbs(projectRoot, identify)
+
+		this.fixFileLinks(projectRoot, identify)
 
 		ModelStore := new(models.DocumentStore)
 		//文档对应的标识
@@ -1069,11 +1073,11 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 				if ok, _ := imgMap[ext]; ok { //图片，录入oss
 					switch utils.StoreType {
 					case utils.StoreOss:
-						if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
+						if err := store.ModelStoreOss.MoveToOss(file.Path, filepath.Join("projects/"+identify, strings.TrimPrefix(file.Path, projectRoot)), false, false); err != nil {
 							beego.Error(err)
 						}
 					case utils.StoreLocal:
-						if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
+						if err := store.ModelStoreLocal.MoveToStore(file.Path, filepath.Join("uploads/projects/"+identify, strings.TrimPrefix(file.Path, projectRoot))); err != nil {
 							beego.Error(err)
 						}
 					}
@@ -1082,13 +1086,9 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 					var mdcont string
 					var htmlStr string
 					if b, err := ioutil.ReadFile(file.Path); err == nil {
-						if ext == ".md" || ext == ".markdown" {
-							mdcont = strings.TrimSpace(string(b))
-							htmlStr = mdtil.Md2html(mdcont)
-						} else {
-							htmlStr = string(b)
-							mdcont = html2md.Convert(htmlStr)
-						}
+						mdcont = strings.TrimSpace(string(b))
+						htmlStr = mdtil.Md2html(mdcont)
+
 						if !strings.HasPrefix(mdcont, "[TOC]") {
 							mdcont = "[TOC]\r\n\r\n" + mdcont
 						}
@@ -1151,7 +1151,7 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 		return
 	}
 
-	this.replaceToAbs(folder, identify)
+	this.fixFileLinks(folder, identify)
 
 	ModelStore := new(models.DocumentStore)
 
@@ -1211,21 +1211,17 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 
 //获取书籍的根目录
 func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) {
-	//获取书籍的根目录(感觉这个函数封装的不是很好，有更好的方法，请通过issue告知我，谢谢。)
-	i := 1000
+	var strs []string
 	for _, f := range fl {
 		if !f.IsDir {
-			if cnt := strings.Count(f.Path, "/"); cnt < i {
-				root = filepath.Dir(f.Path)
-				i = cnt
-			}
+			strs = append(strs, f.Path)
 		}
 	}
-	return
+	return utils.LongestCommonPrefix(strs)
 }
 
 //查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
-func (this *BookController) replaceToAbs(projectRoot string, identify string) {
+func (this *BookController) fixFileLinks(projectRoot string, identify string) {
 	imgBaseUrl := "/uploads/projects/" + identify
 	switch utils.StoreType {
 	case utils.StoreLocal:
@@ -1236,67 +1232,74 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	}
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
-		if ext := strings.ToLower(filepath.Ext(file.Path)); ext == ".md" || ext == ".markdown" {
-			//mdb ==> markdown byte
-			mdb, _ := ioutil.ReadFile(file.Path)
-			mdCont := string(mdb)
-			basePath := filepath.Dir(file.Path)
-			basePath = strings.Trim(strings.Replace(basePath, "\\", "/", -1), "/")
-			basePathSlice := strings.Split(basePath, "/")
-			l := len(basePathSlice)
-			b, _ := ioutil.ReadFile(file.Path)
-			output := blackfriday.Run(b)
-			doc, _ := goquery.NewDocumentFromReader(strings.NewReader(string(output)))
-
-			//图片链接处理
-			doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-				//非http://、// 和 https:// 开头的图片地址，即是相对地址
-				src, ok := selection.Attr("src")
-				lowerSrc := strings.ToLower(src)
-				if ok &&
-					!strings.HasPrefix(lowerSrc, "http://") &&
-					!strings.HasPrefix(lowerSrc, "https://") {
-					newSrc := src //默认为旧地址
-					if strings.HasPrefix(lowerSrc, "//") {
-						newSrc = "https:" + newSrc
-					} else {
-						if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
-							newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
-						}
-						newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
-					}
-					mdCont = strings.Replace(mdCont, src, newSrc, -1)
-				}
-			})
-
-			//a标签链接处理。要注意判断有锚点的情况
-			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-				href, ok := selection.Attr("href")
-				lowerHref := strings.TrimSpace(strings.ToLower(href))
-				// 链接存在，且不以 // 、 http、https、mailto 开头
-				if ok &&
-					!strings.HasPrefix(lowerHref, "//") &&
-					!strings.HasPrefix(lowerHref, "http://") &&
-					!strings.HasPrefix(lowerHref, "https://") &&
-					!strings.HasPrefix(lowerHref, "mailto:") &&
-					!strings.HasPrefix(lowerHref, "#") {
-					newHref := href //默认
-					if cnt := strings.Count(href, "../"); cnt < l {
-						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
-					}
-					newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
-					if !strings.HasPrefix(href, "$") { //原链接不包含$符开头，否则表示已经替换过了。
-						newHref = "$" + strings.Replace(strings.Trim(newHref, "/"), "/", "-", -1)
-						slice := strings.Split(newHref, "$")
-						if ll := len(slice); ll > 0 {
-							newHref = "$" + slice[ll-1]
-						}
-						mdCont = strings.Replace(mdCont, "]("+href, "]("+newHref, -1)
-					}
-				}
-			})
-			ioutil.WriteFile(file.Path, []byte(mdCont), os.ModePerm)
+		ext := strings.ToLower(filepath.Ext(file.Path))
+		if !(ext == ".md" || ext == ".markdown" || ext == ".html" || ext == ".xhtml") {
+			continue
 		}
+
+		//mdb ==> markdown byte
+		mdb, _ := ioutil.ReadFile(file.Path)
+		mdCont := string(mdb)
+		if ext == ".html" || ext == ".xhtml" {
+			mdCont = html2md.Convert(mdCont)
+		}
+
+		basePath := filepath.Dir(file.Path)
+		basePath = strings.Trim(strings.Replace(basePath, "\\", "/", -1), "/")
+		basePathSlice := strings.Split(basePath, "/")
+		l := len(basePathSlice)
+		b, _ := ioutil.ReadFile(file.Path)
+		output := blackfriday.Run(b)
+		doc, _ := goquery.NewDocumentFromReader(bytes.NewReader(output))
+
+		//图片链接处理
+		doc.Find("img").Each(func(i int, selection *goquery.Selection) {
+			//非http://、// 和 https:// 开头的图片地址，即是相对地址
+			src, ok := selection.Attr("src")
+			lowerSrc := strings.ToLower(src)
+			if ok &&
+				!strings.HasPrefix(lowerSrc, "http://") &&
+				!strings.HasPrefix(lowerSrc, "https://") {
+				newSrc := src //默认为旧地址
+				if strings.HasPrefix(lowerSrc, "//") {
+					newSrc = "https:" + newSrc
+				} else {
+					if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
+						newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
+					}
+					newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
+				}
+				mdCont = strings.Replace(mdCont, src, newSrc, -1)
+			}
+		})
+
+		//a标签链接处理。要注意判断有锚点的情况
+		doc.Find("a").Each(func(i int, selection *goquery.Selection) {
+			href, ok := selection.Attr("href")
+			lowerHref := strings.TrimSpace(strings.ToLower(href))
+			// 链接存在，且不以 // 、 http、https、mailto 开头
+			if ok &&
+				!strings.HasPrefix(lowerHref, "//") &&
+				!strings.HasPrefix(lowerHref, "http://") &&
+				!strings.HasPrefix(lowerHref, "https://") &&
+				!strings.HasPrefix(lowerHref, "mailto:") &&
+				!strings.HasPrefix(lowerHref, "#") {
+				newHref := href //默认
+				if cnt := strings.Count(href, "../"); cnt < l {
+					newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
+				}
+				newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
+				if !strings.HasPrefix(href, "$") { //原链接不包含$符开头，否则表示已经替换过了。
+					newHref = "$" + strings.Replace(strings.Trim(newHref, "/"), "/", "-", -1)
+					slice := strings.Split(newHref, "$")
+					if ll := len(slice); ll > 0 {
+						newHref = "$" + slice[ll-1]
+					}
+					mdCont = strings.Replace(mdCont, "]("+href, "]("+newHref, -1)
+				}
+			}
+		})
+		ioutil.WriteFile(file.Path, []byte(mdCont), os.ModePerm)
 	}
 }
 

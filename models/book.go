@@ -230,33 +230,47 @@ func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err 
 
 //分页查询指定用户的书籍
 //按照最新的进行排序
-func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
-
+func (m *Book) FindToPager(pageIndex, pageSize, memberId int, wd string, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
+	var args = []interface{}{memberId}
 	relationship := NewRelationship()
-
 	o := orm.NewOrm()
-	sql1 := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
+	sqlCount := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
 		relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? WHERE rel.relationship_id > 0 "
 	if len(PrivatelyOwned) > 0 {
-		sql1 = sql1 + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
+		sqlCount = sqlCount + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
 	}
-	err = o.Raw(sql1, memberId).QueryRow(&totalCount)
+
+	if wd = strings.TrimSpace(wd); wd != "" {
+		wd = "%" + wd + "%"
+		sqlCount = sqlCount + " and (book.book_name like ? or book.description like ?)"
+		args = append(args, wd, wd)
+	}
+
+	err = o.Raw(sqlCount, args...).QueryRow(&totalCount)
 	if err != nil {
+		beego.Error(err)
 		return
 	}
 
 	offset := (pageIndex - 1) * pageSize
-	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
+	sqlQuery := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
 		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? " +
 		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
 
-	if len(PrivatelyOwned) > 0 {
-		sql2 = fmt.Sprintf(sql2, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
+	cond := []string{}
+	if wd != "" { // 不需要处理 wd 和 args，因为在上面已处理过
+		cond = append(cond, " and (book.book_name like ? or book.description like ?)")
 	}
-	_, err = o.Raw(sql2, memberId).QueryRows(&books)
+
+	if len(PrivatelyOwned) > 0 {
+		cond = append(cond, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
+	}
+	sqlQuery = fmt.Sprintf(sqlQuery, strings.Join(cond, " "))
+
+	_, err = o.Raw(sqlQuery, args...).QueryRows(&books)
 	if err != nil {
-		logs.Error("分页查询书籍列表 => ", err)
+		beego.Error("分页查询书籍列表 => ", err, sqlQuery)
 		return
 	}
 

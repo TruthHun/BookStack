@@ -267,13 +267,14 @@ func (m *Ebook) generate(bookID int) {
 		}
 	}
 
+	o := orm.NewOrm()
 	docStore := NewDocumentStore()
 	baseUrl := "http://localhost:" + strconv.Itoa(beego.AppConfig.DefaultInt("httport", 8181))
 	for _, doc := range docs {
 		content := strings.TrimSpace(docStore.GetFiledById(doc.DocumentId, "content"))
 		if utils.GetTextFromHtml(content) == "" { //内容为空，渲染文档内容，并再重新获取文档内容
 			utils.RenderDocumentById(doc.DocumentId)
-			orm.NewOrm().Read(doc, "document_id")
+			o.Read(doc, "document_id")
 		}
 
 		//将图片链接更换成绝对链接
@@ -348,16 +349,6 @@ func (m *Ebook) generate(bookID int) {
 
 	cfgFile := folder + "config.json"
 	ioutil.WriteFile(cfgFile, []byte(util.InterfaceToJson(cfg)), os.ModePerm)
-	if Convert, err := converter.NewConverter(cfgFile, debug); err == nil {
-		// 电子书生成回调
-		Convert.Callback = m.callback
-		if err := Convert.Convert(); err != nil && strings.TrimSpace(err.Error()) != "" {
-			beego.Error(err.Error())
-		}
-	} else {
-		beego.Error(err.Error())
-	}
-
 	Convert, err := converter.NewConverter(cfgFile, debug)
 	if err != nil {
 		beego.Error(err.Error())
@@ -366,9 +357,11 @@ func (m *Ebook) generate(bookID int) {
 
 	// 设置电子书生成回调
 	Convert.Callback = m.callback
-	if err = Convert.Convert(); err != nil {
+	if err = Convert.Convert(); err != nil && err.Error() != "" {
 		beego.Error(err.Error())
 	}
+	// 转换已经结束，还处在转换状态的电子书为失败的电子书
+	o.QueryTable(m).Filter("book_id", book.BookId).Filter("status", EBookStatusProccessing).Update(orm.Params{"status": EBookStatusFailure})
 }
 
 func (m *Ebook) deleteBook(bookId int) {
@@ -437,4 +430,28 @@ func (m *Ebook) callback(identify, ebookPath string, errConvert error) {
 	ebook.Path = "/" + newEbookPath
 	ebook.Status = EBookStatusSuccess
 	o.Update(&ebook)
+	m.DeleteOldEbook(ebook.BookID, ebook.Ext, ebook.Id)
+}
+
+// DeleteOldEbook 删除旧电子书
+// 1. 相同ext，状态为 Success 之外的记录以及电子书文件
+func (m *Ebook) DeleteOldEbook(bookId int, ext string, ignoreEbookId int) {
+	var (
+		ebooks []Ebook
+		o      = orm.NewOrm()
+	)
+
+	query := o.QueryTable(m).Filter("book_id", bookId).Filter("ext", ext)
+	query.All(&ebooks)
+	if len(ebooks) == 0 {
+		return
+	}
+
+	for _, ebook := range ebooks {
+		if ebook.Id == ignoreEbookId {
+			continue
+		}
+		utils.DeleteFile(ebook.Path)
+		o.QueryTable(m).Filter("id", ebook.Id).Delete()
+	}
 }

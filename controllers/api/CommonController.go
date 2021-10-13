@@ -377,7 +377,7 @@ func (this *CommonController) UserReleaseBook() {
 	size, _ := this.GetInt("size", 10)
 	size = utils.RangeNumber(size, 10, maxPageSize)
 
-	res, totalCount, err := models.NewBook().FindToPager(page, size, uid, 0)
+	res, totalCount, err := models.NewBook().FindToPager(page, size, uid, "", 0)
 	if err != nil {
 		this.Response(http.StatusInternalServerError, messageInternalServerError)
 	}
