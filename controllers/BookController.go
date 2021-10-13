@@ -64,9 +64,11 @@ func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
 	private, _ := this.GetInt("private", 1) //是否是私有文档
+	wd := this.GetString("wd", "")
 	this.Data["Private"] = private
+	this.Data["Wd"] = wd
 	pageIndex, _ := this.GetInt("page", 1)
-	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
+	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, wd, private)
 	ebookStats := make(map[int]map[string]models.Ebook)
 	modelEbook := models.NewEbook()
 	for _, book := range books {
@@ -75,7 +77,7 @@ func (this *BookController) Index() {
 	ebookJSON, _ := json.Marshal(ebookStats)
 	this.Data["EbookStats"] = template.JS(string(ebookJSON))
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v&wd=%s", private, url.QueryEscape(wd)))
 	} else {
 		this.Data["PageHtml"] = ""
 	}

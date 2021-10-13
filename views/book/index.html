@@ -35,9 +35,17 @@
                         <button type="button" data-toggle="modal" data-target="#addBookDialogModal" class="btn btn-success btn-sm pull-right">添加书籍</button>
                     </div>
                     <div class="help-block text-left" style="margin-top: 15px;"><span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span></div>
+                    <form class="form-inline" action="" method="get">
+                        <div class="input-group">
+                            <input class="form-control" name="wd" value="{{.Wd}}" type="search" placeholder="书籍搜索..." value="">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>
                     <ul class="nav nav-tabs" style="margin-top: 15px;">
-                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1">私有书籍</a></li>
-                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0">公开书籍</a></li>
+                        <li {{if eq .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=1&wd={{.Wd}}">私有书籍</a></li>
+                        <li {{if ne .Private 1}}class="active"{{end}}><a href="{{urlfor "BookController.Index"}}?private=0&wd={{.Wd}}">公开书籍</a></li>
                     </ul>
                 </div>
                 <div class="box-body" id="bookList">
