@@ -129,7 +129,14 @@
                         </div>
                     {{end}}
                     <article class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
-                    {{.Content}}
+                        {{if .IsAllowRead}}
+                            {{.Content}}
+                        {{else}}
+                            <div class="locked-reading text-center">
+                                <div class="locked-icon"></div>
+                                <div class="help-block">未登录游客仅可阅读 <span style="color:red">{{.Percent}}%</span> 章节，请您 <a href="/login" title="登录">登录</a> 再阅读</div>
+                            </div>
+                        {{end}}
                     </article>
                     {{if (ads "content-bottom" $.IsMobile)}}
                         <div class="ap ap-content-bottom mgt-15px">

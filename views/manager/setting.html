@@ -381,6 +381,11 @@
 
                         {{if eq .Tab "operation"}}
                             <div class="form-group">
+                                <label>游客允许阅读章节百分比</label>
+                                <input type="number" min="0" max="100" name="VISITOR_ALLOW_READED_PERCENT" class="form-control" value="{{.VISITOR_ALLOW_READED_PERCENT.OptionValue}}">
+                                <div class="help-block">未登录用户，允许阅读的书籍章节百分比。0表示不允许，100表示所有章节游客都可以阅读</div>
+                            </div>
+                            <div class="form-group">
                                 <label>是否需要登录才能下载电子书</label>
                                 <input type="text" name="DOWNLOAD_LIMIT" class="form-control" value="{{.DOWNLOAD_LIMIT.OptionValue}}">
                                 <div class="help-block">

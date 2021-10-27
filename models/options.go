@@ -321,6 +321,11 @@ func (m *Option) Init() error {
 			OptionName:  "DEFAULT_HOME_PAGE",
 			OptionTitle: "默认首页",
 		},
+		{
+			OptionValue: "100",
+			OptionName:  "VISITOR_ALLOW_READED_PERCENT",
+			OptionTitle: "游客允许阅读百分比", // 游客未登录情况下允许阅读的章节百分比
+		},
 	}
 
 	for _, op := range options {

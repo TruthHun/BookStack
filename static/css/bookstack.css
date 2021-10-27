@@ -1498,3 +1498,9 @@ form .btn-row .col-md-10{padding-left: 0;}
     top: 6px;
     position: absolute;
 }
+
+.locked-reading{padding-bottom: 100px;}
+.locked-reading .locked-icon{
+    width: 128px;height: 128px;margin: 100px auto 15px;
+    background: url("/static/images/lock.png") no-repeat center center;
+}

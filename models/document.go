@@ -2,6 +2,7 @@ package models
 
 import (
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -736,4 +737,40 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 
 	}
 	return
+}
+
+// IsAllowReadChapter 书籍章节是否允许阅读
+func (m *Document) IsAllowReadChapter(bookId int, docId int) (yes bool, percent int) {
+	percent = 100
+	if bookId == 0 || docId == 0 {
+		return
+	}
+
+	percent, _ = strconv.Atoi(GetOptionValue("VISITOR_ALLOW_READED_PERCENT", "0"))
+	if percent <= 0 {
+		return false, percent
+	}
+
+	if percent >= 100 {
+		return true, percent
+	}
+
+	var docs []Document
+
+	orm.NewOrm().QueryTable(m).Filter("book_id", bookId).OrderBy("parent_id", "order_sort").All(&docs, "document_id", "identify")
+	length := len(docs)
+	if length == 0 {
+		return true, percent
+	}
+
+	index := int(float64(length*percent) / 100)
+	if index <= 0 {
+		index = 1
+	}
+	for _, doc := range docs[:index] {
+		if doc.DocumentId == docId {
+			return true, percent
+		}
+	}
+	return false, percent
 }

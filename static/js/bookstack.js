@@ -48,6 +48,9 @@ function load_doc(url,wd,without_history) {
             var doc_title = res.data.doc_title;
             var title = res.data.title;
             var $body = body;
+            try {
+                if(res.data.is_allow_read==false){$body='<div class="locked-reading text-center"><div class="locked-icon"></div><div class="help-block">未登录游客仅可阅读 <span style="color:red">'+res.data.percent+'%</span> 章节，请您 <a href="/login" title="登录">登录</a> 再阅读</div>'            }
+            } catch (error) {}
             $("#page-content").html($body);
             // RenderByMarkdown($body);
             $("title").text(title);

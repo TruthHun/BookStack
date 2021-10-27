@@ -228,6 +228,7 @@ func (this *DocumentController) indexWithPassword() {
 
 //阅读文档.
 func (this *DocumentController) Read() {
+
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
 	id := this.GetString(":id")
@@ -270,6 +271,13 @@ func (this *DocumentController) Read() {
 
 	if doc.BookId != bookResult.BookId {
 		this.Abort404(bookName, bookLink)
+	}
+
+	// 是否允许阅读
+	isAllowRead := true
+	percent := 100
+	if this.Member.MemberId == 0 {
+		isAllowRead, percent = doc.IsAllowReadChapter(doc.BookId, doc.DocumentId)
 	}
 
 	bodyText := ""
@@ -387,16 +395,22 @@ func (this *DocumentController) Read() {
 	models.NewBookCounter().Increase(bookResult.BookId, true)
 	comments, _ := models.NewComments().Comments(1, 1000, models.CommentOpt{DocId: doc.DocumentId, Status: []int{1}})
 
+	if !isAllowRead {
+		doc.Release = ""
+	}
+
 	if this.IsAjax() {
 		var data struct {
-			Id        int                         `json:"doc_id"`
-			DocTitle  string                      `json:"doc_title"`
-			Body      string                      `json:"body"`
-			Title     string                      `json:"title"`
-			Bookmark  bool                        `json:"bookmark"` //是否已经添加了书签
-			View      int                         `json:"view"`
-			UpdatedAt string                      `json:"updated_at"`
-			Comments  []models.BookCommentsResult `json:"comments"`
+			Id          int                         `json:"doc_id"`
+			DocTitle    string                      `json:"doc_title"`
+			Body        string                      `json:"body"`
+			Title       string                      `json:"title"`
+			Bookmark    bool                        `json:"bookmark"` //是否已经添加了书签
+			View        int                         `json:"view"`
+			UpdatedAt   string                      `json:"updated_at"`
+			Comments    []models.BookCommentsResult `json:"comments"`
+			IsAllowRead bool                        `json:"is_allow_read"`
+			Percent     int                         `json:"percent"`
 		}
 		data.DocTitle = doc.DocumentName
 		data.Body = doc.Release
@@ -405,9 +419,9 @@ func (this *DocumentController) Read() {
 		data.Bookmark = existBookmark
 		data.View = doc.Vcnt
 		data.UpdatedAt = doc.ModifyTime.Format("2006-01-02 15:04:05")
-		//data.Body = doc.Markdown
 		data.Comments = comments
-
+		data.IsAllowRead = isAllowRead
+		data.Percent = percent
 		this.JsonResult(0, "ok", data)
 	}
 
@@ -474,6 +488,8 @@ func (this *DocumentController) Read() {
 	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
 	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
 	this.Data["Comments"] = comments
+	this.Data["IsAllowRead"] = isAllowRead
+	this.Data["Percent"] = percent
 }
 
 //编辑文档.
