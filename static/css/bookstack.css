@@ -138,11 +138,8 @@ table>tbody>tr:hover{
     z-index: 301;
     bottom: 0;
     width: 300px;
-<<<<<<< HEAD
     border-right: 1px solid #ddd;
-=======
-    border-right: 1px solid #eee;
->>>>>>> dev
+    /* border-right: 1px solid #eee; */
     background-color: #fff;
 }
 .m-manual .manual-tab .tab-navg {
