@@ -32,6 +32,11 @@ func (this *StaticController) APP() {
 	this.Abort("404")
 }
 
+func (this *StaticController) Test() {
+	// fmt.Println(models.NewBook().Export2Markdown("4b98937398e612778711608a3d09a9c4"))
+	this.Ctx.WriteString("this is a test")
+}
+
 // Uploads 查询上传的静态资源。
 // 如果是音频和视频文件，需要根据后台设置而判断是否加密处理
 // 如果使用了OSS存储，则需要将文件处理好

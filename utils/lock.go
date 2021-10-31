@@ -2,10 +2,7 @@ package utils
 
 import "sync"
 
-var (
-	BooksRelease  = BooksLock{Books: make(map[int]bool)}
-	BooksGenerate = BooksLock{Books: make(map[int]bool)}
-)
+var BooksGenerate = BooksLock{Books: make(map[int]bool)}
 
 //书籍发布锁和书籍离线文档生成锁
 type BooksLock struct {

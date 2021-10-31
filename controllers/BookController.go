@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -195,7 +196,6 @@ func (this *BookController) Setting() {
 
 // SaveBook 保存书籍信息
 func (this *BookController) SaveBook() {
-
 	bookResult, err := this.IsPermission()
 	if err != nil {
 		this.JsonResult(6001, err.Error())
@@ -239,6 +239,7 @@ func (this *BookController) SaveBook() {
 	book.Lang = this.GetString("lang")
 	book.AdTitle = this.GetString("ad_title")
 	book.AdLink = this.GetString("ad_link")
+	_, book.NavJSON = this.parseBookNav()
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")
@@ -270,6 +271,47 @@ func (this *BookController) SaveBook() {
 	}()
 	go models.CountCategory()
 	this.JsonResult(0, "ok", bookResult)
+}
+
+func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string) {
+	var data struct {
+		Name   []string `json:"name"`
+		URL    []string `json:"url"`
+		Sort   []string `json:"sort"`
+		Icon   []string `json:"icon"`
+		Color  []string `json:"color"`
+		Target []string `json:"target"`
+	}
+	b, _ := json.Marshal(this.Ctx.Request.PostForm)
+	json.Unmarshal(b, &data)
+	lenName := len(data.Name)
+	if lenName == 0 || lenName != len(data.URL) || lenName != len(data.Sort) || lenName != len(data.Icon) || lenName != len(data.Color) || lenName != len(data.Target) {
+		return
+	}
+
+	for idx, name := range data.Name {
+		name = strings.TrimSpace(name)
+		url := strings.TrimSpace(data.URL[idx])
+		if url == "" || name == "" {
+			continue
+		}
+		nav := models.BookNav{
+			Name:   name,
+			URL:    url,
+			Color:  strings.TrimSpace(data.Color[idx]),
+			Icon:   strings.TrimSpace(data.Icon[idx]),
+			Target: strings.TrimSpace(data.Target[idx]),
+		}
+		nav.Sort, _ = strconv.Atoi(strings.TrimSpace(data.Sort[idx]))
+		navs = append(navs, nav)
+	}
+	if len(navs) > 0 {
+		// 排序
+		sort.Sort(navs)
+		b, _ := json.Marshal(navs)
+		navStr = string(b)
+	}
+	return
 }
 
 //设置书籍私有状态.
@@ -610,6 +652,47 @@ func (this *BookController) Create() {
 	this.JsonResult(0, "ok", bookResult)
 }
 
+// Create 创建书籍.
+func (this *BookController) Copy() {
+	if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建书籍
+			this.JsonResult(1, "普通读者无法创建书籍，如需创建书籍，请向管理员申请成为作者")
+		}
+	}
+	identify := strings.TrimSpace(this.GetString("identify", ""))
+	sourceIdentify := strings.TrimSpace(this.GetString("source_identify", ""))
+	sourceBook, err := models.NewBook().FindByIdentify(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	existBook, _ := models.NewBook().FindByIdentify(identify, "book_id")
+	if existBook != nil && existBook.BookId > 0 {
+		this.JsonResult(1, "请更换新的书籍标识")
+	}
+
+	// 如果是私有书籍，且不是团队的人，不允许拷贝该项目
+	if sourceBook.PrivatelyOwned == 1 {
+		rel, err := models.NewRelationship().FindByBookIdAndMemberId(sourceBook.BookId, this.Member.MemberId)
+		if err != nil || rel == nil || rel.RelationshipId == 0 {
+			this.JsonResult(1, "无拷贝书籍权限")
+		}
+	}
+	sourceBook.BookId = 0
+	sourceBook.BookName = strings.TrimSpace(this.GetString("book_name", ""))
+	sourceBook.Identify = identify
+	sourceBook.Description = strings.TrimSpace(this.GetString("description", ""))
+	sourceBook.Author = strings.TrimSpace(this.GetString("author", ""))
+	sourceBook.AuthorURL = strings.TrimSpace(this.GetString("author_url", ""))
+	sourceBook.PrivatelyOwned, _ = strconv.Atoi(this.GetString("privately_owned"))
+	sourceBook.MemberId = this.Member.MemberId
+	err = sourceBook.Copy(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, "拷贝书籍失败："+err.Error())
+	}
+
+	this.JsonResult(0, "拷贝书籍成功")
+}
+
 // CreateToken 创建访问来令牌.
 func (this *BookController) CreateToken() {
 	if this.forbidGeneralRole() {
@@ -702,6 +785,7 @@ func (this *BookController) Delete() {
 // 发布书籍.
 func (this *BookController) Release() {
 	identify := this.GetString("identify")
+	force, _ := this.GetBool("force")
 	bookId := 0
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -727,13 +811,7 @@ func (this *BookController) Release() {
 		bookId = book.BookId
 	}
 
-	if exist := utils.BooksRelease.Exist(bookId); exist {
-		this.JsonResult(1, "上次内容发布正在执行中，请稍后再操作")
-	}
-
-	go func(identify string) {
-		models.NewDocument().ReleaseContent(bookId, this.BaseUrl())
-	}(identify)
+	go models.NewDocument().ReleaseContent(bookId, this.BaseUrl(), force)
 
 	this.JsonResult(0, "发布任务已推送到任务队列，稍后将在后台执行。")
 }
@@ -1261,4 +1339,30 @@ func (this *BookController) Comment() {
 		this.JsonResult(0, "评论成功")
 	}
 	this.JsonResult(1, "书籍不存在")
+}
+
+// ExportMarkdown 将书籍导出为markdown
+// 注意：系统管理员和书籍参与者有权限导出
+func (this *BookController) Export2Markdown() {
+	identify := this.GetString("identify")
+	if this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+	if !this.Member.IsAdministrator() {
+		if _, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId); err != nil {
+			this.JsonResult(1, "无操作权限")
+		}
+	}
+	path, err := models.NewBook().Export2Markdown(identify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	defer func() {
+		os.Remove(path)
+	}()
+	attchmentName := filepath.Base(path)
+	if book, _ := models.NewBook().FindByIdentify(identify, "book_name", "book_id"); book != nil && book.BookId > 0 {
+		attchmentName = book.BookName + ".zip"
+	}
+	this.Ctx.Output.Download(strings.TrimLeft(path, "./"), attchmentName)
 }

@@ -1,10 +1,13 @@
 package store
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/TruthHun/gotil/filetil"
 )
 
 //本地存储
@@ -55,4 +58,53 @@ func (this *Local) DelFiles(object ...string) error {
 //删除文件夹
 func (this *Local) DelFromFolder(folder string) (err error) {
 	return os.RemoveAll(folder)
+}
+
+func (this *Local) CopyFile(sourceFile, targetFile string) (err error) {
+
+	return
+}
+
+// 拷贝文件夹
+func (this *Local) CopyDir(sourceDir, targetDir string) (err error) {
+	var fl []filetil.FileList
+
+	sourceDir = strings.TrimLeft(sourceDir, "./")
+	targetDir = strings.TrimLeft(targetDir, "./")
+
+	if fl, err = filetil.ScanFiles(sourceDir); err != nil {
+		return
+	}
+	if len(fl) == 0 {
+		return
+	}
+
+	for _, f := range fl {
+		if f.IsDir {
+			continue
+		}
+
+		// 不能用defer，因为在文件多的时候，会打开跟多文件句柄
+		targetFile := strings.ReplaceAll(filepath.Join(targetDir, strings.TrimPrefix(f.Path, sourceDir)), "\\", "/")
+		src, errOpen := os.Open(f.Path)
+		if errOpen != nil {
+			return errOpen
+		}
+
+		os.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
+		target, errOpen := os.OpenFile(targetFile, os.O_WRONLY|os.O_CREATE, 0644)
+		if errOpen != nil {
+			src.Close()
+			return errOpen
+		}
+
+		if _, err = io.Copy(target, src); err != nil {
+			target.Close()
+			src.Close()
+			return
+		}
+		target.Close()
+		src.Close()
+	}
+	return
 }

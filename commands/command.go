@@ -193,6 +193,13 @@ func RegisterFunction() {
 		}
 		return cdn + p
 	})
+	beego.AddFuncMap("parseICON", func(icon string) string {
+		icon = strings.TrimSpace(icon)
+		if strings.Contains(icon, "fa-") {
+			return fmt.Sprintf(`<i class="%s"></i>`, icon)
+		}
+		return fmt.Sprintf(`<img src="%s" class="icon-img" alt="icon"/>`, icon)
+	})
 	beego.AddFuncMap("getUsernameByUid", func(id interface{}) string {
 		return new(models.Member).GetUsernameByUid(id)
 	})

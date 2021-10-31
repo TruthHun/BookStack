@@ -21,6 +21,7 @@
     <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
+    <style>table .sort{width: 100px;}</style>
 </head>
 <body>
 <div class="manual-reader">
@@ -135,7 +136,87 @@
                                 </div>
                                 <p class="text help-block">文字广告，可以放原作者的打赏和赞助二维码链接，也可以放开源书籍的购买链接以支持作者</p>
                             </div>
-
+                            <div class="form-group">
+                                <label>导航栏</label>
+                                <p class="text help-block">书籍阅读页面右上角导航栏链接。链接名称或链接地址为空，则忽略该链接。新增的链接会按顺序追加在<strong class="text-danger">首页</strong>后面！</p>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="sort">顺序排序</th>
+                                            <th>图标</th>
+                                            <th>颜色</th>
+                                            <th>名称</th>
+                                            <th>链接</th>
+                                            <th class="sort">打开方式</th>
+                                            <th>
+                                                <div class="text-center">
+                                                    <a href="javascript:;" class="add-tr tooltips" title="添加书籍导航链接"><i class="fa fa-plus"></i></a>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{range .Model.Navs}}
+                                            <tr>
+                                                <td class="sort">
+                                                    <input type="number" class="form-control" value="{{.Sort}}" placeholder="0" name="sort">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" value="{{.Icon}}" name="icon" placeholder="小图片或fontawesome图标，如：fa fa-home">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" value="{{.Color}}" name="color" placeholder="#333">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" value="{{.Name}}" name="name" placeholder="链接名称，如：首页">
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" value="{{.URL}}" name="url" placeholder="链接地址，如：https://www.bookstack.cn/">
+                                                </td>
+                                                <td class="sort">
+                                                    <select name="target" class="form-control">
+                                                        <option value="" {{if .Target}}{{else}}selected{{end}}>当前窗口</option>
+                                                        <option value="_blank" {{if .Target}}selected{{end}}>新窗口</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div class="text-center">
+                                                        <a href="javascript:;" class="btn btn-danger rm-tr tooltips" title="移除当前链接"><i class="fa fa-remove"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {{end}}
+                                        <tr>
+                                            <td class="sort">
+                                                <input type="number" class="form-control" placeholder="0" name="sort">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="icon" placeholder="小图片或fontawesome图标，如：fa fa-home">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="color" placeholder="#333">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="name" placeholder="链接名称，如：首页">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="url" placeholder="链接地址，如：https://www.bookstack.cn/">
+                                            </td>
+                                            <td class="sort">
+                                                <select name="target" class="form-control">
+                                                    <option value="" >当前窗口</option>
+                                                    <option value="_blank">新窗口</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <div class="text-center">
+                                                    <a href="javascript:;" class="btn btn-danger rm-tr tooltips" title="移除当前链接"><i class="fa fa-remove"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             <div class="form-group">
                                 <label>分类 (<span class="text-muted">支持选择多个分类</span>)</label>
                                 {{range $idx,$cate:=$.Cates}}
@@ -529,6 +610,62 @@
         }catch(e){
             console.log(e);
         }
+        $("table").on("click",".rm-tr",function(){
+            $(this).parents("tr").remove()
+        })
+        $(".add-tr").click(function(){
+            var tr = "";
+                tr += "<tr>\n";
+                tr += "  <td class=\"sort\">\n";
+                tr += "    <input type=\"number\" class=\"form-control\" placeholder=\"0\" name=\"sort\" />\n";
+                tr += "  <\/td>\n";
+                tr += "  <td>\n";
+                tr += "    <input\n";
+                tr += "      type=\"text\"\n";
+                tr += "      class=\"form-control\"\n";
+                tr += "      name=\"icon\"\n";
+                tr += "      placeholder=\"小图片或fontawesome图标，如：fa fa-home\"\n";
+                tr += "    />\n";
+                tr += "  <\/td>\n";
+                tr += "  <td>\n";
+                tr += "    <input type=\"text\" class=\"form-control\" name=\"color\" placeholder=\"#333\" />\n";
+                tr += "  <\/td>\n";
+                tr += "  <td>\n";
+                tr += "    <input\n";
+                tr += "      type=\"text\"\n";
+                tr += "      class=\"form-control\"\n";
+                tr += "      name=\"name\"\n";
+                tr += "      placeholder=\"链接名称，如：首页\"\n";
+                tr += "    />\n";
+                tr += "  <\/td>\n";
+                tr += "  <td>\n";
+                tr += "    <input\n";
+                tr += "      type=\"text\"\n";
+                tr += "      class=\"form-control\"\n";
+                tr += "      name=\"url\"\n";
+                tr += "      placeholder=\"链接地址，如：https://www.bookstack.cn/\"\n";
+                tr += "    />\n";
+                tr += "  <\/td>\n";
+                tr += "        <td class=\"sort\">";
+                tr += "            <select class=\"form-control\" name=\"target\">";
+                tr += "                <option value=\"\">当前窗口</option>";
+                tr += "                <option value=\"_blank\">新窗口</option>";
+                tr += "            </select>";
+                tr += "        </td>";
+                tr += "  <td>\n";
+                tr += "    <div class=\"text-center\">\n";
+                tr += "      <a\n";
+                tr += "        href=\"javascript:;\"\n";
+                tr += "        class=\"btn btn-danger rm-tr tooltips\"\n";
+                tr += "        title=\"移除当前链接\"\n";
+                tr += "        ><i class=\"fa fa-remove\"><\/i\n";
+                tr += "      ><\/a>\n";
+                tr += "    <\/div>\n";
+                tr += "  <\/td>\n";
+                tr += "<\/tr>\n";
+                tr += "\n";
+            $(this).parents("table").find("tbody").append(tr);
+        })
     });
 </script>
 </body>

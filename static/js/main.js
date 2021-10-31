@@ -244,6 +244,12 @@ $(function () {
         e.preventDefault();
         var _this=$(this),form=$(this).parents("form"),method=form.attr("method"),action=form.attr("action"),data=form.serialize(),_url=form.attr("data-url");
         var require=form.find("[required=required]"),l=require.length;
+        var btnText = _this.text()
+        if (_this.hasClass("disabled")){
+            return false
+        }
+        _this.addClass("disabled").text("处理中，请耐心等待...")
+
         $.each(require, function() {
             if (!$(this).val()){
                 $(this).focus();
@@ -255,7 +261,11 @@ $(function () {
         if (!_url || _url==undefined){
             _url=location.href;
         }
-        if (l>0) return false;
+        if (l>0) {
+            _this.removeClass("disabled").text(btnText)
+            return false;
+        }
+        
         if (method=="post") {
             if (form.attr("enctype")=="multipart/form-data"){
                 form.attr("target","notarget");
@@ -268,10 +278,9 @@ $(function () {
                     } else{
                         alertTips("error",ret.message,3000,"");
                     }
+                    _this.removeClass("disabled").text(btnText)
                 });
-                _this.removeClass("disabled");
             }
-
         } else{
             $.get(action,data,function(ret){
                 ret=parseJson(ret);
@@ -280,6 +289,7 @@ $(function () {
                 } else{
                     alertTips("error",ret.message,3000,"");
                 }
+                _this.removeClass("disabled").text(btnText)
             });
         }
     });

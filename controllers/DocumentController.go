@@ -568,6 +568,7 @@ func (this *DocumentController) Create() {
 	parentId, _ := this.GetInt("parent_id", 0)
 	docId, _ := this.GetInt("doc_id", 0)
 	bookIdentify := strings.TrimSpace(this.GetString(":key"))
+
 	o := orm.NewOrm()
 
 	if identify == "" {
@@ -577,7 +578,6 @@ func (this *DocumentController) Create() {
 		this.JsonResult(6004, "文档名称不能为空")
 	}
 	if docIdentify != "" {
-
 		if ok, err := regexp.MatchString(`^[a-zA-Z0-9_\-\.]*$`, docIdentify); !ok || err != nil {
 			this.JsonResult(6003, "文档标识只能是数字、字母，以及“-”、“_”和“.”等字符，并且不能是纯数字")
 		}
@@ -600,7 +600,7 @@ func (this *DocumentController) Create() {
 			this.JsonResult(6006, "文档标识已被使用")
 		}
 	} else {
-		docIdentify = fmt.Sprintf("date-%v", time.Now().Format("2006.01.02.15.04.05"))
+		docIdentify = fmt.Sprintf("date%v", time.Now().Format("20060102150405.md"))
 	}
 
 	bookId := 0
@@ -633,6 +633,7 @@ func (this *DocumentController) Create() {
 
 	document.MemberId = this.Member.MemberId
 	document.BookId = bookId
+	oldIdentify := document.Identify
 	if docIdentify != "" {
 		document.Identify = docIdentify
 	}
@@ -652,6 +653,9 @@ func (this *DocumentController) Create() {
 		if err := ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(docIdInt64), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 			beego.Error(err)
 		}
+	}
+	if docId > 0 && oldIdentify != docIdentify {
+		go document.ReplaceIdentify(bookId, oldIdentify, docIdentify)
 	}
 	this.JsonResult(0, "ok", document)
 }
@@ -1241,7 +1245,7 @@ func (this *DocumentController) ExportOld() {
 	book, err := new(models.Book).FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err.Error())
-		this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+		this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 	}
 	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
 		this.JsonResult(1, "私有文档，只有文档创建人可导出")
@@ -1253,14 +1257,14 @@ func (this *DocumentController) ExportOld() {
 	case utils.StoreOss:
 		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
-			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 		}
 		link = this.OssDomain + "/" + obj
 	case utils.StoreLocal:
 		obj = "uploads/" + obj
 		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
-			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 		}
 		link = "/" + obj
 	}
@@ -1276,7 +1280,7 @@ func (this *DocumentController) ExportOld() {
 		}
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
-	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 }
 
 //导出文件

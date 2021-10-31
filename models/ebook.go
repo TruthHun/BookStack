@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -39,7 +38,10 @@ type Ebook struct {
 	UpdatedAt     time.Time `json:"updated_at" orm:"auto_now;type(datetime)"`
 }
 
-var convert2ebookRunning = false
+var (
+	convert2ebookRunning = false
+	ebookExts            = []string{".epub", ".pdf", ".mobi"}
+)
 
 const (
 	EBookStatusPending     = 0 // 待处理
@@ -86,16 +88,13 @@ func (m *Ebook) GetEBook(id int) (book Ebook) {
 
 // 添加书籍到电子书生成队列
 func (m *Ebook) AddToGenerate(bookID int) (err error) {
-	var (
-		ebooks []Ebook
-		exts   = []string{".pdf", ".mobi", ".epub"}
-	)
+	var ebooks []Ebook
 
 	b, _ := NewBook().Find(bookID)
 	if b == nil || b.BookId == 0 {
 		return errors.New("书籍不存在")
 	}
-	for _, ext := range exts {
+	for _, ext := range ebookExts {
 		ebooks = append(ebooks, Ebook{
 			Title:       b.BookName,
 			Keywords:    b.Label,
@@ -160,28 +159,26 @@ func (m *Ebook) CheckAndGenerateEbook() {
 	if cpuNum > 1 && runtime.NumCPU() == cpuNum { // 比如双核服务器，不能直接占用双核，以避免服务器无法正常提供服务
 		cpuNum = cpuNum - 1
 	}
+	sleep := 5 * time.Second
+	handling := make(chan bool, cpuNum)
 	for {
-		wg := &sync.WaitGroup{}
-		for i := 0; i < cpuNum; i++ {
+		for len(handling) < cpuNum {
 			var ebook Ebook
 			o.QueryTable(m).Filter("book_id__gt", 0).Filter("status", EBookStatusPending).OrderBy("id").One(&ebook)
 			if ebook.Id > 0 {
-				// 将相应书籍的状态，设置为处理中
+				handling <- true
 				o.QueryTable(m).Filter("book_id", ebook.BookID).Filter("status", EBookStatusPending).Update(orm.Params{"status": EBookStatusProccessing})
-				wg.Add(1)
 				go func(bookId int) {
 					m.generate(bookId)
-					wg.Done()
+					<-handling
 				}(ebook.BookID)
 			} else {
-				time.Sleep(5 * time.Second)
-				i--
+				time.Sleep(sleep)
 			}
 		}
-
-		wg.Wait()
-		time.Sleep(5 * time.Second)
+		time.Sleep(sleep)
 	}
+
 }
 
 //离线文档生成
@@ -192,7 +189,6 @@ func (m *Ebook) generate(bookID int) {
 		return
 	}
 
-	exts := []string{".pdf", ".epub", ".mobi"}
 	debug := true
 	if beego.AppConfig.String("runmode") == "prod" {
 		debug = false
@@ -216,7 +212,7 @@ func (m *Ebook) generate(bookID int) {
 		Language:    "zh-CN",
 		Publisher:   beego.AppConfig.String("exportCreator"),
 		Title:       book.BookName,
-		Format:      exts,
+		Format:      ebookExts,
 		FontSize:    beego.AppConfig.String("exportFontSize"),
 		PaperSize:   beego.AppConfig.String("exportPaperSize"),
 		More: []string{
@@ -379,15 +375,21 @@ func (m *Ebook) setEbookStatus(bookId int, ext string, status int) {
 	orm.NewOrm().QueryTable(m).Filter("book_id", bookId).Filter("ext", ext).Update(orm.Params{"status": status})
 }
 
-func (m *Ebook) callback(identify, ebookPath string) {
+func (m *Ebook) callback(identify, ebookPath string, errConvert error) {
 	var ebook Ebook
 	o := orm.NewOrm()
 
-	ebookPath = strings.TrimLeft(ebookPath, "./")
 	book, err := NewBook().FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err)
 		m.deleteBook(book.BookId)
+		return
+	}
+
+	if errConvert != nil { // 电子书转换失败
+		beego.Error(errConvert)
+		ebook.Status = EBookStatusFailure
+		o.Update(&ebook)
 		return
 	}
 
