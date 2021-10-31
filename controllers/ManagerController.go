@@ -39,86 +39,6 @@ func (this *ManagerController) Prepare() {
 	}
 }
 
-var (
-	installed     []installedDependency
-	lastCheckedAt *time.Time
-)
-
-type installedDependency struct {
-	Name        string // 依赖名称
-	IsInstalled bool   // 是否已安装
-	Message     string // 相关信息
-	Error       string
-	CheckedAt   string // 上次检测时间
-}
-
-func init() {
-	go checkInstalledDependencyData()
-}
-
-func checkInstalledDependencyData() {
-	var (
-		err            error
-		dateLayout     = "2006-01-02 15:04:05"
-		checkInstalled []installedDependency
-	)
-
-	if lastCheckedAt != nil && time.Now().Unix()-lastCheckedAt.Unix() <= 60 {
-		return
-	}
-
-	errCalibre := "-"
-	if err = utils.IsInstalledCalibre("ebook-convert"); err != nil {
-		errCalibre = err.Error()
-	}
-	checkInstalled = append(checkInstalled, installedDependency{
-		Name:        "calibre",
-		IsInstalled: err == nil,
-		Error:       errCalibre,
-		Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
-		CheckedAt:   time.Now().Format(dateLayout),
-	})
-
-	errGit := "-"
-	if err = utils.IsInstalledGit(); err != nil {
-		errGit = err.Error()
-	}
-	checkInstalled = append(checkInstalled, installedDependency{
-		Name:        "git",
-		IsInstalled: err == nil,
-		Error:       errGit,
-		Message:     "git，用于克隆项目",
-		CheckedAt:   time.Now().Format(dateLayout),
-	})
-
-	errChrome := "-"
-	if err = utils.IsInstalledChrome(beego.AppConfig.DefaultString("chrome", "chrome")); err != nil {
-		errChrome = err.Error()
-	}
-	checkInstalled = append(checkInstalled, installedDependency{
-		Name:        "chrome",
-		IsInstalled: err == nil,
-		Error:       errChrome,
-		Message:     "chrome浏览器，即谷歌浏览器，或者chromium-browser，用于渲染markdown内容为HTML。",
-		CheckedAt:   time.Now().Format(dateLayout),
-	})
-
-	errPuppeteer := "-"
-	if err = utils.IsInstalledPuppetter(beego.AppConfig.DefaultInt("httpport", 8181)); err != nil {
-		errPuppeteer = err.Error()
-	}
-	checkInstalled = append(checkInstalled, installedDependency{
-		Name:        "puppeteer",
-		IsInstalled: err == nil,
-		Error:       errPuppeteer,
-		Message:     "puppeteer, node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
-		CheckedAt:   time.Now().Format(dateLayout),
-	})
-	installed = checkInstalled
-	t := time.Now()
-	lastCheckedAt = &t
-}
-
 func (this *ManagerController) Index() {
 	this.TplName = "manager/index.html"
 	this.Data["Model"] = models.NewDashboard().Query()
@@ -127,8 +47,7 @@ func (this *ManagerController) Index() {
 		"keywords":    "仪表盘",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-	go checkInstalledDependencyData()
-	this.Data["Installed"] = installed
+	this.Data["Installed"] = utils.GetInstalledDependencies()
 	this.Data["IsDashboard"] = true
 }
 
