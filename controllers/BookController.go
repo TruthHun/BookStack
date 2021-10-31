@@ -93,6 +93,10 @@ func (this *BookController) Index() {
 	} else {
 		this.Data["Result"] = template.JS(string(b))
 	}
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
+	}
 }
 
 //收藏书籍
@@ -192,6 +196,10 @@ func (this *BookController) Setting() {
 	this.Data["Cates"], _ = new(models.Category).GetCates(-1, 1)
 	this.Data["Model"] = book
 	this.TplName = "book/setting.html"
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
+	}
 }
 
 // SaveBook 保存书籍信息

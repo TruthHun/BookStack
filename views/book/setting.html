@@ -40,7 +40,8 @@
                 <div class="m-box">
                     <div class="box-head">
                         <strong class="box-title"> 书籍设置</strong>
-
+                        
+                        {{if or $.chrome_is_installed $.puppeteer_is_installed}}
                         <div class="btn-group pull-right btn-group-sm" style="margin-left: 5px;">
                             <button type="button" class="btn btn-default"><i class="fa fa-cloud-upload"></i> 导入书籍</button>
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -53,13 +54,16 @@
                                         <i class="fa fa-link"></i> ZIP 拉取导入
                                     </a>
                                 </li>
+                                {{if $.git_is_installed}}
                                 <li>
                                     <a href="javascript:void(0);" class="btn-pull-by-git" data-toggle="tooltip" data-identify="{{.Model.Identify}}" title="从Git仓库导入markdown书籍">
                                         <i class="fa fa-git"></i> Git Clone 导入
                                     </a>
                                 </li>
+                                {{end}}
                             </ul>
                         </div>
+                        {{end}}
 
                         <a style="margin-left: 5px;" href="/api/{{.Model.Identify}}/edit" class="btn btn-default btn-sm pull-right">编辑文档</a>
 
@@ -70,9 +74,13 @@
                         {{else}}
                         <button type="button"  class="btn btn-danger btn-sm pull-right" data-toggle="modal" data-target="#changePrivatelyOwnedModal" style="margin-right: 5px;">转为私有</button>
                         {{end}}
+
+                        {{if $.calibre_is_installed}}
                         <a href="{{urlfor "BookController.Generate" ":key" .Model.Identify}}" style="margin-right: 5px;"  class="btn btn-success btn-sm ajax-get  pull-right">
                             生成电子书
                         </a>
+                        {{end}}
+
                         <button type="button"  class="btn btn-danger btn-sm pull-right" style="margin-right: 5px;" data-toggle="modal" data-target="#deleteBookModal">删除书籍</button>
                         {{end}}
 

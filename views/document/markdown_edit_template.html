@@ -65,8 +65,10 @@
             <a href="javascript:;" id="markdown-save" data-toggle="tooltip" data-title="保存内容" class="disabled save"><i class="fa fa-save" aria-hidden="true" name="save"></i></a>
         </div>
         <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍（【普通发布】，适用于正常编写文档且前台排版正常的情况）"><i class="fa fa-paper-plane first" name="release"unselectable="on"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍"><i class="fa fa-paper-plane first" name="release"unselectable="on"></i></a>
+            {{if or $.chrome_is_installed $.puppeteer_is_installed}}
             <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍（【强制发布】，适用于前台排版错乱的情况）"><i class="fa fa-flash last" name="force-release" unselectable="on"></i></a>
+            {{end}}
         </div>
         {{/*<div class="editormd-group">*/}}
             {{/*<a href="javascript:;" data-toggle="tooltip" data-title="撤销 (Ctrl-Z)"><i class="fa fa-undo first" name="undo" unselectable="on"></i></a>*/}}
@@ -132,9 +134,11 @@
             {{/*<a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>*/}}
         {{/*</div>*/}}
 
+        {{if $.calibre_is_installed}}
         <div class="editormd-group pull-right">
             <a href="javascript:;" data-toggle="tooltip" data-title="生成电子书"><i class="fa fa-book" name="generate" aria-hidden="true"></i></a>
         </div>
+        {{end}}
 
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title=""></a>

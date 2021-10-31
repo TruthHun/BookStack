@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-var installedDependencies = make(map[string]installedDependency)
+var installedDependencies []installedDependency
 
 type installedDependency struct {
 	Name        string // 依赖名称
@@ -20,7 +20,7 @@ func init() {
 	go checkInstalledDependencyData()
 }
 
-func GetInstalledDependencies() map[string]installedDependency {
+func GetInstalledDependencies() []installedDependency {
 	return installedDependencies
 }
 
@@ -35,52 +35,52 @@ func checkInstalledDependencyData() {
 	if err = IsInstalledCalibre("ebook-convert"); err != nil {
 		errCalibre = err.Error()
 	}
-	installedDependencies[nameCalibre] = installedDependency{
+	installedDependencies = append(installedDependencies, installedDependency{
 		Name:        nameCalibre,
 		IsInstalled: err == nil,
 		Error:       errCalibre,
 		Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>。如果未安装该模块，则无法生成电子书和提供电子书下载。",
 		CheckedAt:   time.Now().Format(dateLayout),
-	}
+	})
 
 	errGit := "-"
 	nameGit := "git"
 	if err = IsInstalledGit(); err != nil {
 		errGit = err.Error()
 	}
-	installedDependencies[nameGit] = installedDependency{
+	installedDependencies = append(installedDependencies, installedDependency{
 		Name:        nameGit,
 		IsInstalled: err == nil,
 		Error:       errGit,
 		Message:     "git，用于git clone方式导入项目。如果未安装该模块，则无法使用该方式导入项目。",
 		CheckedAt:   time.Now().Format(dateLayout),
-	}
+	})
 
 	errChrome := "-"
 	nameChrome := "chrome"
 	if err = IsInstalledChrome(beego.AppConfig.DefaultString("chrome", "chrome")); err != nil {
 		errChrome = err.Error()
 	}
-	installedDependencies[nameChrome] = installedDependency{
+	installedDependencies = append(installedDependencies, installedDependency{
 		Name:        nameChrome,
 		IsInstalled: err == nil,
 		Error:       errChrome,
 		Message:     "chrome浏览器，即谷歌浏览器，或者chromium-browser，用于渲染markdown内容为HTML。",
 		CheckedAt:   time.Now().Format(dateLayout),
-	}
+	})
 
 	namePuppeteer := "puppeteer"
 	errPuppeteer := "-"
 	if err = IsInstalledPuppetter(); err != nil {
 		errPuppeteer = err.Error()
 	}
-	installedDependencies[namePuppeteer] = installedDependency{
-		Name:        "puppeteer",
+	installedDependencies = append(installedDependencies, installedDependency{
+		Name:        namePuppeteer,
 		IsInstalled: err == nil,
 		Error:       errPuppeteer,
 		Message:     "puppeteer, node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
 		CheckedAt:   time.Now().Format(dateLayout),
-	}
+	})
 }
 
 // IsInstalledPuppetter 是否安装了puppeteer

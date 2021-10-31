@@ -557,7 +557,10 @@ func (this *DocumentController) Edit() {
 		}
 	}
 	this.Data["BaiDuMapKey"] = beego.AppConfig.DefaultString("baidumapkey", "")
-
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
+	}
 }
 
 //创建一个文档.
