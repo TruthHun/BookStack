@@ -16,10 +16,12 @@ import (
 //评论表
 type Comments struct {
 	Id         int
-	Uid        int       `orm:"index"` //用户id
-	BookId     int       `orm:"index"` //书籍id
-	Content    string    //评论内容
-	TimeCreate time.Time //评论时间
+	Pid        int       `orm:"index;default(0)"` // 上一个评论的ID
+	Uid        int       `orm:"index"`            // 用户id
+	BookId     int       `orm:"index"`            // 书籍id
+	DocId      int       `orm:"index;default(0)"` // 文档ID
+	Content    string    `orm:"type(text)"`       // 评论内容
+	TimeCreate time.Time // 评论时间
 	Status     int8      //  审核状态; 0，待审核，1 通过，-1 不通过
 }
 
@@ -35,24 +37,35 @@ type Score struct {
 // 多字段唯一键
 func (this *Score) TableUnique() [][]string {
 	return [][]string{
-		[]string{"Uid", "BookId"},
+		{"Uid", "BookId"},
 	}
+}
+
+type CommentOpt struct {
+	Status            []int
+	BookId            int
+	DocId             int
+	WithoutDocComment bool
 }
 
 //评论内容
 type BookCommentsResult struct {
-	Id         int       `json:"id"`
-	Uid        int       `json:"uid"`
-	Score      int       `json:"score"`
-	Avatar     string    `json:"avatar"`
-	Account    string    `json:"account"`
-	Nickname   string    `json:"nickname"`
-	BookId     int       `json:"book_id"`
-	BookName   string    `json:"book_name"`
-	Identify   string    `json:"identify"`
-	Content    string    `json:"content"`
-	Status     int8      `json:"status"`
-	TimeCreate time.Time `json:"created_at"` //评论时间
+	Id             int       `json:"id"`
+	Pid            int       `json:"pid"`
+	Uid            int       `json:"uid"`
+	DocId          int       `json:"doc_id"`
+	Score          int       `json:"score"`
+	Avatar         string    `json:"avatar"`
+	Account        string    `json:"account"`
+	Nickname       string    `json:"nickname"`
+	BookId         int       `json:"book_id"`
+	BookName       string    `json:"book_name"`
+	Identify       string    `json:"identify"`
+	Content        string    `json:"content"`
+	Status         int8      `json:"status"`
+	TimeCreate     time.Time `json:"created_at"` //评论时间
+	ReplyToUser    string    `json:"reply_to_user"`
+	ReplyToContent string    `json:"reply_to_content"`
 }
 
 func NewComments() *Comments {
@@ -65,15 +78,23 @@ func (this *Comments) SetCommentStatus(id, status int) (err error) {
 }
 
 // 获取可显示的评论内容
-func (this *Comments) Comments(p, listRows, bookId int, status ...int) (comments []BookCommentsResult, err error) {
-	sql := `select c.id,c.content,s.score,c.uid,c.status,c.time_create,m.avatar,m.nickname,m.account,b.book_id,b.book_name,b.identify from md_comments c left join md_members m on m.member_id=c.uid left join md_score s on s.uid=c.uid and s.book_id=c.book_id left join md_books b on b.book_id = c.book_id %v order by c.id desc limit %v offset %v`
+func (this *Comments) Comments(p, listRows int, opt CommentOpt) (comments []BookCommentsResult, err error) {
+	sql := `select c.id,c.content,s.score,c.uid,c.status,c.pid,c.doc_id,c.time_create,m.avatar,m.nickname,m.account,b.book_id,b.book_name,b.identify from md_comments c left join md_members m on m.member_id=c.uid left join md_score s on s.uid=c.uid and s.book_id=c.book_id left join md_books b on b.book_id = c.book_id %v order by c.id desc limit %v offset %v`
 	whereStr := ""
 	whereSlice := []string{"true"}
-	if bookId > 0 {
-		whereSlice = append(whereSlice, "c.book_id = "+strconv.Itoa(bookId))
+	if opt.BookId > 0 {
+		whereSlice = append(whereSlice, "c.book_id = "+strconv.Itoa(opt.BookId))
 	}
-	if len(status) > 0 {
-		whereSlice = append(whereSlice, "c.status = "+strconv.Itoa(status[0]))
+	if opt.WithoutDocComment { // 不加载文档的评论
+		whereSlice = append(whereSlice, "c.doc_id = 0")
+	} else {
+		if opt.DocId > 0 {
+			whereSlice = append(whereSlice, "c.doc_id = "+strconv.Itoa(opt.DocId))
+		}
+	}
+
+	if len(opt.Status) > 0 {
+		whereSlice = append(whereSlice, "c.status = "+strconv.Itoa(opt.Status[0]))
 	}
 
 	if len(whereSlice) > 0 {
@@ -82,6 +103,27 @@ func (this *Comments) Comments(p, listRows, bookId int, status ...int) (comments
 
 	sql = fmt.Sprintf(sql, whereStr, listRows, (p-1)*listRows)
 	_, err = orm.NewOrm().Raw(sql).QueryRows(&comments)
+	if len(comments) == 0 {
+		return
+	}
+
+	commentMap := make(map[int]BookCommentsResult)
+	for _, comment := range comments {
+		commentMap[comment.Id] = comment
+	}
+	for idx, comment := range comments {
+		if val, ok := commentMap[comment.Pid]; ok {
+			if val.Nickname == "" {
+				val.Nickname = "匿名"
+			}
+			comment.ReplyToUser = val.Nickname
+			comment.ReplyToContent = val.Content
+		}
+		if comment.Nickname == "" {
+			comment.Nickname = "匿名"
+		}
+		comments[idx] = comment
+	}
 	return
 }
 
@@ -137,7 +179,7 @@ func (this *Comments) DeleteComment(id int) {
 	m := &Comments{}
 	o := orm.NewOrm()
 	o.QueryTable(m).Filter("id", id).One(m, "book_id")
-	if m.BookId > 0 {
+	if m.BookId > 0 && m.DocId == 0 {
 		o.QueryTable(m).Filter("id", id).Delete()
 		sql := "update md_books set cnt_comment = cnt_comment - 1 where cnt_comment > 0 and book_id = ?"
 		_, err := o.Raw(sql, m.BookId).Exec()
@@ -221,7 +263,7 @@ func (this *Score) AddScore(uid, bookId, score int) (err error) {
 }
 
 //添加评论
-func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
+func (this *Comments) AddComments(uid, bookId, pid, docId int, content string) (err error) {
 	var comment Comments
 
 	//查询该用户现有的评论
@@ -238,6 +280,8 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 		BookId:     bookId,
 		Content:    content,
 		TimeCreate: now,
+		DocId:      docId,
+		Pid:        pid,
 	}
 
 	if _, err = o.Insert(&comments); err != nil {
@@ -245,7 +289,9 @@ func (this *Comments) AddComments(uid, bookId int, content string) (err error) {
 		err = errors.New("发表评论失败")
 		return
 	}
-	// 书籍被评论数量量+1
-	SetIncreAndDecre("md_books", "cnt_comment", fmt.Sprintf("book_id=%v", bookId), true)
+	if docId == 0 {
+		// 书籍被评论数量量+1
+		SetIncreAndDecre("md_books", "cnt_comment", fmt.Sprintf("book_id=%v", bookId), true)
+	}
 	return
 }

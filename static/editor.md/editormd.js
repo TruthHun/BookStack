@@ -3614,23 +3614,21 @@
             text = trim(text);
             
             var escapedText    = text.toLowerCase().replace(/[^\w]+/g, "-");
-            var id = Math.floor(Math.random() * 1000000000 ).toString(36);
             var toc = {
                 text  : text,
                 level : level,
-                slug  : escapedText,
-                id    : id
+                slug  : escapedText
             };
             
-            //var isChinese = /^[\u4e00-\u9fa5]+$/.test(text);
-            //var id        = (isChinese) ? escape(text).replace(/\%/g, "") : text.toLowerCase().replace(/[^\w]+/g, "-");
+            var isChinese = /^[\u4e00-\u9fa5]+$/.test(text);
+            var id        = (isChinese) ? escape(text).replace(/\%/g, "") : text.toLowerCase().replace(/[^\w]+/g, "-");
 
             markdownToC.push(toc);
             
-            var headingHTML = "<h" + level + " id=\""+ id +"\">";
+            var headingHTML = "<h" + level + " id=\"h"+ level + "-" + this.options.headerPrefix + id +"\">";
             
-            headingHTML    += "<a name=\"" + id + "\" class=\"reference-link\"></a>";
-            headingHTML    += "<span class=\"header-link octicon octicon-link\"></span>";
+            headingHTML    += "<a name=\"" + text + "\" class=\"reference-link\"></a>";
+            // headingHTML    += "<span class=\"header-link octicon octicon-link\"></span>";
             headingHTML    += (hasLinkReg) ? this.atLink(this.emoji(linkText)) : this.atLink(this.emoji(text));
             headingHTML    += "</h" + level + ">";
 
@@ -3796,7 +3794,7 @@
                 html += "</ul></li>";
             }
 
-            html += "<li><a class=\"toc-level-" + level + "\" href=\"#" + id + "\" level=\"" + level +"\" title=\""+text+ "\">" + text + "</a><ul>";
+            html += "<li><a class=\"toc-level-" + level + "\" href=\"#" + text + "\" level=\"" + level + "\">" + text + "</a><ul>";
             lastLevel = level;
         }
         

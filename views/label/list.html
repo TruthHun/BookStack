@@ -6,7 +6,7 @@
 <body>
 <div class="manual-reader manual-container manual-search-reader">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="search-head">
             <strong class="search-title">标签列表</strong>
         </div>

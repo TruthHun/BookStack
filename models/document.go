@@ -2,6 +2,7 @@ package models
 
 import (
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -91,6 +92,40 @@ func (m *Document) Find(id int) (doc *Document, err error) {
 	return m, nil
 }
 
+// ReplaceIdentify 重命名文件文档标识之后，要重新替换内容中的旧文档链接为新的文档链接。
+func (m *Document) ReplaceIdentify(bookId int, oldIdentify, newIdentify string) {
+	// 1. 查找书籍的所有文档
+	// 2. 替换存在这些链接的文档
+	var (
+		o        = orm.NewOrm()
+		replaces []string
+		docs     []Document
+		ds       = &DocumentStore{}
+	)
+
+	linkFmt := []string{
+		"]($%s ",       // 如 [xxx]($aaa.md "aaaa")
+		"]($%s)",       // 如 [xxx]($aaa.md)
+		"]($%s#",       // 如 [xxx]($aaa.md#xxx)
+		"href=\"$%s\"", // href="$aaa.md"
+		"href=\"$%s#",  // href="$aaa.md#xxx
+	}
+
+	for _, link := range linkFmt {
+		replaces = append(replaces, fmt.Sprintf(link, oldIdentify), fmt.Sprintf(link, newIdentify))
+	}
+	replacer := strings.NewReplacer(replaces...)
+
+	o.QueryTable(m).Filter("book_id", bookId).Limit(100000).All(&docs, "document_id")
+	for _, doc := range docs {
+		o.QueryTable(ds).Filter("document_id", doc.DocumentId).One(ds, "document_id", "markdown")
+		if strings.Count(ds.Markdown, "$"+oldIdentify) > 0 {
+			ds.Markdown = replacer.Replace(ds.Markdown)
+			o.Update(ds, "document_id", "markdown")
+		}
+	}
+}
+
 //插入和更新文档.
 //存在文档id或者文档标识，则表示更新文档内容
 func (m *Document) InsertOrUpdate(cols ...string) (id int64, err error) {
@@ -166,11 +201,7 @@ func (m *Document) RecursiveDocument(docId int) error {
 }
 
 //发布文档内容为HTML
-func (m *Document) ReleaseContent(bookId int, baseUrl string) {
-	// 加锁
-	utils.BooksRelease.Set(bookId)
-	defer utils.BooksRelease.Delete(bookId)
-
+func (m *Document) ReleaseContent(bookId int, baseUrl string, force ...bool) {
 	var (
 		o           = orm.NewOrm()
 		docs        []*Document
@@ -201,29 +232,24 @@ func (m *Document) ReleaseContent(bookId int, baseUrl string) {
 			continue
 		}
 
-		if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
-			// 如果markdown内容为空，则查询下一级目录内容来填充
-			ds.Markdown, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
-			ds.Markdown = "[TOC]\n\n" + ds.Markdown
-		} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
+		if len(force) > 0 && force[0] {
 			//内容为空，渲染一下文档，然后再重新获取
 			utils.RenderDocumentById(item.DocumentId)
 			ds, _ = ModelStore.GetById(item.DocumentId)
+		} else {
+			if strings.TrimSpace(utils.GetTextFromHtml(strings.Replace(ds.Markdown, "[TOC]", "", -1))) == "" {
+				// 如果markdown内容为空，则查询下一级目录内容来填充
+				_, ds.Content = item.BookStackAuto(bookId, ds.DocumentId)
+			} else if len(utils.GetTextFromHtml(ds.Content)) == 0 {
+				//内容为空，渲染一下文档，然后再重新获取
+				utils.RenderDocumentById(item.DocumentId)
+				ds, _ = ModelStore.GetById(item.DocumentId)
+			}
 		}
 
 		item.Release = ds.Content
-		// attachList, err := NewAttachment().FindListByDocumentId(item.DocumentId)
-		// if err == nil && len(attachList) > 0 {
-		// 	content := bytes.NewBufferString("<div class=\"attach-list\"><strong>附件</strong><ul>")
-		// 	for _, attach := range attachList {
-		// 		li := fmt.Sprintf("<li><a href=\"%s\" target=\"_blank\" title=\"%s\">%s</a></li>", attach.HttpPath, attach.FileName, attach.FileName)
-		// 		content.WriteString(li)
-		// 	}
-		// 	content.WriteString("</ul></div>")
-		// 	item.Release += content.String()
-		// }
 
-		// 采集图片与稳定内容连接替换
+		// 采集图片与文档内容链接替换
 		if gq, err := goquery.NewDocumentFromReader(strings.NewReader(item.Release)); err == nil {
 			images := gq.Find("img")
 			if images.Length() > 0 {
@@ -736,4 +762,40 @@ func (m *Document) SplitMarkdownAndStore(seg string, markdown string, docId int)
 
 	}
 	return
+}
+
+// IsAllowReadChapter 书籍章节是否允许阅读
+func (m *Document) IsAllowReadChapter(bookId int, docId int) (yes bool, percent int) {
+	percent = 100
+	if bookId == 0 || docId == 0 {
+		return
+	}
+
+	percent, _ = strconv.Atoi(GetOptionValue("VISITOR_ALLOW_READED_PERCENT", "0"))
+	if percent <= 0 {
+		return false, percent
+	}
+
+	if percent >= 100 {
+		return true, percent
+	}
+
+	var docs []Document
+
+	orm.NewOrm().QueryTable(m).Filter("book_id", bookId).OrderBy("parent_id", "order_sort").All(&docs, "document_id", "identify")
+	length := len(docs)
+	if length == 0 {
+		return true, percent
+	}
+
+	index := int(float64(length*percent) / 100)
+	if index <= 0 {
+		index = 1
+	}
+	for _, doc := range docs[:index] {
+		if doc.DocumentId == docId {
+			return true, percent
+		}
+	}
+	return false, percent
 }

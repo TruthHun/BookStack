@@ -46,7 +46,7 @@ func (this *UserController) Index() {
 	if page < 1 {
 		page = 1
 	}
-	books, totalCount, _ := models.NewBook().FindToPager(page, pageSize, this.UcenterMember.MemberId, 0)
+	books, totalCount, _ := models.NewBook().FindToPager(page, pageSize, this.UcenterMember.MemberId, "", 0)
 	this.Data["Books"] = books
 
 	if totalCount > 0 {

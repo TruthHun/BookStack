@@ -9,7 +9,7 @@
 </head>
 <body id="bookstack-intro">
 {{template "widgets/header.html" .}}
-<div class="container">
+<div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
     <div class="row bookstack-info">
         <div class="col-xs-12">
             <h1>{{.Book.BookName}}
@@ -27,12 +27,12 @@
                 </div>
             {{end}}
         </div>
-        <div class="col-sm-3 col-xs-6 col-md-3">
+        <div class="col-sm-3 col-xs-6 col-md-3 {{if $.IsWideScreen}}col-lg-2{{end}}">
             <div class="{{if gt .Book.OrderIndex 0}}recommend-book{{end}} mgt-15px">
                 <img src="{{showImg .Book.Cover "cover"}}"  onerror="this.src='/static/images/book.png'"  class="img-responsive border-cover-img" alt="{{.Book.BookName}}">
             </div>
         </div>
-        <div class="{{if $.Wxacode}}col-sm-6 col-md-7{{else}}col-sm-9{{end}} col-xs-6">
+        <div class="{{if $.Wxacode}}col-sm-6 col-md-7 {{if $.IsWideScreen}}col-lg-8{{end}}{{else}}col-sm-9 {{if $.IsWideScreen}}col-lg-10{{end}}{{end}} col-xs-6">
             <ul class="none-listyle">
                 <li class="bookstack-score"><span>文档评分：</span>
                     <i class="bookstack-star star-{{.Book.Score}}"></i>
@@ -76,7 +76,7 @@
             </ul>
         </div>
         {{if $.Wxacode}}
-            <div class="col-sm-3 col-md-2 hidden-xs">
+            <div class="col-sm-3 col-md-2 col-lg-2 hidden-xs">
                 <img class="img-responsive" src="{{showImg $.Wxacode}}" alt="{{.Book.BookName}} - BookChat 微信小程序阅读码">
                 <div class="help-block text-center">微信扫一扫，知识掌上学</div>
             </div>
@@ -153,12 +153,12 @@
                                     {{end}}
 
                                 </div>
-                                <form action="{{urlfor "BookController.Comment" ":id" $.Book.BookId}}" method="post" class="ajax-form">
+                                <form action="{{urlfor "BookController.Comment" ":id" $.Book.BookId}}" method="post" class="ajax-form comment-form">
+                                    <input type="hidden" name="pid" value="0">
                                     <div class="form-group">
-                                        <textarea class="form-control" name="content" rows="3" placeholder="在这里，您可以给当前小编提意见和建议，以及对文档内容进行纠偏纠错提醒。"></textarea>
+                                        <textarea class="form-control" name="content" rows="5" placeholder="文明评论，理性发言"></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <span class="pull-left text-muted">文明评论，理性发言</span>
                                         <input type="submit" class="btn btn-success pull-right" value="发表点评">
                                     </div>
                                 </form>
@@ -170,10 +170,25 @@
                                         <div class="col-xs-12">
                                             <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="{{.Nickname}}">
                                             <span class="username">{{.Nickname}}</span>
-                                            <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
-                                            <span class="text-muted hidden-xs pull-right">{{date .TimeCreate "Y-m-d H:i:s"}}</span>
+                                            {{if gt .Score 0}}
+                                                <span>评分:<i class="bookstack-star star-{{.Score}}"></i></span>
+                                            {{end}}
                                         </div>
-                                        <div class="col-xs-12 comments-content">{{.Content}}</div>
+                                        <div class="col-xs-12 comments-content">
+                                            {{if gt .Pid 0}}
+                                            <div class="reply-to"><span class="text-info">{{.ReplyToUser}}</span> : {{.ReplyToContent}}</div>
+                                            {{end}}
+                                            <div>{{.Content}}</div>
+                                        </div>
+                                        <div class="mgt-15px">
+                                            <span class="text-muted">
+                                                <i class="fa fa-clock-o"></i>
+                                                {{date .TimeCreate "Y-m-d H:i:s"}}
+                                            </span>
+                                            <span class="reply" data-pid="{{.Id}}">
+                                                <i class="fa fa-comments-o"></i> 回复
+                                            </span>
+                                        </div>
                                     </li>
                                     {{end}}
 
@@ -200,7 +215,7 @@
     {{end}}
 
     {{if .RelateBooks}}
-        <div class="row mgt-15px">
+        <div class="row mgt-15px related-source">
             <div class="col-xs-12 mgt-15px">
                 <h4 class="help-block"><i class="fa fa-th color-gray"></i> 相关书籍</h4>
             </div>

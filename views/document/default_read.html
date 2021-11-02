@@ -28,29 +28,10 @@
         body{-webkit-overflow-scrolling:touch;}
         .alink,.alink a{color: #888 !important;}
         .alink:hover,.alink a:hover{color: red !important;}
+        img.icon-img { width: 13px;  height: 13px; position: relative; top: -2px; }
     </style>
 </head>
 <body>
-
-<!-- Modal -->
-<!-- 这个Modal主要用于显示思维导图的备注信息。 -->
-<div class="modal fade" id="ModalNote" tabindex="-1" role="dialog" aria-labelledby="ModalReplaceLabel">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span></button>
-				<h1 class="modal-title" id="ModalReplaceLabel" style="align:center;">思维导图备注</h1></div>
-			<div class="modal-body" style="overflow-y:auto; height:400px;"></div>
-			<div class="modal-footer">
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
-			</div>
-		</div>
-	</div>
-</div>
-
-
 <div class="m-manual manual-mode-view manual-reader">
     <header class="navbar navbar-static-top manual-head" role="banner">
         <div class="container-fluid">
@@ -63,6 +44,12 @@
                 <div class="bookstack-item">
                     {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
                     <a title="首页" href="/" class="btn btn-link"><i class="fa fa-home"></i> 首页</a>
+                    {{range .Model.Navs}}
+                        <a title="{{.Name}}" href="{{.URL}}" class="btn btn-link" target="{{.Target}}" style="{{if .Color}}color:{{.Color}} !important;{{end}}">
+                            {{str2html (parseICON .Icon)}}
+                             {{.Name}}</a>
+                    {{end}}
+
                     {{if $.Wxacode}}
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalBookChat" class="btn btn-light">
                         <img src="/static/images/wxacode.png" style="position: relative;top:-2px;" alt="BookChat 小程序"> <span>小程序</span></a>
@@ -121,6 +108,7 @@
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>
                         <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
+                        <span><a href="javascript:;"title="打印当前页面内容为PDF" class="tooltips printPDF"><i class="fa fa-print"></i> 打印</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
                     {{if (ads "content-top" $.IsMobile)}}
@@ -129,7 +117,14 @@
                         </div>
                     {{end}}
                     <article class="article-body  {{if eq .Model.Editor "markdown"}}markdown-body editormd-preview-container{{else}}editor-content{{end}}"  id="page-content">
-                    {{.Content}}
+                        {{if .IsAllowRead}}
+                            {{.Content}}
+                        {{else}}
+                            <div class="locked-reading text-center">
+                                <div class="locked-icon"></div>
+                                <div class="help-block">未登录游客仅可阅读 <span style="color:red">{{.Percent}}%</span> 章节，请您 <a href="/login" title="登录">登录</a> 再阅读</div>
+                            </div>
+                        {{end}}
                     </article>
                     {{if (ads "content-bottom" $.IsMobile)}}
                         <div class="ap ap-content-bottom mgt-15px">
@@ -145,9 +140,60 @@
                         </div>
                     </div>
 
-                    {{/*<div class="jump-top">*/}}
-                        {{/*<a href="javascript:;" class="view-backtop"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>*/}}
-                    {{/*</div>*/}}
+                    <div class="row comments-box">
+                        <div class="comments-form col-md-12">
+                            <form action="{{urlfor "BookController.Comment" ":id" $.Model.BookId}}" method="post" class="ajax-form comment-form">
+                                <div class="form-group">
+                                    <textarea name="content" rows="5" placeholder="文明评论，理性发言."></textarea>
+                                    <input type="hidden" name="pid" value="0">
+                                    <input type="hidden" name="doc_id" value="{{.DocId}}">
+                                  </div>
+                                  <div class="form-group row">
+                                    <div class="col-xs-7 col-sm-9 col-md-10"></div>
+                                    <div class="col-xs-5 col-sm-3 col-md-2">
+                                      <button type="submit" class="btn btn-success btn-block"><i class="fa fa-paper-plane-o"></i> 发布点评</button>
+                                    </div>
+                                  </div>
+                            </form>
+                        </div>
+
+                        <div class="comments-list col-md-12">
+                            {{range .Comments}}
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        {{if gt .Uid 0}}
+                                            <img src="{{showImg .Avatar "avatar"}}" class="img-thumbnail img-circle img-responsive" alt="{{.Nickname}}"/>
+                                            <span class="username">{{.Nickname}}</span>
+                                        {{else}}
+                                            <img src="/static/images/avatar.png" class="img-thumbnail img-circle img-responsive" alt="匿名">
+                                            <span class="username">匿名</span>
+                                        {{end}}
+                                    </div>
+                                    
+                                    <div class="col-xs-12 comments-content">
+                                        {{if gt .Pid 0}}
+                                            <div class="reply-to"><span class="text-info">
+                                                {{if eq .ReplyToUser ""}}匿名{{else}}{{.ReplyToUser}}{{end}}
+                                            </span> : {{.ReplyToContent}}</div>
+                                        {{end}}
+                                        <div>{{.Content}}</div>
+                                    </div>
+                                    
+                                    <div class="col-xs-12">
+                                        <span class="text-muted">
+                                            <i class="fa fa-clock-o"></i>
+                                            {{date .TimeCreate "Y-m-d H:i:s"}}
+                                        </span>
+                                        <span class="reply" data-pid="{{.Id}}">
+                                            <i class="fa fa-comments-o"></i> 回复
+                                        </span>
+                                    </div>
+                                </div>
+                            {{end}}
+                                
+                        </div>
+                    </div>
+
                     <div class="bookstack-bars">
                         <ul>
 
@@ -228,12 +274,30 @@
     </div>
     <div class="manual-mask"></div>
 </div>
-<span class="article-toggle tooltips" title="展开/收起文章目录"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
+<span class="article-toggle tooltips hidden" title="展开/收起文章目录"><img alt="展开/收起文章目录" src="/static/images/toggle.png"/></span>
 <div id="menu-hidden" style="display: none;">
     <!--站点统计代码-->
     {{str2html $.TONGJI}}
 </div>
 
+
+<!-- Modal -->
+<!-- 这个Modal主要用于显示思维导图的备注信息。 -->
+<div class="modal fade" id="ModalNote" tabindex="-1" role="dialog" aria-labelledby="ModalReplaceLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span></button>
+				<h1 class="modal-title" id="ModalReplaceLabel" style="align:center;">思维导图备注</h1></div>
+			<div class="modal-body" style="overflow-y:auto; height:400px;"></div>
+			<div class="modal-footer">
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div>
+			</div>
+		</div>
+	</div>
+</div>
 
 {{template "widgets/share.html" .}}
 {{template "widgets/qrcode.html" .}}
@@ -268,6 +332,8 @@
 <script src="{{$.StaticDomain}}/static/mind-map/kity.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/mind-map/kityminder.core.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/mind-map/mindmap.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/jquery.lazyload.min.js" type="text/javascript"></script>
+<script src="{{$.StaticDomain}}/static/js/printThis.js" type="text/javascript"></script>
 <script type="text/javascript" src="/static/js/bookstack.js?version={{$.Version}}"></script>
 <script type="text/javascript" src="/static/js/main.js?version={{$.Version}}"></script>
 
@@ -314,7 +380,15 @@ $(function () {
 
     show_copy_btn();
     initLinkWithImage();
-
+    $(".printPDF").click(function(){
+        // 由于懒加载的存在，需要处理下页面图片
+        $("img.lazy").each(function(){
+            $(this).attr("src",$(this).attr("data-original"))
+        });
+        $(".manual-article").printThis({
+            printDelay:500, // 延时500ms，页面样式渲染也要一定的时间
+        });
+    })
     $(".tooltips").tooltip();
     $("#qrcode").qrcode(location.href);
 

@@ -1,7 +1,13 @@
 package models
 
 import (
+	"archive/zip"
+	"encoding/json"
+	"errors"
+	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"time"
 
 	"strings"
@@ -10,9 +16,12 @@ import (
 
 	"strconv"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models/store"
 	"github.com/TruthHun/BookStack/utils"
+	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/TruthHun/gotil/filetil"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -33,9 +42,19 @@ const (
 	OrderLatestRecommend BookOrder = "latest-recommend" //最新推荐
 )
 
+type BookNav struct {
+	Sort   int    `json:"sort"`
+	Icon   string `json:"icon"`
+	Color  string `json:"color"`
+	Name   string `json:"name"`
+	URL    string `json:"url"`
+	Target string `json:"target"`
+}
+
 // Book struct .
 type Book struct {
 	BookId            int       `orm:"pk;auto;unique;column(book_id)" json:"book_id"`
+	ParentId          int       `orm:"column(parent_id);default(0)"`                      // 书籍的父级id，一般用于拷贝书籍项目生成新项目的时候
 	BookName          string    `orm:"column(book_name);size(500)" json:"book_name"`      // BookName 书籍名称.
 	Identify          string    `orm:"column(identify);size(100);unique" json:"identify"` // Identify 书籍唯一标识.
 	OrderIndex        int       `orm:"column(order_index);type(int);default(0);index" json:"order_index"`
@@ -55,8 +74,8 @@ type Book struct {
 	MemberId          int       `orm:"column(member_id);size(100);index" json:"member_id"`
 	ModifyTime        time.Time `orm:"type(datetime);column(modify_time);auto_now" json:"modify_time"`
 	ReleaseTime       time.Time `orm:"type(datetime);column(release_time);" json:"release_time"`   //书籍发布时间，每次发布都更新一次，如果文档更新时间小于发布时间，则文档不再执行发布
-	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //下载文档生成时间
-	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击上传文档的时间，用于显示频繁点击浪费服务器硬件资源的情况
+	GenerateTime      time.Time `orm:"type(datetime);column(generate_time);" json:"generate_time"` //电子书生成时间
+	LastClickGenerate time.Time `orm:"type(datetime);column(last_click_generate)" json:"-"`        //上次点击生成电子书的时间，用于显示频繁点击浪费服务器硬件资源的情况
 	Version           int64     `orm:"type(bigint);column(version);default(0)" json:"version"`
 	Vcnt              int       `orm:"column(vcnt);default(0)" json:"vcnt"`    // 书籍被阅读次数
 	Star              int       `orm:"column(star);default(0)" json:"star"`    // 书籍被收藏次数
@@ -68,7 +87,17 @@ type Book struct {
 	AdTitle           string    `orm:"default()"`           // 文字广告标题
 	AdLink            string    `orm:"default();size(512)"` // 文字广告链接
 	Lang              string    `orm:"size(10);index;default(zh)"`
+	NavJSON           string    `orm:"size(8192);default();column(nav_json)"` // 导航栏扩展
+	Navs              []BookNav `orm:"-" json:"navs"`
 }
+
+type BookNavs []BookNav
+
+func (s BookNavs) Len() int { return len(s) }
+
+func (s BookNavs) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+func (s BookNavs) Less(i, j int) bool { return s[i].Sort < s[j].Sort }
 
 // TableName 获取对应数据库表名.
 func (m *Book) TableName() string {
@@ -201,33 +230,47 @@ func (m *Book) FindByIdentify(identify string, cols ...string) (book *Book, err 
 
 //分页查询指定用户的书籍
 //按照最新的进行排序
-func (m *Book) FindToPager(pageIndex, pageSize, memberId int, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
-
+func (m *Book) FindToPager(pageIndex, pageSize, memberId int, wd string, PrivatelyOwned ...int) (books []*BookResult, totalCount int, err error) {
+	var args = []interface{}{memberId}
 	relationship := NewRelationship()
-
 	o := orm.NewOrm()
-	sql1 := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
+	sqlCount := "SELECT COUNT(book.book_id) AS total_count FROM " + m.TableNameWithPrefix() + " AS book LEFT JOIN " +
 		relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? WHERE rel.relationship_id > 0 "
 	if len(PrivatelyOwned) > 0 {
-		sql1 = sql1 + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
+		sqlCount = sqlCount + " and book.privately_owned=" + strconv.Itoa(PrivatelyOwned[0])
 	}
-	err = o.Raw(sql1, memberId).QueryRow(&totalCount)
+
+	if wd = strings.TrimSpace(wd); wd != "" {
+		wd = "%" + wd + "%"
+		sqlCount = sqlCount + " and (book.book_name like ? or book.description like ?)"
+		args = append(args, wd, wd)
+	}
+
+	err = o.Raw(sqlCount, args...).QueryRow(&totalCount)
 	if err != nil {
+		beego.Error(err)
 		return
 	}
 
 	offset := (pageIndex - 1) * pageSize
-	sql2 := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
+	sqlQuery := "SELECT book.*,rel.member_id,rel.role_id,m.account as create_name FROM " + m.TableNameWithPrefix() + " AS book" +
 		" LEFT JOIN " + relationship.TableNameWithPrefix() + " AS rel ON book.book_id=rel.book_id AND rel.member_id = ? " +
 		" LEFT JOIN " + NewMember().TableNameWithPrefix() + " AS m ON rel.member_id=m.member_id " +
 		" WHERE rel.relationship_id > 0 %v ORDER BY book.book_id DESC LIMIT " + fmt.Sprintf("%d,%d", offset, pageSize)
 
-	if len(PrivatelyOwned) > 0 {
-		sql2 = fmt.Sprintf(sql2, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
+	cond := []string{}
+	if wd != "" { // 不需要处理 wd 和 args，因为在上面已处理过
+		cond = append(cond, " and (book.book_name like ? or book.description like ?)")
 	}
-	_, err = o.Raw(sql2, memberId).QueryRows(&books)
+
+	if len(PrivatelyOwned) > 0 {
+		cond = append(cond, " and book.privately_owned="+strconv.Itoa(PrivatelyOwned[0]))
+	}
+	sqlQuery = fmt.Sprintf(sqlQuery, strings.Join(cond, " "))
+
+	_, err = o.Raw(sqlQuery, args...).QueryRows(&books)
 	if err != nil {
-		logs.Error("分页查询书籍列表 => ", err)
+		beego.Error("分页查询书籍列表 => ", err, sqlQuery)
 		return
 	}
 
@@ -576,6 +619,8 @@ func (book *Book) ToBookResult() (m *BookResult) {
 	m.AdLink = book.AdLink
 	m.Lang = book.Lang
 
+	json.Unmarshal([]byte(book.NavJSON), &m.Navs)
+
 	if book.Theme == "" {
 		m.Theme = "default"
 	}
@@ -691,6 +736,324 @@ func (b *Book) SearchBookByLabel(labels []string, limit int, excludeIds []int) (
 	_, err = o.Raw(sql, rawRegex, limit).QueryRows(&bookIds)
 	if err != nil {
 		logs.Error("failed to execute sql: %s, err: %s", sql, err.Error())
+	}
+	return
+}
+
+// Copy 拷贝书籍项目
+// 1. 创建新的书籍，设置书籍的父级id为被拷贝的项目，并同步数据信息
+// 2. 迁移章节内容，包括 md_documents 和 md_document_store
+// 3. 替换内容中的书籍标识
+// 4. 迁移书籍相关的图片等资源文件
+func (m *Book) Copy(sourceBookIdentify string) (err error) {
+	var (
+		sourceBook      Book
+		sourceDocs      []Document
+		sourceDocStores []DocumentStore
+		existBook       Book
+		sourceDocId     []interface{}
+		docMap          = make(map[int]int) // map[old_doc_id]new_doc_id
+	)
+	o := orm.NewOrm()
+	o.Begin()
+	defer func() {
+		if err == nil {
+			o.Commit()
+			m.ResetDocumentNumber(m.BookId)
+		} else {
+			o.Rollback()
+		}
+	}()
+
+	o.QueryTable(m).Filter("identify", sourceBookIdentify).One(&sourceBook, "book_id")
+	if sourceBook.BookId <= 0 {
+		return errors.New("拷贝的书籍不存在")
+	}
+
+	o.QueryTable(m).Filter("identify", m.Identify).One(&existBook, "book_id")
+	if existBook.BookId > 0 {
+		return errors.New("已存在相同标识的书籍，请更换书籍标识")
+	}
+
+	if m.Cover != "" {
+		newCover := strings.ReplaceAll(filepath.Join(filepath.Dir(m.Cover), fmt.Sprintf("cover-%v%v", m.Identify, filepath.Ext(m.Cover))), "\\", "/")
+		if utils.StoreType == utils.StoreOss {
+			store.ModelStoreOss.CopyFile(m.Cover, newCover)
+		} else {
+			utils.CopyFile(newCover, m.Cover)
+		}
+		m.Cover = newCover
+	}
+
+	m.ParentId = sourceBook.BookId
+	if _, err = o.Insert(m); err != nil {
+		beego.Error(err)
+		return errors.New("新建书籍失败：" + err.Error())
+	}
+
+	relationship := NewRelationship()
+	relationship.BookId = m.BookId
+	relationship.RoleId = 0
+	relationship.MemberId = m.MemberId
+
+	if _, err = o.Insert(relationship); err != nil {
+		beego.Error("插入项目与用户关联 => ", err)
+		return
+	}
+
+	document := NewDocument()
+
+	o.QueryTable(document).Filter("book_id", sourceBook.BookId).Limit(10000).All(&sourceDocs)
+	if len(sourceDocs) == 0 {
+		return errors.New("克隆的书籍项目章节不存在")
+	}
+
+	replacer := strings.NewReplacer(
+		fmt.Sprintf("/read/%s/", sourceBookIdentify), fmt.Sprintf("/read/%s/", m.Identify), // 内容中的阅读链接
+		fmt.Sprintf("/projects/%s/", sourceBookIdentify), fmt.Sprintf("/projects/%s/", m.Identify), // 内容中的相关附件
+	)
+
+	for _, doc := range sourceDocs {
+		oldDocId := doc.DocumentId
+		doc.DocumentId = 0
+		doc.BookId = m.BookId
+		doc.MemberId = m.MemberId
+		doc.Vcnt = 0
+
+		// 替换相关链接等
+		doc.Release = ""
+		if _, err = o.Insert(&doc); err != nil {
+			return errors.New("新建章节失败：" + err.Error())
+		}
+
+		sourceDocId = append(sourceDocId, oldDocId)
+		docMap[oldDocId] = doc.DocumentId
+	}
+
+	o.QueryTable(NewDocumentStore()).Filter("document_id__in", sourceDocId...).Limit(10000).All(&sourceDocStores)
+	for _, ds := range sourceDocStores {
+		if newId, ok := docMap[ds.DocumentId]; ok {
+			ds.DocumentId = newId
+			ds.Markdown = replacer.Replace(ds.Markdown)
+			ds.Content = ""
+			o.Insert(&ds)
+		}
+	}
+
+	// 更新章节所属父级ID
+	sql := "update md_documents set parent_id = ? where parent_id = ? and book_id = ?"
+	for oldId, newId := range docMap {
+		if _, err = o.Raw(sql, newId, oldId, m.BookId).Exec(); err != nil {
+			return
+		}
+	}
+
+	sourceDir := "projects/" + sourceBookIdentify
+	targetDir := "projects/" + m.Identify
+
+	if utils.StoreType == utils.StoreOss {
+		err = store.ModelStoreOss.CopyDir(sourceDir, targetDir)
+	} else {
+		sourceDir = "uploads/" + sourceDir
+		targetDir = "uploads/" + targetDir
+		if _, e := os.Stat(sourceDir); e == nil { // 存在文件夹
+			err = store.ModelStoreLocal.CopyDir(sourceDir, targetDir)
+		}
+	}
+	return
+}
+
+// Export2Markdown 将书籍导出markdown
+func (m *Book) Export2Markdown(identify string) (path string, err error) {
+	var (
+		book               *Book
+		exportDir          = fmt.Sprintf("uploads/export/%v", identify)
+		attachPrefix       string
+		exportAttachPrefix = "../attachments/"
+		docs               []Document
+		ds                 []DocumentStore
+		docIds             []interface{}
+		docMap             = make(map[int]Document)
+		o                  = orm.NewOrm()
+		isOSSProject       = utils.StoreType == utils.StoreOss
+		cover              = ""
+		replaces           []string
+	)
+
+	path = fmt.Sprintf("uploads/export/%v.zip", identify)
+	if book, err = m.FindByIdentify(identify); err != nil {
+		beego.Error(err)
+		return
+	}
+
+	os.MkdirAll(filepath.Join(exportDir, "docs"), os.ModePerm)
+	// 最后删除导出目录
+	defer func() {
+		os.RemoveAll(exportDir)
+	}()
+
+	attachPrefix = fmt.Sprintf("/uploads/projects/%s/", identify)
+	if isOSSProject {
+		attachPrefix = fmt.Sprintf("/projects/%s/", identify)
+	}
+
+	o.QueryTable(NewDocument()).Filter("book_id", book.BookId).Limit(100000).All(&docs, "document_id", "document_name", "identify")
+	if len(docs) == 0 {
+		err = errors.New("找不到书籍章节")
+		return
+	}
+
+	ext := ".md"
+	replaces = append(replaces, attachPrefix, exportAttachPrefix)
+	for _, doc := range docs {
+		docIds = append(docIds, doc.DocumentId)
+		identify := doc.Identify
+		id := strconv.Itoa(doc.DocumentId)
+
+		if docExt := strings.ToLower(strings.TrimSpace(filepath.Ext(doc.Identify))); docExt != ".md" {
+			doc.Identify = doc.Identify + ext
+		}
+		docMap[doc.DocumentId] = doc
+		replaces = append(replaces,
+			"]($"+identify, "]("+doc.Identify,
+			"href=\"$"+identify, "href=\""+doc.Identify,
+			"]($"+id, "]("+doc.Identify,
+			"href=\"$"+id, "href=\""+doc.Identify,
+		)
+	}
+
+	replaces = append(replaces, "]($", "](", "href=\"$", "href=\"")
+
+	// 图片等文件附件链接、URL链接等替换
+	replacer := strings.NewReplacer(replaces...)
+
+	o.QueryTable(NewDocumentStore()).Filter("document_id__in", docIds...).Limit(100000).All(&ds)
+	for _, item := range ds {
+		doc, ok := docMap[item.DocumentId]
+		if !ok {
+			continue
+		}
+
+		// 基本的链接替换
+		md := replacer.Replace(item.Markdown)
+		file := filepath.Join(exportDir, "docs", doc.Identify)
+		ioutil.WriteFile(file, []byte(md), os.ModePerm)
+	}
+
+	// SUMMARY 文档内容
+	docModel := NewDocument()
+	cont, _ := docModel.CreateDocumentTreeForHtml(book.BookId, 0)
+	// 把最后没有 .md 结尾的链接替换为 .md 结尾
+	if gq, _ := goquery.NewDocumentFromReader(strings.NewReader(cont)); gq != nil {
+		gq.Find("a").Each(func(i int, sel *goquery.Selection) {
+			if href, ok := sel.Attr("href"); ok {
+				if strings.ToLower(filepath.Ext(href)) != ".md" {
+					href = href + ".md"
+					sel.SetAttr("href", href)
+				}
+			}
+		})
+		cont, _ = gq.Html()
+	}
+	md := html2md.Convert(cont)
+	md = strings.ReplaceAll(md, fmt.Sprintf("](/read/%s/", identify), "](docs/")
+	md = fmt.Sprintf("- [%v](README.md)\n", book.BookName) + md
+	summaryFile := filepath.Join(exportDir, "SUMMARY.md")
+	ioutil.WriteFile(summaryFile, []byte(md), os.ModePerm)
+
+	// 书籍封面处理
+	if book.Cover != "" {
+		cover = fmt.Sprintf("![封面](attachments/%s)", strings.TrimPrefix(strings.TrimLeft(strings.ReplaceAll(book.Cover, "\\", "/"), "./"), strings.TrimLeft(attachPrefix, "./")))
+	}
+
+	// README
+	md = fmt.Sprintf("# %s\n\n%s\n\n%s\n\n\n\n## 目录\n\n%s", book.BookName, cover, book.Description, md)
+	readmeFile := filepath.Join(exportDir, "README.md")
+	ioutil.WriteFile(readmeFile, []byte(md), os.ModePerm)
+
+	dst := filepath.Join(exportDir, "attachments")
+	src := fmt.Sprintf("projects/%s", identify)
+	if !isOSSProject {
+		src = "uploads/" + src
+	}
+
+	if errDown := m.down2local(src, dst); errDown != nil {
+		beego.Error("down2local error:", errDown.Error())
+	}
+
+	err = m.zip(exportDir, path)
+	if err != nil {
+		beego.Error("压缩失败：", err.Error())
+	}
+	return
+}
+
+// 把书籍相关附件下载到本地
+func (m *Book) down2local(srcDir, desDir string) (err error) {
+	if utils.StoreType == utils.StoreLocal {
+		return store.ModelStoreLocal.CopyDir(srcDir, desDir)
+	}
+	return store.ModelStoreOss.Down2local(srcDir, desDir)
+}
+
+func (m *Book) zip(dir, zipFile string) (err error) {
+	// zip 压缩
+
+	var (
+		d     *os.File
+		fw    io.Writer
+		fcont []byte
+		fl    []filetil.FileList
+	)
+
+	if fl, err = filetil.ScanFiles(dir); err != nil {
+		return
+	}
+
+	os.Remove(zipFile)
+	d, err = os.Create(zipFile)
+	if err != nil {
+		beego.Error(err)
+		return
+	}
+	defer d.Close()
+	zipWriter := zip.NewWriter(d)
+	defer zipWriter.Close()
+
+	for _, file := range fl {
+		if file.IsDir {
+			continue
+		}
+
+		info, errInfo := os.Stat(file.Path)
+		if errInfo != nil {
+			beego.Error(errInfo)
+			continue
+		}
+
+		header, errHeader := zip.FileInfoHeader(info)
+		if errHeader != nil {
+			beego.Error(errHeader)
+			continue
+		}
+
+		header.Method = zip.Deflate
+		header.Name = strings.TrimLeft(strings.TrimPrefix(strings.ReplaceAll(file.Path, "\\", "/"), dir), "./")
+
+		fw, err = zipWriter.CreateHeader(header)
+		if err != nil {
+			beego.Error(err)
+			return
+		}
+
+		fcont, err = ioutil.ReadFile(file.Path)
+		if err != nil {
+			return
+		}
+
+		if _, err = fw.Write(fcont); err != nil {
+			return
+		}
 	}
 	return
 }

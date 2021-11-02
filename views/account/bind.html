@@ -9,7 +9,7 @@
 </head>
 <body class="manual-container">
 <header class="navbar navbar-static-top smart-nav navbar-fixed-top manual-header" role="banner">
-    <div class="container">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
         <div class="navbar-header col-sm-12 col-md-6 col-lg-5">
             <a href="/" class="navbar-brand" title="{{.SITE_NAME}}">
                 <img class="logo" src="/static/images/logo.png" alt="{{.SITE_NAME}}">
@@ -17,7 +17,7 @@
         </div>
     </div>
 </header>
-<div class="container manual-body">
+<div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
     <div class="row login">
         <div class="col-xs-12">
                 <div class="login-body">
@@ -80,7 +80,7 @@
                             </div>
 
                             <div class="help-block">
-                                 {{if $.OauthLogin}}使用以下方式一键登录{{end}}
+                                 {{if $.OauthLogin}}使用以下方式一键登录{{end}}&nbsp;
                                  <span class="pull-right"> 已有账号？ <a href="{{urlfor "AccountController.Login"}}" title="立即登录" class="tooltips text-primary">立即登录</a></span>
                             </div>
                             <div class="form-group login-by-third">

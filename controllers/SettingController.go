@@ -50,6 +50,7 @@ func (this *SettingController) Index() {
 		member.Phone = phone
 		member.WechatNO = wechatNO
 		member.Description = description
+		member.Nickname = nickname
 		if err := member.Update(); err != nil {
 			this.JsonResult(602, err.Error())
 		}

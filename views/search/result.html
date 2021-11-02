@@ -21,9 +21,9 @@
 <body>
 <div class="manual-reader manual-container manual-search-reader search-result">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row">
-            <div class="col-sm-8 col-xs-12">
+            <div class="col-sm-8 col-md-8 col-xs-12 {{if $.IsWideScreen}}col-lg-6 col-lg-offset-1{{end}}">
                 <form method="get" action="{{urlfor "SearchController.Result"}}" class="search-form">
                     <div class="input-group input-group-lg">
                         <input type="text" name="wd" value="{{.Wd}}" placeholder="Search..." class="form-control">
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-8 col-xs-12 result-list">
+            <div class="col-sm-8 col-md-8 col-xs-12 result-list {{if $.IsWideScreen}}col-lg-6 col-lg-offset-1{{end}}">
                 <div class="help-block"><a style="color: red;" target="_blank" rel="nofollow noreferrer" href="https://www.baidu.com/s?wd={{.SITE_NAME}}">{{.SITE_NAME}}</a> 本次搜索耗时 <span class="text-danger">{{.SpendTime}}</span> 秒，为您找到  <span class="text-success">{{.TotalRows}}</span> 个相关结果.</div>
                 {{if (ads "search-top" $.IsMobile)}}
                     <div class="ap ap-search-top mgb-15px">
@@ -104,7 +104,7 @@
                 {{.PageHtml}}
             </div>
             {{if (ads "search-right" $.IsMobile)}}
-                <div class="col-sm-4 hidden-xs result-right ap ap-search-right">
+                <div class="col-sm-4 col-lg-5 hidden-xs result-right ap ap-search-right">
                     {{str2html (ads "search-right" $.IsMobile)}}
                 </div>
             {{end}}

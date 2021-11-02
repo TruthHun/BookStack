@@ -39,15 +39,6 @@ func (this *ManagerController) Prepare() {
 	}
 }
 
-var installed []installedDependency
-
-type installedDependency struct {
-	Name        string // 依赖名称
-	IsInstalled bool   // 是否已安装
-	Message     string // 相关信息
-	Error       string
-}
-
 func (this *ManagerController) Index() {
 	this.TplName = "manager/index.html"
 	this.Data["Model"] = models.NewDashboard().Query()
@@ -56,55 +47,7 @@ func (this *ManagerController) Index() {
 		"keywords":    "仪表盘",
 		"description": this.Sitename + "专注于文档在线写作、协作、分享、阅读与托管，让每个人更方便地发布、分享和获得知识。",
 	})
-	if len(installed) == 0 {
-		var err error
-
-		errCalibre := "-"
-		if err = utils.IsInstalledCalibre("ebook-convert"); err != nil {
-			errCalibre = err.Error()
-		}
-		installed = append(installed, installedDependency{
-			Name:        "calibre",
-			IsInstalled: err == nil,
-			Error:       errCalibre,
-			Message:     "calibre 用于将书籍转换成PDF、epub和mobi ==> <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
-		})
-
-		errGit := "-"
-		if err = utils.IsInstalledGit(); err != nil {
-			errGit = err.Error()
-		}
-		installed = append(installed, installedDependency{
-			Name:        "git",
-			IsInstalled: err == nil,
-			Error:       errGit,
-			Message:     "git，用于克隆项目",
-		})
-
-		errChrome := "-"
-		if err = utils.IsInstalledChrome(beego.AppConfig.DefaultString("chrome", "chrome")); err != nil {
-			errChrome = err.Error()
-		}
-		installed = append(installed, installedDependency{
-			Name:        "chrome",
-			IsInstalled: err == nil,
-			Error:       errChrome,
-			Message:     "chrome浏览器，即谷歌浏览器，或者chromium-browser，用于渲染markdown内容为HTML。",
-		})
-
-		errPuppeteer := "-"
-		if err = utils.IsInstalledPuppetter(beego.AppConfig.DefaultInt("httpport", 8181)); err != nil {
-			errPuppeteer = err.Error()
-		}
-		installed = append(installed, installedDependency{
-			Name:        "puppeteer",
-			IsInstalled: err == nil,
-			Error:       errPuppeteer,
-			Message:     "puppeteer, node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
-		})
-	}
-
-	this.Data["Installed"] = installed
+	this.Data["Installed"] = utils.GetInstalledDependencies()
 	this.Data["IsDashboard"] = true
 }
 
@@ -615,7 +558,7 @@ func (this *ManagerController) CreateToken() {
 }
 
 func (this *ManagerController) Setting() {
-
+	tab := this.GetString("tab", "basic")
 	options, err := models.NewOption().All()
 	if err != nil {
 		this.Abort("404")
@@ -623,12 +566,16 @@ func (this *ManagerController) Setting() {
 
 	if this.Ctx.Input.IsPost() {
 		for _, item := range options {
-			item.OptionValue = this.GetString(item.OptionName)
-			item.InsertOrUpdate()
+			if _, ok := this.Ctx.Request.PostForm[item.OptionName]; ok {
+				item.OptionValue = this.GetString(item.OptionName)
+				item.InsertOrUpdate()
+			}
 		}
+
 		if err := models.NewElasticSearchClient().Init(); err != nil {
 			this.JsonResult(1, err.Error())
 		}
+
 		models.NewSign().UpdateSignRule()
 		models.NewReadRecord().UpdateReadingRule()
 		this.JsonResult(0, "ok")
@@ -643,7 +590,7 @@ func (this *ManagerController) Setting() {
 		}
 	}
 	this.Data["SITE_TITLE"] = this.Option["SITE_NAME"]
-
+	this.Data["Tab"] = tab
 	this.Data["IsSetting"] = true
 	this.Data["SeoTitle"] = "配置管理"
 	this.TplName = "manager/setting.html"
@@ -701,10 +648,12 @@ func (this *ManagerController) Comments() {
 	p, _ := this.GetInt("page", 1)
 	size, _ := this.GetInt("size", 10)
 	m := models.NewComments()
+	opt := models.CommentOpt{}
 	if status == "" {
-		this.Data["Comments"], _ = m.Comments(p, size, 0)
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	} else {
-		this.Data["Comments"], _ = m.Comments(p, size, 0, statusNum)
+		opt.Status = []int{statusNum}
+		this.Data["Comments"], _ = m.Comments(p, size, opt)
 	}
 	this.Data["IsComments"] = true
 	this.Data["Status"] = status

@@ -677,7 +677,7 @@ a{color: #333}
 
 
 .border{border: 1px solid #efefef;}
-.border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.1);border-radius: 4px;}
+.border-cover-img{box-shadow: 0px 1px 3px rgba(0,0,0,.2);border-radius: 4px;}
 .navbar-brand>img.logo{height: 45px;margin-top: -7px;}
 #bookstack-intro{padding-top: 70px;}
 #bookstack-intro ul,#bookstack-intro li{list-style: none;padding:0px;}
@@ -697,18 +697,29 @@ a{color: #333}
 #bookstack-intro .comments-form .fa{font-size: 18px;}
 #bookstack-intro .comments-form .fa-star{color: #ff6600}
 #bookstack-intro .comments-form .cursor-pointer{cursor: pointer;}
-#bookstack-intro .comments-list li{padding: 30px 0px;border-bottom: 1px solid #EFEFEF;}
+#bookstack-intro .comments-list li{padding: 15px 0px 5px;border-bottom: 1px solid #EFEFEF;}
 #bookstack-intro .comments-list li>.col-xs-12{padding: 0px;}
 #bookstack-intro .comments-list .username{color: #333333;}
 #bookstack-intro .comments-list span{color: #b6b6b6;margin-left: 5px;}
 #bookstack-intro .comments-list img{display: inline-block;height: 50px;width: 50px;}
-#bookstack-intro .comments-list .comments-content{font-size: 13px;color: #999999;text-indent: 2em;line-height: 170%;margin-top:10px;}
+#bookstack-intro .comments-list .comments-content{
+    font-size: 13px;color: #666;line-height: 170%;margin-top:10px;margin-bottom: 15px;
+    padding-left: 15px !important;
+}
 #bookstack-intro .comments-left{padding-left: 0px;}
 #bookstack-intro .comments-right{padding:  0px;}
 #bookstack-intro .comments-right .userinfo{font-size: 16px;position: relative;top:-7px;}
 #bookstack-intro .comments-right .userinfo span{font-size: 14px;color: #999999;}
 #bookstack-intro .comments-content{color: #999999;}
-
+#bookstack-intro .reply:hover{cursor: pointer;}
+#bookstack-intro .comments-list form{margin-left: 2em;padding-top: 15px;}
+#bookstack-intro .comments-list .reply-to{
+    background-color: #efefef;
+    border-radius: 5px;line-height: 160%;
+    padding: 10px;margin-bottom: 10px;
+    box-sizing: border-box;
+    color: #888;
+}
 
 .friend-links a{margin-right: 8px;}
 .book-title{line-height: 200%;}
@@ -847,6 +858,12 @@ a{color: #333}
     content: url("../images/recommend-red.png");
     position: absolute;top:5px;left: 22px;
 }
+
+@media(min-width: 1200px){
+    .manual-list .recommend-book:before{left: 35px;}
+    .manual-list .pin-book:after{left: 35px;}
+}
+
 .bookstack-info .recommend-book:before{
     top:22px;
 }
@@ -860,7 +877,8 @@ a{color: #333}
 
 .search-result .search-form{margin: 10px 0px;}
 .result-list ul,.result-list li.clearfix{list-style: none;padding: 0px;}
-.result-list li.clearfix img{width: 80%;}
+/* .result-list li.clearfix img{width: 80%;} */
+.result-list li.clearfix img{width: 100%;}
 .result-list li.clearfix{margin: 20px 0px;border-bottom: 1px dashed #EFEFEF;
     line-height: 180%;
 }
@@ -887,7 +905,7 @@ a{color: #333}
 }
 
 .lang-explore .text-muted{color: #999;}
-.lang-explore a{margin-left: 5px;margin-right: 3px;}
+.lang-explore a{margin: 0 5px;}
 .lang-explore a.active{color: #06f}
 .submit-book{margin-top: 90px;}
 .submit-book p{margin-bottom: 0;}
@@ -1004,3 +1022,58 @@ a{color: #333}
 .wait2del>div{margin-bottom: 15px;}
 .wait2del ul{padding-left: 15px;}
 .wait2del label{font-weight: normal;}
+
+.lang-explore{font-size: 15px;line-height: 220%;}
+
+/* --------------------- 宽屏样式 ------------------- */
+@media(min-width: 1200px){
+    .container-widescreen .manual-list .col-md-2{
+        width: 12.5%;
+    }
+    .container-widescreen .manual-list .border-cover-img{
+        margin: 0 auto;
+    }
+    /* 标题宽度，要跟封面最大宽度一致 */
+    .manual-list .manual-item-standard dd a{max-width: 175px;margin:15px auto 30px;}
+
+    .container-widescreen .book-list .list-item a{
+        font-size: 20px;line-height: 200%;
+    }
+
+    .container-widescreen .book-list .list-item .info{
+        font-size: 14px;
+    }
+
+    .container-widescreen .book-list .list-item .desc-text{
+        font-size: 16px;
+    }
+    .container-widescreen .book-list .list-item a.btn{font-size: unset;line-height: 178%;}
+    .container-widescreen .result-list .clearfix a{display: inline-block;margin-bottom: 13px;}
+}
+
+.related-source dl.manual-item-standard{
+    max-width: 175px;
+    margin: 0 auto 15px;
+}
+
+.loading{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.63);
+    z-index: 9999;
+    top: 0;
+    display: none;
+}
+.loading.show{display: block;}
+
+.loading-box{width: 360px;padding: 30px;background-color: #fff;text-align: center;max-width: 100%;box-sizing: border-box;margin: 300px auto;
+    border-radius: 5px;
+}
+.loading-icon img{margin-bottom: 20px;}
+.loading-cancel{margin-top: 10px;color: red;display: inline-block;}
+
+.book-list .progress{height: 10px;border-radius: 10px;margin-bottom: 5px;}
+.book-list .progress-bar{font-size: 0.2em;line-height: 10px;}
+.book-list .progress-bar-primary{background-color: #cccccc;}
+.book-list .progress-bar-disabled{background-color: #efefef;color: #888;}

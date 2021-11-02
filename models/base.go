@@ -50,6 +50,7 @@ func Init() {
 			time.Sleep(time.Second * 30)
 		}
 	}()
+	go NewEbook().CheckAndGenerateEbook()
 }
 
 //设置增减
@@ -196,24 +197,13 @@ type Count struct {
 
 // CountCategory 统计书籍分类
 func CountCategory() {
-	var count []Count
+	var (
+		count     []Count
+		tableCate = "md_category"
+		err       error
+	)
 
 	o := orm.NewOrm()
-	sql := "select count(bc.id) cnt, bc.category_id from md_book_category bc left join md_books b on b.book_id=bc.book_id where b.privately_owned=0 and bc.category_id>0  group by bc.category_id"
-	o.Raw(sql).QueryRows(&count)
-	if len(count) == 0 {
-		return
-	}
-
-	var cates []Category
-	tableCate := "md_category"
-	o.QueryTable(tableCate).All(&cates, "id", "pid", "cnt")
-	if len(cates) == 0 {
-		return
-	}
-
-	var err error
-
 	o.Begin()
 	defer func() {
 		if err != nil {
@@ -224,15 +214,16 @@ func CountCategory() {
 		}
 	}()
 
-	cateChild := make(map[int]int)
+	sql := "select count(bc.id) cnt, bc.category_id from md_book_category bc left join md_books b on b.book_id=bc.book_id where b.privately_owned=0 and bc.category_id>0  group by bc.category_id"
+	o.Raw(sql).QueryRows(&count)
+
+	// 重置为0
 	if _, err = o.QueryTable(tableCate).Filter("id__gt", 0).Update(orm.Params{"cnt": 0}); err != nil {
-		return
+		beego.Error(err)
 	}
 
 	for _, item := range count {
-		cateChild[item.CategoryId] = item.Cnt
-		_, err = o.QueryTable(tableCate).Filter("id", item.CategoryId).Update(orm.Params{"cnt": item.Cnt})
-		if err != nil {
+		if _, err = o.QueryTable(tableCate).Filter("id", item.CategoryId).Update(orm.Params{"cnt": item.Cnt}); err != nil {
 			return
 		}
 	}

@@ -1,5 +1,5 @@
 <div class="footer">
-    <div class="container">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
         <div class="row">
             {{if (ads "global-before-friend-link" $.IsMobile)}}
                 <div class="ap ap-global-before-friend-link col-xs-12 mgb-15px">{{str2html (ads "global-before-friend-link" $.IsMobile)}}</div>

@@ -214,12 +214,42 @@ $(function () {
             }
         })
     });
-
+    $(".down-tab").click(function(){
+        var _this = $(this),target = _this.attr("data-target");
+        _this.addClass("active").siblings().removeClass("active");
+        $(".down-tab-cont").hide();
+        $("."+target).show();
+    })
+    $("body").on("click", ".ajax-form-down [type=submit]", function(e){
+        e.preventDefault();
+        var form=$(this).parents("form"),action=form.attr("action"),data=form.serialize();
+        var wecode = form.find("[name=wecode]").val();
+        if (wecode == ""){
+            form.find("[name=wecode]").focus();
+            alertTips("danger", "请输入下载码", 3000,"");
+        }else{
+            $.get(action, data, function(res){
+                var obj=parseJson(res);
+               if (obj.errcode==0){
+                   location.href=obj.data.url;
+                   $(".modal").modal("hide");
+               }else{
+                    alertTips("danger",obj.message,3000,"");
+               }
+            });
+        }
+    })
     //ajax-form
-    $(".ajax-form [type=submit]").click(function(e){
+    $("body").on("click", ".ajax-form [type=submit]", function(e){
         e.preventDefault();
         var _this=$(this),form=$(this).parents("form"),method=form.attr("method"),action=form.attr("action"),data=form.serialize(),_url=form.attr("data-url");
         var require=form.find("[required=required]"),l=require.length;
+        var btnText = _this.text()
+        if (_this.hasClass("disabled")){
+            return false
+        }
+        _this.addClass("disabled").text("处理中，请耐心等待...")
+
         $.each(require, function() {
             if (!$(this).val()){
                 $(this).focus();
@@ -231,7 +261,11 @@ $(function () {
         if (!_url || _url==undefined){
             _url=location.href;
         }
-        if (l>0) return false;
+        if (l>0) {
+            _this.removeClass("disabled").text(btnText)
+            return false;
+        }
+        
         if (method=="post") {
             if (form.attr("enctype")=="multipart/form-data"){
                 form.attr("target","notarget");
@@ -244,10 +278,9 @@ $(function () {
                     } else{
                         alertTips("error",ret.message,3000,"");
                     }
+                    _this.removeClass("disabled").text(btnText)
                 });
-                _this.removeClass("disabled");
             }
-
         } else{
             $.get(action,data,function(ret){
                 ret=parseJson(ret);
@@ -256,6 +289,7 @@ $(function () {
                 } else{
                     alertTips("error",ret.message,3000,"");
                 }
+                _this.removeClass("disabled").text(btnText)
             });
         }
     });
@@ -370,5 +404,13 @@ $(function () {
         })
     })
 
+    $("body").on("click", ".reply", function(){
+        var _this = $(this),pid = _this.attr("data-pid"),ele = _this.parent().parent();
+        if (ele.find("form").length==0){
+            $(".comments-list").find("form").remove();
+            ele.find(".comments-content").after($(".comment-form")[0].outerHTML)
+            ele.find("[name=pid]").val(pid)
+        }
+    })
 
 });

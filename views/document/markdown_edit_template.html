@@ -65,7 +65,10 @@
             <a href="javascript:;" id="markdown-save" data-toggle="tooltip" data-title="保存内容" class="disabled save"><i class="fa fa-save" aria-hidden="true" name="save"></i></a>
         </div>
         <div class="editormd-group">
-            <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍"><i class="fa fa-paper-plane" name="release" aria-hidden="true"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍"><i class="fa fa-paper-plane first" name="release"unselectable="on"></i></a>
+            {{if or $.chrome_is_installed $.puppeteer_is_installed}}
+            <a href="javascript:;" data-toggle="tooltip" data-title="发布书籍（【强制发布】，适用于前台排版错乱的情况）"><i class="fa fa-flash last" name="force-release" unselectable="on"></i></a>
+            {{end}}
         </div>
         {{/*<div class="editormd-group">*/}}
             {{/*<a href="javascript:;" data-toggle="tooltip" data-title="撤销 (Ctrl-Z)"><i class="fa fa-undo first" name="undo" unselectable="on"></i></a>*/}}
@@ -131,9 +134,11 @@
             {{/*<a href="javascript:;" data-toggle="tooltip" data-title="使用帮助"><i class="fa fa-question-circle-o last" aria-hidden="true" name="help"></i></a>*/}}
         {{/*</div>*/}}
 
+        {{if $.calibre_is_installed}}
         <div class="editormd-group pull-right">
-            <a href="javascript:;" data-toggle="tooltip" data-title="生成下载文档"><i class="fa fa-book" name="generate" aria-hidden="true"></i></a>
+            <a href="javascript:;" data-toggle="tooltip" data-title="生成电子书"><i class="fa fa-book" name="generate" aria-hidden="true"></i></a>
         </div>
+        {{end}}
 
         <div class="editormd-group">
             <a href="javascript:;" data-toggle="tooltip" data-title=""></a>
@@ -274,7 +279,7 @@
                 <h4 class="modal-title" id="modal-title">请选择模板类型</h4>
             </div>
             <div class="modal-body template-list">
-                <div class="container">
+                <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}}">
                     <div class="section">
                         <a data-type="normal" href="javascript:;"><i class="fa fa-file-o"></i></a>
                         <h3><a data-type="normal" href="javascript:;">普通文档</a></h3>
@@ -618,68 +623,64 @@
         window.uploader = null;
 
         $("#uploadAttachModal").on("shown.bs.modal",function () {
-            if(window.uploader === null){
-                try {
-                    window.uploader = WebUploader.create({
-                        auto: true,
-                        dnd : true,
-                        swf: '/static/webuploader/Uploader.swf',
-                        server: '{{urlfor "DocumentController.Upload"}}',
-                        formData : { "identify" : {{.Model.Identify}},"doc_id" :  window.selectNode.id },
-                        pick: "#filePicker",
-                        fileVal : "editormd-file-file",
-                        fileNumLimit : 1,
-                        compress : false
-                    }).on("beforeFileQueued",function (file) {
-                        uploader.reset();
-                    }).on( 'fileQueued', function( file ) {
-                        var item = {
-                            state : "wait",
-                            attachment_id : file.id,
-                            file_size : file.size,
-                            file_name : file.name,
-                            message : "正在上传"
-                        };
-                        window.vueApp.lists.splice(0,0,item);
+            try {
+                window.uploader = WebUploader.create({
+                    auto: true,
+                    dnd : true,
+                    swf: '/static/webuploader/Uploader.swf',
+                    server: '{{urlfor "DocumentController.Upload"}}',
+                    formData : { "identify" : {{.Model.Identify}}, "doc_id" :  window.selectNode.id },
+                    pick: "#filePicker",
+                    fileVal : "editormd-file-file",
+                    fileNumLimit : 1,
+                    compress : false
+                }).on("beforeFileQueued",function (file) {
+                    uploader.reset();
+                }).on( 'fileQueued', function( file ) {
+                    var item = {
+                        state : "wait",
+                        attachment_id : file.id,
+                        file_size : file.size,
+                        file_name : file.name,
+                        message : "正在上传"
+                    };
+                    window.vueApp.lists.splice(0,0,item);
+                }).on("uploadError",function (file,reason) {
+                    for(var i in window.vueApp.lists){
+                        var item = window.vueApp.lists[i];
+                        if(item.attachment_id == file.id){
+                            item.state = "error";
+                            item.message = "上传失败";
+                            break;
+                        }
+                    }
+                }).on("uploadSuccess",function (file, res) {
+                    for(var index in window.vueApp.lists){
+                        var item = window.vueApp.lists[index];
+                        if(item.attachment_id === file.id){
+                            if(res.errcode === 0) {
+                                window.vueApp.lists.splice(index, 1, res.attach);
 
-                    }).on("uploadError",function (file,reason) {
-                        for(var i in window.vueApp.lists){
-                            var item = window.vueApp.lists[i];
-                            if(item.attachment_id == file.id){
+                            }else{
+                                item.message = res.message;
                                 item.state = "error";
-                                item.message = "上传失败";
-                                break;
                             }
+                            break;
                         }
+                    }
 
-                    }).on("uploadSuccess",function (file, res) {
-                        for(var index in window.vueApp.lists){
-                            var item = window.vueApp.lists[index];
-                            if(item.attachment_id === file.id){
-                                if(res.errcode === 0) {
-                                    window.vueApp.lists.splice(index, 1, res.attach);
+                }).on("beforeFileQueued",function (file) {
 
-                                }else{
-                                    item.message = res.message;
-                                    item.state = "error";
-                                }
-                                break;
-                            }
-                        }
+                }).on("uploadComplete",function () {
 
-                    }).on("beforeFileQueued",function (file) {
+                }).on("uploadProgress",function (file, percentage) {
+                    var $li = $( '#'+file.id ),
+                        $percent = $li.find('.progress .progress-bar');
 
-                    }).on("uploadComplete",function () {
-
-                    }).on("uploadProgress",function (file, percentage) {
-                        var $li = $( '#'+file.id ),
-                            $percent = $li.find('.progress .progress-bar');
-
-                        $percent.css( 'width', percentage * 100 + '%' );
-                    });
-                }catch(e){
-                    console.log(e);
-                }
+                    $percent.css( 'width', percentage * 100 + '%' );
+                });
+            }catch(e){
+                console.log(e);
             }
         });
     });

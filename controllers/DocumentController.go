@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -182,6 +183,7 @@ func (this *DocumentController) Index() {
 	default:
 		tab = "default"
 	}
+	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
 	this.Data["Qrcode"] = new(models.Member).GetQrcodeByUid(bookResult.MemberId)
 	this.Data["MyScore"] = new(models.Score).BookScoreByUid(this.Member.MemberId, bookResult.BookId)
 	this.Data["Tab"] = tab
@@ -191,8 +193,10 @@ func (this *DocumentController) Index() {
 		this.Data["Wxacode"] = wechatCode.GetCode(bookResult.BookId)
 	}
 
-	//当前默认展示100条评论
-	this.Data["Comments"], _ = new(models.Comments).Comments(1, 100, bookResult.BookId, 1)
+	//当前默认展示1000条评论(暂时先默认1000条)
+	comments, _ := new(models.Comments).Comments(1, 1000, models.CommentOpt{BookId: bookResult.BookId, Status: []int{1}, WithoutDocComment: true})
+
+	this.Data["Comments"] = comments
 	this.Data["Menu"], _ = new(models.Document).GetMenuTop(bookResult.BookId)
 	title := "《" + bookResult.BookName + "》"
 	if tab == "comment" {
@@ -224,6 +228,7 @@ func (this *DocumentController) indexWithPassword() {
 
 //阅读文档.
 func (this *DocumentController) Read() {
+
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
 	id := this.GetString(":id")
@@ -268,6 +273,13 @@ func (this *DocumentController) Read() {
 		this.Abort404(bookName, bookLink)
 	}
 
+	// 是否允许阅读
+	isAllowRead := true
+	percent := 100
+	if this.Member.MemberId == 0 {
+		isAllowRead, percent = doc.IsAllowReadChapter(doc.BookId, doc.DocumentId)
+	}
+
 	bodyText := ""
 	authHTTPS := strings.ToLower(models.GetOptionValue("AUTO_HTTPS", "false")) == "true"
 	if doc.Release != "" {
@@ -287,7 +299,7 @@ func (this *DocumentController) Read() {
 						src = "https://" + strings.Join(srcArr[1:], "://")
 					}
 				}
-				contentSelection.SetAttr("src", src)
+				contentSelection.SetAttr("data-original", src).SetAttr("src", "/static/images/loading.gif").AddClass("lazy")
 				if alt, _ := contentSelection.Attr("alt"); alt == "" {
 					contentSelection.SetAttr("alt", doc.DocumentName+" - 图"+fmt.Sprint(i+1))
 				}
@@ -381,16 +393,24 @@ func (this *DocumentController) Read() {
 	doc.Vcnt = doc.Vcnt + 1
 
 	models.NewBookCounter().Increase(bookResult.BookId, true)
+	comments, _ := models.NewComments().Comments(1, 1000, models.CommentOpt{DocId: doc.DocumentId, Status: []int{1}})
+
+	if !isAllowRead {
+		doc.Release = ""
+	}
 
 	if this.IsAjax() {
 		var data struct {
-			Id        int    `json:"doc_id"`
-			DocTitle  string `json:"doc_title"`
-			Body      string `json:"body"`
-			Title     string `json:"title"`
-			Bookmark  bool   `json:"bookmark"` //是否已经添加了书签
-			View      int    `json:"view"`
-			UpdatedAt string `json:"updated_at"`
+			Id          int                         `json:"doc_id"`
+			DocTitle    string                      `json:"doc_title"`
+			Body        string                      `json:"body"`
+			Title       string                      `json:"title"`
+			Bookmark    bool                        `json:"bookmark"` //是否已经添加了书签
+			View        int                         `json:"view"`
+			UpdatedAt   string                      `json:"updated_at"`
+			Comments    []models.BookCommentsResult `json:"comments"`
+			IsAllowRead bool                        `json:"is_allow_read"`
+			Percent     int                         `json:"percent"`
 		}
 		data.DocTitle = doc.DocumentName
 		data.Body = doc.Release
@@ -399,8 +419,9 @@ func (this *DocumentController) Read() {
 		data.Bookmark = existBookmark
 		data.View = doc.Vcnt
 		data.UpdatedAt = doc.ModifyTime.Format("2006-01-02 15:04:05")
-		//data.Body = doc.Markdown
-
+		data.Comments = comments
+		data.IsAllowRead = isAllowRead
+		data.Percent = percent
 		this.JsonResult(0, "ok", data)
 	}
 
@@ -465,6 +486,10 @@ func (this *DocumentController) Read() {
 	this.Data["Content"] = template.HTML(doc.Release)
 	this.Data["View"] = doc.Vcnt
 	this.Data["UpdatedAt"] = doc.ModifyTime.Format("2006-01-02 15:04:05")
+	this.Data["ExistWeCode"] = strings.TrimSpace(models.GetOptionValue("DOWNLOAD_WECODE", "")) != ""
+	this.Data["Comments"] = comments
+	this.Data["IsAllowRead"] = isAllowRead
+	this.Data["Percent"] = percent
 }
 
 //编辑文档.
@@ -532,7 +557,10 @@ func (this *DocumentController) Edit() {
 		}
 	}
 	this.Data["BaiDuMapKey"] = beego.AppConfig.DefaultString("baidumapkey", "")
-
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
+	}
 }
 
 //创建一个文档.
@@ -543,6 +571,7 @@ func (this *DocumentController) Create() {
 	parentId, _ := this.GetInt("parent_id", 0)
 	docId, _ := this.GetInt("doc_id", 0)
 	bookIdentify := strings.TrimSpace(this.GetString(":key"))
+
 	o := orm.NewOrm()
 
 	if identify == "" {
@@ -552,7 +581,6 @@ func (this *DocumentController) Create() {
 		this.JsonResult(6004, "文档名称不能为空")
 	}
 	if docIdentify != "" {
-
 		if ok, err := regexp.MatchString(`^[a-zA-Z0-9_\-\.]*$`, docIdentify); !ok || err != nil {
 			this.JsonResult(6003, "文档标识只能是数字、字母，以及“-”、“_”和“.”等字符，并且不能是纯数字")
 		}
@@ -575,7 +603,7 @@ func (this *DocumentController) Create() {
 			this.JsonResult(6006, "文档标识已被使用")
 		}
 	} else {
-		docIdentify = fmt.Sprintf("date-%v", time.Now().Format("2006.01.02.15.04.05"))
+		docIdentify = fmt.Sprintf("date%v", time.Now().Format("20060102150405.md"))
 	}
 
 	bookId := 0
@@ -608,6 +636,7 @@ func (this *DocumentController) Create() {
 
 	document.MemberId = this.Member.MemberId
 	document.BookId = bookId
+	oldIdentify := document.Identify
 	if docIdentify != "" {
 		document.Identify = docIdentify
 	}
@@ -627,6 +656,9 @@ func (this *DocumentController) Create() {
 		if err := ModelStore.InsertOrUpdate(models.DocumentStore{DocumentId: int(docIdInt64), Markdown: "[TOC]\n\r\n\r"}); err != nil {
 			beego.Error(err)
 		}
+	}
+	if docId > 0 && oldIdentify != docIdentify {
+		go document.ReplaceIdentify(bookId, oldIdentify, docIdentify)
 	}
 	this.JsonResult(0, "ok", document)
 }
@@ -1191,8 +1223,9 @@ func (this *DocumentController) Content() {
 }
 
 //导出文件
-func (this *DocumentController) Export() {
-	if this.Member == nil || this.Member.MemberId == 0 {
+func (this *DocumentController) ExportOld() {
+	wecode := strings.TrimSpace(this.GetString("wecode"))
+	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
 		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
 			tips = strings.TrimSpace(tips)
 			if len(tips) > 0 {
@@ -1201,7 +1234,6 @@ func (this *DocumentController) Export() {
 		}
 	}
 
-	this.TplName = "document/export.html"
 	identify := this.Ctx.Input.Param(":key")
 	ext := strings.ToLower(this.GetString("output"))
 	switch ext {
@@ -1216,7 +1248,7 @@ func (this *DocumentController) Export() {
 	book, err := new(models.Book).FindByIdentify(identify)
 	if err != nil {
 		beego.Error(err.Error())
-		this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+		this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 	}
 	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
 		this.JsonResult(1, "私有文档，只有文档创建人可导出")
@@ -1228,28 +1260,98 @@ func (this *DocumentController) Export() {
 	case utils.StoreOss:
 		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
-			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 		}
 		link = this.OssDomain + "/" + obj
 	case utils.StoreLocal:
 		obj = "uploads/" + obj
 		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
 			beego.Error(err, obj)
-			this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 		}
 		link = "/" + obj
 	}
 	if link != "" {
 		// 查询是否可以下载
 		counter := models.NewDownloadCounter()
-		times, min := counter.DoesICanDownload(this.Member.MemberId)
-		if times == 0 {
-			this.JsonResult(1, fmt.Sprintf("下载失败。每天每阅读学习 %v 分钟可下载1个离线文档。请您再阅读学习 %v 分钟", min, min))
+		_, err := counter.DoesICanDownload(this.Member.MemberId, wecode)
+		if err != nil {
+			this.JsonResult(1, err.Error())
 		}
-		counter.Increase(this.Member.MemberId)
+		if wecode == "" {
+			counter.Increase(this.Member.MemberId)
+		}
 		this.JsonResult(0, "获取文档下载链接成功", map[string]interface{}{"url": link})
 	}
-	this.JsonResult(1, "下载失败，您要下载的文档当前并未生成可下载文档。")
+	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
+}
+
+//导出文件
+func (this *DocumentController) Export() {
+	wecode := strings.TrimSpace(this.GetString("wecode"))
+	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
+		if tips, ok := this.Option["DOWNLOAD_LIMIT"]; ok {
+			tips = strings.TrimSpace(tips)
+			if len(tips) > 0 {
+				this.JsonResult(1, tips)
+			}
+		}
+	}
+
+	identify := this.Ctx.Input.Param(":key")
+	ext := strings.ToLower(this.GetString("output"))
+	switch ext {
+	case "pdf", "epub", "mobi":
+		ext = "." + ext
+	default:
+		ext = ".pdf"
+	}
+	if identify == "" {
+		this.JsonResult(1, "下载失败，无法识别您要下载的电子书")
+	}
+	book, err := new(models.Book).FindByIdentify(identify)
+	if err != nil {
+		beego.Error(err.Error())
+		this.JsonResult(1, "下载失败，无法识别您要下载的电子书")
+	}
+	if book.PrivatelyOwned == 1 && this.Member.MemberId != book.MemberId {
+		this.JsonResult(1, "私有书籍，只有书籍创建人可导出电子书")
+	}
+	ebook := models.NewEbook().Get2Download(book.BookId, ext)
+	if ebook.Id == 0 || ebook.Status != models.EBookStatusSuccess || ebook.Path == "" {
+		this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+	}
+
+	//查询文档是否存在
+	obj := strings.TrimLeft(ebook.Path, "./")
+	link := ""
+	switch utils.StoreType {
+	case utils.StoreOss:
+		if err := store.ModelStoreOss.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+		}
+		link = this.OssDomain + "/" + obj
+	case utils.StoreLocal:
+		if err := store.ModelStoreLocal.IsObjectExist(obj); err != nil {
+			beego.Error(err, obj)
+			this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
+		}
+		link = "/" + obj + fmt.Sprintf("?attachment=%s%s", url.QueryEscape(ebook.Title), ebook.Ext)
+	}
+	if link != "" {
+		// 查询是否可以下载
+		counter := models.NewDownloadCounter()
+		_, err := counter.DoesICanDownload(this.Member.MemberId, wecode)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+		if wecode == "" {
+			counter.Increase(this.Member.MemberId)
+		}
+		this.JsonResult(0, "获取电子书下载链接成功", map[string]interface{}{"url": link})
+	}
+	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成电子书。")
 }
 
 //生成书籍访问的二维码.

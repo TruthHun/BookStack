@@ -150,6 +150,10 @@ func (this *BaseController) Prepare() {
 		this.Data["CloseSubmitEnter"] = v == "true"
 	}
 
+	if v, ok := this.Option["WIDESCREEN"]; ok {
+		this.Data["IsWideScreen"] = v == "true"
+	}
+
 	this.Data["SiteName"] = this.Sitename
 
 	// 默认显示创建书籍的入口
@@ -212,6 +216,11 @@ func (this *BaseController) SetMember(member models.Member) {
 
 // JsonResult 响应 json 结果
 func (this *BaseController) JsonResult(errCode int, errMsg string, data ...interface{}) {
+	if !this.Ctx.Input.IsAjax() {
+		this.Data["Message"] = errMsg
+		this.Abort("404")
+	}
+
 	jsonData := make(map[string]interface{}, 3)
 	jsonData["errcode"] = errCode
 	jsonData["message"] = errMsg

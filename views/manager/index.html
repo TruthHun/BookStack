@@ -11,7 +11,7 @@
 <body>
 <div class="manual-reader">
     {{template "widgets/header.html" .}}
-    <div class="container manual-body">
+    <div class="{{if $.IsWideScreen}}container-fluid container-widescreen{{else}}container{{end}} manual-body">
         <div class="row">
             <div class="page-left">
                 {{template "manager/menu.html" .}}
@@ -79,11 +79,6 @@
                                 {{end}}
                             </span> )</div>
                     </a>
-{{/*                    <a href="{{urlfor "ManagerController.AttachList" }}" class="dashboard-item">*/}}
-{{/*                        <span class="fa fa-cloud-download" aria-hidden="true"></span>*/}}
-{{/*                        <span class="fa-class">附件数量</span>*/}}
-{{/*                        <span class="fa-class">{{.Model.AttachmentNumber}}</span>*/}}
-{{/*                    </a>*/}}
                 </div>
                 <div>
                     <table class="table table-bordered table-hover ">
@@ -94,6 +89,7 @@
                                 <th class="min-width">安装</th>
                                 <th>作用</th>
                                 <th>错误</th>
+                                <th>检测</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,6 +100,7 @@
                                 </td>
                                 <td>用于将程序加入系统守护进行。Linux可用supervisor，Windows可用pm2</td>
                                 <td>-</td>
+                                <td>-</td>
                             </tr>
                             <tr>
                                 <td>elasticsearch</td>
@@ -111,6 +108,7 @@
                                     <span class="text-danger">不检测</span>
                                 </td>
                                 <td>内容全文搜索引擎。docker镜像：https://hub.docker.com/r/truthhun/elasticsearch</td>
+                                <td>-</td>
                                 <td>-</td>
                             </tr>
                             {{range .Installed}}
@@ -125,6 +123,7 @@
                                 </td>
                                 <td>{{str2html .Message}}</td>
                                 <td>{{.Error}}</td>
+                                <td>{{.CheckedAt}}</td>
                             </tr>
                             {{end}}
                         </tbody>

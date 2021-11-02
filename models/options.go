@@ -306,6 +306,26 @@ func (m *Option) Init() error {
 			OptionName:  "DOWNLOAD_INTERVAL",
 			OptionTitle: "每阅读多少秒可以下载一个电子书",
 		},
+		{
+			OptionValue: "false",
+			OptionName:  "WIDESCREEN",
+			OptionTitle: "是否宽屏",
+		},
+		{
+			OptionValue: "",
+			OptionName:  "DOWNLOAD_WECODE",
+			OptionTitle: "下载码",
+		},
+		{
+			OptionValue: "/", // 默认为分类页
+			OptionName:  "DEFAULT_HOME_PAGE",
+			OptionTitle: "默认首页",
+		},
+		{
+			OptionValue: "100",
+			OptionName:  "VISITOR_ALLOW_READED_PERCENT",
+			OptionTitle: "游客允许阅读百分比", // 游客未登录情况下允许阅读的章节百分比
+		},
 	}
 
 	for _, op := range options {

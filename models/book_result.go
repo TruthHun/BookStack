@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 
@@ -37,19 +38,20 @@ type BookResult struct {
 	RoleId           int       `json:"role_id"`
 	RoleName         string    `json:"role_name"`
 	Status           int
-	Vcnt             int    `json:"vcnt"`
-	Star             int    `json:"star"`
-	Score            int    `json:"score"`
-	CntComment       int    `json:"cnt_comment"`
-	CntScore         int    `json:"cnt_score"`
-	ScoreFloat       string `json:"score_float"`
-	LastModifyText   string `json:"last_modify_text"`
-	IsDisplayComment bool   `json:"is_display_comment"`
-	Author           string `json:"author"`
-	AuthorURL        string `json:"author_url"`
-	AdTitle          string `json:"ad_title"`
-	AdLink           string `json:"ad_link"`
-	Lang             string `json:"lang"`
+	Vcnt             int       `json:"vcnt"`
+	Star             int       `json:"star"`
+	Score            int       `json:"score"`
+	CntComment       int       `json:"cnt_comment"`
+	CntScore         int       `json:"cnt_score"`
+	ScoreFloat       string    `json:"score_float"`
+	LastModifyText   string    `json:"last_modify_text"`
+	IsDisplayComment bool      `json:"is_display_comment"`
+	Author           string    `json:"author"`
+	AuthorURL        string    `json:"author_url"`
+	AdTitle          string    `json:"ad_title"`
+	AdLink           string    `json:"ad_link"`
+	Lang             string    `json:"lang"`
+	Navs             []BookNav `json:"navs"`
 }
 
 func NewBookResult() *BookResult {
@@ -69,6 +71,8 @@ func (m *BookResult) FindByIdentify(identify string, memberId int) (result *Book
 	if err != nil {
 		return
 	}
+
+	json.Unmarshal([]byte(book.NavJSON), &book.Navs)
 
 	relationship := NewRelationship()
 
@@ -91,11 +95,11 @@ func (m *BookResult) FindByIdentify(identify string, memberId int) (result *Book
 	}
 
 	result = book.ToBookResult()
-
 	result.CreateName = member.Account
 	result.MemberId = relationship.MemberId
 	result.RoleId = relationship.RoleId
 	result.RelationshipId = relationship.RelationshipId
+	result.Navs = book.Navs
 
 	switch result.RoleId {
 	case conf.BookFounder:

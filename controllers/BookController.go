@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -63,12 +65,20 @@ func (this *BookController) Index() {
 	this.Data["SettingBook"] = true
 	this.TplName = "book/index.html"
 	private, _ := this.GetInt("private", 1) //是否是私有文档
+	wd := this.GetString("wd", "")
 	this.Data["Private"] = private
+	this.Data["Wd"] = wd
 	pageIndex, _ := this.GetInt("page", 1)
-	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, private)
-
+	books, totalCount, _ := models.NewBook().FindToPager(pageIndex, conf.PageSize, this.Member.MemberId, wd, private)
+	ebookStats := make(map[int]map[string]models.Ebook)
+	modelEbook := models.NewEbook()
+	for _, book := range books {
+		ebookStats[book.BookId] = modelEbook.GetStats(book.BookId)
+	}
+	ebookJSON, _ := json.Marshal(ebookStats)
+	this.Data["EbookStats"] = template.JS(string(ebookJSON))
 	if totalCount > 0 {
-		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v", private))
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, totalCount, conf.PageSize, pageIndex, beego.URLFor("BookController.Index"), fmt.Sprintf("&private=%v&wd=%s", private, url.QueryEscape(wd)))
 	} else {
 		this.Data["PageHtml"] = ""
 	}
@@ -82,6 +92,10 @@ func (this *BookController) Index() {
 		this.Data["Result"] = template.JS("[]")
 	} else {
 		this.Data["Result"] = template.JS(string(b))
+	}
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
 	}
 }
 
@@ -182,11 +196,14 @@ func (this *BookController) Setting() {
 	this.Data["Cates"], _ = new(models.Category).GetCates(-1, 1)
 	this.Data["Model"] = book
 	this.TplName = "book/setting.html"
+	installedDependencies := utils.GetInstalledDependencies()
+	for _, item := range installedDependencies {
+		this.Data[item.Name+"_is_installed"] = item.IsInstalled
+	}
 }
 
 // SaveBook 保存书籍信息
 func (this *BookController) SaveBook() {
-
 	bookResult, err := this.IsPermission()
 	if err != nil {
 		this.JsonResult(6001, err.Error())
@@ -230,6 +247,7 @@ func (this *BookController) SaveBook() {
 	book.Lang = this.GetString("lang")
 	book.AdTitle = this.GetString("ad_title")
 	book.AdLink = this.GetString("ad_link")
+	_, book.NavJSON = this.parseBookNav()
 
 	if err := book.Update(); err != nil {
 		this.JsonResult(6006, "保存失败")
@@ -261,6 +279,47 @@ func (this *BookController) SaveBook() {
 	}()
 	go models.CountCategory()
 	this.JsonResult(0, "ok", bookResult)
+}
+
+func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string) {
+	var data struct {
+		Name   []string `json:"name"`
+		URL    []string `json:"url"`
+		Sort   []string `json:"sort"`
+		Icon   []string `json:"icon"`
+		Color  []string `json:"color"`
+		Target []string `json:"target"`
+	}
+	b, _ := json.Marshal(this.Ctx.Request.PostForm)
+	json.Unmarshal(b, &data)
+	lenName := len(data.Name)
+	if lenName == 0 || lenName != len(data.URL) || lenName != len(data.Sort) || lenName != len(data.Icon) || lenName != len(data.Color) || lenName != len(data.Target) {
+		return
+	}
+
+	for idx, name := range data.Name {
+		name = strings.TrimSpace(name)
+		url := strings.TrimSpace(data.URL[idx])
+		if url == "" || name == "" {
+			continue
+		}
+		nav := models.BookNav{
+			Name:   name,
+			URL:    url,
+			Color:  strings.TrimSpace(data.Color[idx]),
+			Icon:   strings.TrimSpace(data.Icon[idx]),
+			Target: strings.TrimSpace(data.Target[idx]),
+		}
+		nav.Sort, _ = strconv.Atoi(strings.TrimSpace(data.Sort[idx]))
+		navs = append(navs, nav)
+	}
+	if len(navs) > 0 {
+		// 排序
+		sort.Sort(navs)
+		b, _ := json.Marshal(navs)
+		navStr = string(b)
+	}
+	return
 }
 
 //设置书籍私有状态.
@@ -564,7 +623,7 @@ func (this *BookController) Create() {
 		this.JsonResult(6006, "书籍标识已存在")
 	}
 
-	book.Label = ""
+	book.Label = strings.Join(utils.SegWords(bookName+"。"+description, 5), ",")
 	book.BookName = bookName
 	book.Author = author
 	book.AuthorURL = authorURL
@@ -585,7 +644,7 @@ func (this *BookController) Create() {
 	//设置默认时间，因为beego的orm好像无法设置datetime的默认值
 	defaultTime, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
 	book.LastClickGenerate = defaultTime
-	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") //默认生成文档的时间
+	book.GenerateTime, _ = time.Parse("2006-01-02 15:04:05", "2000-01-02 15:04:05") // 电子书生成的默认时间
 	book.ReleaseTime = defaultTime
 
 	if err := book.Insert(); err != nil {
@@ -599,6 +658,47 @@ func (this *BookController) Create() {
 	}
 
 	this.JsonResult(0, "ok", bookResult)
+}
+
+// Create 创建书籍.
+func (this *BookController) Copy() {
+	if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
+		if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole { // 读者无权限创建书籍
+			this.JsonResult(1, "普通读者无法创建书籍，如需创建书籍，请向管理员申请成为作者")
+		}
+	}
+	identify := strings.TrimSpace(this.GetString("identify", ""))
+	sourceIdentify := strings.TrimSpace(this.GetString("source_identify", ""))
+	sourceBook, err := models.NewBook().FindByIdentify(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	existBook, _ := models.NewBook().FindByIdentify(identify, "book_id")
+	if existBook != nil && existBook.BookId > 0 {
+		this.JsonResult(1, "请更换新的书籍标识")
+	}
+
+	// 如果是私有书籍，且不是团队的人，不允许拷贝该项目
+	if sourceBook.PrivatelyOwned == 1 {
+		rel, err := models.NewRelationship().FindByBookIdAndMemberId(sourceBook.BookId, this.Member.MemberId)
+		if err != nil || rel == nil || rel.RelationshipId == 0 {
+			this.JsonResult(1, "无拷贝书籍权限")
+		}
+	}
+	sourceBook.BookId = 0
+	sourceBook.BookName = strings.TrimSpace(this.GetString("book_name", ""))
+	sourceBook.Identify = identify
+	sourceBook.Description = strings.TrimSpace(this.GetString("description", ""))
+	sourceBook.Author = strings.TrimSpace(this.GetString("author", ""))
+	sourceBook.AuthorURL = strings.TrimSpace(this.GetString("author_url", ""))
+	sourceBook.PrivatelyOwned, _ = strconv.Atoi(this.GetString("privately_owned"))
+	sourceBook.MemberId = this.Member.MemberId
+	err = sourceBook.Copy(sourceIdentify)
+	if err != nil {
+		this.JsonResult(1, "拷贝书籍失败："+err.Error())
+	}
+
+	this.JsonResult(0, "拷贝书籍成功")
 }
 
 // CreateToken 创建访问来令牌.
@@ -693,6 +793,7 @@ func (this *BookController) Delete() {
 // 发布书籍.
 func (this *BookController) Release() {
 	identify := this.GetString("identify")
+	force, _ := this.GetBool("force")
 	bookId := 0
 	if this.Member.IsAdministrator() {
 		book, err := models.NewBook().FindByFieldFirst("identify", identify)
@@ -718,19 +819,12 @@ func (this *BookController) Release() {
 		bookId = book.BookId
 	}
 
-	if exist := utils.BooksRelease.Exist(bookId); exist {
-		this.JsonResult(1, "上次内容发布正在执行中，请稍后再操作")
-	}
-
-	go func(identify string) {
-		models.NewDocument().ReleaseContent(bookId, this.BaseUrl())
-	}(identify)
+	go models.NewDocument().ReleaseContent(bookId, this.BaseUrl(), force)
 
 	this.JsonResult(0, "发布任务已推送到任务队列，稍后将在后台执行。")
 }
 
-//生成下载文档
-//加锁，防止用户不停地点击生成下载文档造成服务器资源开销.
+// 生成电子书
 func (this *BookController) Generate() {
 	identify := this.GetString(":key")
 
@@ -743,15 +837,20 @@ func (this *BookController) Generate() {
 		beego.Error(err)
 		this.JsonResult(1, "书籍不存在")
 	}
-	//书籍正在生成离线文档
-	if isGenerating := utils.BooksGenerate.Exist(book.BookId); isGenerating {
-		this.JsonResult(1, "上一次下载文档生成任务正在后台执行，请您稍后再执行新的下载文档生成操作")
+
+	ebookModel := models.NewEbook()
+
+	// 电子书不是处于完成状态，不允许再添加到电子书生成队列中
+	if ok := ebookModel.IsFinish(book.BookId); !ok {
+		this.JsonResult(1, "电子书生成任务已在处理中，如需再次生成，请您稍后再试。")
 	}
 
-	baseUrl := "http://localhost:" + beego.AppConfig.String("httpport")
-	go new(models.Document).GenerateBook(book, baseUrl)
+	// 添加到电子书生成队列
+	if err = ebookModel.AddToGenerate(book.BookId); err != nil {
+		this.JsonResult(1, err.Error())
+	}
 
-	this.JsonResult(0, "下载文档生成任务已交由后台执行，请您耐心等待。")
+	this.JsonResult(0, "电子书生成任务已交由后台执行，请您耐心等待。")
 }
 
 //文档排序.
@@ -890,7 +989,7 @@ func (this *BookController) GitPull() {
 		folder := "store/" + identify
 		err := utils.GitClone(link, folder)
 		if err != nil {
-			this.JsonResult(1, err.Error())
+			beego.Error(err.Error())
 		}
 		this.loadByFolder(book.BookId, identify, folder)
 	}()
@@ -971,7 +1070,8 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 	//读取文件，把图片文档录入oss
 	if files, err := filetil.ScanFiles(unzipPath); err == nil {
 		projectRoot = this.getProjectRoot(files)
-		this.replaceToAbs(projectRoot, identify)
+
+		this.fixFileLinks(projectRoot, identify)
 
 		ModelStore := new(models.DocumentStore)
 		//文档对应的标识
@@ -981,11 +1081,11 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 				if ok, _ := imgMap[ext]; ok { //图片，录入oss
 					switch utils.StoreType {
 					case utils.StoreOss:
-						if err := store.ModelStoreOss.MoveToOss(file.Path, "projects/"+identify+strings.TrimPrefix(file.Path, projectRoot), false, false); err != nil {
+						if err := store.ModelStoreOss.MoveToOss(file.Path, filepath.Join("projects/"+identify, strings.TrimPrefix(file.Path, projectRoot)), false, false); err != nil {
 							beego.Error(err)
 						}
 					case utils.StoreLocal:
-						if err := store.ModelStoreLocal.MoveToStore(file.Path, "uploads/projects/"+identify+strings.TrimPrefix(file.Path, projectRoot)); err != nil {
+						if err := store.ModelStoreLocal.MoveToStore(file.Path, filepath.Join("uploads/projects/"+identify, strings.TrimPrefix(file.Path, projectRoot))); err != nil {
 							beego.Error(err)
 						}
 					}
@@ -994,13 +1094,9 @@ func (this *BookController) unzipToData(bookId int, identify, zipFile, originFil
 					var mdcont string
 					var htmlStr string
 					if b, err := ioutil.ReadFile(file.Path); err == nil {
-						if ext == ".md" || ext == ".markdown" {
-							mdcont = strings.TrimSpace(string(b))
-							htmlStr = mdtil.Md2html(mdcont)
-						} else {
-							htmlStr = string(b)
-							mdcont = html2md.Convert(htmlStr)
-						}
+						mdcont = strings.TrimSpace(string(b))
+						htmlStr = mdtil.Md2html(mdcont)
+
 						if !strings.HasPrefix(mdcont, "[TOC]") {
 							mdcont = "[TOC]\r\n\r\n" + mdcont
 						}
@@ -1063,7 +1159,7 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 		return
 	}
 
-	this.replaceToAbs(folder, identify)
+	this.fixFileLinks(folder, identify)
 
 	ModelStore := new(models.DocumentStore)
 
@@ -1123,21 +1219,17 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 
 //获取书籍的根目录
 func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) {
-	//获取书籍的根目录(感觉这个函数封装的不是很好，有更好的方法，请通过issue告知我，谢谢。)
-	i := 1000
+	var strs []string
 	for _, f := range fl {
 		if !f.IsDir {
-			if cnt := strings.Count(f.Path, "/"); cnt < i {
-				root = filepath.Dir(f.Path)
-				i = cnt
-			}
+			strs = append(strs, f.Path)
 		}
 	}
-	return
+	return utils.LongestCommonPrefix(strs)
 }
 
 //查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
-func (this *BookController) replaceToAbs(projectRoot string, identify string) {
+func (this *BookController) fixFileLinks(projectRoot string, identify string) {
 	imgBaseUrl := "/uploads/projects/" + identify
 	switch utils.StoreType {
 	case utils.StoreLocal:
@@ -1148,67 +1240,74 @@ func (this *BookController) replaceToAbs(projectRoot string, identify string) {
 	}
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
-		if ext := strings.ToLower(filepath.Ext(file.Path)); ext == ".md" || ext == ".markdown" {
-			//mdb ==> markdown byte
-			mdb, _ := ioutil.ReadFile(file.Path)
-			mdCont := string(mdb)
-			basePath := filepath.Dir(file.Path)
-			basePath = strings.Trim(strings.Replace(basePath, "\\", "/", -1), "/")
-			basePathSlice := strings.Split(basePath, "/")
-			l := len(basePathSlice)
-			b, _ := ioutil.ReadFile(file.Path)
-			output := blackfriday.Run(b)
-			doc, _ := goquery.NewDocumentFromReader(strings.NewReader(string(output)))
-
-			//图片链接处理
-			doc.Find("img").Each(func(i int, selection *goquery.Selection) {
-				//非http://、// 和 https:// 开头的图片地址，即是相对地址
-				src, ok := selection.Attr("src")
-				lowerSrc := strings.ToLower(src)
-				if ok &&
-					!strings.HasPrefix(lowerSrc, "http://") &&
-					!strings.HasPrefix(lowerSrc, "https://") {
-					newSrc := src //默认为旧地址
-					if strings.HasPrefix(lowerSrc, "//") {
-						newSrc = "https:" + newSrc
-					} else {
-						if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
-							newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
-						}
-						newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
-					}
-					mdCont = strings.Replace(mdCont, src, newSrc, -1)
-				}
-			})
-
-			//a标签链接处理。要注意判断有锚点的情况
-			doc.Find("a").Each(func(i int, selection *goquery.Selection) {
-				href, ok := selection.Attr("href")
-				lowerHref := strings.TrimSpace(strings.ToLower(href))
-				// 链接存在，且不以 // 、 http、https、mailto 开头
-				if ok &&
-					!strings.HasPrefix(lowerHref, "//") &&
-					!strings.HasPrefix(lowerHref, "http://") &&
-					!strings.HasPrefix(lowerHref, "https://") &&
-					!strings.HasPrefix(lowerHref, "mailto:") &&
-					!strings.HasPrefix(lowerHref, "#") {
-					newHref := href //默认
-					if cnt := strings.Count(href, "../"); cnt < l {
-						newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
-					}
-					newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
-					if !strings.HasPrefix(href, "$") { //原链接不包含$符开头，否则表示已经替换过了。
-						newHref = "$" + strings.Replace(strings.Trim(newHref, "/"), "/", "-", -1)
-						slice := strings.Split(newHref, "$")
-						if ll := len(slice); ll > 0 {
-							newHref = "$" + slice[ll-1]
-						}
-						mdCont = strings.Replace(mdCont, "]("+href, "]("+newHref, -1)
-					}
-				}
-			})
-			ioutil.WriteFile(file.Path, []byte(mdCont), os.ModePerm)
+		ext := strings.ToLower(filepath.Ext(file.Path))
+		if !(ext == ".md" || ext == ".markdown" || ext == ".html" || ext == ".xhtml") {
+			continue
 		}
+
+		//mdb ==> markdown byte
+		mdb, _ := ioutil.ReadFile(file.Path)
+		mdCont := string(mdb)
+		if ext == ".html" || ext == ".xhtml" {
+			mdCont = html2md.Convert(mdCont)
+		}
+
+		basePath := filepath.Dir(file.Path)
+		basePath = strings.Trim(strings.Replace(basePath, "\\", "/", -1), "/")
+		basePathSlice := strings.Split(basePath, "/")
+		l := len(basePathSlice)
+		b, _ := ioutil.ReadFile(file.Path)
+		output := blackfriday.Run(b)
+		doc, _ := goquery.NewDocumentFromReader(bytes.NewReader(output))
+
+		//图片链接处理
+		doc.Find("img").Each(func(i int, selection *goquery.Selection) {
+			//非http://、// 和 https:// 开头的图片地址，即是相对地址
+			src, ok := selection.Attr("src")
+			lowerSrc := strings.ToLower(src)
+			if ok &&
+				!strings.HasPrefix(lowerSrc, "http://") &&
+				!strings.HasPrefix(lowerSrc, "https://") {
+				newSrc := src //默认为旧地址
+				if strings.HasPrefix(lowerSrc, "//") {
+					newSrc = "https:" + newSrc
+				} else {
+					if cnt := strings.Count(src, "../"); cnt < l { //以或者"../"开头的路径
+						newSrc = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(src, "./")
+					}
+					newSrc = imgBaseUrl + "/" + strings.TrimLeft(strings.TrimPrefix(strings.TrimLeft(newSrc, "./"), projectRoot), "/")
+				}
+				mdCont = strings.Replace(mdCont, src, newSrc, -1)
+			}
+		})
+
+		//a标签链接处理。要注意判断有锚点的情况
+		doc.Find("a").Each(func(i int, selection *goquery.Selection) {
+			href, ok := selection.Attr("href")
+			lowerHref := strings.TrimSpace(strings.ToLower(href))
+			// 链接存在，且不以 // 、 http、https、mailto 开头
+			if ok &&
+				!strings.HasPrefix(lowerHref, "//") &&
+				!strings.HasPrefix(lowerHref, "http://") &&
+				!strings.HasPrefix(lowerHref, "https://") &&
+				!strings.HasPrefix(lowerHref, "mailto:") &&
+				!strings.HasPrefix(lowerHref, "#") {
+				newHref := href //默认
+				if cnt := strings.Count(href, "../"); cnt < l {
+					newHref = strings.Join(basePathSlice[0:l-cnt], "/") + "/" + strings.TrimLeft(href, "./")
+				}
+				newHref = strings.TrimPrefix(strings.Trim(newHref, "/"), projectRoot)
+				if !strings.HasPrefix(href, "$") { //原链接不包含$符开头，否则表示已经替换过了。
+					newHref = "$" + strings.Replace(strings.Trim(newHref, "/"), "/", "-", -1)
+					slice := strings.Split(newHref, "$")
+					if ll := len(slice); ll > 0 {
+						newHref = "$" + slice[ll-1]
+					}
+					mdCont = strings.Replace(mdCont, "]("+href, "]("+newHref, -1)
+				}
+			}
+		})
+		ioutil.WriteFile(file.Path, []byte(mdCont), os.ModePerm)
 	}
 }
 
@@ -1235,15 +1334,43 @@ func (this *BookController) Comment() {
 		this.JsonResult(1, "请先登录在评论")
 	}
 	content := this.GetString("content")
-	if l := len(content); l < 5 || l > 256 {
-		this.JsonResult(1, "评论内容限 5 - 256 个字符")
+	if l := len(content); l < 5 || l > 255 {
+		this.JsonResult(1, "评论内容限 5 - 255 个字符")
 	}
 	bookId, _ := this.GetInt(":id")
+	pid, _ := this.GetInt("pid")
+	docId, _ := this.GetInt("doc_id")
 	if bookId > 0 {
-		if err := new(models.Comments).AddComments(this.Member.MemberId, bookId, content); err != nil {
+		if err := new(models.Comments).AddComments(this.Member.MemberId, bookId, pid, docId, content); err != nil {
 			this.JsonResult(1, err.Error())
 		}
 		this.JsonResult(0, "评论成功")
 	}
 	this.JsonResult(1, "书籍不存在")
+}
+
+// ExportMarkdown 将书籍导出为markdown
+// 注意：系统管理员和书籍参与者有权限导出
+func (this *BookController) Export2Markdown() {
+	identify := this.GetString("identify")
+	if this.Member.MemberId == 0 {
+		this.JsonResult(1, "请先登录")
+	}
+	if !this.Member.IsAdministrator() {
+		if _, err := models.NewBookResult().FindByIdentify(identify, this.Member.MemberId); err != nil {
+			this.JsonResult(1, "无操作权限")
+		}
+	}
+	path, err := models.NewBook().Export2Markdown(identify)
+	if err != nil {
+		this.JsonResult(1, err.Error())
+	}
+	defer func() {
+		os.Remove(path)
+	}()
+	attchmentName := filepath.Base(path)
+	if book, _ := models.NewBook().FindByIdentify(identify, "book_name", "book_id"); book != nil && book.BookId > 0 {
+		attchmentName = book.BookName + ".zip"
+	}
+	this.Ctx.Output.Download(strings.TrimLeft(path, "./"), attchmentName)
 }

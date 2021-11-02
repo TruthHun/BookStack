@@ -14,6 +14,8 @@ import (
 	"sync"
 
 	"github.com/TruthHun/BookStack/utils/html2md"
+	"github.com/go-ego/gse"
+	"github.com/go-ego/gse/hmm/idf"
 
 	"github.com/mssola/user_agent"
 
@@ -60,6 +62,11 @@ const (
 
 //分词器
 var (
+	seg gse.Segmenter
+	te  idf.TagExtracter
+)
+
+var (
 	Version     string = "unknown"
 	GitHash     string = "unknown"
 	BuildAt     string = "unknown"
@@ -74,6 +81,23 @@ func init() {
 	langs.Store("zh", "中文")
 	langs.Store("en", "英文")
 	langs.Store("other", "其他")
+	go loadDict()
+}
+
+func loadDict() {
+	beego.Info("加载分词词典...")
+	dict := "dictionary/dictionary.txt"
+	err := seg.LoadDict(dict)
+	if err != nil {
+		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
+	}
+	seg.LoadStop("dictionary/stop_tokens.txt, dictionary/stop_word.txt")
+	te.WithGse(seg)
+	err = te.LoadIdf("dictionary/idf.txt")
+	if err != nil {
+		beego.Error("加载分词词典失败！请在程序根目录启动程序", err.Error())
+	}
+	beego.Info("加载分词词典完成！")
 }
 
 func PrintInfo() {
@@ -898,16 +922,20 @@ func RangeNumber(val, min, max int) int {
 }
 
 func DeleteFile(file string) {
-	file = strings.TrimPrefix(file, "./")
+	file = strings.TrimPrefix(strings.TrimSpace(file), "/")
 	fileLower := strings.ToLower(file)
 	if strings.HasPrefix(fileLower, "https://") || strings.HasPrefix(fileLower, "http://") {
 		return
 	}
 	switch StoreType {
 	case StoreLocal:
-		go store.ModelStoreLocal.DelFromFolder(file)
+		if info, err := os.Stat(file); err == nil && info.IsDir() {
+			store.ModelStoreLocal.DelFromFolder(file)
+		} else {
+			os.Remove(file)
+		}
 	case StoreOss:
-		go store.ModelStoreOss.DelOssFolder(file)
+		store.ModelStoreOss.DelOssFile(file)
 	}
 }
 
@@ -1073,4 +1101,37 @@ func ExecCommand(name string, args []string, timeout ...time.Duration) (out stri
 	}
 	out = stdout.String()
 	return
+}
+
+// SegWords 分词
+func SegWords(sentence string, length ...int) (words []string) {
+	topk := 5
+	if len(length) > 0 && length[0] > 0 {
+		topk = length[0]
+	}
+	tags := te.ExtractTags(sentence, topk)
+	for _, tag := range tags {
+		words = append(words, tag.Text())
+	}
+	return
+}
+
+// LongestCommonPrefix 查找最长共同前缀
+func LongestCommonPrefix(strs []string) string {
+	if len(strs) == 0 {
+		return ""
+	}
+	if len(strs) == 1 {
+		return strs[0]
+	}
+	mx := 0
+	for {
+		for i := 1; i < len(strs); i++ {
+			if mx >= len(strs[i-1]) || mx >= len(strs[i]) ||
+				strs[i-1][mx] != strs[i][mx] {
+				return string(strs[0][:mx])
+			}
+		}
+		mx++
+	}
 }
