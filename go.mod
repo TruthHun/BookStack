@@ -7,7 +7,7 @@ replace github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 => github.
 require (
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/TruthHun/converter v0.0.0-20210623150616-172c168cdcda
-	github.com/TruthHun/gotil v0.0.0-20210509080330-2470bb9be7cd
+	github.com/TruthHun/gotil v0.0.0-20210817134928-d2d642c3c7b7
 	github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b
 	github.com/TruthHun/html2json v0.0.0-20201228115506-dee0570dffa8
 	github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17
@@ -31,7 +31,6 @@ require (
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/unknwon/com v1.0.1
-	github.com/yanyiwu/gojieba v1.1.2 // indirect
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b // indirect
