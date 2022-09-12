@@ -16,13 +16,9 @@ func webRouter() {
 	beego.Router("/submit", &controllers.SubmitController{}, "post:Post")
 
 	beego.Router("/login", &controllers.AccountController{}, "*:Login")
-	beego.Router("/login/:oauth", &controllers.AccountController{}, "*:Oauth")
+	beego.Router("/signup", &controllers.AccountController{}, "*:Signup")
+	beego.Router("/login/callback", &controllers.AccountController{}, "*:Callback")
 	beego.Router("/logout", &controllers.AccountController{}, "*:Logout")
-	beego.Router("/bind", &controllers.AccountController{}, "post:Bind")
-	beego.Router("/note", &controllers.AccountController{}, "get,post:Note")
-	beego.Router("/find_password", &controllers.AccountController{}, "*:FindPassword")
-	beego.Router("/valid_email", &controllers.AccountController{}, "post:ValidEmail")
-	//beego.Router("/captcha", &controllers.AccountController{}, "*:Captcha")
 
 	beego.Router("/manager", &controllers.ManagerController{}, "*:Index")
 	beego.Router("/manager/users", &controllers.ManagerController{}, "*:Users")
@@ -73,8 +69,6 @@ func webRouter() {
 	beego.Router("/manager/del-tags", &controllers.ManagerController{}, "get:DelTags")
 
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
-	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")
-	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")
 	beego.Router("/setting/star", &controllers.SettingController{}, "*:Star")
 	beego.Router("/setting/qrcode", &controllers.SettingController{}, "*:Qrcode")
 
