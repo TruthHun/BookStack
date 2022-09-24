@@ -890,12 +890,12 @@ func (this *BookController) GitPull() {
 		folder := "store/" + identify
 		err := utils.GitClone(link, folder)
 		if err != nil {
-			this.JsonResult(1, err.Error())
+			beego.Error(err)
 		}
 		this.loadByFolder(book.BookId, identify, folder)
 	}()
 
-	this.JsonResult(0, "提交成功，请耐心等待。")
+	this.JsonResult(0, "提交成功，拉取任务已交由后台执行")
 }
 
 //上传书籍
