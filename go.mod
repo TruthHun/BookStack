@@ -31,7 +31,6 @@ require (
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/unknwon/com v1.0.1
-	github.com/yanyiwu/gojieba v1.1.2 // indirect
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b // indirect
