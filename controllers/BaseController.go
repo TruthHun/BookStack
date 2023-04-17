@@ -216,7 +216,7 @@ func (this *BaseController) SetMember(member models.Member) {
 
 // JsonResult 响应 json 结果
 func (this *BaseController) JsonResult(errCode int, errMsg string, data ...interface{}) {
-	if !this.Ctx.Input.IsAjax() {
+	if !this.Ctx.Input.IsAjax() && this.Ctx.Request.Method == "GET" {
 		this.Data["Message"] = errMsg
 		this.Abort("404")
 	}
@@ -276,7 +276,7 @@ func (this *BaseController) BaseUrl() string {
 	return this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
 }
 
-//显示错误信息页面.
+// 显示错误信息页面.
 func (this *BaseController) ShowErrorPage(errCode int, errMsg string) {
 	this.TplName = "errors/error.html"
 	this.Data["ErrorMessage"] = errMsg
@@ -284,9 +284,9 @@ func (this *BaseController) ShowErrorPage(errCode int, errMsg string) {
 	this.StopRun()
 }
 
-//根据页面获取seo
-//@param			page			页面标识
-//@param			defSeo			默认的seo的map，必须有title、keywords和description字段
+// 根据页面获取seo
+// @param			page			页面标识
+// @param			defSeo			默认的seo的map，必须有title、keywords和description字段
 func (this *BaseController) GetSeoByPage(page string, defSeo map[string]string) {
 	var seo models.Seo
 
@@ -304,7 +304,7 @@ func (this *BaseController) GetSeoByPage(page string, defSeo map[string]string) 
 	this.Data["SeoDescription"] = seo.Description
 }
 
-//站点地图
+// 站点地图
 func (this *BaseController) Sitemap() {
 	this.Data["SeoTitle"] = "站点地图 - " + this.Sitename
 	page, _ := this.GetInt("page")
@@ -344,7 +344,7 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 	return err
 }
 
-//在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
+// 在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
 func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) string {
 	debug := beego.AppConfig.String("runmod") != "prod"
 	o := orm.NewOrm()
@@ -464,7 +464,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 	return htmlStr
 }
 
-//排序
+// 排序
 type Sort struct {
 	Id        int
 	Pid       int
@@ -472,8 +472,8 @@ type Sort struct {
 	Identify  string
 }
 
-//替换链接
-//如果是summary，则根据这个进行排序调整
+// 替换链接
+// 如果是summary，则根据这个进行排序调整
 func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, isSummary ...bool) string {
 	var (
 		book models.Book
@@ -530,7 +530,7 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 	return docHtml
 }
 
-//内容采集
+// 内容采集
 func (this *BaseController) Crawl() {
 	if this.Member.MemberId > 0 {
 		if val, ok := this.GetSession("crawl").(string); ok && val == "1" {
@@ -552,7 +552,7 @@ func (this *BaseController) Crawl() {
 	this.JsonResult(1, "请先登录再操作")
 }
 
-//关注或取消关注
+// 关注或取消关注
 func (this *BaseController) SetFollow() {
 	var cancel bool
 	if this.Member == nil || this.Member.MemberId == 0 {

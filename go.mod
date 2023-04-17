@@ -7,7 +7,7 @@ replace github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 => github.
 require (
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/TruthHun/converter v0.0.0-20210623150616-172c168cdcda
-	github.com/TruthHun/gotil v0.0.0-20210817134928-d2d642c3c7b7
+	github.com/TruthHun/gotil v0.0.0-20221201022546-19fe8ec6ef40
 	github.com/TruthHun/html2article v0.0.0-20180202140721-67d6ff09647b
 	github.com/TruthHun/html2json v0.0.0-20201228115506-dee0570dffa8
 	github.com/alexcesaro/mail v0.0.0-20141015155039-29068ce49a17

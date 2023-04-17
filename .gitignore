@@ -49,3 +49,7 @@ docker
 license.cert
 index
 index/
+/web
+/am
+/group
+/platform

@@ -24,7 +24,7 @@ type SettingController struct {
 	BaseController
 }
 
-//基本信息
+// 基本信息
 func (this *SettingController) Index() {
 	if this.Ctx.Input.IsPost() {
 		email := strings.TrimSpace(this.GetString("email", ""))
@@ -62,7 +62,7 @@ func (this *SettingController) Index() {
 	this.TplName = "setting/index.html"
 }
 
-//修改密码
+// 修改密码
 func (this *SettingController) Password() {
 
 	if this.Ctx.Input.IsPost() {
@@ -114,7 +114,7 @@ func (this *SettingController) Password() {
 	this.TplName = "setting/password.html"
 }
 
-//收藏
+// 收藏
 func (this *SettingController) Star() {
 	page, _ := this.GetInt("page")
 	cid, _ := this.GetInt("cid")
@@ -150,7 +150,7 @@ func (this *SettingController) Star() {
 	this.Data["Cates"] = cates
 }
 
-//二维码
+// 二维码
 func (this *SettingController) Qrcode() {
 
 	if this.Ctx.Input.IsPost() {
