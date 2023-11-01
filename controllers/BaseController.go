@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/gob"
 	"fmt"
+
 	"net/url"
 	"strconv"
 	"unicode/utf8"
-
-	"github.com/TruthHun/BookStack/utils"
 
 	"encoding/json"
 	"io"
@@ -22,8 +22,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/TruthHun/BookStack/conf"
 	"github.com/TruthHun/BookStack/models"
+	"github.com/TruthHun/BookStack/utils"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/casdoor/casdoor-go-sdk/auth"
 )
 
 type BaseController struct {
@@ -46,8 +48,54 @@ type CookieRemember struct {
 	Time     time.Time
 }
 
-func (this *BaseController) refreshReferer() {
-	referer := this.Ctx.Request.Header.Get("referer")
+func init() {
+	gob.Register(auth.Claims{})
+}
+
+func (c *BaseController) GetSessionClaims() *auth.Claims {
+	s := c.GetSession("user")
+	if s == nil {
+		return nil
+	}
+
+	claims := s.(auth.Claims)
+	return &claims
+}
+
+func (c *BaseController) SetSessionClaims(claims *auth.Claims) {
+	if claims == nil {
+		c.DelSession("user")
+		return
+	}
+
+	c.SetSession("user", *claims)
+}
+
+func (c *BaseController) refreshUser() {
+	//casdoor用户信息更新,需要同步
+	if c.GetSession("isUpdateUser") == 1 {
+		account := c.GetSessionClaims()
+		if account == nil {
+			c.Redirect(beego.URLFor("AccountController.Login"), 302)
+		}
+		user, err := auth.GetUser(account.Name)
+		if err != nil {
+			return
+		}
+		if member, err := models.NewMember().Find(c.Member.MemberId); err == nil {
+			member.Avatar = user.Avatar
+			member.Nickname = user.DisplayName
+			err = member.Update()
+			if err != nil {
+				c.JsonResult(60001, "更新用户信息失败")
+			}
+		}
+		c.SetSession("isUpdateUser", 0)
+	}
+}
+
+func (c *BaseController) refreshReferer() {
+	referer := c.Ctx.Request.Header.Get("referer")
 	if referer != "" {
 		referer, _ = url.QueryUnescape(referer)
 		referer = strings.ToLower(referer)
@@ -56,12 +104,12 @@ func (this *BaseController) refreshReferer() {
 			for _, item := range forbid {
 				item = strings.ToLower(strings.TrimSpace(item))
 				// 先判断是否带有非法关键字
-				if item != "" && strings.Contains(referer, item) && !strings.HasSuffix(referer, strings.ToLower(this.Ctx.Request.RequestURI)) {
+				if item != "" && strings.Contains(referer, item) && !strings.HasSuffix(referer, strings.ToLower(c.Ctx.Request.RequestURI)) {
 					if u, err := url.Parse(referer); err == nil {
 						// 且referer的host与当前请求的host不是同一个，则进行302跳转以刷新过滤当前referer
-						if strings.ToLower(u.Host) != strings.ToLower(this.Ctx.Request.Host) {
-							this.Redirect(this.Ctx.Request.RequestURI, 302)
-							this.StopRun()
+						if strings.ToLower(u.Host) != strings.ToLower(c.Ctx.Request.Host) {
+							c.Redirect(c.Ctx.Request.RequestURI, 302)
+							c.StopRun()
 							return
 						}
 					}
@@ -72,124 +120,124 @@ func (this *BaseController) refreshReferer() {
 }
 
 // Prepare 预处理.
-func (this *BaseController) Prepare() {
-	this.refreshReferer()
+func (c *BaseController) Prepare() {
+	c.refreshReferer()
 
-	this.Data["Version"] = utils.Version
-	this.IsMobile = utils.IsMobile(this.Ctx.Request.UserAgent())
-	this.Data["IsMobile"] = this.IsMobile
-	this.Member = models.NewMember() //初始化
-	this.EnableAnonymous = false
-	this.AllowRegister = true
-	this.EnableDocumentHistory = 0
-	this.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
-	this.Data["OssDomain"] = this.OssDomain
-	this.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
-	this.Data["StaticDomain"] = this.StaticDomain
+	c.Data["Version"] = utils.Version
+	c.IsMobile = utils.IsMobile(c.Ctx.Request.UserAgent())
+	c.Data["IsMobile"] = c.IsMobile
+	c.Member = models.NewMember() //初始化
+	c.EnableAnonymous = false
+	c.AllowRegister = true
+	c.EnableDocumentHistory = 0
+	c.OssDomain = strings.TrimRight(beego.AppConfig.String("oss::Domain"), "/ ")
+	c.Data["OssDomain"] = c.OssDomain
+	c.StaticDomain = strings.Trim(beego.AppConfig.DefaultString("static_domain", ""), "/")
+	c.Data["StaticDomain"] = c.StaticDomain
 
 	//从session中获取用户信息
-	if member, ok := this.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
+	if member, ok := c.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0 {
 		m, _ := models.NewMember().Find(member.MemberId)
-		this.Member = m
+		c.Member = m
 	} else {
 		//如果Cookie中存在登录信息，从cookie中获取用户信息
-		if cookie, ok := this.GetSecureCookie(conf.GetAppKey(), "login"); ok {
+		if cookie, ok := c.GetSecureCookie(conf.GetAppKey(), "login"); ok {
 			var remember CookieRemember
 			err := utils.Decode(cookie, &remember)
 			if err == nil {
 				member, err := models.NewMember().Find(remember.MemberId)
 				if err == nil {
-					this.SetMember(*member)
-					this.Member = member
+					c.SetMember(*member)
+					c.Member = member
 				}
 			}
 		}
 
 	}
-	if this.Member.RoleName == "" {
-		this.Member.ResolveRoleName()
+	if c.Member.RoleName == "" {
+		c.Member.ResolveRoleName()
 	}
-	this.Data["Member"] = this.Member
-	this.Data["BaseUrl"] = this.BaseUrl()
-	this.Data["IsSignedToday"] = false
-	if this.Member.MemberId > 0 {
-		this.Data["IsSignedToday"] = models.NewSign().IsSignToday(this.Member.MemberId)
+	c.Data["Member"] = c.Member
+	c.Data["BaseUrl"] = c.BaseUrl()
+	c.Data["IsSignedToday"] = false
+	if c.Member.MemberId > 0 {
+		c.Data["IsSignedToday"] = models.NewSign().IsSignToday(c.Member.MemberId)
 	}
 
 	if options, err := models.NewOption().All(); err == nil {
-		this.Option = make(map[string]string, len(options))
+		c.Option = make(map[string]string, len(options))
 		for _, item := range options {
 			if item.OptionName == "SITE_NAME" {
-				this.Sitename = item.OptionValue
+				c.Sitename = item.OptionValue
 			}
-			this.Data[item.OptionName] = item.OptionValue
-			this.Option[item.OptionName] = item.OptionValue
+			c.Data[item.OptionName] = item.OptionValue
+			c.Option[item.OptionName] = item.OptionValue
 			if strings.EqualFold(item.OptionName, "ENABLE_ANONYMOUS") && item.OptionValue == "true" {
-				this.EnableAnonymous = true
+				c.EnableAnonymous = true
 			}
 
 			if strings.EqualFold(item.OptionName, "ENABLED_REGISTER") && item.OptionValue == "false" {
-				this.AllowRegister = false
+				c.AllowRegister = false
 			}
 
 			if verNum, _ := strconv.Atoi(item.OptionValue); strings.EqualFold(item.OptionName, "ENABLE_DOCUMENT_HISTORY") && verNum > 0 {
-				this.EnableDocumentHistory = verNum
+				c.EnableDocumentHistory = verNum
 			}
 		}
 	}
 
-	if v, ok := this.Option["CLOSE_OPEN_SOURCE_LINK"]; ok {
-		this.Data["CloseOpenSourceLink"] = v == "true"
+	if v, ok := c.Option["CLOSE_OPEN_SOURCE_LINK"]; ok {
+		c.Data["CloseOpenSourceLink"] = v == "true"
 	}
 
-	if v, ok := this.Option["HIDE_TAG"]; ok {
-		this.Data["HideTag"] = v == "true"
+	if v, ok := c.Option["HIDE_TAG"]; ok {
+		c.Data["HideTag"] = v == "true"
 	}
 
-	if v, ok := this.Option["CLOSE_SUBMIT_ENTER"]; ok {
-		this.Data["CloseSubmitEnter"] = v == "true"
+	if v, ok := c.Option["CLOSE_SUBMIT_ENTER"]; ok {
+		c.Data["CloseSubmitEnter"] = v == "true"
 	}
 
-	this.Data["SiteName"] = this.Sitename
+	c.Data["SiteName"] = c.Sitename
 
 	// 默认显示创建书籍的入口
 	ShowCreateBookEntrance := false
 
-	if this.Member.MemberId > 0 {
+	if c.Member.MemberId > 0 {
 		ShowCreateBookEntrance = true
 		if opt, err := models.NewOption().FindByKey("ALL_CAN_WRITE_BOOK"); err == nil {
-			if opt.OptionValue == "false" && this.Member.Role == conf.MemberGeneralRole {
+			if opt.OptionValue == "false" && c.Member.Role == conf.MemberGeneralRole {
 				// 如果用户现在是普通用户，但是之前是作者或者之前有新建书籍书籍的权限并且创建了书籍，则也给用户显示入口
-				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(this.Member.MemberId)
+				ShowCreateBookEntrance = models.NewRelationship().HasRelatedBook(c.Member.MemberId)
 			}
 		}
 	}
 
-	this.Data["ShowCreateBookEntrance"] = ShowCreateBookEntrance
+	c.Data["ShowCreateBookEntrance"] = ShowCreateBookEntrance
 
-	if this.Member.MemberId == 0 {
-		if this.EnableAnonymous == false && !this.NoNeedLoginRouter { // 不允许游客访问
+	if c.Member.MemberId == 0 {
+		if c.EnableAnonymous == false && !c.NoNeedLoginRouter { // 不允许游客访问
 			allowPaths := map[string]bool{
 				beego.URLFor("AccountController.Login"):        true,
 				beego.URLFor("AccountController.Logout"):       true,
 				beego.URLFor("AccountController.FindPassword"): true,
 				beego.URLFor("AccountController.ValidEmail"):   true,
 			}
-			if _, ok := allowPaths[this.Ctx.Request.URL.Path]; !ok {
-				this.Redirect(beego.URLFor("AccountController.Login"), 302)
+			if _, ok := allowPaths[c.Ctx.Request.URL.Path]; !ok {
+				c.Redirect(beego.URLFor("AccountController.Login"), 302)
 				return
 			}
 		}
 
-		if this.AllowRegister == false { // 不允许用户注册
+		if c.AllowRegister == false { // 不允许用户注册
 			denyPaths := map[string]bool{
 				// 第三方登录，如果是新注册的话，需要绑定信息，这里不让绑定信息就是不让注册
 				beego.URLFor("AccountController.Bind"): true,
 				// 禁止邮箱注册
 				beego.URLFor("AccountController.Oauth", ":oauth", "email"): true,
 			}
-			if _, ok := denyPaths[this.Ctx.Request.URL.Path]; ok {
-				this.Redirect("/login", 302)
+			if _, ok := denyPaths[c.Ctx.Request.URL.Path]; ok {
+				c.Redirect("/login", 302)
 				return
 			}
 		}
@@ -198,20 +246,20 @@ func (this *BaseController) Prepare() {
 }
 
 // SetMember 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
-func (this *BaseController) SetMember(member models.Member) {
+func (c *BaseController) SetMember(member models.Member) {
 
 	if member.MemberId <= 0 {
-		this.DelSession(conf.LoginSessionName)
-		this.DelSession("uid")
-		this.DestroySession()
+		c.DelSession(conf.LoginSessionName)
+		c.DelSession("uid")
+		c.DestroySession()
 	} else {
-		this.SetSession(conf.LoginSessionName, member)
-		this.SetSession("uid", member.MemberId)
+		c.SetSession(conf.LoginSessionName, member)
+		c.SetSession("uid", member.MemberId)
 	}
 }
 
 // JsonResult 响应 json 结果
-func (this *BaseController) JsonResult(errCode int, errMsg string, data ...interface{}) {
+func (c *BaseController) JsonResult(errCode int, errMsg string, data ...interface{}) {
 	jsonData := make(map[string]interface{}, 3)
 	jsonData["errcode"] = errCode
 	jsonData["message"] = errMsg
@@ -223,29 +271,29 @@ func (this *BaseController) JsonResult(errCode int, errMsg string, data ...inter
 	if err != nil {
 		beego.Error(err)
 	}
-	this.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
+	c.Ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 	//this.Ctx.ResponseWriter.Header().Set("Cache-Control", "no-cache, no-store")//解决回退出现json的问题
 	//使用gzip原始，json数据会只有原本数据的10分之一左右
-	if strings.Contains(strings.ToLower(this.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") {
-		this.Ctx.ResponseWriter.Header().Set("Content-Encoding", "gzip")
+	if strings.Contains(strings.ToLower(c.Ctx.Request.Header.Get("Accept-Encoding")), "gzip") {
+		c.Ctx.ResponseWriter.Header().Set("Content-Encoding", "gzip")
 		//gzip压缩
-		w := gzip.NewWriter(this.Ctx.ResponseWriter)
+		w := gzip.NewWriter(c.Ctx.ResponseWriter)
 		defer w.Close()
 		w.Write(returnJSON)
 		w.Flush()
 	} else {
-		io.WriteString(this.Ctx.ResponseWriter, string(returnJSON))
+		io.WriteString(c.Ctx.ResponseWriter, string(returnJSON))
 	}
-	this.StopRun()
+	c.StopRun()
 }
 
 // ExecuteViewPathTemplate 执行指定的模板并返回执行结果.
-func (this *BaseController) ExecuteViewPathTemplate(tplName string, data interface{}) (string, error) {
+func (c *BaseController) ExecuteViewPathTemplate(tplName string, data interface{}) (string, error) {
 	var buf bytes.Buffer
 
-	viewPath := this.ViewPath
+	viewPath := c.ViewPath
 
-	if this.ViewPath == "" {
+	if c.ViewPath == "" {
 		viewPath = beego.BConfig.WebConfig.ViewsPath
 
 	}
@@ -256,33 +304,33 @@ func (this *BaseController) ExecuteViewPathTemplate(tplName string, data interfa
 	return buf.String(), nil
 }
 
-func (this *BaseController) BaseUrl() string {
+func (c *BaseController) BaseUrl() string {
 	host := beego.AppConfig.String("sitemap_host")
 	if len(host) > 0 {
 		if strings.HasPrefix(host, "http://") || strings.HasPrefix(host, "https://") {
 			return host
 		}
-		return this.Ctx.Input.Scheme() + "://" + host
+		return c.Ctx.Input.Scheme() + "://" + host
 	}
-	return this.Ctx.Input.Scheme() + "://" + this.Ctx.Request.Host
+	return c.Ctx.Input.Scheme() + "://" + c.Ctx.Request.Host
 }
 
 //显示错误信息页面.
-func (this *BaseController) ShowErrorPage(errCode int, errMsg string) {
-	this.TplName = "errors/error.html"
-	this.Data["ErrorMessage"] = errMsg
-	this.Data["ErrorCode"] = errCode
-	this.StopRun()
+func (c *BaseController) ShowErrorPage(errCode int, errMsg string) {
+	c.TplName = "errors/error.html"
+	c.Data["ErrorMessage"] = errMsg
+	c.Data["ErrorCode"] = errCode
+	c.StopRun()
 }
 
 //根据页面获取seo
 //@param			page			页面标识
 //@param			defSeo			默认的seo的map，必须有title、keywords和description字段
-func (this *BaseController) GetSeoByPage(page string, defSeo map[string]string) {
+func (c *BaseController) GetSeoByPage(page string, defSeo map[string]string) {
 	var seo models.Seo
 
 	orm.NewOrm().QueryTable(models.TableSeo).Filter("Page", page).One(&seo)
-	defSeo["sitename"] = this.Sitename
+	defSeo["sitename"] = c.Sitename
 	if seo.Id > 0 {
 		for k, v := range defSeo {
 			seo.Title = strings.Replace(seo.Title, fmt.Sprintf("{%v}", k), v, -1)
@@ -290,29 +338,29 @@ func (this *BaseController) GetSeoByPage(page string, defSeo map[string]string) 
 			seo.Description = strings.Replace(seo.Description, fmt.Sprintf("{%v}", k), v, -1)
 		}
 	}
-	this.Data["SeoTitle"] = seo.Title
-	this.Data["SeoKeywords"] = seo.Keywords
-	this.Data["SeoDescription"] = seo.Description
+	c.Data["SeoTitle"] = seo.Title
+	c.Data["SeoKeywords"] = seo.Keywords
+	c.Data["SeoDescription"] = seo.Description
 }
 
 //站点地图
-func (this *BaseController) Sitemap() {
-	this.Data["SeoTitle"] = "站点地图 - " + this.Sitename
-	page, _ := this.GetInt("page")
+func (c *BaseController) Sitemap() {
+	c.Data["SeoTitle"] = "站点地图 - " + c.Sitename
+	page, _ := c.GetInt("page")
 	listRows := 100
 	totalCount, docs := models.SitemapData(page, listRows)
 	if totalCount > 0 {
-		html := utils.GetPagerHtml(this.Ctx.Request.RequestURI, page, listRows, int(totalCount))
-		this.Data["PageHtml"] = html
+		html := utils.GetPagerHtml(c.Ctx.Request.RequestURI, page, listRows, int(totalCount))
+		c.Data["PageHtml"] = html
 	} else {
-		this.Data["PageHtml"] = ""
+		c.Data["PageHtml"] = ""
 	}
 	//this.JsonResult(0, "aaa", docs)
-	this.Data["Docs"] = docs
-	this.TplName = "widgets/sitemap.html"
+	c.Data["Docs"] = docs
+	c.TplName = "widgets/sitemap.html"
 }
 
-func (this *BaseController) loginByMemberId(memberId int) (err error) {
+func (c *BaseController) loginByMemberId(memberId int) (err error) {
 	member, err := models.NewMember().Find(memberId)
 	if member.MemberId == 0 {
 		return errors.New("用户不存在")
@@ -323,20 +371,20 @@ func (this *BaseController) loginByMemberId(memberId int) (err error) {
 	}
 	member.LastLoginTime = time.Now()
 	member.Update()
-	this.SetMember(*member)
+	c.SetMember(*member)
 	var remember CookieRemember
 	remember.MemberId = member.MemberId
 	remember.Account = member.Account
 	remember.Time = time.Now()
 	v, err := utils.Encode(remember)
 	if err == nil {
-		this.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
+		c.SetSecureCookie(conf.GetAppKey(), "login", v, 24*3600*365)
 	}
 	return err
 }
 
 //在markdown头部加上<bookstack></bookstack>或者<bookstack/>，即解析markdown中的ul>li>a链接作为目录
-func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) string {
+func (c *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId int) string {
 	debug := beego.AppConfig.String("runmod") != "prod"
 	o := orm.NewOrm()
 	qs := o.QueryTable("md_documents").Filter("book_id", bookId)
@@ -450,7 +498,7 @@ func (this *BaseController) sortBySummary(bookIdentify, htmlStr string, bookId i
 
 	htmlStr, _ = doc.Find("body").Html()
 	if len(hrefs) > 0 { //如果有新创建的文档，则再调用一遍，用于处理排序
-		htmlStr = this.replaceLinks(bookIdentify, htmlStr, true)
+		htmlStr = c.replaceLinks(bookIdentify, htmlStr, true)
 	}
 	return htmlStr
 }
@@ -465,7 +513,7 @@ type Sort struct {
 
 //替换链接
 //如果是summary，则根据这个进行排序调整
-func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, isSummary ...bool) string {
+func (c *BaseController) replaceLinks(bookIdentify string, docHtml string, isSummary ...bool) string {
 	var (
 		book models.Book
 		docs []models.Document
@@ -510,7 +558,7 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 				if newHtml, err := gq.Find("body").Html(); err == nil {
 					docHtml = newHtml
 					if len(isSummary) > 0 && isSummary[0] == true { //更新排序
-						docHtml = this.sortBySummary(bookIdentify, docHtml, book.BookId) //更新排序
+						docHtml = c.sortBySummary(bookIdentify, docHtml, book.BookId) //更新排序
 					}
 				}
 			} else {
@@ -522,58 +570,58 @@ func (this *BaseController) replaceLinks(bookIdentify string, docHtml string, is
 }
 
 //内容采集
-func (this *BaseController) Crawl() {
-	if this.Member.MemberId > 0 {
-		if val, ok := this.GetSession("crawl").(string); ok && val == "1" {
-			this.JsonResult(1, "您提交的上一次采集未完成，请稍后再提交新的内容采集")
+func (c *BaseController) Crawl() {
+	if c.Member.MemberId > 0 {
+		if val, ok := c.GetSession("crawl").(string); ok && val == "1" {
+			c.JsonResult(1, "您提交的上一次采集未完成，请稍后再提交新的内容采集")
 		}
-		this.SetSession("crawl", "1")
-		defer this.DelSession("crawl")
-		urlStr := this.GetString("url")
-		force, _ := this.GetBool("force")              //是否是强力采集，强力采集，使用Chrome
-		intelligence, _ := this.GetInt("intelligence") //是否是强力采集，强力采集，使用Chrome
-		contType, _ := this.GetInt("type")
-		diySel := this.GetString("diy")
+		c.SetSession("crawl", "1")
+		defer c.DelSession("crawl")
+		urlStr := c.GetString("url")
+		force, _ := c.GetBool("force")              //是否是强力采集，强力采集，使用Chrome
+		intelligence, _ := c.GetInt("intelligence") //是否是强力采集，强力采集，使用Chrome
+		contType, _ := c.GetInt("type")
+		diySel := c.GetString("diy")
 		content, err := utils.CrawlHtml2Markdown(urlStr, contType, force, intelligence, diySel, []string{}, nil)
 		if err != nil {
-			this.JsonResult(1, "采集失败："+err.Error())
+			c.JsonResult(1, "采集失败："+err.Error())
 		}
-		this.JsonResult(0, "采集成功", content)
+		c.JsonResult(0, "采集成功", content)
 	}
-	this.JsonResult(1, "请先登录再操作")
+	c.JsonResult(1, "请先登录再操作")
 }
 
 //关注或取消关注
-func (this *BaseController) SetFollow() {
+func (c *BaseController) SetFollow() {
 	var cancel bool
-	if this.Member == nil || this.Member.MemberId == 0 {
-		this.JsonResult(1, "请先登录")
+	if c.Member == nil || c.Member.MemberId == 0 {
+		c.JsonResult(1, "请先登录")
 	}
-	uid, _ := this.GetInt(":uid")
-	if uid == this.Member.MemberId {
-		this.JsonResult(1, "自己不能关注自己")
+	uid, _ := c.GetInt(":uid")
+	if uid == c.Member.MemberId {
+		c.JsonResult(1, "自己不能关注自己")
 	}
-	cancel, _ = new(models.Fans).FollowOrCancel(uid, this.Member.MemberId)
+	cancel, _ = new(models.Fans).FollowOrCancel(uid, c.Member.MemberId)
 	if cancel {
-		this.JsonResult(0, "您已经成功取消了关注")
+		c.JsonResult(0, "您已经成功取消了关注")
 	}
-	this.JsonResult(0, "您已经成功关注了Ta")
+	c.JsonResult(0, "您已经成功关注了Ta")
 }
 
-func (this *BaseController) SignToday() {
-	if this.Member == nil || this.Member.MemberId == 0 {
-		this.JsonResult(1, "请先登录")
+func (c *BaseController) SignToday() {
+	if c.Member == nil || c.Member.MemberId == 0 {
+		c.JsonResult(1, "请先登录")
 	}
-	reward, err := models.NewSign().Sign(this.Member.MemberId, false)
+	reward, err := models.NewSign().Sign(c.Member.MemberId, false)
 	if err != nil {
-		this.JsonResult(1, "签到失败："+err.Error())
+		c.JsonResult(1, "签到失败："+err.Error())
 	}
-	this.JsonResult(0, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
+	c.JsonResult(0, fmt.Sprintf("恭喜您，签到成功,奖励阅读时长 %v 秒", reward))
 }
 
-func (this *BaseController) forbidGeneralRole() bool {
+func (c *BaseController) forbidGeneralRole() bool {
 	// 如果只有作者和管理员才能写作的话，那么已创建了书籍的普通用户无法将书籍转为公开或者是私密分享
-	if this.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
+	if c.Member.Role == conf.MemberGeneralRole && models.GetOptionValue("ALL_CAN_WRITE_BOOK", "true") != "true" {
 		return true
 	}
 	return false

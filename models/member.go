@@ -170,10 +170,6 @@ func (m *Member) Add() error {
 		return errors.New("邮箱格式不正确")
 	}
 
-	if l := strings.Count(m.Password, ""); l < 7 || l >= 50 {
-		return errors.New("密码不能为空且必须在6-50个字符之间")
-	}
-
 	cond := orm.NewCondition().Or("email", m.Email).Or("nickname", m.Nickname).Or("account", m.Account)
 	var one Member
 	if o.QueryTable(m.TableNameWithPrefix()).SetCond(cond).One(&one, "member_id", "nickname", "account", "email"); one.MemberId > 0 {
@@ -218,9 +214,6 @@ func (m *Member) Add() error {
 func (m *Member) Update(cols ...string) error {
 	o := orm.NewOrm()
 
-	if m.Email == "" {
-		return errors.New("邮箱不能为空")
-	}
 	if _, err := o.Update(m, cols...); err != nil {
 		return err
 	}

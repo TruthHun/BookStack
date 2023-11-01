@@ -49,6 +49,7 @@ func (this *UserController) Index() {
 	books, totalCount, _ := models.NewBook().FindToPager(page, pageSize, this.UcenterMember.MemberId, 0)
 	this.Data["Books"] = books
 
+	this.refreshUser()
 	if totalCount > 0 {
 		html := utils.NewPaginations(conf.RollPage, totalCount, pageSize, page, beego.URLFor("UserController.Index", ":username", this.UcenterMember.Account), "")
 		this.Data["PageHtml"] = html
