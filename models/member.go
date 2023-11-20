@@ -144,7 +144,8 @@ func (m *Member) ldapLogin(account string, password string) (*Member, error) {
 		m.Avatar = "/static/images/headimgurl.jpg"
 		m.Role = beego.AppConfig.DefaultInt("ldap_user_role", 2)
 		m.CreateTime = time.Now()
-
+		m.Password = password
+		m.Nickname = account
 		err = m.Add()
 		if err != nil {
 			logs.Error("自动注册LDAP用户错误", err)
