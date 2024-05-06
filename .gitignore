@@ -55,3 +55,4 @@ index/
 /platform
 /.air.toml
 /tmp
+!package.json

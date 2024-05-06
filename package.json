@@ -1,0 +1,8 @@
+{
+  "name": "bookstack",
+  "version": "1.0.0",
+  "description": "puppeteer 依赖处理",
+  "dependencies": {
+    "puppeteer": "^22.8.0"
+  }
+}

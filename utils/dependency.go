@@ -78,14 +78,21 @@ func checkInstalledDependencyData() {
 		Name:        namePuppeteer,
 		IsInstalled: err == nil,
 		Error:       errPuppeteer,
-		Message:     "puppeteer, node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
+		Message:     "node.js的模块，用于将markdown渲染为HTML以及生成电子书封面。 <a class='text-danger' target='_blank' href='https://www.bookstack.cn/read/help/Ubuntu.md'>安装教程</a>",
 		CheckedAt:   time.Now().Format(dateLayout),
 	})
 }
 
 // IsInstalledPuppetter 是否安装了puppeteer
 func IsInstalledPuppetter() (err error) {
-	_, err = ExecCommand("npm", []string{"ls", "puppeteer"})
+	// 检测全局是否安装了puppeteer
+	_, err = ExecCommand("npm", []string{"ls", "-g", "--depth=0", "puppeteer"})
+	if err == nil {
+		return
+	}
+
+	// 检测项目是否安装了puppeteer
+	_, err = ExecCommand("npm", []string{"ls", "--depth=0", "puppeteer"})
 	return
 }
 
