@@ -53,25 +53,19 @@
                 {{end}}
                 <li><span>整理分享：</span><a target="_blank" class="text-primary" href="{{urlfor "UserController.Index" ":username" (.Book.MemberId|getUsernameByUid)}}">{{.Book.MemberId|getNicknameByUid}}</a></li>
                 <li class="hidden-xs">
-                    <div class="btn btn-group">
                     {{range $index,$val:=.Menu}}
                     {{if eq $index 0}}
-                        <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 阅读</a>
+                        <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success  btn-lg"><i class="fa fa-book"></i> 马上阅读</a>
                     {{end}}
                     {{end}}
-                        <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-warning ajax-star">
+                        <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-warning ajax-star  btn-lg">
                             {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
-                                <i class="fa fa-heart"></i> <span>已收藏</span>
+                                <i class="fa fa-heart"></i> <span>取消收藏</span>
                             {{else}}
-                                <i class="fa fa-heart-o"></i> <span>收藏</span>
+                                <i class="fa fa-heart-o"></i> <span>加入收藏</span>
                             {{end}}
                         </a>
-                        <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载</a>
-                        <!-- {{if $.Wxacode}}
-                            <a href="#" data-target="#ModalBookChat" data-toggle="modal" class="btn btn-primary"><img src="/static/images/wxacode-white.png"> 小程序</a>
-                        {{end}} -->
-                        <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-info"><i class="fa fa-share-alt"></i> &nbsp;分享</a>
-                    </div>
+                        <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger btn-lg"><i class="fa fa-cloud-download"></i> 下载电子书</a>
                 </li>
             </ul>
         </div>
@@ -82,25 +76,19 @@
             </div>
         {{end}}
         <div class="col-xs-12 text-center visible-xs">
-            <div class="btn btn-group">
             {{range $index,$val:=.Menu}}
             {{if eq $index 0}}
-                <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i>阅读</a>
+                <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 马上阅读</a>
             {{end}}
             {{end}}
                 <a href="{{urlfor "BookController.Star" ":id" .Book.BookId}}" rel="nofollow" class="btn btn-warning ajax-star">
                 {{if eq (doesStar $.Member.MemberId $.Book.BookId) true}}
-                    <i class="fa fa-heart"></i> <span>已收藏</span>
+                    <i class="fa fa-heart"></i> <span>取消收藏</span>
                 {{else}}
-                    <i class="fa fa-heart-o"></i> <span>收藏</span>
+                    <i class="fa fa-heart-o"></i> <span>收藏书籍</span>
                 {{end}}
                 </a>
-                <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i>下载</a>
-{{/*                {{if $.Wxacode}}*/}}
-{{/*                    <a href="#" data-target="#ModalBookChat" data-toggle="modal" class="btn btn-primary"><img src="/static/images/wxacode-white.png">小程序</a>*/}}
-{{/*                {{end}}*/}}
-                <a href="#" data-target="#ModalShare" data-toggle="modal" class="btn btn-info"><i class="fa fa-share-alt"></i>分享</a>
-            </div>
+                <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载书籍</a>
         </div>
         {{if (ads "intro-before-menu" $.IsMobile)}}
             <div class="ap ap-intro-before-menu mgt-15px col-xs-12">
@@ -236,7 +224,6 @@
         </div>
     {{end}}
 </div>
-{{template "widgets/share.html" .}}
 {{template "widgets/download.html" .}}
 {{if $.Wxacode}}
     {{template "widgets/bookchat.html" .}}

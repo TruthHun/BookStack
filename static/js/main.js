@@ -180,10 +180,10 @@ $(function () {
             if(ret.errcode==0){//操作成功
                 alertTips("success",ret.message,3000,"");
                 if (ret.data.IsCancel){//取消收藏
-                    _this.find("span").text("收藏");
+                    _this.find("span").text("收藏书籍");
                     _this.find(".fa-heart").addClass("fa-heart-o").removeClass("fa-heart");
                 }else{//添加收藏
-                    _this.find("span").text("已收藏");
+                    _this.find("span").text("取消收藏");
                     _this.find(".fa-heart-o").addClass("fa-heart").removeClass("fa-heart-o");
                 }
             }else{

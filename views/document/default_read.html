@@ -42,7 +42,6 @@
             </div>
             <div class="navbar-header pull-right manual-menu">
                 <div class="bookstack-item">
-                    {{/*<a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare" class="btn btn-default"><i class="fa fa-share-alt"></i> 分享</a>*/}}
                     <a title="首页" href="/" class="btn btn-link"><i class="fa fa-home"></i> 首页</a>
                     {{range .Model.Navs}}
                         <a title="{{.Name}}" href="{{.URL}}" class="btn btn-link" target="{{.Target}}" style="{{if .Color}}color:{{.Color}} !important;{{end}}">
@@ -107,7 +106,6 @@
                         {{end}}
                         <span><i class="fa fa-eye"></i> 浏览 <i class="read-count">{{.View}}</i></span>
                         <span class="hidden-xs"><a href="#" data-target="#ModalQRcode" data-toggle="modal"><i class="fa fa-qrcode"></i> 扫码</a></span>
-                        <span><a href="#" data-target="#ModalShare" data-toggle="modal"><i class="fa fa-share-alt"></i> 分享</a></span>
                         <span><a href="javascript:;"title="打印当前页面内容为PDF" class="tooltips printPDF"><i class="fa fa-print"></i> 打印</a></span>
                         <span class="pull-right hidden-xs tooltips" title="更新时间"><i class="fa fa-clock-o"></i> <i class="updated-at">{{.UpdatedAt}}</i></span>
                     </div>
@@ -200,9 +198,6 @@
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide"><a href="/" title="首页"><i class="fa fa-home"></i></a></li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalDownload"><i class="fa fa-cloud-download"></i></a>
-                            </li>
-                            <li class="visible-xs visible-sm bars-menu bars-menu-hide">
-                                <a title="分享" href="javascript:" data-toggle="modal" data-target="#ModalShare"><i class="fa fa-share-alt"></i></a>
                             </li>
                             <li class="visible-xs visible-sm bars-menu bars-menu-hide">
                                 <a title="阅读记录" class="showModalHistory" href="{{urlfor "RecordController.List" ":book_id" .Model.BookId}}" rel="nofollow"><i class="fa fa-clock-o"></i></a>
@@ -299,7 +294,6 @@
 	</div>
 </div>
 
-{{template "widgets/share.html" .}}
 {{template "widgets/qrcode.html" .}}
 
 {{template "widgets/download.html" .}}
