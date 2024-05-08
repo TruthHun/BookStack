@@ -54,7 +54,7 @@ var (
   `
 )
 
-//DocumentController struct.
+// DocumentController struct.
 type DocumentController struct {
 	BaseController
 }
@@ -93,7 +93,7 @@ func parseGitCommit(str string) (cont, commit string) {
 	return
 }
 
-//判断用户是否可以阅读文档.
+// 判断用户是否可以阅读文档.
 func isReadable(identify, token string, this *DocumentController) *models.BookResult {
 	book, err := models.NewBook().FindByFieldFirst("identify", identify)
 	if err != nil {
@@ -153,7 +153,7 @@ func isReadable(identify, token string, this *DocumentController) *models.BookRe
 	return bookResult
 }
 
-//文档首页.
+// 文档首页.
 func (this *DocumentController) Index() {
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
@@ -210,7 +210,7 @@ func (this *DocumentController) Index() {
 	this.Data["RelateBooks"] = models.NewRelateBook().Lists(bookResult.BookId)
 }
 
-//文档首页.
+// 文档首页.
 func (this *DocumentController) indexWithPassword() {
 	identify := this.Ctx.Input.Param(":key")
 	if identify == "" {
@@ -226,7 +226,7 @@ func (this *DocumentController) indexWithPassword() {
 	this.Data["Identify"] = identify
 }
 
-//阅读文档.
+// 阅读文档.
 func (this *DocumentController) Read() {
 
 	identify := this.Ctx.Input.Param(":key")
@@ -477,6 +477,7 @@ func (this *DocumentController) Read() {
 	if wd := this.GetString("wd"); strings.TrimSpace(wd) != "" {
 		this.Data["Keywords"] = models.NewElasticSearchClient().SegWords(wd)
 	}
+	this.Data["IsThemeDark"] = this.Ctx.GetCookie("theme-dark") == "true"
 	this.Data["Bookmark"] = existBookmark
 	this.Data["Model"] = bookResult
 	this.Data["Book"] = bookResult //文档下载需要用到Book变量
@@ -492,7 +493,7 @@ func (this *DocumentController) Read() {
 	this.Data["Percent"] = percent
 }
 
-//编辑文档.
+// 编辑文档.
 func (this *DocumentController) Edit() {
 	docId := 0 // 文档id
 
@@ -563,7 +564,7 @@ func (this *DocumentController) Edit() {
 	}
 }
 
-//创建一个文档.
+// 创建一个文档.
 func (this *DocumentController) Create() {
 	identify := this.GetString("identify")        //书籍书籍标识
 	docIdentify := this.GetString("doc_identify") //新建的文档标识
@@ -663,7 +664,7 @@ func (this *DocumentController) Create() {
 	this.JsonResult(0, "ok", document)
 }
 
-//批量创建文档
+// 批量创建文档
 func (this *DocumentController) CreateMulti() {
 	bookId, _ := this.GetInt("book_id")
 
@@ -708,7 +709,7 @@ func (this *DocumentController) CreateMulti() {
 	this.JsonResult(0, "添加成功")
 }
 
-//上传附件或图片.
+// 上传附件或图片.
 func (this *DocumentController) Upload() {
 	identify := this.GetString("identify")
 	docId, _ := this.GetInt("doc_id")
@@ -866,7 +867,7 @@ func (this *DocumentController) Upload() {
 	this.StopRun()
 }
 
-//DownloadAttachment 下载附件.
+// DownloadAttachment 下载附件.
 func (this *DocumentController) DownloadAttachment() {
 	identify := this.Ctx.Input.Param(":key")
 	attachId, _ := strconv.Atoi(this.Ctx.Input.Param(":attach_id"))
@@ -919,7 +920,7 @@ func (this *DocumentController) DownloadAttachment() {
 	this.StopRun()
 }
 
-//删除附件.
+// 删除附件.
 func (this *DocumentController) RemoveAttachment() {
 	attachId, _ := this.GetInt("attach_id")
 	if attachId <= 0 {
@@ -958,7 +959,7 @@ func (this *DocumentController) RemoveAttachment() {
 	this.JsonResult(0, "ok", attach)
 }
 
-//删除文档.
+// 删除文档.
 func (this *DocumentController) Delete() {
 
 	identify := this.GetString("identify")
@@ -1222,7 +1223,7 @@ func (this *DocumentController) Content() {
 
 }
 
-//导出文件
+// 导出文件
 func (this *DocumentController) ExportOld() {
 	wecode := strings.TrimSpace(this.GetString("wecode"))
 	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
@@ -1286,7 +1287,7 @@ func (this *DocumentController) ExportOld() {
 	this.JsonResult(1, "下载失败，您要下载的书籍当前并未生成可下载的电子书。")
 }
 
-//导出文件
+// 导出文件
 func (this *DocumentController) Export() {
 	wecode := strings.TrimSpace(this.GetString("wecode"))
 	if wecode == "" && (this.Member == nil || this.Member.MemberId == 0) {
@@ -1389,7 +1390,7 @@ func (this *DocumentController) QrCode() {
 	}
 }
 
-//书籍内搜索.
+// 书籍内搜索.
 func (this *DocumentController) Search() {
 	identify := this.Ctx.Input.Param(":key")
 	token := this.GetString("token")
@@ -1443,7 +1444,7 @@ func (this *DocumentController) Search() {
 	}
 }
 
-//文档历史列表.
+// 文档历史列表.
 func (this *DocumentController) History() {
 
 	this.TplName = "document/history.html"
@@ -1667,7 +1668,7 @@ func (this *DocumentController) Compare() {
 	this.Data["Content"] = ModelStore.GetFiledById(doc.DocumentId, "markdown")
 }
 
-//递归生成文档序列数组.
+// 递归生成文档序列数组.
 func RecursiveFun(parentId int, prefix, dpath string, this *DocumentController, book *models.BookResult, docs []*models.Document, paths *list.List) {
 	for _, item := range docs {
 		if item.ParentId == parentId {

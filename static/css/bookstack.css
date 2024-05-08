@@ -1549,3 +1549,45 @@ form .btn-row .col-md-10{padding-left: 0;}
     width: 128px;height: 128px;margin: 100px auto 15px;
     background: url("/static/images/lock.png") no-repeat center center;
 }
+
+html.theme-dark{
+    filter: invert(1) hue-rotate(180deg);
+}
+
+html.theme-dark img{
+    filter: invert(1) hue-rotate(180deg);
+}
+
+html.theme-dark .bookstack-item img{
+    filter: none;
+}
+
+html.theme-dark body{
+    font-family: PingFang SC,-apple-system,SF UI Text,Lucida Grande,STheiti,Microsoft YaHei,sans-serif;
+}
+
+html.theme-dark .markdown-body{
+    color: #666;
+    font-family: unset;
+}
+
+html.theme-dark .editormd-preview-container code,html.theme-dark  .editormd-html-preview code{
+    background-color: #ccc;
+}
+
+html.theme-dark .editormd-preview-container blockquote,html.theme-dark  .editormd-html-preview blockquote{
+    border-color: #aaa;
+    background-color: #ddd;
+}
+
+html.theme-dark .editormd-preview-container pre,html.theme-dark  .editormd-html-preview pre{
+    background-color: #ccc;
+}
+
+html.theme-dark .com{
+    color: #888;
+}
+html span.moon{display: inline-block;}
+html.theme-dark span.moon{display: none;}
+html span.sun{display: none;}
+html.theme-dark span.sun{display: inline-block;}

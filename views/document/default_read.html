@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" {{if $.IsThemeDark}}class="theme-dark"{{end}}>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,6 +48,11 @@
                             {{str2html (parseICON .Icon)}}
                              {{.Name}}</a>
                     {{end}}
+
+                    <a href="javascript:;" class="btn btn-link btn-theme">
+                        <span class="tooltips sun" title="切换白天浅色模式" data-placement="bottom"><i class="fa fa-sun-o"></i> 白天</span>
+                        <span class="tooltips moon" title="切换夜间深色模式" data-placement="bottom"><i class="fa fa-moon-o"></i> 夜间</span>
+                    </a>
 
                     {{if $.Wxacode}}
                     <a title="下载" href="javascript:" data-toggle="modal" data-target="#ModalBookChat" class="btn btn-light">
@@ -420,6 +425,22 @@ $(function () {
             $(this).parent().addClass("collapse-hide")
         }
     })
+
+    $(".btn-theme").click(function(){
+        if($("html").hasClass("theme-dark")){
+            $("html").removeClass("theme-dark")
+            setCookie('theme-dark',false,-1000)
+        }else{
+            $("html").addClass("theme-dark")
+            setCookie('theme-dark',true,3600*24*365*1000)
+        }
+    })
+
+    function setCookie(name, value, time){
+        var exp = new Date();
+        exp.setTime(exp.getTime() + time);
+        document.cookie = name + "="+ escape (value) + ";path=/;expires=" + exp.toGMTString();
+    }
 });
 </script>
 </body>
