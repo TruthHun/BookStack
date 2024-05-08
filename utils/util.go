@@ -52,7 +52,7 @@ import (
 
 //存储类型
 
-//更多存储类型有待扩展
+// 更多存储类型有待扩展
 const (
 	StoreLocal  = "local"
 	StoreOss    = "oss"
@@ -60,7 +60,7 @@ const (
 	unknown     = "unknown"
 )
 
-//分词器
+// 分词器
 var (
 	seg gse.Segmenter
 	te  idf.TagExtracter
@@ -124,15 +124,15 @@ func GetLang(lang string) string {
 	return "中文"
 }
 
-//评分处理
+// 评分处理
 func ScoreFloat(score int) string {
 	return fmt.Sprintf("%1.1f", float32(score)/10.0)
 }
 
-//@param            conf            邮箱配置
-//@param            subject         邮件主题
-//@param            email           收件人
-//@param            body            邮件内容
+// @param            conf            邮箱配置
+// @param            subject         邮件主题
+// @param            email           收件人
+// @param            body            邮件内容
 func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
 	msg := &mail.Message{
 		Header: mail.Header{
@@ -152,27 +152,28 @@ func SendMail(conf *conf.SmtpConf, subject, email string, body string) error {
 	return m.Send(msg)
 }
 
-//渲染markdown为html并录入数据库
+// 渲染markdown为html并录入数据库
 func RenderDocumentById(id int) {
 	//使用chromium-browser
 	//	chromium-browser --headless --disable-gpu --screenshot --no-sandbox --window-size=320,480 http://www.bookstack.cn
 	link := "http://localhost:" + beego.AppConfig.DefaultString("httpport", "8181") + "/local-render?id=" + strconv.Itoa(id)
-	name := beego.AppConfig.DefaultString("chrome", "chromium-browser")
-	args := []string{"--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
-	if ok := beego.AppConfig.DefaultBool("puppeteer", false); ok {
-		name = "node"
-		args = []string{"crawl.js", "--url", link}
-	}
-	cmd := exec.Command(name, args...)
-	beego.Info("render document by document_id:", cmd.Args)
-	// 超过10秒，杀掉进程，避免长期占用
-	time.AfterFunc(httpTimeout, func() {
-		if cmd.Process != nil && cmd.Process.Pid != 0 {
-			cmd.Process.Kill()
+	chrome := beego.AppConfig.DefaultString("chrome", "chromium-browser")
+	chromeArgs := []string{chrome, "--headless", "--disable-gpu", "--screenshot", "--no-sandbox", "--window-size=320,480", link}
+	nodeArgs := []string{"node", "crawl.js", "--url", link}
+	for _, v := range [][]string{chromeArgs, nodeArgs} {
+		cmd := exec.Command(v[0], v[1:]...)
+		beego.Info("render document by document_id:", cmd.Args)
+		// 超过10秒，杀掉进程，避免长期占用
+		time.AfterFunc(httpTimeout, func() {
+			if cmd.Process != nil && cmd.Process.Pid != 0 {
+				cmd.Process.Kill()
+			}
+		})
+		if err := cmd.Run(); err != nil {
+			beego.Error(err)
+			continue
 		}
-	})
-	if err := cmd.Run(); err != nil {
-		beego.Error(err)
+		return
 	}
 }
 
@@ -251,7 +252,7 @@ func RenderCoverByBookIdentify(identify string) (err error) {
 	return
 }
 
-//使用chrome采集网页HTML
+// 使用chrome采集网页HTML
 func CrawlByChrome(urlStr string, bookIdentify string) (cont string, err error) {
 	if strings.Contains(strings.ToLower(urlStr), "bookstack") {
 		return
@@ -354,11 +355,11 @@ func cropScreenshot(selector, jsonFile, pngFile string) (images map[string]map[i
 }
 
 // 图片缩放居中裁剪
-//图片缩放居中裁剪
-//@param        file        图片文件
-//@param        width       图片宽度
-//@param        height      图片高度
-//@return       err         错误
+// 图片缩放居中裁剪
+// @param        file        图片文件
+// @param        width       图片宽度
+// @param        height      图片高度
+// @return       err         错误
 func CropImage(file string, width, height int) (err error) {
 	var img image.Image
 	img, err = imaging.Open(file)
@@ -376,12 +377,12 @@ func CropImage(file string, width, height int) (err error) {
 	return imaging.Save(img, file)
 }
 
-//采集HTML并把相对链接和相对图片
-//内容类型，contType:0表示markdown，1表示html，2表示文本
-//force:是否是强力采集
-//intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
-//diySelecter:自定义选择器
-//注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为书籍的标识
+// 采集HTML并把相对链接和相对图片
+// 内容类型，contType:0表示markdown，1表示html，2表示文本
+// force:是否是强力采集
+// intelligence:是否是智能提取，智能提取，使用html2article，否则提取body
+// diySelecter:自定义选择器
+// 注意：由于参数问题，采集并下载图片的话，在headers中加上key为"project"的字段，值为书籍的标识
 func CrawlHtml2Markdown(urlstr string, contType int, force bool, intelligence int, diySelector string, excludeSelector []string, links map[string]string, headers ...map[string]string) (cont string, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -591,8 +592,8 @@ func HandleSVG(doc *goquery.Document, project string) *goquery.Document {
 	return doc
 }
 
-//操作图片显示
-//如果用的是oss存储，这style是avatar、cover可选项
+// 操作图片显示
+// 如果用的是oss存储，这style是avatar、cover可选项
 func ShowImg(img string, style ...string) (url string) {
 	img = strings.ReplaceAll(img, "\\", "/")
 	if strings.HasPrefix(img, "https://") || strings.HasPrefix(img, "http://") {
@@ -636,12 +637,12 @@ func Substr(s string, length int) string {
 	return str
 }
 
-//分页函数（这个分页函数不具有通用性）
-//rollPage:展示分页的个数
-//totalRows：总记录
-//currentPage:每页显示记录数
-//urlPrefix:url链接前缀
-//urlParams:url键值对参数
+// 分页函数（这个分页函数不具有通用性）
+// rollPage:展示分页的个数
+// totalRows：总记录
+// currentPage:每页显示记录数
+// urlPrefix:url链接前缀
+// urlParams:url键值对参数
 func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix string, urlSuffix string, urlParams ...interface{}) html1.HTML {
 	var (
 		htmlPage, path string
@@ -746,7 +747,7 @@ func NewPaginations(rollPage, totalRows, listRows, currentPage int, urlPrefix st
 	return html1.HTML(`<ul class="pagination">` + htmlPage + `</ul>`)
 }
 
-//判断数据是否在map中
+// 判断数据是否在map中
 func InMap(maps map[int]bool, key int) (ret bool) {
 	if _, ok := maps[key]; ok {
 		return true
