@@ -100,6 +100,8 @@ func RegisterModel() {
 		models.NewBookCounter(),
 		models.NewDownloadCounter(),
 		models.NewEbook(),
+		models.NewVersion(),
+		models.NewVersionItem(),
 	)
 	migrate.RegisterMigration()
 }

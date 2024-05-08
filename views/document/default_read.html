@@ -239,6 +239,18 @@
                 <div class="article-search" data-bookid="{{.Model.BookId}}">
                     <form id="searchForm" action="/read/{{.Model.Identify}}/search" method="post">
                         <div class="input-group">
+                            {{if .Versions}}
+                                <div class="btn-group input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        <span>版本</span> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        {{range .Versions}}
+                                            <li class="{{if eq $.Model.Identify .BookIdentify}}active{{end}}"><a href="{{urlfor "DocumentController.ReadBook" ":key" .BookIdentify}}" class="menu-item" title="{{.BookName}}">{{.BookName}}</a></li>
+                                        {{end}}
+                                    </ul>
+                                </div>
+                            {{end}}
                             <input type="text" name="keyword" placeholder="Search..." autocomplete="off" class="form-control">
                             <span class="input-group-addon input-group-addon-clear"><i class="fa fa-remove"></i></span>
                             <span class="input-group-addon">

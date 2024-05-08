@@ -683,12 +683,12 @@ a{color: #333}
 #bookstack-intro ul,#bookstack-intro li{list-style: none;padding:0px;}
 #bookstack-intro h1{font-size: 22px;line-height: 150%;color: #555;margin-top: 10px;}
 #bookstack-intro .none-listyle li{line-height: 250%;border-bottom: 1px dashed #EFEFEF;}
-#bookstack-intro .col-xs-6 .none-listyle li{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+/* #bookstack-intro .col-xs-6 .none-listyle li{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;} */
 #bookstack-intro .none-listyle li:last-child{border-bottom: 0px;}
 #bookstack-intro .bookstack-info .col-sm-9{padding-left: 0px;}
 #bookstack-intro .bookstack-info img{cursor: pointer;}
 #bookstack-intro .bookstack-info span{color: #888888;}
-#bookstack-intro .bookstack-info .btn-group{padding:0px;margin-top: 8px;}
+/* #bookstack-intro .bookstack-info .btn-group{padding:0px;margin-top: 8px;} */
 #bookstack-intro .bookstack-info a span{color: #fff;}
 #bookstack-intro .bookstack-info .btn-block{max-width: 300px;margin-top:15px;}
 #bookstack-intro .bookstack-menu .none-listyle  a{line-height: 250%;padding-left: 15px;display: block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap}
@@ -868,7 +868,7 @@ a{color: #333}
     top:22px;
 }
 .bookstack-info .btn{border: 0px;margin-right: 15px;margin-top: 15px;border-radius: 4px !important;}
-.bookstack-info .btn:last-of-type{margin-right: 0px;}
+/* .bookstack-info .btn:last-of-type{margin-right: 0px;} */
 .book-list .recommend-book:before,.ucenter .recommend-book:before{left: 7px;}
 
 .manual-header .nav>li>a:focus, .manual-header .nav>li>a:hover{

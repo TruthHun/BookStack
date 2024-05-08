@@ -23,7 +23,12 @@ type DocumentSelected struct {
 	Opened   bool `json:"opened"`
 }
 
-//获取书籍的文档树状结构
+func (m *Document) FirstChapter(bookId int, cols ...string) (doc Document, err error) {
+	err = orm.NewOrm().QueryTable(m).Filter("book_id", bookId).OrderBy("parent_id", "order_sort", "identify").One(&doc, cols...)
+	return
+}
+
+// 获取书籍的文档树状结构
 func (m *Document) FindDocumentTree(bookId int, selectedId int, isEdit ...bool) ([]*DocumentTree, error) {
 	o := orm.NewOrm()
 
@@ -91,7 +96,7 @@ func (m *Document) CreateDocumentTreeForHtml(bookId, selectedId int) (string, er
 
 }
 
-//使用递归的方式获取指定ID的最顶层ID
+// 使用递归的方式获取指定ID的最顶层ID
 func getSelectedNode(array []*DocumentTree, selectedId int, level ...int) int {
 	lv := 0
 	if len(level) > 0 {

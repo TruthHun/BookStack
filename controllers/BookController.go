@@ -99,7 +99,7 @@ func (this *BookController) Index() {
 	}
 }
 
-//收藏书籍
+// 收藏书籍
 func (this *BookController) Star() {
 	uid := this.BaseController.Member.MemberId
 	if uid <= 0 {
@@ -193,6 +193,10 @@ func (this *BookController) Setting() {
 		this.Data["Maps"] = maps
 	}
 
+	ver := models.NewVersion()
+	this.Data["Versions"] = ver.All()
+	this.Data["VersionItem"] = ver.GetVersionItem(book.Identify)
+
 	this.Data["Cates"], _ = new(models.Category).GetCates(-1, 1)
 	this.Data["Model"] = book
 	this.TplName = "book/setting.html"
@@ -277,6 +281,9 @@ func (this *BookController) SaveBook() {
 			beego.Error(errSearch.Error())
 		}
 	}()
+	versionId, _ := this.GetInt("version")
+	versionNO := this.GetString("version_no")
+	models.NewVersion().InsertOrUpdateVersionItem(versionId, book.Identify, book.BookName, versionNO)
 	go models.CountCategory()
 	this.JsonResult(0, "ok", bookResult)
 }
@@ -322,7 +329,7 @@ func (this *BookController) parseBookNav() (navs models.BookNavs, navStr string)
 	return
 }
 
-//设置书籍私有状态.
+// 设置书籍私有状态.
 func (this *BookController) PrivatelyOwned() {
 
 	status := this.GetString("status")
@@ -407,7 +414,7 @@ func (this *BookController) Transfer() {
 	this.JsonResult(0, "ok")
 }
 
-//上传书籍封面.
+// 上传书籍封面.
 func (this *BookController) UploadCover() {
 
 	bookResult, err := this.IsPermission()
@@ -853,7 +860,7 @@ func (this *BookController) Generate() {
 	this.JsonResult(0, "电子书生成任务已交由后台执行，请您耐心等待。")
 }
 
-//文档排序.
+// 文档排序.
 func (this *BookController) SaveSort() {
 
 	identify := this.Ctx.Input.Param(":key")
@@ -929,7 +936,7 @@ func (this *BookController) IsPermission() (*models.BookResult, error) {
 	return book, nil
 }
 
-//从github等拉取下载markdown书籍
+// 从github等拉取下载markdown书籍
 func (this *BookController) DownloadProject() {
 
 	//处理步骤
@@ -997,7 +1004,7 @@ func (this *BookController) GitPull() {
 	this.JsonResult(0, "提交成功，请耐心等待。")
 }
 
-//上传书籍
+// 上传书籍
 func (this *BookController) UploadProject() {
 	//处理步骤
 	//1、接受上传上来的zip文件，并存放到store/temp目录下
@@ -1032,11 +1039,11 @@ func (this *BookController) UploadProject() {
 	this.JsonResult(0, "上传成功")
 }
 
-//将zip压缩文件解压并录入数据库
-//@param            book_id             书籍id(其实有想不标识了可以不要这个的，但是这里的书籍标识只做目录)
-//@param            identify            书籍标识
-//@param            zipfile             压缩文件
-//@param            originFilename      上传文件的原始文件名
+// 将zip压缩文件解压并录入数据库
+// @param            book_id             书籍id(其实有想不标识了可以不要这个的，但是这里的书籍标识只做目录)
+// @param            identify            书籍标识
+// @param            zipfile             压缩文件
+// @param            originFilename      上传文件的原始文件名
 func (this *BookController) unzipToData(bookId int, identify, zipFile, originFilename string) {
 
 	//说明：
@@ -1217,7 +1224,7 @@ func (this *BookController) loadByFolder(bookId int, identify, folder string) {
 	}
 }
 
-//获取书籍的根目录
+// 获取书籍的根目录
 func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) {
 	var strs []string
 	for _, f := range fl {
@@ -1228,7 +1235,7 @@ func (this *BookController) getProjectRoot(fl []filetil.FileList) (root string) 
 	return utils.LongestCommonPrefix(strs)
 }
 
-//查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
+// 查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
 func (this *BookController) fixFileLinks(projectRoot string, identify string) {
 	imgBaseUrl := "/uploads/projects/" + identify
 	switch utils.StoreType {
@@ -1311,7 +1318,7 @@ func (this *BookController) fixFileLinks(projectRoot string, identify string) {
 	}
 }
 
-//给书籍打分
+// 给书籍打分
 func (this *BookController) Score() {
 	bookId, _ := this.GetInt(":id")
 	if bookId == 0 {
@@ -1328,7 +1335,7 @@ func (this *BookController) Score() {
 	this.JsonResult(1, "给文档打分失败，请先登录再操作")
 }
 
-//添加评论
+// 添加评论
 func (this *BookController) Comment() {
 	if this.Member.MemberId == 0 {
 		this.JsonResult(1, "请先登录在评论")

@@ -16,12 +16,11 @@
     <link href="{{$.StaticDomain}}/static/webuploader/webuploader.css" rel="stylesheet">
     <link href="{{$.StaticDomain}}/static/cropper/2.3.4/cropper.min.css" rel="stylesheet">
     <link href="{{$.StaticDomain}}/static/bootstrap/plugins/tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
-
-
+    <link href="/static/bootstrap-select-1.13.18/css/bootstrap-select.min.css" rel="stylesheet" />
     <link href="/static/css/main.css?version={{$.Version}}" rel="stylesheet">
     <script src="/static/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="/static/respond.js/1.4.2/respond.min.js"></script>
-    <style>table .sort{width: 100px;}</style>
+    <style>table .sort{width: 100px;}.input-group .bootstrap-select.form-control .dropdown-toggle{border-radius: 0;}</style>
 </head>
 <body>
 <div class="manual-reader">
@@ -103,6 +102,35 @@
                             <div class="form-group">
                                 <label>标题</label>
                                 <input type="text" class="form-control" name="book_name" id="bookName" placeholder="书籍名称" value="{{.Model.BookName}}">
+                            </div>
+                            <div class="form-group">
+                                <label>版本</label>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6"  style="padding-right: 0;">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button">版本库</button>
+                                            </span>
+                                            <select name="version" class="form-control selectpicker" data-live-search="true">
+                                                <option value="">== 无 ==</option>
+                                                {{range $.Versions}}
+                                                    <option value="{{.Id}}" {{if eq $.VersionItem.VersionId .Id}}selected{{end}}>{{.Title}}</option>
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6" style="padding-left: 0;">
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" style="border-left: 0px;border-right: 0px;border-radius: 0px;" type="button">版本号</button>
+                                            </span>
+                                            <input type="text" placeholder="请输入版本号" {{if $.VersionItem.VersionNO}}value="{{$.VersionItem.VersionNO}}"{{else}}readonly{{end}} name="version_no" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="help-block">
+                                    如需将书籍项目划分到版本库，则请选择对应版本库，并填写遵循 <a href="https://semver.org/lang/zh-CN/" class="text-danger">语义化版本</a> 的版本号，如版本号 1.7.0、1.7.1 等。如果下拉菜单中没有对应版本库，则请联系管理员在管理后台添加。
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>标识</label>
@@ -428,9 +456,17 @@
 <script src="{{$.StaticDomain}}/static/js/jquery.form.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/bootstrap/plugins/tagsinput/bootstrap-tagsinput.min.js" type="text/javascript"></script>
 <script src="{{$.StaticDomain}}/static/js/toast.script.js" type="text/javascript"></script>
+<script src="/static/bootstrap-select-1.13.18/js/bootstrap-select.min.js"></script>
 <script src="/static/js/main.js?version={{$.Version}}" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
+        $("[name=version]").change(function(){
+            if($(this).val()==""){
+                $("[name=version_no]").attr("readonly","readonly")
+            }else{
+                $("[name=version_no]").removeAttr("readonly")
+            }
+        })
         $("#upload-logo-panel").on("hidden.bs.modal",function () {
             $("#upload-logo-panel").find(".modal-body").html(window.modalHtml);
         }).on("show.bs.modal",function () {

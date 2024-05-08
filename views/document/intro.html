@@ -5,6 +5,29 @@
         <style>
             .relate-bookname{height: 40px; overflow: hidden; margin-bottom: 0px; text-overflow: ellipsis; display: block; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;}
             h4{font-weight: normal;font-size: 16px;color: #333;}
+            .btn-versions button {
+                background-color: #ff7979;
+                margin-right: 12px !important;
+            }
+
+            .btn-versions .dropdown-menu {
+                border: 0;
+                max-height: 280px;
+                overflow: auto;
+            }
+
+            .btn-versions .dropdown-menu>li>a {
+                padding: 8px 15px;
+            }
+
+            .btn-versions .btn-danger:hover {
+                background-color: #fc6868;
+            }
+
+            .btn-versions .btn-danger.active,.btn-versions .btn-danger:active,.btn-versions.open>.dropdown-toggle.btn-danger {
+                background-color: #fc6868 !important;
+                border-color: #fc6868 !important;
+            }
         </style>
 </head>
 <body id="bookstack-intro">
@@ -65,8 +88,22 @@
                                 <i class="fa fa-heart-o"></i> <span>加入收藏</span>
                             {{end}}
                         </a>
-                        <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger btn-lg"><i class="fa fa-cloud-download"></i> 下载电子书</a>
+                        <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-info btn-lg"><i class="fa fa-cloud-download"></i> 下载电子书</a>
+
+                        {{if .Versions}}
+                            <div class="btn-group btn-versions">
+                                <button type="button" class="btn btn-danger btn-lg dropdown-toggle" data-toggle="dropdown">
+                                    版本切换 <span class="caret" style="color: #fff;"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    {{range .Versions}}
+                                        <li class="{{if eq $.Book.Identify .BookIdentify}}active{{end}}"><a href="{{urlfor "DocumentController.Index" ":key" .BookIdentify}}" title="{{.BookName}}">{{.BookName}}</a></li>
+                                    {{end}}
+                                </ul>
+                            </div>
+                        {{end}}
                 </li>
+                
             </ul>
         </div>
         {{if $.Wxacode}}
@@ -76,6 +113,18 @@
             </div>
         {{end}}
         <div class="col-xs-12 text-center visible-xs">
+            {{if .Versions}}
+                <div class="btn-group btn-versions">
+                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                        版本切换 <span class="caret" style="color: #fff;"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        {{range .Versions}}
+                            <li class="{{if eq $.Book.Identify .BookIdentify}}active{{end}}"><a href="{{urlfor "DocumentController.Index" ":key" .BookIdentify}}" title="{{.BookName}}">{{.BookName}}</a></li>
+                        {{end}}
+                    </ul>
+                </div>
+            {{end}}
             {{range $index,$val:=.Menu}}
             {{if eq $index 0}}
                 <a href="{{urlfor "DocumentController.Read" ":key" $.Book.Identify ":id" .Identify}}" target="_blank" title="马上阅读" class="btn btn-success"><i class="fa fa-book"></i> 马上阅读</a>
@@ -88,7 +137,9 @@
                     <i class="fa fa-heart-o"></i> <span>收藏书籍</span>
                 {{end}}
                 </a>
-                <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-danger"><i class="fa fa-cloud-download"></i> 下载书籍</a>
+                {{if .Versions}}{{else}}
+                    <a data-target="#ModalDownload" data-toggle="modal" href="#" target="_blank" class="btn btn-info"><i class="fa fa-cloud-download"></i> 下载书籍</a>
+                {{end}}
         </div>
         {{if (ads "intro-before-menu" $.IsMobile)}}
             <div class="ap ap-intro-before-menu mgt-15px col-xs-12">

@@ -72,6 +72,11 @@ func webRouter() {
 	beego.Router("/manager/add-tags", &controllers.ManagerController{}, "post:AddTags")
 	beego.Router("/manager/del-tags", &controllers.ManagerController{}, "get:DelTags")
 
+	beego.Router("/manager/versions", &controllers.ManagerController{}, "*:Version")
+	beego.Router("/manager/add-versions", &controllers.ManagerController{}, "post:AddVersions")
+	beego.Router("/manager/delete-version", &controllers.ManagerController{}, "get:DeleteVersion")
+	beego.Router("/manager/update-version", &controllers.ManagerController{}, "*:UpdateVersion")
+
 	beego.Router("/setting", &controllers.SettingController{}, "*:Index")
 	beego.Router("/setting/password", &controllers.SettingController{}, "*:Password")
 	beego.Router("/setting/upload", &controllers.SettingController{}, "*:Upload")
@@ -127,6 +132,7 @@ func webRouter() {
 	beego.Router("/history/restore", &controllers.DocumentController{}, "*:RestoreHistory")
 
 	beego.Router("/books/:key", &controllers.DocumentController{}, "*:Index")
+	beego.Router("/read/:key", &controllers.DocumentController{}, "*:ReadBook")
 	beego.Router("/read/:key/:id", &controllers.DocumentController{}, "*:Read")
 	beego.Router("/read/:key/search", &controllers.DocumentController{}, "post:Search")
 

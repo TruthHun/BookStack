@@ -217,7 +217,7 @@ func (this *ManagerController) CreateMember() {
 	this.JsonResult(0, "ok", member)
 }
 
-//更新用户状态.
+// 更新用户状态.
 func (this *ManagerController) UpdateMemberStatus() {
 
 	memberId, _ := this.GetInt("member_id", 0)
@@ -249,7 +249,7 @@ func (this *ManagerController) UpdateMemberStatus() {
 	this.JsonResult(0, "ok", member)
 }
 
-//变更用户权限.
+// 变更用户权限.
 func (this *ManagerController) ChangeMemberRole() {
 
 	memberId, _ := this.GetInt("member_id", 0)
@@ -281,7 +281,7 @@ func (this *ManagerController) ChangeMemberRole() {
 	this.JsonResult(0, "ok", member)
 }
 
-//编辑用户信息.
+// 编辑用户信息.
 func (this *ManagerController) EditMember() {
 
 	memberId, _ := this.GetInt(":id", 0)
@@ -338,7 +338,7 @@ func (this *ManagerController) EditMember() {
 	this.TplName = "manager/edit_users.html"
 }
 
-//删除一个用户，并将该用户的所有信息转移到超级管理员上.
+// 删除一个用户，并将该用户的所有信息转移到超级管理员上.
 func (this *ManagerController) DeleteMember() {
 	memberId, _ := this.GetInt("id", 0)
 	if memberId <= 0 {
@@ -370,9 +370,8 @@ func (this *ManagerController) DeleteMember() {
 	this.JsonResult(0, "ok")
 }
 
-//书籍列表.
+// 书籍列表.
 func (this *ManagerController) Books() {
-
 	pageIndex, _ := this.GetInt("page", 1)
 	private, _ := this.GetInt("private")
 	wd := this.GetString("wd")
@@ -397,9 +396,10 @@ func (this *ManagerController) Books() {
 	})
 	this.Data["Private"] = private
 	this.TplName = "manager/books.html"
+	this.Data["Versions"], _ = models.NewVersion().Lists(1, 10000, "")
 }
 
-//编辑书籍.
+// 编辑书籍.
 func (this *ManagerController) EditBook() {
 
 	identify := this.GetString(":key")
@@ -694,7 +694,7 @@ func (this *ManagerController) SetCommentStatus() {
 	this.JsonResult(0, "设置成功")
 }
 
-//设置书籍私有状态.
+// 设置书籍私有状态.
 func (this *ManagerController) PrivatelyOwned() {
 	status := this.GetString("status")
 	identify := this.GetString("identify")
@@ -743,7 +743,7 @@ func (this *ManagerController) PrivatelyOwned() {
 	this.JsonResult(0, "ok")
 }
 
-//附件列表.
+// 附件列表.
 func (this *ManagerController) AttachList() {
 
 	pageIndex, _ := this.GetInt("page", 1)
@@ -765,7 +765,7 @@ func (this *ManagerController) AttachList() {
 	this.TplName = "manager/attach_list.html"
 }
 
-//附件详情.
+// 附件详情.
 func (this *ManagerController) AttachDetailed() {
 
 	attachId, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
@@ -788,7 +788,7 @@ func (this *ManagerController) AttachDetailed() {
 	this.TplName = "manager/attach_detailed.html"
 }
 
-//删除附件.
+// 删除附件.
 func (this *ManagerController) AttachDelete() {
 
 	attachId, _ := this.GetInt("attach_id")
@@ -815,7 +815,7 @@ func (this *ManagerController) AttachDelete() {
 	this.JsonResult(0, "ok")
 }
 
-//SEO管理
+// SEO管理
 func (this *ManagerController) Seo() {
 	o := orm.NewOrm()
 	if this.Ctx.Input.IsPost() { //SEO更新
@@ -865,7 +865,7 @@ func (this *ManagerController) DelAds() {
 	this.JsonResult(0, "删除成功")
 }
 
-//广告管理
+// 广告管理
 func (this *ManagerController) Ads() {
 	if this.Ctx.Request.Method == http.MethodPost {
 		pid, _ := this.GetInt("pid")
@@ -906,7 +906,7 @@ func (this *ManagerController) Ads() {
 	}
 }
 
-//更行书籍书籍的排序
+// 更行书籍书籍的排序
 func (this *ManagerController) UpdateBookSort() {
 	bookId, _ := this.GetInt("book_id")
 	orderIndex, _ := this.GetInt("value")
@@ -929,7 +929,7 @@ func (this *ManagerController) Sitemap() {
 	this.JsonResult(0, "站点地图更新提交成功，已交由后台执行更新，请耐心等待。")
 }
 
-//分类管理
+// 分类管理
 func (this *ManagerController) Category() {
 	Model := new(models.Category)
 	if strings.ToLower(this.Ctx.Request.Method) == "post" {
@@ -966,7 +966,7 @@ func (this *ManagerController) Category() {
 	this.TplName = "manager/category.html"
 }
 
-//更新分类字段内容
+// 更新分类字段内容
 func (this *ManagerController) UpdateCate() {
 	field := this.GetString("field")
 	val := this.GetString("value")
@@ -977,7 +977,7 @@ func (this *ManagerController) UpdateCate() {
 	this.JsonResult(0, "更新成功")
 }
 
-//删除分类
+// 删除分类
 func (this *ManagerController) DelCate() {
 	var err error
 	if id, _ := this.GetInt("id"); id > 0 {
@@ -989,7 +989,7 @@ func (this *ManagerController) DelCate() {
 	this.JsonResult(0, "删除成功")
 }
 
-//更新分类的图标
+// 更新分类的图标
 func (this *ManagerController) UpdateCateIcon() {
 	var err error
 	id, _ := this.GetInt("id")
@@ -1029,7 +1029,7 @@ func (this *ManagerController) UpdateCateIcon() {
 	this.JsonResult(0, "更新成功", data)
 }
 
-//友情链接
+// 友情链接
 func (this *ManagerController) FriendLink() {
 	this.Data["SeoTitle"] = "友链管理"
 	this.Data["Links"] = new(models.FriendLink).GetList(true)
@@ -1037,7 +1037,7 @@ func (this *ManagerController) FriendLink() {
 	this.TplName = "manager/friendlink.html"
 }
 
-//添加友链
+// 添加友链
 func (this *ManagerController) AddFriendlink() {
 	if err := new(models.FriendLink).Add(this.GetString("title"), this.GetString("link")); err != nil {
 		this.JsonResult(1, "新增友链失败:"+err.Error())
@@ -1045,7 +1045,7 @@ func (this *ManagerController) AddFriendlink() {
 	this.JsonResult(0, "新增友链成功")
 }
 
-//更新友链
+// 更新友链
 func (this *ManagerController) UpdateFriendlink() {
 	id, _ := this.GetInt("id")
 	if err := new(models.FriendLink).Update(id, this.GetString("field"), this.GetString("value")); err != nil {
@@ -1054,7 +1054,7 @@ func (this *ManagerController) UpdateFriendlink() {
 	this.JsonResult(0, "操作成功")
 }
 
-//删除友链
+// 删除友链
 func (this *ManagerController) DelFriendlink() {
 	id, _ := this.GetInt("id")
 	if err := new(models.FriendLink).Del(id); err != nil {
@@ -1173,4 +1173,59 @@ func (this *ManagerController) UpdateSubmitBook() {
 		}
 	}
 	this.JsonResult(0, "更新成功")
+}
+
+// Versions 版本管理
+func (this *ManagerController) Version() {
+	m := models.NewVersion()
+	wd := this.GetString("wd")
+	page, _ := this.GetInt("page", 1)
+	size := 10
+	versions, total := m.Lists(page, size, wd)
+	if total > 0 {
+		this.Data["PageHtml"] = utils.NewPaginations(conf.RollPage, int(total), size, page, beego.URLFor("ManagerController.Version"), "&wd="+wd)
+	} else {
+		this.Data["PageHtml"] = ""
+	}
+	this.Data["Versions"] = versions
+	this.Data["Wd"] = wd
+	this.Data["IsManagerVersion"] = true
+	this.TplName = "manager/version.html"
+}
+
+// Versions 版本管理
+func (this *ManagerController) DeleteVersion() {
+	id, _ := this.GetInt("id")
+	if id > 0 {
+		err := models.NewVersion().Delete(id)
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+	}
+	this.JsonResult(0, "删除成功")
+}
+
+// Versions 版本管理
+func (this *ManagerController) UpdateVersion() {
+	id, _ := this.GetInt("id")
+	field := this.GetString("field")
+	value := this.GetString("value")
+	if id > 0 {
+		_, err := orm.NewOrm().QueryTable(models.NewVersion()).Filter("id", id).Update(orm.Params{field: value})
+		if err != nil {
+			this.JsonResult(1, err.Error())
+		}
+	}
+	this.JsonResult(0, "更新成功")
+}
+
+// AddVersions 添加版本
+func (this *ManagerController) AddVersions() {
+	for _, title := range strings.Split(this.GetString("versions"), "\n") {
+		ver := models.Version{
+			Title: strings.TrimSpace(title),
+		}
+		ver.InsertOrUpdate()
+	}
+	this.JsonResult(0, "添加成功")
 }

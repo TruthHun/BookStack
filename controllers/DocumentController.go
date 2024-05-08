@@ -208,6 +208,7 @@ func (this *DocumentController) Index() {
 		"description": bookResult.Description,
 	})
 	this.Data["RelateBooks"] = models.NewRelateBook().Lists(bookResult.BookId)
+	this.Data["Versions"] = models.NewVersion().GetPublicVersionItems(bookResult.Identify)
 }
 
 // 文档首页.
@@ -491,6 +492,33 @@ func (this *DocumentController) Read() {
 	this.Data["Comments"] = comments
 	this.Data["IsAllowRead"] = isAllowRead
 	this.Data["Percent"] = percent
+	this.Data["Versions"] = models.NewVersion().GetPublicVersionItems(bookResult.Identify)
+}
+
+func (this *DocumentController) ReadBook() {
+	identify := this.Ctx.Input.Param(":key")
+	if identify == "" {
+		this.Abort("404")
+		return
+	}
+
+	book, err := models.NewBook().FindByIdentify(identify, "book_id")
+	if err != nil || book.BookId == 0 {
+		this.Abort("404")
+		return
+	}
+
+	doc, err := models.NewDocument().FirstChapter(book.BookId, "document_id", "identify")
+	if err != nil || doc.DocumentId == 0 {
+		this.Abort("404")
+		return
+	}
+
+	if sign := this.GetString("sign"); sign != "" {
+		this.SetSession(book.BookId, sign)
+	}
+
+	this.Redirect(beego.URLFor("DocumentController.Read", ":key", identify, ":id", doc.Identify), 302)
 }
 
 // 编辑文档.

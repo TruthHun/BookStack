@@ -21,6 +21,7 @@ require (
 	github.com/disintegration/imaging v1.6.1
 	github.com/go-ego/gse v0.66.7
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/hashicorp/go-version v1.6.0
 	github.com/kardianos/service v1.0.0
 	github.com/lifei6671/gocaptcha v0.0.0-20190301083731-c467a25bc100
 	github.com/mssola/user_agent v0.5.0
