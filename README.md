@@ -1,37 +1,30 @@
 
-**BookStack 配套手机APP `BookChatApp` 开源地址**
-
-- Gitee: https://gitee.com/truthhun/BookChatApp
-- GitHub: https://github.com/TruthHun/BookChatApp
-
-**BookChatApp下载体验地址**
-
-- https://www.bookstack.cn/app
-
 目录：
-- [BookStack简介](#intro)
-    - [开源](#open)
-    - [QQ交流群](#qqgroup)
-    - [站点](#site)
-		- [演示站点](#demo)
-		- [正式站点](#normal)
-    - [更新、维护和升级](#upgrade)
-    - [功能与亮点](#func)
-		- [书籍分类](#cate)
-		- [用户主页](#homepage)
-		- [一键导入markdown书籍](#import)
-		- [一键拉取markdown书籍](#pull)
-		- [生成和导出PDF、epub、mobi等离线文档](#generate)
-		- [文档排序和批量创建文档](#sort)
-		- [文档间的跳转](#redirect)
-		- [采集功能](#crawl)
-		- [SEO](#seo)
-		- [赞助二维码](#qrcode)
-		- [更美观、简洁的页面布局和更为完善的移动端兼容](#beauty)
-    - [TODO](#todo)
-    - [安装与使用](#install)
-    - [关于本人](#aboutme)
-    - [赞助我](#support)
+- [BookStack 简介](#bookstack-简介)
+  - [开源](#开源)
+  - [QQ交流群](#qq交流群)
+  - [站点](#站点)
+    - [演示站点](#演示站点)
+    - [正式站点](#正式站点)
+  - [更新、维护和升级](#更新维护和升级)
+  - [功能与亮点](#功能与亮点)
+    - [书籍分类(V1.2 +)](#书籍分类v12-)
+    - [用户主页(V1.2 +)](#用户主页v12-)
+    - [一键导入markdown书籍](#一键导入markdown书籍)
+    - [一键拉取markdown书籍](#一键拉取markdown书籍)
+    - [生成和导出PDF、epub、mobi等离线文档](#生成和导出pdfepubmobi等离线文档)
+    - [文档排序和批量创建文档](#文档排序和批量创建文档)
+    - [文档间的跳转](#文档间的跳转)
+    - [采集功能](#采集功能)
+    - [SEO](#seo)
+    - [版本控制](#版本控制)
+    - [更美观、简洁的页面布局和更为完善的移动端兼容](#更美观简洁的页面布局和更为完善的移动端兼容)
+  - [TODO](#todo)
+  - [安装与使用](#安装与使用)
+  - [关于本人](#关于本人)
+  - [赞助我](#赞助我)
+    - [支付宝打赏赞助](#支付宝打赏赞助)
+    - [微信打赏赞助](#微信打赏赞助)
 
     
 <a name="intro"></a>
@@ -43,6 +36,14 @@ BookStack是基于[Mindoc](https://github.com/lifei6671/mindoc)开发的，为�
 
 在开发的过程中，增加和移除了一些东西，目前已经不兼容MinDoc了（毕竟数据表结构、字段、索引都有了一些不同），同时只支持markdown编辑器。
 
+**BookStack 配套手机APP `BookChatApp` 开源地址**
+
+- Gitee: https://gitee.com/truthhun/BookChatApp
+- GitHub: https://github.com/TruthHun/BookChatApp
+
+**BookChatApp下载体验地址**
+
+- https://www.bookstack.cn/app
 
 <a name="open"></a>
 ## 开源
@@ -232,10 +233,6 @@ BookStack 安装使用手册：[https://www.bookstack.cn/books/help](https://www
 - 版本管理 ？(待找到更优解决方案了再实现)
 - 使用weex开发手机端APP ? (vue.js熟练了再抽时间实现)
 - 使用electron开发桌面端，实现类似网易`有道云笔记`的功能 ? (vue.js熟练了再抽时间实现)
-
-Tips:
-> 更多功能，期待您的想象力，然后通过issue向我提出来，或者到HC-CMS(http://www.hc-cms.com) 发帖提出
-
 
 <a name="install"></a>
 ## 安装与使用
